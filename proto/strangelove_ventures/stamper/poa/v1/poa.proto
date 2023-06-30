@@ -1,0 +1,58 @@
+syntax = "proto3";
+package strangelove_ventures.stamper.poa.v1;
+
+option go_package = "github.com/strangelove-ventures/stamper/poa";
+
+import "gogoproto/gogo.proto";
+import "amino/amino.proto";
+import "cosmos/staking/v1beta1/staking.proto";
+import "cosmos_proto/cosmos.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/any.proto";
+
+// Params defines the parameters of the module.
+message Params { 
+  option (amino.name) = "strangelove-ventures/poa/Params"; 
+  option (gogoproto.equal) = true; 
+  option (gogoproto.gogoproto_stringer) = false;
+
+  // unbonding_time is the time duration of unbonding.
+  google.protobuf.Duration unbonding_period = 1
+      [(gogoproto.nullable) = false, (gogoproto.stdduration) = true, (gogoproto.moretags) = "yaml:\"unbonding_period\""];
+  // max_validators is the maximum number of validators.
+  uint32 max_validators = 2 [(gogoproto.moretags) = "yaml:\"max_validators\""];
+  // quorum is the percentage of validators that must vouch for another validator for them to enter the active set.
+  uint32 quorum = 3 [(gogoproto.moretags) = "yaml:\"quorum\""];
+  // historical_entries is the number of historical entries to persist.
+  uint32 historical_entries = 4 [(gogoproto.moretags) = "yaml:\"historical_entries\""];
+
+}
+
+// GenesisState is the state that must be provided at genesis.
+message GenesisState {
+  // params defines all the parameters of the module.
+  Params params = 1
+      [ (gogoproto.nullable) = false, (amino.dont_omitempty) = true ];
+  repeated Validator validators = 2;
+  repeated Vouch vouches = 3;
+}
+
+message Validator {
+  option (gogoproto.equal)           = false;
+  option (gogoproto.goproto_getters) = false;
+
+  // string name = 1 [(gogoproto.moretags) = "yaml:\"name\""];
+  cosmos.staking.v1beta1.Description description = 1 [(gogoproto.nullable) = false];
+  bytes address = 2;
+  google.protobuf.Any pubkey = 3 [(cosmos_proto.accepts_interface) = "cosmos.crypto.PubKey"];
+  bool in_set = 4;
+  bool is_accepted = 5;
+  bool jailed = 6;
+  uint64 jail_count = 7;
+}
+
+message Vouch {
+  bytes voucher_address = 1;
+  bytes candidate_address = 2;
+  bool in_favor = 3;
+}
