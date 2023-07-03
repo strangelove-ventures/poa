@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package cosmosregistry.example.module.v1;
+package strangelove_ventures.poa.module.v1;
 
 import "cosmos/app/v1alpha1/module.proto";
 
@@ -8,7 +8,7 @@ import "cosmos/app/v1alpha1/module.proto";
 // Learn more: https://docs.cosmos.network/main/building-modules/depinject
 message Module {
   option (cosmos.app.v1alpha1.module) = {
-    go_import : "github.com/cosmosregistry/example"
+    go_import : "github.com/strangelove-ventures/poa"
   };
 
   // authority defines the custom module authority.

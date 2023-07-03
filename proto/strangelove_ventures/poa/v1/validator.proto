@@ -1,0 +1,41 @@
+syntax = "proto3";
+package strangelove_ventures.poa.v1;
+
+// import "cosmos/staking/v1beta1/staking.proto";
+import "cosmos_proto/cosmos.proto";
+import "google/protobuf/any.proto";
+import "google/protobuf/timestamp.proto";
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/strangelove-ventures/poa";
+
+// Description defines a validator description.
+message Description {
+  option (gogoproto.equal) = true;
+
+  // moniker defines a human-readable name for the validator.
+  string moniker = 1;
+  // identity defines an optional identity signature (ex. UPort or Keybase).
+  string identity = 2;
+  // website defines an optional website link.
+  string website = 3;
+  // security_contact defines an optional email for security contact.
+  string security_contact = 4;
+  // details define other optional details.
+  string details = 5;
+}
+
+
+// Validator models a POA Validator
+message Validator {
+  option (gogoproto.equal)           = false;
+  // option (gogoproto.goproto_getters) = false;
+
+  Description description = 1 [(gogoproto.nullable) = false];
+  bytes address = 2;
+  google.protobuf.Any pubkey = 3 [(cosmos_proto.accepts_interface) = "cosmos.crypto.PubKey"];
+  bool in_set = 4;
+  bool is_accepted = 5;
+  bool jailed = 6;
+  uint64 jail_count = 7;
+}

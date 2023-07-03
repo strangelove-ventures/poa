@@ -2,7 +2,7 @@ package module
 
 import (
 	autocliv1 "cosmossdk.io/api/cosmos/autocli/v1"
-	examplev1 "github.com/cosmosregistry/example/api/v1"
+	examplev1 "github.com/strangelove-ventures/poa/api/v1"
 )
 
 // AutoCLIOptions implements the autocli.HasAutoCLIConfig interface.

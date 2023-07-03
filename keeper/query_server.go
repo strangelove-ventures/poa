@@ -2,20 +2,14 @@ package keeper
 
 import (
 	"context"
-	"errors"
-	"fmt"
 
-	"cosmossdk.io/collections"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-
-	"github.com/cosmosregistry/example"
+	"github.com/strangelove-ventures/poa"
 )
 
-var _ example.QueryServer = queryServer{}
+var _ poa.QueryServer = queryServer{}
 
 // NewQueryServerImpl returns an implementation of the module QueryServer.
-func NewQueryServerImpl(k Keeper) example.QueryServer {
+func NewQueryServerImpl(k Keeper) poa.QueryServer {
 	return queryServer{k}
 }
 
@@ -23,30 +17,18 @@ type queryServer struct {
 	k Keeper
 }
 
-// Counter defines the handler for the Query/Counter RPC method.
-func (qs queryServer) Counter(ctx context.Context, req *example.QueryCounterRequest) (*example.QueryCounterResponse, error) {
-	if _, err := qs.k.addressCodec.StringToBytes(req.Address); err != nil {
-		return nil, fmt.Errorf("invalid sender address: %w", err)
-	}
-
-	counter, err := qs.k.Counter.Get(ctx, req.Address)
-	if err != nil {
-		if errors.Is(err, collections.ErrNotFound) {
-			return &example.QueryCounterResponse{Counter: 0}, nil
-		}
-
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
-	return &example.QueryCounterResponse{Counter: counter}, nil
+func (qs queryServer) QueryValidator(context.Context, *poa.QueryValidatorRequest) (*poa.QueryValidatorResponse, error) {
+	return nil, nil
 }
 
-// Params defines the handler for the Query/Params RPC method.
-func (qs queryServer) Params(ctx context.Context, req *example.QueryParamsRequest) (*example.QueryParamsResponse, error) {
-	params, err := qs.k.Params.Get(ctx)
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
+func (qs queryServer) QueryValidators(context.Context, *poa.QueryValidatorsRequest) (*poa.QueryValidatorsResponse, error) {
+	return nil, nil
+}
 
-	return &example.QueryParamsResponse{Params: params}, nil
+func (qs queryServer) QueryVouch(context.Context, *poa.QueryVouchRequest) (*poa.QueryVouchResponse, error) {
+	return nil, nil
+}
+
+func (qs queryServer) QueryVouches(context.Context, *poa.QueryVouchesRequest) (*poa.QueryVouchesResponse, error) {
+	return nil, nil
 }

@@ -1,0 +1,16 @@
+syntax = "proto3";
+package strangelove_ventures.poa.v1;
+
+import "gogoproto/gogo.proto";
+import "strangelove_ventures/poa/v1/validator.proto";
+import "strangelove_ventures/poa/v1/vouch.proto";
+import "strangelove_ventures/poa/v1/params.proto";
+
+option go_package = "github.com/strangelove-ventures/poa";
+
+// GenesisState defines the poa module's genesis state.
+message GenesisState {
+  Params params = 1 [(gogoproto.nullable) = false];
+  repeated Validator validators = 2;
+  repeated Vouch vouches = 3;
+}

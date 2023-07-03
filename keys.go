@@ -1,4 +1,4 @@
-package example
+package poa
 
 import "cosmossdk.io/collections"
 

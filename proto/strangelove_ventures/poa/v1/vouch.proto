@@ -1,0 +1,10 @@
+syntax = "proto3";
+package strangelove_ventures.poa.v1;
+
+option go_package = "github.com/strangelove-ventures/poa";
+
+message Vouch {
+  bytes voucher_address = 1;
+  bytes candidate_address = 2;
+  bool in_favor = 3;
+}

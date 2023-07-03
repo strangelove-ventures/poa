@@ -1,4 +1,4 @@
-module github.com/cosmosregistry/example/integration
+module github.com/strangelove-ventures/poa/integration
 
 go 1.20
 
@@ -8,7 +8,7 @@ require (
 	cosmossdk.io/depinject v1.0.0-alpha.3
 	cosmossdk.io/log v1.1.0
 	github.com/cosmos/cosmos-sdk v0.50.0-alpha.0.0.20230626194453-a5b6ce7c3f73
-	github.com/cosmosregistry/example v1.0.0
+	github.com/strangelove-ventures/poa v1.0.0
 	github.com/stretchr/testify v1.8.4
 )
 
@@ -153,4 +153,4 @@ require (
 )
 
 // always test the latest module code.
-replace github.com/cosmosregistry/example => ../.
+replace github.com/strangelove-ventures/poa => ../.

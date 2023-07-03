@@ -2,9 +2,9 @@
 // versions:
 // - protoc-gen-go-grpc v1.3.0
 // - protoc             (unknown)
-// source: cosmosregistry/example/v1/query.proto
+// source: strangelove_ventures/poa/v1/query.proto
 
-package examplev1
+package poav1
 
 import (
 	context "context"
@@ -19,18 +19,20 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Query_Counter_FullMethodName = "/cosmosregistry.example.v1.Query/Counter"
-	Query_Params_FullMethodName  = "/cosmosregistry.example.v1.Query/Params"
+	Query_QueryValidator_FullMethodName  = "/strangelove_ventures.poa.v1.Query/QueryValidator"
+	Query_QueryValidators_FullMethodName = "/strangelove_ventures.poa.v1.Query/QueryValidators"
+	Query_QueryVouch_FullMethodName      = "/strangelove_ventures.poa.v1.Query/QueryVouch"
+	Query_QueryVouches_FullMethodName    = "/strangelove_ventures.poa.v1.Query/QueryVouches"
 )
 
 // QueryClient is the client API for Query service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type QueryClient interface {
-	// Counter returns the current counter value.
-	Counter(ctx context.Context, in *QueryCounterRequest, opts ...grpc.CallOption) (*QueryCounterResponse, error)
-	// Params returns the module parameters.
-	Params(ctx context.Context, in *QueryParamsRequest, opts ...grpc.CallOption) (*QueryParamsResponse, error)
+	QueryValidator(ctx context.Context, in *QueryValidatorRequest, opts ...grpc.CallOption) (*QueryValidatorResponse, error)
+	QueryValidators(ctx context.Context, in *QueryValidatorsRequest, opts ...grpc.CallOption) (*QueryValidatorsResponse, error)
+	QueryVouch(ctx context.Context, in *QueryVouchRequest, opts ...grpc.CallOption) (*QueryVouchResponse, error)
+	QueryVouches(ctx context.Context, in *QueryVouchesRequest, opts ...grpc.CallOption) (*QueryVouchesResponse, error)
 }
 
 type queryClient struct {
@@ -41,18 +43,36 @@ func NewQueryClient(cc grpc.ClientConnInterface) QueryClient {
 	return &queryClient{cc}
 }
 
-func (c *queryClient) Counter(ctx context.Context, in *QueryCounterRequest, opts ...grpc.CallOption) (*QueryCounterResponse, error) {
-	out := new(QueryCounterResponse)
-	err := c.cc.Invoke(ctx, Query_Counter_FullMethodName, in, out, opts...)
+func (c *queryClient) QueryValidator(ctx context.Context, in *QueryValidatorRequest, opts ...grpc.CallOption) (*QueryValidatorResponse, error) {
+	out := new(QueryValidatorResponse)
+	err := c.cc.Invoke(ctx, Query_QueryValidator_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *queryClient) Params(ctx context.Context, in *QueryParamsRequest, opts ...grpc.CallOption) (*QueryParamsResponse, error) {
-	out := new(QueryParamsResponse)
-	err := c.cc.Invoke(ctx, Query_Params_FullMethodName, in, out, opts...)
+func (c *queryClient) QueryValidators(ctx context.Context, in *QueryValidatorsRequest, opts ...grpc.CallOption) (*QueryValidatorsResponse, error) {
+	out := new(QueryValidatorsResponse)
+	err := c.cc.Invoke(ctx, Query_QueryValidators_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *queryClient) QueryVouch(ctx context.Context, in *QueryVouchRequest, opts ...grpc.CallOption) (*QueryVouchResponse, error) {
+	out := new(QueryVouchResponse)
+	err := c.cc.Invoke(ctx, Query_QueryVouch_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *queryClient) QueryVouches(ctx context.Context, in *QueryVouchesRequest, opts ...grpc.CallOption) (*QueryVouchesResponse, error) {
+	out := new(QueryVouchesResponse)
+	err := c.cc.Invoke(ctx, Query_QueryVouches_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -63,10 +83,10 @@ func (c *queryClient) Params(ctx context.Context, in *QueryParamsRequest, opts .
 // All implementations must embed UnimplementedQueryServer
 // for forward compatibility
 type QueryServer interface {
-	// Counter returns the current counter value.
-	Counter(context.Context, *QueryCounterRequest) (*QueryCounterResponse, error)
-	// Params returns the module parameters.
-	Params(context.Context, *QueryParamsRequest) (*QueryParamsResponse, error)
+	QueryValidator(context.Context, *QueryValidatorRequest) (*QueryValidatorResponse, error)
+	QueryValidators(context.Context, *QueryValidatorsRequest) (*QueryValidatorsResponse, error)
+	QueryVouch(context.Context, *QueryVouchRequest) (*QueryVouchResponse, error)
+	QueryVouches(context.Context, *QueryVouchesRequest) (*QueryVouchesResponse, error)
 	mustEmbedUnimplementedQueryServer()
 }
 
@@ -74,11 +94,17 @@ type QueryServer interface {
 type UnimplementedQueryServer struct {
 }
 
-func (UnimplementedQueryServer) Counter(context.Context, *QueryCounterRequest) (*QueryCounterResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Counter not implemented")
+func (UnimplementedQueryServer) QueryValidator(context.Context, *QueryValidatorRequest) (*QueryValidatorResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method QueryValidator not implemented")
 }
-func (UnimplementedQueryServer) Params(context.Context, *QueryParamsRequest) (*QueryParamsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Params not implemented")
+func (UnimplementedQueryServer) QueryValidators(context.Context, *QueryValidatorsRequest) (*QueryValidatorsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method QueryValidators not implemented")
+}
+func (UnimplementedQueryServer) QueryVouch(context.Context, *QueryVouchRequest) (*QueryVouchResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method QueryVouch not implemented")
+}
+func (UnimplementedQueryServer) QueryVouches(context.Context, *QueryVouchesRequest) (*QueryVouchesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method QueryVouches not implemented")
 }
 func (UnimplementedQueryServer) mustEmbedUnimplementedQueryServer() {}
 
@@ -93,38 +119,74 @@ func RegisterQueryServer(s grpc.ServiceRegistrar, srv QueryServer) {
 	s.RegisterService(&Query_ServiceDesc, srv)
 }
 
-func _Query_Counter_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryCounterRequest)
+func _Query_QueryValidator_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryValidatorRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(QueryServer).Counter(ctx, in)
+		return srv.(QueryServer).QueryValidator(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Query_Counter_FullMethodName,
+		FullMethod: Query_QueryValidator_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).Counter(ctx, req.(*QueryCounterRequest))
+		return srv.(QueryServer).QueryValidator(ctx, req.(*QueryValidatorRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Query_Params_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryParamsRequest)
+func _Query_QueryValidators_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryValidatorsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(QueryServer).Params(ctx, in)
+		return srv.(QueryServer).QueryValidators(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Query_Params_FullMethodName,
+		FullMethod: Query_QueryValidators_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).Params(ctx, req.(*QueryParamsRequest))
+		return srv.(QueryServer).QueryValidators(ctx, req.(*QueryValidatorsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Query_QueryVouch_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryVouchRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).QueryVouch(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Query_QueryVouch_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).QueryVouch(ctx, req.(*QueryVouchRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Query_QueryVouches_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryVouchesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).QueryVouches(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Query_QueryVouches_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).QueryVouches(ctx, req.(*QueryVouchesRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -133,18 +195,26 @@ func _Query_Params_Handler(srv interface{}, ctx context.Context, dec func(interf
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var Query_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "cosmosregistry.example.v1.Query",
+	ServiceName: "strangelove_ventures.poa.v1.Query",
 	HandlerType: (*QueryServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "Counter",
-			Handler:    _Query_Counter_Handler,
+			MethodName: "QueryValidator",
+			Handler:    _Query_QueryValidator_Handler,
 		},
 		{
-			MethodName: "Params",
-			Handler:    _Query_Params_Handler,
+			MethodName: "QueryValidators",
+			Handler:    _Query_QueryValidators_Handler,
+		},
+		{
+			MethodName: "QueryVouch",
+			Handler:    _Query_QueryVouch_Handler,
+		},
+		{
+			MethodName: "QueryVouches",
+			Handler:    _Query_QueryVouches_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "cosmosregistry/example/v1/query.proto",
+	Metadata: "strangelove_ventures/poa/v1/query.proto",
 }

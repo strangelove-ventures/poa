@@ -2,9 +2,9 @@
 // versions:
 // - protoc-gen-go-grpc v1.3.0
 // - protoc             (unknown)
-// source: cosmosregistry/example/v1/tx.proto
+// source: strangelove_ventures/poa/v1/tx.proto
 
-package examplev1
+package poav1
 
 import (
 	context "context"
@@ -19,18 +19,16 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Msg_IncrementCounter_FullMethodName = "/cosmosregistry.example.v1.Msg/IncrementCounter"
-	Msg_UpdateParams_FullMethodName     = "/cosmosregistry.example.v1.Msg/UpdateParams"
+	Msg_CreateValidator_FullMethodName = "/strangelove_ventures.poa.v1.Msg/CreateValidator"
+	Msg_VouchValidator_FullMethodName  = "/strangelove_ventures.poa.v1.Msg/VouchValidator"
 )
 
 // MsgClient is the client API for Msg service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type MsgClient interface {
-	// IncrementCounter increments the counter.
-	IncrementCounter(ctx context.Context, in *MsgIncrementCounter, opts ...grpc.CallOption) (*MsgIncrementCounterResponse, error)
-	// UpdateParams updates the module parameters.
-	UpdateParams(ctx context.Context, in *MsgUpdateParams, opts ...grpc.CallOption) (*MsgUpdateParamsResponse, error)
+	CreateValidator(ctx context.Context, in *MsgCreateValidator, opts ...grpc.CallOption) (*MsgCreateValidatorResponse, error)
+	VouchValidator(ctx context.Context, in *MsgVouchValidator, opts ...grpc.CallOption) (*MsgVouchValidatorResponse, error)
 }
 
 type msgClient struct {
@@ -41,18 +39,18 @@ func NewMsgClient(cc grpc.ClientConnInterface) MsgClient {
 	return &msgClient{cc}
 }
 
-func (c *msgClient) IncrementCounter(ctx context.Context, in *MsgIncrementCounter, opts ...grpc.CallOption) (*MsgIncrementCounterResponse, error) {
-	out := new(MsgIncrementCounterResponse)
-	err := c.cc.Invoke(ctx, Msg_IncrementCounter_FullMethodName, in, out, opts...)
+func (c *msgClient) CreateValidator(ctx context.Context, in *MsgCreateValidator, opts ...grpc.CallOption) (*MsgCreateValidatorResponse, error) {
+	out := new(MsgCreateValidatorResponse)
+	err := c.cc.Invoke(ctx, Msg_CreateValidator_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *msgClient) UpdateParams(ctx context.Context, in *MsgUpdateParams, opts ...grpc.CallOption) (*MsgUpdateParamsResponse, error) {
-	out := new(MsgUpdateParamsResponse)
-	err := c.cc.Invoke(ctx, Msg_UpdateParams_FullMethodName, in, out, opts...)
+func (c *msgClient) VouchValidator(ctx context.Context, in *MsgVouchValidator, opts ...grpc.CallOption) (*MsgVouchValidatorResponse, error) {
+	out := new(MsgVouchValidatorResponse)
+	err := c.cc.Invoke(ctx, Msg_VouchValidator_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -63,10 +61,8 @@ func (c *msgClient) UpdateParams(ctx context.Context, in *MsgUpdateParams, opts 
 // All implementations must embed UnimplementedMsgServer
 // for forward compatibility
 type MsgServer interface {
-	// IncrementCounter increments the counter.
-	IncrementCounter(context.Context, *MsgIncrementCounter) (*MsgIncrementCounterResponse, error)
-	// UpdateParams updates the module parameters.
-	UpdateParams(context.Context, *MsgUpdateParams) (*MsgUpdateParamsResponse, error)
+	CreateValidator(context.Context, *MsgCreateValidator) (*MsgCreateValidatorResponse, error)
+	VouchValidator(context.Context, *MsgVouchValidator) (*MsgVouchValidatorResponse, error)
 	mustEmbedUnimplementedMsgServer()
 }
 
@@ -74,11 +70,11 @@ type MsgServer interface {
 type UnimplementedMsgServer struct {
 }
 
-func (UnimplementedMsgServer) IncrementCounter(context.Context, *MsgIncrementCounter) (*MsgIncrementCounterResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method IncrementCounter not implemented")
+func (UnimplementedMsgServer) CreateValidator(context.Context, *MsgCreateValidator) (*MsgCreateValidatorResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateValidator not implemented")
 }
-func (UnimplementedMsgServer) UpdateParams(context.Context, *MsgUpdateParams) (*MsgUpdateParamsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateParams not implemented")
+func (UnimplementedMsgServer) VouchValidator(context.Context, *MsgVouchValidator) (*MsgVouchValidatorResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method VouchValidator not implemented")
 }
 func (UnimplementedMsgServer) mustEmbedUnimplementedMsgServer() {}
 
@@ -93,38 +89,38 @@ func RegisterMsgServer(s grpc.ServiceRegistrar, srv MsgServer) {
 	s.RegisterService(&Msg_ServiceDesc, srv)
 }
 
-func _Msg_IncrementCounter_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgIncrementCounter)
+func _Msg_CreateValidator_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgCreateValidator)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MsgServer).IncrementCounter(ctx, in)
+		return srv.(MsgServer).CreateValidator(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Msg_IncrementCounter_FullMethodName,
+		FullMethod: Msg_CreateValidator_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).IncrementCounter(ctx, req.(*MsgIncrementCounter))
+		return srv.(MsgServer).CreateValidator(ctx, req.(*MsgCreateValidator))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Msg_UpdateParams_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgUpdateParams)
+func _Msg_VouchValidator_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgVouchValidator)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MsgServer).UpdateParams(ctx, in)
+		return srv.(MsgServer).VouchValidator(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Msg_UpdateParams_FullMethodName,
+		FullMethod: Msg_VouchValidator_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).UpdateParams(ctx, req.(*MsgUpdateParams))
+		return srv.(MsgServer).VouchValidator(ctx, req.(*MsgVouchValidator))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -133,18 +129,18 @@ func _Msg_UpdateParams_Handler(srv interface{}, ctx context.Context, dec func(in
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var Msg_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "cosmosregistry.example.v1.Msg",
+	ServiceName: "strangelove_ventures.poa.v1.Msg",
 	HandlerType: (*MsgServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "IncrementCounter",
-			Handler:    _Msg_IncrementCounter_Handler,
+			MethodName: "CreateValidator",
+			Handler:    _Msg_CreateValidator_Handler,
 		},
 		{
-			MethodName: "UpdateParams",
-			Handler:    _Msg_UpdateParams_Handler,
+			MethodName: "VouchValidator",
+			Handler:    _Msg_VouchValidator_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "cosmosregistry/example/v1/tx.proto",
+	Metadata: "strangelove_ventures/poa/v1/tx.proto",
 }

@@ -2,7 +2,7 @@ version: v1
 managed:
   enabled: true
   go_package_prefix:
-    default: github.com/cosmosregistry/poa/api
+    default: github.com/strangelove-ventures/poa/api
     except:
       - buf.build/googleapis/googleapis
       - buf.build/cosmos/gogo-proto

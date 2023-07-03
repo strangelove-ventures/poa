@@ -1,4 +1,4 @@
-package example
+package poa
 
 // NewGenesisState creates a new genesis state with default values.
 func NewGenesisState() *GenesisState {
