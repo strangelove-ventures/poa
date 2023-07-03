@@ -19,9 +19,10 @@ type Keeper struct {
 	authority string
 
 	// state management
-	Schema  collections.Schema
-	Params  collections.Item[poa.Params]
-	Counter collections.Map[string, uint64]
+	Schema     collections.Schema
+	Params     collections.Item[poa.Params]
+	Validators collections.Map[string, poa.Validator]
+	Vouches    collections.Map[string, poa.Vouch]
 }
 
 // NewKeeper creates a new Keeper instance
@@ -36,7 +37,8 @@ func NewKeeper(cdc codec.BinaryCodec, addressCodec address.Codec, storeService s
 		addressCodec: addressCodec,
 		authority:    authority,
 		Params:       collections.NewItem(sb, poa.ParamsKey, "params", codec.CollValue[poa.Params](cdc)),
-		Counter:      collections.NewMap(sb, poa.CounterKey, "counter", collections.StringKey, collections.Uint64Value),
+		Validators:   collections.NewMap(sb, poa.ValidatorsKey, "validators", collections.StringKey, codec.CollValue[poa.Validator](cdc)),
+		Vouches:      collections.NewMap(sb, poa.VouchesKey, "vouches", collections.StringKey, codec.CollValue[poa.Vouch](cdc)),
 	}
 
 	schema, err := sb.Build()

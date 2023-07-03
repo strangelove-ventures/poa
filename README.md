@@ -1,9 +1,6 @@
-# `attestation`
+# `poa`
 
-Attestation module processes attestations validators make about the state of rollups. It is responsible for storing attestations about rollup hashes to state and finalizing  them once 2/3+ of validators have seen the same hash. Old attestations, heights after a certain time period, and attestations after a certain time period are pruned.
-
-is the logic for initializing coverage of the rollups another module? I think yes. attestation should just be for storing and finalizing attestations.
-
+The proof of authority module is a replacement for the staking module that allows for a permissioned set of validators to vote on the validity of blocks.
 
 ## Concepts
 
@@ -11,35 +8,7 @@ Describe specialized concepts and definitions used throughout the spec.
 
 ## State
 
-Specify and describe structures expected to marshalled into the store, and their keys
-
-Each block validators submit `[]HeaderAttestation` via vote extensions. When these are processed they are added to the store as follows:
-
-```go
-type HeaderAttestation struct {
-    Validator sdk.ValAddress
-    ChainId   string
-    Height    uint64
-    Hash      []byte
-}
-// Store path /{module_name}/unconfirmed/{chain_id}/{height}/{hash}/{validator_addr} -> bool
-// Or as a go map:
-// map[fmt.Sprintf("%s/%d/%x",chain_id,height,hash)][]sdk.ValAddress
-// map[string][]sdk.ValAddress
-```
-
-The `attestation` module iterates over each chain's unconfirmed heights and hashes and checks if 2/3+ of validators have seen the same hash. If so, the attestation is finalized and added to the store as follows:
-
-```go
-type CoveredHeader struct {
-    ChainId string
-    Height  uint64
-    Hash    []byte
-}
-// Store path /{module_name}/finalized/{chain_id}/{height} -> {hash}
-```
-
-## State Transitions
+ 
 
 Each Begin Block we iterate over the unconfirmed store and check if 2/3+ of validators have seen the same hash. If so, we finalize the attestation and add it to the finalized store.
 

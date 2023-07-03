@@ -2,7 +2,10 @@ package keeper
 
 import (
 	"context"
+	"fmt"
 
+	sdkerrors "cosmossdk.io/errors"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/strangelove-ventures/poa"
 )
 
@@ -17,7 +20,55 @@ func NewMsgServerImpl(keeper Keeper) poa.MsgServer {
 	return &msgServer{k: keeper}
 }
 
-func (ms msgServer) CreateValidator(context.Context, *poa.MsgCreateValidator) (*poa.MsgCreateValidatorResponse, error) {
+func (ms msgServer) CreateValidator(goCtx context.Context, msg *poa.MsgCreateValidator) (*poa.MsgCreateValidatorResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	valAddr, err := sdk.AccAddressFromBech32(msg.Address)
+	if err != nil {
+		return nil, fmt.Errorf("failed to decode address as bech32: %w", err)
+	}
+
+	if _, found := ms.k.GetValidator(ctx, valAddr); found {
+		return nil, sdkerrors.Wrap(poa.ErrBadValidatorAddr, fmt.Sprintf("%s validator already exists: %T", poa.ModuleName, msg))
+	}
+
+	validator := &poa.Validator{
+		Description: msg.Description,
+		Address:     valAddr,
+		Pubkey:      msg.Pubkey,
+	}
+
+	ms.k.SaveValidator(ctx, validator)
+
+	// Validators vouch for themselves
+	ms.k.SetVouch(ctx, &poa.Vouch{
+		VoucherAddress:   valAddr,
+		CandidateAddress: valAddr,
+		InFavor:          true,
+	})
+
+	// call the after-creation hook
+	k.AfterValidatorCreated(ctx, validator.GetOperator())
+
+	consAddr, err := validator.GetConsAddr()
+	if err != nil {
+		return nil, sdkerrors.Wrap(types.ErrBadValidatorPubKey, err.Error())
+	}
+
+	k.AfterValidatorBonded(ctx, consAddr, validator.GetOperator())
+
+	// ctx.EventManager().EmitEvents(sdk.Events{
+	// 	sdk.NewEvent(
+	// 		stakingtypes.EventTypeCreateValidator,
+	// 		sdk.NewAttribute(stakingtypes.AttributeKeyValidator, msg.Address.String()),
+	// 		sdk.NewAttribute(sdk.AttributeKeySender, msg.Owner.String()),
+	// 	),
+	// })
+
+	err = ctx.EventManager().EmitTypedEvent(msg)
+
+	return &types.MsgCreateValidatorResponse{}, err
+
 	return nil, nil
 }
 
