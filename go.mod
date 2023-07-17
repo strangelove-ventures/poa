@@ -7,8 +7,9 @@ require (
 	cosmossdk.io/collections v0.2.0
 	cosmossdk.io/core v0.9.0
 	cosmossdk.io/depinject v1.0.0-alpha.3
+	cosmossdk.io/errors v1.0.0-beta.7.0.20230524212735-6cabb6aa5741
 	cosmossdk.io/store v0.1.0-alpha.1.0.20230606190835-3e18f4088b2c
-	github.com/cometbft/cometbft v0.38.0-rc2
+	github.com/cometbft/cometbft v0.38.0-rc3
 	github.com/cosmos/cosmos-proto v1.0.0-beta.3
 	github.com/cosmos/cosmos-sdk v0.50.0-alpha.1
 	github.com/cosmos/gogoproto v1.4.10
@@ -20,7 +21,6 @@ require (
 )
 
 require (
-	cosmossdk.io/errors v1.0.0-beta.7.0.20230524212735-6cabb6aa5741 // indirect
 	cosmossdk.io/log v1.1.0 // indirect
 	cosmossdk.io/math v1.0.1 // indirect
 	cosmossdk.io/x/tx v0.8.0 // indirect
