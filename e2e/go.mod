@@ -11,8 +11,7 @@ replace (
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 
 	github.com/strangelove-ventures/poa => ../.
-	github.com/vedhavyas/go-subkey => github.com/strangelove-ventures/go-subkey v1.0.7
-	// github.com/strangelove-ventures/interchaintest/v8 => /home/reece/Desktop/Programming/Go/interchaintest // https://github.com/strangelove-ventures/interchaintest/pull/836
+	github.com/vedhavyas/go-subkey => github.com/strangelove-ventures/go-subkey v1.0.7	
 )
 
 require (
