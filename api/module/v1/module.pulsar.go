@@ -13,6 +13,52 @@ import (
 	sync "sync"
 )
 
+var _ protoreflect.List = (*_Module_1_list)(nil)
+
+type _Module_1_list struct {
+	list *[]string
+}
+
+func (x *_Module_1_list) Len() int {
+	if x.list == nil {
+		return 0
+	}
+	return len(*x.list)
+}
+
+func (x *_Module_1_list) Get(i int) protoreflect.Value {
+	return protoreflect.ValueOfString((*x.list)[i])
+}
+
+func (x *_Module_1_list) Set(i int, value protoreflect.Value) {
+	valueUnwrapped := value.String()
+	concreteValue := valueUnwrapped
+	(*x.list)[i] = concreteValue
+}
+
+func (x *_Module_1_list) Append(value protoreflect.Value) {
+	valueUnwrapped := value.String()
+	concreteValue := valueUnwrapped
+	*x.list = append(*x.list, concreteValue)
+}
+
+func (x *_Module_1_list) AppendMutable() protoreflect.Value {
+	panic(fmt.Errorf("AppendMutable can not be called on message Module at list field Authority as it is not of Message kind"))
+}
+
+func (x *_Module_1_list) Truncate(n int) {
+	*x.list = (*x.list)[:n]
+}
+
+func (x *_Module_1_list) NewElement() protoreflect.Value {
+	v := ""
+	return protoreflect.ValueOfString(v)
+}
+
+func (x *_Module_1_list) IsValid() bool {
+	return x.list != nil
+}
+
 var (
 	md_Module           protoreflect.MessageDescriptor
 	fd_Module_authority protoreflect.FieldDescriptor
@@ -89,8 +135,8 @@ func (x *fastReflection_Module) Interface() protoreflect.ProtoMessage {
 // While iterating, mutating operations may only be performed
 // on the current field descriptor.
 func (x *fastReflection_Module) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
-	if x.Authority != "" {
-		value := protoreflect.ValueOfString(x.Authority)
+	if len(x.Authority) != 0 {
+		value := protoreflect.ValueOfList(&_Module_1_list{list: &x.Authority})
 		if !f(fd_Module_authority, value) {
 			return
 		}
@@ -111,7 +157,7 @@ func (x *fastReflection_Module) Range(f func(protoreflect.FieldDescriptor, proto
 func (x *fastReflection_Module) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
 	case "strangelove_ventures.poa.module.v1.Module.authority":
-		return x.Authority != ""
+		return len(x.Authority) != 0
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.module.v1.Module"))
@@ -129,7 +175,7 @@ func (x *fastReflection_Module) Has(fd protoreflect.FieldDescriptor) bool {
 func (x *fastReflection_Module) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
 	case "strangelove_ventures.poa.module.v1.Module.authority":
-		x.Authority = ""
+		x.Authority = nil
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.module.v1.Module"))
@@ -147,8 +193,11 @@ func (x *fastReflection_Module) Clear(fd protoreflect.FieldDescriptor) {
 func (x *fastReflection_Module) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
 	case "strangelove_ventures.poa.module.v1.Module.authority":
-		value := x.Authority
-		return protoreflect.ValueOfString(value)
+		if len(x.Authority) == 0 {
+			return protoreflect.ValueOfList(&_Module_1_list{})
+		}
+		listValue := &_Module_1_list{list: &x.Authority}
+		return protoreflect.ValueOfList(listValue)
 	default:
 		if descriptor.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.module.v1.Module"))
@@ -170,7 +219,9 @@ func (x *fastReflection_Module) Get(descriptor protoreflect.FieldDescriptor) pro
 func (x *fastReflection_Module) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
 	case "strangelove_ventures.poa.module.v1.Module.authority":
-		x.Authority = value.Interface().(string)
+		lv := value.List()
+		clv := lv.(*_Module_1_list)
+		x.Authority = *clv.list
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.module.v1.Module"))
@@ -192,7 +243,11 @@ func (x *fastReflection_Module) Set(fd protoreflect.FieldDescriptor, value proto
 func (x *fastReflection_Module) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
 	case "strangelove_ventures.poa.module.v1.Module.authority":
-		panic(fmt.Errorf("field authority of message strangelove_ventures.poa.module.v1.Module is not mutable"))
+		if x.Authority == nil {
+			x.Authority = []string{}
+		}
+		value := &_Module_1_list{list: &x.Authority}
+		return protoreflect.ValueOfList(value)
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.module.v1.Module"))
@@ -207,7 +262,8 @@ func (x *fastReflection_Module) Mutable(fd protoreflect.FieldDescriptor) protore
 func (x *fastReflection_Module) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
 	case "strangelove_ventures.poa.module.v1.Module.authority":
-		return protoreflect.ValueOfString("")
+		list := []string{}
+		return protoreflect.ValueOfList(&_Module_1_list{list: &list})
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.module.v1.Module"))
@@ -277,9 +333,11 @@ func (x *fastReflection_Module) ProtoMethods() *protoiface.Methods {
 		var n int
 		var l int
 		_ = l
-		l = len(x.Authority)
-		if l > 0 {
-			n += 1 + l + runtime.Sov(uint64(l))
+		if len(x.Authority) > 0 {
+			for _, s := range x.Authority {
+				l = len(s)
+				n += 1 + l + runtime.Sov(uint64(l))
+			}
 		}
 		if x.unknownFields != nil {
 			n += len(x.unknownFields)
@@ -311,11 +369,13 @@ func (x *fastReflection_Module) ProtoMethods() *protoiface.Methods {
 			copy(dAtA[i:], x.unknownFields)
 		}
 		if len(x.Authority) > 0 {
-			i -= len(x.Authority)
-			copy(dAtA[i:], x.Authority)
-			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Authority)))
-			i--
-			dAtA[i] = 0xa
+			for iNdEx := len(x.Authority) - 1; iNdEx >= 0; iNdEx-- {
+				i -= len(x.Authority[iNdEx])
+				copy(dAtA[i:], x.Authority[iNdEx])
+				i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Authority[iNdEx])))
+				i--
+				dAtA[i] = 0xa
+			}
 		}
 		if input.Buf != nil {
 			input.Buf = append(input.Buf, dAtA...)
@@ -396,7 +456,7 @@ func (x *fastReflection_Module) ProtoMethods() *protoiface.Methods {
 				if postIndex > l {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
-				x.Authority = string(dAtA[iNdEx:postIndex])
+				x.Authority = append(x.Authority, string(dAtA[iNdEx:postIndex]))
 				iNdEx = postIndex
 			default:
 				iNdEx = preIndex
@@ -455,7 +515,7 @@ type Module struct {
 
 	// authority defines the custom module authority.
 	// if not set, defaults to the governance module.
-	Authority string `protobuf:"bytes,1,opt,name=authority,proto3" json:"authority,omitempty"`
+	Authority []string `protobuf:"bytes,1,rep,name=authority,proto3" json:"authority,omitempty"`
 }
 
 func (x *Module) Reset() {
@@ -478,11 +538,11 @@ func (*Module) Descriptor() ([]byte, []int) {
 	return file_strangelove_ventures_poa_module_v1_module_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *Module) GetAuthority() string {
+func (x *Module) GetAuthority() []string {
 	if x != nil {
 		return x.Authority
 	}
-	return ""
+	return nil
 }
 
 var File_strangelove_ventures_poa_module_v1_module_proto protoreflect.FileDescriptor
@@ -497,7 +557,7 @@ var file_strangelove_ventures_poa_module_v1_module_proto_rawDesc = []byte{
 	0x70, 0x2f, 0x76, 0x31, 0x61, 0x6c, 0x70, 0x68, 0x61, 0x31, 0x2f, 0x6d, 0x6f, 0x64, 0x75, 0x6c,
 	0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x53, 0x0a, 0x06, 0x4d, 0x6f, 0x64, 0x75, 0x6c,
 	0x65, 0x12, 0x1c, 0x0a, 0x09, 0x61, 0x75, 0x74, 0x68, 0x6f, 0x72, 0x69, 0x74, 0x79, 0x18, 0x01,
-	0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x61, 0x75, 0x74, 0x68, 0x6f, 0x72, 0x69, 0x74, 0x79, 0x3a,
+	0x20, 0x03, 0x28, 0x09, 0x52, 0x09, 0x61, 0x75, 0x74, 0x68, 0x6f, 0x72, 0x69, 0x74, 0x79, 0x3a,
 	0x2b, 0xba, 0xc0, 0x96, 0xda, 0x01, 0x25, 0x0a, 0x23, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e,
 	0x63, 0x6f, 0x6d, 0x2f, 0x73, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65, 0x2d,
 	0x76, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65, 0x73, 0x2f, 0x70, 0x6f, 0x61, 0x42, 0xb1, 0x02, 0x0a,

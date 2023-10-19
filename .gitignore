@@ -23,3 +23,5 @@ go.work.sum
 
 # Depinject debug file
 debug_container.dot
+
+build/

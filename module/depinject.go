@@ -7,8 +7,9 @@ import (
 	"cosmossdk.io/depinject"
 
 	"github.com/cosmos/cosmos-sdk/codec"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
+	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
+	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	modulev1 "github.com/strangelove-ventures/poa/api/module/v1"
 	"github.com/strangelove-ventures/poa/keeper"
 )
@@ -35,6 +36,9 @@ type ModuleInputs struct {
 	StoreService store.KVStoreService
 	AddressCodec address.Codec
 
+	BankKeeper    bankkeeper.Keeper
+	StakingKeeper stakingkeeper.Keeper
+
 	Config *modulev1.Module
 }
 
@@ -46,13 +50,7 @@ type ModuleOutputs struct {
 }
 
 func ProvideModule(in ModuleInputs) ModuleOutputs {
-	// default to governance as authority if not provided
-	authority := authtypes.NewModuleAddress("gov")
-	if in.Config.Authority != "" {
-		authority = authtypes.NewModuleAddressOrBech32Address(in.Config.Authority)
-	}
-
-	k := keeper.NewKeeper(in.Cdc, in.AddressCodec, in.StoreService, authority.String())
+	k := keeper.NewKeeper(in.Cdc, in.StoreService, &in.StakingKeeper)
 	m := NewAppModule(in.Cdc, k)
 
 	return ModuleOutputs{Module: m, Keeper: k}

@@ -19,16 +19,19 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Msg_CreateValidator_FullMethodName = "/strangelove_ventures.poa.v1.Msg/CreateValidator"
-	Msg_VouchValidator_FullMethodName  = "/strangelove_ventures.poa.v1.Msg/VouchValidator"
+	Msg_SetPower_FullMethodName        = "/strangelove_ventures.poa.v1.Msg/SetPower"
+	Msg_RemoveValidator_FullMethodName = "/strangelove_ventures.poa.v1.Msg/RemoveValidator"
+	Msg_UpdateParams_FullMethodName    = "/strangelove_ventures.poa.v1.Msg/UpdateParams"
 )
 
 // MsgClient is the client API for Msg service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type MsgClient interface {
-	CreateValidator(ctx context.Context, in *MsgCreateValidator, opts ...grpc.CallOption) (*MsgCreateValidatorResponse, error)
-	VouchValidator(ctx context.Context, in *MsgVouchValidator, opts ...grpc.CallOption) (*MsgVouchValidatorResponse, error)
+	// x/poa specific setters
+	SetPower(ctx context.Context, in *MsgSetPower, opts ...grpc.CallOption) (*MsgSetPowerResponse, error)
+	RemoveValidator(ctx context.Context, in *MsgRemoveValidator, opts ...grpc.CallOption) (*MsgRemoveValidatorResponse, error)
+	UpdateParams(ctx context.Context, in *MsgUpdateParams, opts ...grpc.CallOption) (*MsgUpdateParamsResponse, error)
 }
 
 type msgClient struct {
@@ -39,18 +42,27 @@ func NewMsgClient(cc grpc.ClientConnInterface) MsgClient {
 	return &msgClient{cc}
 }
 
-func (c *msgClient) CreateValidator(ctx context.Context, in *MsgCreateValidator, opts ...grpc.CallOption) (*MsgCreateValidatorResponse, error) {
-	out := new(MsgCreateValidatorResponse)
-	err := c.cc.Invoke(ctx, Msg_CreateValidator_FullMethodName, in, out, opts...)
+func (c *msgClient) SetPower(ctx context.Context, in *MsgSetPower, opts ...grpc.CallOption) (*MsgSetPowerResponse, error) {
+	out := new(MsgSetPowerResponse)
+	err := c.cc.Invoke(ctx, Msg_SetPower_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *msgClient) VouchValidator(ctx context.Context, in *MsgVouchValidator, opts ...grpc.CallOption) (*MsgVouchValidatorResponse, error) {
-	out := new(MsgVouchValidatorResponse)
-	err := c.cc.Invoke(ctx, Msg_VouchValidator_FullMethodName, in, out, opts...)
+func (c *msgClient) RemoveValidator(ctx context.Context, in *MsgRemoveValidator, opts ...grpc.CallOption) (*MsgRemoveValidatorResponse, error) {
+	out := new(MsgRemoveValidatorResponse)
+	err := c.cc.Invoke(ctx, Msg_RemoveValidator_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) UpdateParams(ctx context.Context, in *MsgUpdateParams, opts ...grpc.CallOption) (*MsgUpdateParamsResponse, error) {
+	out := new(MsgUpdateParamsResponse)
+	err := c.cc.Invoke(ctx, Msg_UpdateParams_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -61,8 +73,10 @@ func (c *msgClient) VouchValidator(ctx context.Context, in *MsgVouchValidator, o
 // All implementations must embed UnimplementedMsgServer
 // for forward compatibility
 type MsgServer interface {
-	CreateValidator(context.Context, *MsgCreateValidator) (*MsgCreateValidatorResponse, error)
-	VouchValidator(context.Context, *MsgVouchValidator) (*MsgVouchValidatorResponse, error)
+	// x/poa specific setters
+	SetPower(context.Context, *MsgSetPower) (*MsgSetPowerResponse, error)
+	RemoveValidator(context.Context, *MsgRemoveValidator) (*MsgRemoveValidatorResponse, error)
+	UpdateParams(context.Context, *MsgUpdateParams) (*MsgUpdateParamsResponse, error)
 	mustEmbedUnimplementedMsgServer()
 }
 
@@ -70,11 +84,14 @@ type MsgServer interface {
 type UnimplementedMsgServer struct {
 }
 
-func (UnimplementedMsgServer) CreateValidator(context.Context, *MsgCreateValidator) (*MsgCreateValidatorResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CreateValidator not implemented")
+func (UnimplementedMsgServer) SetPower(context.Context, *MsgSetPower) (*MsgSetPowerResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetPower not implemented")
 }
-func (UnimplementedMsgServer) VouchValidator(context.Context, *MsgVouchValidator) (*MsgVouchValidatorResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method VouchValidator not implemented")
+func (UnimplementedMsgServer) RemoveValidator(context.Context, *MsgRemoveValidator) (*MsgRemoveValidatorResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RemoveValidator not implemented")
+}
+func (UnimplementedMsgServer) UpdateParams(context.Context, *MsgUpdateParams) (*MsgUpdateParamsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateParams not implemented")
 }
 func (UnimplementedMsgServer) mustEmbedUnimplementedMsgServer() {}
 
@@ -89,38 +106,56 @@ func RegisterMsgServer(s grpc.ServiceRegistrar, srv MsgServer) {
 	s.RegisterService(&Msg_ServiceDesc, srv)
 }
 
-func _Msg_CreateValidator_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgCreateValidator)
+func _Msg_SetPower_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgSetPower)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MsgServer).CreateValidator(ctx, in)
+		return srv.(MsgServer).SetPower(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Msg_CreateValidator_FullMethodName,
+		FullMethod: Msg_SetPower_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).CreateValidator(ctx, req.(*MsgCreateValidator))
+		return srv.(MsgServer).SetPower(ctx, req.(*MsgSetPower))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Msg_VouchValidator_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgVouchValidator)
+func _Msg_RemoveValidator_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgRemoveValidator)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MsgServer).VouchValidator(ctx, in)
+		return srv.(MsgServer).RemoveValidator(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Msg_VouchValidator_FullMethodName,
+		FullMethod: Msg_RemoveValidator_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).VouchValidator(ctx, req.(*MsgVouchValidator))
+		return srv.(MsgServer).RemoveValidator(ctx, req.(*MsgRemoveValidator))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_UpdateParams_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgUpdateParams)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).UpdateParams(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Msg_UpdateParams_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).UpdateParams(ctx, req.(*MsgUpdateParams))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -133,12 +168,16 @@ var Msg_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*MsgServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "CreateValidator",
-			Handler:    _Msg_CreateValidator_Handler,
+			MethodName: "SetPower",
+			Handler:    _Msg_SetPower_Handler,
 		},
 		{
-			MethodName: "VouchValidator",
-			Handler:    _Msg_VouchValidator_Handler,
+			MethodName: "RemoveValidator",
+			Handler:    _Msg_RemoveValidator_Handler,
+		},
+		{
+			MethodName: "UpdateParams",
+			Handler:    _Msg_UpdateParams_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

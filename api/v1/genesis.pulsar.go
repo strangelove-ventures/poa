@@ -13,121 +13,15 @@ import (
 	sync "sync"
 )
 
-var _ protoreflect.List = (*_GenesisState_2_list)(nil)
-
-type _GenesisState_2_list struct {
-	list *[]*Validator
-}
-
-func (x *_GenesisState_2_list) Len() int {
-	if x.list == nil {
-		return 0
-	}
-	return len(*x.list)
-}
-
-func (x *_GenesisState_2_list) Get(i int) protoreflect.Value {
-	return protoreflect.ValueOfMessage((*x.list)[i].ProtoReflect())
-}
-
-func (x *_GenesisState_2_list) Set(i int, value protoreflect.Value) {
-	valueUnwrapped := value.Message()
-	concreteValue := valueUnwrapped.Interface().(*Validator)
-	(*x.list)[i] = concreteValue
-}
-
-func (x *_GenesisState_2_list) Append(value protoreflect.Value) {
-	valueUnwrapped := value.Message()
-	concreteValue := valueUnwrapped.Interface().(*Validator)
-	*x.list = append(*x.list, concreteValue)
-}
-
-func (x *_GenesisState_2_list) AppendMutable() protoreflect.Value {
-	v := new(Validator)
-	*x.list = append(*x.list, v)
-	return protoreflect.ValueOfMessage(v.ProtoReflect())
-}
-
-func (x *_GenesisState_2_list) Truncate(n int) {
-	for i := n; i < len(*x.list); i++ {
-		(*x.list)[i] = nil
-	}
-	*x.list = (*x.list)[:n]
-}
-
-func (x *_GenesisState_2_list) NewElement() protoreflect.Value {
-	v := new(Validator)
-	return protoreflect.ValueOfMessage(v.ProtoReflect())
-}
-
-func (x *_GenesisState_2_list) IsValid() bool {
-	return x.list != nil
-}
-
-var _ protoreflect.List = (*_GenesisState_3_list)(nil)
-
-type _GenesisState_3_list struct {
-	list *[]*Vouch
-}
-
-func (x *_GenesisState_3_list) Len() int {
-	if x.list == nil {
-		return 0
-	}
-	return len(*x.list)
-}
-
-func (x *_GenesisState_3_list) Get(i int) protoreflect.Value {
-	return protoreflect.ValueOfMessage((*x.list)[i].ProtoReflect())
-}
-
-func (x *_GenesisState_3_list) Set(i int, value protoreflect.Value) {
-	valueUnwrapped := value.Message()
-	concreteValue := valueUnwrapped.Interface().(*Vouch)
-	(*x.list)[i] = concreteValue
-}
-
-func (x *_GenesisState_3_list) Append(value protoreflect.Value) {
-	valueUnwrapped := value.Message()
-	concreteValue := valueUnwrapped.Interface().(*Vouch)
-	*x.list = append(*x.list, concreteValue)
-}
-
-func (x *_GenesisState_3_list) AppendMutable() protoreflect.Value {
-	v := new(Vouch)
-	*x.list = append(*x.list, v)
-	return protoreflect.ValueOfMessage(v.ProtoReflect())
-}
-
-func (x *_GenesisState_3_list) Truncate(n int) {
-	for i := n; i < len(*x.list); i++ {
-		(*x.list)[i] = nil
-	}
-	*x.list = (*x.list)[:n]
-}
-
-func (x *_GenesisState_3_list) NewElement() protoreflect.Value {
-	v := new(Vouch)
-	return protoreflect.ValueOfMessage(v.ProtoReflect())
-}
-
-func (x *_GenesisState_3_list) IsValid() bool {
-	return x.list != nil
-}
-
 var (
-	md_GenesisState            protoreflect.MessageDescriptor
-	fd_GenesisState_params     protoreflect.FieldDescriptor
-	fd_GenesisState_validators protoreflect.FieldDescriptor
-	fd_GenesisState_vouches    protoreflect.FieldDescriptor
+	md_GenesisState        protoreflect.MessageDescriptor
+	fd_GenesisState_params protoreflect.FieldDescriptor
 )
 
 func init() {
 	file_strangelove_ventures_poa_v1_genesis_proto_init()
 	md_GenesisState = File_strangelove_ventures_poa_v1_genesis_proto.Messages().ByName("GenesisState")
 	fd_GenesisState_params = md_GenesisState.Fields().ByName("params")
-	fd_GenesisState_validators = md_GenesisState.Fields().ByName("validators")
-	fd_GenesisState_vouches = md_GenesisState.Fields().ByName("vouches")
 }
 
 var _ protoreflect.Message = (*fastReflection_GenesisState)(nil)
@@ -201,18 +95,6 @@ func (x *fastReflection_GenesisState) Range(f func(protoreflect.FieldDescriptor,
 			return
 		}
 	}
-	if len(x.Validators) != 0 {
-		value := protoreflect.ValueOfList(&_GenesisState_2_list{list: &x.Validators})
-		if !f(fd_GenesisState_validators, value) {
-			return
-		}
-	}
-	if len(x.Vouches) != 0 {
-		value := protoreflect.ValueOfList(&_GenesisState_3_list{list: &x.Vouches})
-		if !f(fd_GenesisState_vouches, value) {
-			return
-		}
-	}
 }
 
 // Has reports whether a field is populated.
@@ -230,10 +112,6 @@ func (x *fastReflection_GenesisState) Has(fd protoreflect.FieldDescriptor) bool 
 	switch fd.FullName() {
 	case "strangelove_ventures.poa.v1.GenesisState.params":
 		return x.Params != nil
-	case "strangelove_ventures.poa.v1.GenesisState.validators":
-		return len(x.Validators) != 0
-	case "strangelove_ventures.poa.v1.GenesisState.vouches":
-		return len(x.Vouches) != 0
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.GenesisState"))
@@ -252,10 +130,6 @@ func (x *fastReflection_GenesisState) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
 	case "strangelove_ventures.poa.v1.GenesisState.params":
 		x.Params = nil
-	case "strangelove_ventures.poa.v1.GenesisState.validators":
-		x.Validators = nil
-	case "strangelove_ventures.poa.v1.GenesisState.vouches":
-		x.Vouches = nil
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.GenesisState"))
@@ -275,18 +149,6 @@ func (x *fastReflection_GenesisState) Get(descriptor protoreflect.FieldDescripto
 	case "strangelove_ventures.poa.v1.GenesisState.params":
 		value := x.Params
 		return protoreflect.ValueOfMessage(value.ProtoReflect())
-	case "strangelove_ventures.poa.v1.GenesisState.validators":
-		if len(x.Validators) == 0 {
-			return protoreflect.ValueOfList(&_GenesisState_2_list{})
-		}
-		listValue := &_GenesisState_2_list{list: &x.Validators}
-		return protoreflect.ValueOfList(listValue)
-	case "strangelove_ventures.poa.v1.GenesisState.vouches":
-		if len(x.Vouches) == 0 {
-			return protoreflect.ValueOfList(&_GenesisState_3_list{})
-		}
-		listValue := &_GenesisState_3_list{list: &x.Vouches}
-		return protoreflect.ValueOfList(listValue)
 	default:
 		if descriptor.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.GenesisState"))
@@ -309,14 +171,6 @@ func (x *fastReflection_GenesisState) Set(fd protoreflect.FieldDescriptor, value
 	switch fd.FullName() {
 	case "strangelove_ventures.poa.v1.GenesisState.params":
 		x.Params = value.Message().Interface().(*Params)
-	case "strangelove_ventures.poa.v1.GenesisState.validators":
-		lv := value.List()
-		clv := lv.(*_GenesisState_2_list)
-		x.Validators = *clv.list
-	case "strangelove_ventures.poa.v1.GenesisState.vouches":
-		lv := value.List()
-		clv := lv.(*_GenesisState_3_list)
-		x.Vouches = *clv.list
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.GenesisState"))
@@ -342,18 +196,6 @@ func (x *fastReflection_GenesisState) Mutable(fd protoreflect.FieldDescriptor) p
 			x.Params = new(Params)
 		}
 		return protoreflect.ValueOfMessage(x.Params.ProtoReflect())
-	case "strangelove_ventures.poa.v1.GenesisState.validators":
-		if x.Validators == nil {
-			x.Validators = []*Validator{}
-		}
-		value := &_GenesisState_2_list{list: &x.Validators}
-		return protoreflect.ValueOfList(value)
-	case "strangelove_ventures.poa.v1.GenesisState.vouches":
-		if x.Vouches == nil {
-			x.Vouches = []*Vouch{}
-		}
-		value := &_GenesisState_3_list{list: &x.Vouches}
-		return protoreflect.ValueOfList(value)
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.GenesisState"))
@@ -370,12 +212,6 @@ func (x *fastReflection_GenesisState) NewField(fd protoreflect.FieldDescriptor) 
 	case "strangelove_ventures.poa.v1.GenesisState.params":
 		m := new(Params)
 		return protoreflect.ValueOfMessage(m.ProtoReflect())
-	case "strangelove_ventures.poa.v1.GenesisState.validators":
-		list := []*Validator{}
-		return protoreflect.ValueOfList(&_GenesisState_2_list{list: &list})
-	case "strangelove_ventures.poa.v1.GenesisState.vouches":
-		list := []*Vouch{}
-		return protoreflect.ValueOfList(&_GenesisState_3_list{list: &list})
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.GenesisState"))
@@ -449,18 +285,6 @@ func (x *fastReflection_GenesisState) ProtoMethods() *protoiface.Methods {
 			l = options.Size(x.Params)
 			n += 1 + l + runtime.Sov(uint64(l))
 		}
-		if len(x.Validators) > 0 {
-			for _, e := range x.Validators {
-				l = options.Size(e)
-				n += 1 + l + runtime.Sov(uint64(l))
-			}
-		}
-		if len(x.Vouches) > 0 {
-			for _, e := range x.Vouches {
-				l = options.Size(e)
-				n += 1 + l + runtime.Sov(uint64(l))
-			}
-		}
 		if x.unknownFields != nil {
 			n += len(x.unknownFields)
 		}
@@ -489,38 +313,6 @@ func (x *fastReflection_GenesisState) ProtoMethods() *protoiface.Methods {
 		if x.unknownFields != nil {
 			i -= len(x.unknownFields)
 			copy(dAtA[i:], x.unknownFields)
-		}
-		if len(x.Vouches) > 0 {
-			for iNdEx := len(x.Vouches) - 1; iNdEx >= 0; iNdEx-- {
-				encoded, err := options.Marshal(x.Vouches[iNdEx])
-				if err != nil {
-					return protoiface.MarshalOutput{
-						NoUnkeyedLiterals: input.NoUnkeyedLiterals,
-						Buf:               input.Buf,
-					}, err
-				}
-				i -= len(encoded)
-				copy(dAtA[i:], encoded)
-				i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
-				i--
-				dAtA[i] = 0x1a
-			}
-		}
-		if len(x.Validators) > 0 {
-			for iNdEx := len(x.Validators) - 1; iNdEx >= 0; iNdEx-- {
-				encoded, err := options.Marshal(x.Validators[iNdEx])
-				if err != nil {
-					return protoiface.MarshalOutput{
-						NoUnkeyedLiterals: input.NoUnkeyedLiterals,
-						Buf:               input.Buf,
-					}, err
-				}
-				i -= len(encoded)
-				copy(dAtA[i:], encoded)
-				i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
-				i--
-				dAtA[i] = 0x12
-			}
 		}
 		if x.Params != nil {
 			encoded, err := options.Marshal(x.Params)
@@ -621,74 +413,6 @@ func (x *fastReflection_GenesisState) ProtoMethods() *protoiface.Methods {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
 				}
 				iNdEx = postIndex
-			case 2:
-				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Validators", wireType)
-				}
-				var msglen int
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
-					}
-					if iNdEx >= l {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					msglen |= int(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				if msglen < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				postIndex := iNdEx + msglen
-				if postIndex < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				if postIndex > l {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-				}
-				x.Validators = append(x.Validators, &Validator{})
-				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.Validators[len(x.Validators)-1]); err != nil {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
-				}
-				iNdEx = postIndex
-			case 3:
-				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Vouches", wireType)
-				}
-				var msglen int
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
-					}
-					if iNdEx >= l {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					msglen |= int(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				if msglen < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				postIndex := iNdEx + msglen
-				if postIndex < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				if postIndex > l {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-				}
-				x.Vouches = append(x.Vouches, &Vouch{})
-				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.Vouches[len(x.Vouches)-1]); err != nil {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
-				}
-				iNdEx = postIndex
 			default:
 				iNdEx = preIndex
 				skippy, err := runtime.Skip(dAtA[iNdEx:])
@@ -743,9 +467,8 @@ type GenesisState struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Params     *Params      `protobuf:"bytes,1,opt,name=params,proto3" json:"params,omitempty"`
-	Validators []*Validator `protobuf:"bytes,2,rep,name=validators,proto3" json:"validators,omitempty"`
-	Vouches    []*Vouch     `protobuf:"bytes,3,rep,name=vouches,proto3" json:"vouches,omitempty"`
+	// params
+	Params *Params `protobuf:"bytes,1,opt,name=params,proto3" json:"params,omitempty"`
 }
 
 func (x *GenesisState) Reset() {
@@ -775,20 +498,6 @@ func (x *GenesisState) GetParams() *Params {
 	return nil
 }
 
-func (x *GenesisState) GetValidators() []*Validator {
-	if x != nil {
-		return x.Validators
-	}
-	return nil
-}
-
-func (x *GenesisState) GetVouches() []*Vouch {
-	if x != nil {
-		return x.Vouches
-	}
-	return nil
-}
-
 var File_strangelove_ventures_poa_v1_genesis_proto protoreflect.FileDescriptor
 
 var file_strangelove_ventures_poa_v1_genesis_proto_rawDesc = []byte{
@@ -800,26 +509,15 @@ var file_strangelove_ventures_poa_v1_genesis_proto_rawDesc = []byte{
 	0x6f, 0x74, 0x6f, 0x2f, 0x67, 0x6f, 0x67, 0x6f, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x2b,
 	0x73, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65, 0x5f, 0x76, 0x65, 0x6e, 0x74,
 	0x75, 0x72, 0x65, 0x73, 0x2f, 0x70, 0x6f, 0x61, 0x2f, 0x76, 0x31, 0x2f, 0x76, 0x61, 0x6c, 0x69,
-	0x64, 0x61, 0x74, 0x6f, 0x72, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x27, 0x73, 0x74, 0x72,
+	0x64, 0x61, 0x74, 0x6f, 0x72, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x28, 0x73, 0x74, 0x72,
 	0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65, 0x5f, 0x76, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65,
-	0x73, 0x2f, 0x70, 0x6f, 0x61, 0x2f, 0x76, 0x31, 0x2f, 0x76, 0x6f, 0x75, 0x63, 0x68, 0x2e, 0x70,
-	0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x28, 0x73, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f, 0x76,
-	0x65, 0x5f, 0x76, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65, 0x73, 0x2f, 0x70, 0x6f, 0x61, 0x2f, 0x76,
-	0x31, 0x2f, 0x70, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0xd7,
-	0x01, 0x0a, 0x0c, 0x47, 0x65, 0x6e, 0x65, 0x73, 0x69, 0x73, 0x53, 0x74, 0x61, 0x74, 0x65, 0x12,
-	0x41, 0x0a, 0x06, 0x70, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32,
-	0x23, 0x2e, 0x73, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65, 0x5f, 0x76, 0x65,
-	0x6e, 0x74, 0x75, 0x72, 0x65, 0x73, 0x2e, 0x70, 0x6f, 0x61, 0x2e, 0x76, 0x31, 0x2e, 0x50, 0x61,
-	0x72, 0x61, 0x6d, 0x73, 0x42, 0x04, 0xc8, 0xde, 0x1f, 0x00, 0x52, 0x06, 0x70, 0x61, 0x72, 0x61,
-	0x6d, 0x73, 0x12, 0x46, 0x0a, 0x0a, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x73,
-	0x18, 0x02, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x26, 0x2e, 0x73, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65,
-	0x6c, 0x6f, 0x76, 0x65, 0x5f, 0x76, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65, 0x73, 0x2e, 0x70, 0x6f,
-	0x61, 0x2e, 0x76, 0x31, 0x2e, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x52, 0x0a,
-	0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x73, 0x12, 0x3c, 0x0a, 0x07, 0x76, 0x6f,
-	0x75, 0x63, 0x68, 0x65, 0x73, 0x18, 0x03, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x22, 0x2e, 0x73, 0x74,
-	0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65, 0x5f, 0x76, 0x65, 0x6e, 0x74, 0x75, 0x72,
-	0x65, 0x73, 0x2e, 0x70, 0x6f, 0x61, 0x2e, 0x76, 0x31, 0x2e, 0x56, 0x6f, 0x75, 0x63, 0x68, 0x52,
-	0x07, 0x76, 0x6f, 0x75, 0x63, 0x68, 0x65, 0x73, 0x42, 0x84, 0x02, 0x0a, 0x1f, 0x63, 0x6f, 0x6d,
+	0x73, 0x2f, 0x70, 0x6f, 0x61, 0x2f, 0x76, 0x31, 0x2f, 0x70, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x2e,
+	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x51, 0x0a, 0x0c, 0x47, 0x65, 0x6e, 0x65, 0x73, 0x69, 0x73,
+	0x53, 0x74, 0x61, 0x74, 0x65, 0x12, 0x41, 0x0a, 0x06, 0x70, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x23, 0x2e, 0x73, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c,
+	0x6f, 0x76, 0x65, 0x5f, 0x76, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65, 0x73, 0x2e, 0x70, 0x6f, 0x61,
+	0x2e, 0x76, 0x31, 0x2e, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x42, 0x04, 0xc8, 0xde, 0x1f, 0x00,
+	0x52, 0x06, 0x70, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x42, 0x84, 0x02, 0x0a, 0x1f, 0x63, 0x6f, 0x6d,
 	0x2e, 0x73, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65, 0x5f, 0x76, 0x65, 0x6e,
 	0x74, 0x75, 0x72, 0x65, 0x73, 0x2e, 0x70, 0x6f, 0x61, 0x2e, 0x76, 0x31, 0x42, 0x0c, 0x47, 0x65,
 	0x6e, 0x65, 0x73, 0x69, 0x73, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x49, 0x67, 0x69,
@@ -855,18 +553,14 @@ var file_strangelove_ventures_poa_v1_genesis_proto_msgTypes = make([]protoimpl.M
 var file_strangelove_ventures_poa_v1_genesis_proto_goTypes = []interface{}{
 	(*GenesisState)(nil), // 0: strangelove_ventures.poa.v1.GenesisState
 	(*Params)(nil),       // 1: strangelove_ventures.poa.v1.Params
-	(*Validator)(nil),    // 2: strangelove_ventures.poa.v1.Validator
-	(*Vouch)(nil),        // 3: strangelove_ventures.poa.v1.Vouch
 }
 var file_strangelove_ventures_poa_v1_genesis_proto_depIdxs = []int32{
 	1, // 0: strangelove_ventures.poa.v1.GenesisState.params:type_name -> strangelove_ventures.poa.v1.Params
-	2, // 1: strangelove_ventures.poa.v1.GenesisState.validators:type_name -> strangelove_ventures.poa.v1.Validator
-	3, // 2: strangelove_ventures.poa.v1.GenesisState.vouches:type_name -> strangelove_ventures.poa.v1.Vouch
-	3, // [3:3] is the sub-list for method output_type
-	3, // [3:3] is the sub-list for method input_type
-	3, // [3:3] is the sub-list for extension type_name
-	3, // [3:3] is the sub-list for extension extendee
-	0, // [0:3] is the sub-list for field type_name
+	1, // [1:1] is the sub-list for method output_type
+	1, // [1:1] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_strangelove_ventures_poa_v1_genesis_proto_init() }
@@ -875,7 +569,6 @@ func file_strangelove_ventures_poa_v1_genesis_proto_init() {
 		return
 	}
 	file_strangelove_ventures_poa_v1_validator_proto_init()
-	file_strangelove_ventures_poa_v1_vouch_proto_init()
 	file_strangelove_ventures_poa_v1_params_proto_init()
 	if !protoimpl.UnsafeEnabled {
 		file_strangelove_ventures_poa_v1_genesis_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {

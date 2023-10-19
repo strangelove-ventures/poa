@@ -5,41 +5,43 @@ import (
 	fmt "fmt"
 	_ "github.com/cosmos/cosmos-proto"
 	runtime "github.com/cosmos/cosmos-proto/runtime"
+	_ "github.com/cosmos/cosmos-sdk/types/msgservice"
+	_ "github.com/cosmos/cosmos-sdk/types/tx/amino"
 	_ "github.com/cosmos/cosmos-sdk/x/staking/types"
 	_ "github.com/cosmos/gogoproto/gogoproto"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoiface "google.golang.org/protobuf/runtime/protoiface"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	anypb "google.golang.org/protobuf/types/known/anypb"
+	_ "google.golang.org/protobuf/types/known/anypb"
 	io "io"
 	reflect "reflect"
 	sync "sync"
 )
 
 var (
-	md_MsgCreateValidator             protoreflect.MessageDescriptor
-	fd_MsgCreateValidator_description protoreflect.FieldDescriptor
-	fd_MsgCreateValidator_address     protoreflect.FieldDescriptor
-	fd_MsgCreateValidator_pubkey      protoreflect.FieldDescriptor
+	md_MsgSetPower                   protoreflect.MessageDescriptor
+	fd_MsgSetPower_from_address      protoreflect.FieldDescriptor
+	fd_MsgSetPower_validator_address protoreflect.FieldDescriptor
+	fd_MsgSetPower_power             protoreflect.FieldDescriptor
 )
 
 func init() {
 	file_strangelove_ventures_poa_v1_tx_proto_init()
-	md_MsgCreateValidator = File_strangelove_ventures_poa_v1_tx_proto.Messages().ByName("MsgCreateValidator")
-	fd_MsgCreateValidator_description = md_MsgCreateValidator.Fields().ByName("description")
-	fd_MsgCreateValidator_address = md_MsgCreateValidator.Fields().ByName("address")
-	fd_MsgCreateValidator_pubkey = md_MsgCreateValidator.Fields().ByName("pubkey")
+	md_MsgSetPower = File_strangelove_ventures_poa_v1_tx_proto.Messages().ByName("MsgSetPower")
+	fd_MsgSetPower_from_address = md_MsgSetPower.Fields().ByName("from_address")
+	fd_MsgSetPower_validator_address = md_MsgSetPower.Fields().ByName("validator_address")
+	fd_MsgSetPower_power = md_MsgSetPower.Fields().ByName("power")
 }
 
-var _ protoreflect.Message = (*fastReflection_MsgCreateValidator)(nil)
+var _ protoreflect.Message = (*fastReflection_MsgSetPower)(nil)
 
-type fastReflection_MsgCreateValidator MsgCreateValidator
+type fastReflection_MsgSetPower MsgSetPower
 
-func (x *MsgCreateValidator) ProtoReflect() protoreflect.Message {
-	return (*fastReflection_MsgCreateValidator)(x)
+func (x *MsgSetPower) ProtoReflect() protoreflect.Message {
+	return (*fastReflection_MsgSetPower)(x)
 }
 
-func (x *MsgCreateValidator) slowProtoReflect() protoreflect.Message {
+func (x *MsgSetPower) slowProtoReflect() protoreflect.Message {
 	mi := &file_strangelove_ventures_poa_v1_tx_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -51,43 +53,43 @@ func (x *MsgCreateValidator) slowProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-var _fastReflection_MsgCreateValidator_messageType fastReflection_MsgCreateValidator_messageType
-var _ protoreflect.MessageType = fastReflection_MsgCreateValidator_messageType{}
+var _fastReflection_MsgSetPower_messageType fastReflection_MsgSetPower_messageType
+var _ protoreflect.MessageType = fastReflection_MsgSetPower_messageType{}
 
-type fastReflection_MsgCreateValidator_messageType struct{}
+type fastReflection_MsgSetPower_messageType struct{}
 
-func (x fastReflection_MsgCreateValidator_messageType) Zero() protoreflect.Message {
-	return (*fastReflection_MsgCreateValidator)(nil)
+func (x fastReflection_MsgSetPower_messageType) Zero() protoreflect.Message {
+	return (*fastReflection_MsgSetPower)(nil)
 }
-func (x fastReflection_MsgCreateValidator_messageType) New() protoreflect.Message {
-	return new(fastReflection_MsgCreateValidator)
+func (x fastReflection_MsgSetPower_messageType) New() protoreflect.Message {
+	return new(fastReflection_MsgSetPower)
 }
-func (x fastReflection_MsgCreateValidator_messageType) Descriptor() protoreflect.MessageDescriptor {
-	return md_MsgCreateValidator
+func (x fastReflection_MsgSetPower_messageType) Descriptor() protoreflect.MessageDescriptor {
+	return md_MsgSetPower
 }
 
 // Descriptor returns message descriptor, which contains only the protobuf
 // type information for the message.
-func (x *fastReflection_MsgCreateValidator) Descriptor() protoreflect.MessageDescriptor {
-	return md_MsgCreateValidator
+func (x *fastReflection_MsgSetPower) Descriptor() protoreflect.MessageDescriptor {
+	return md_MsgSetPower
 }
 
 // Type returns the message type, which encapsulates both Go and protobuf
 // type information. If the Go type information is not needed,
 // it is recommended that the message descriptor be used instead.
-func (x *fastReflection_MsgCreateValidator) Type() protoreflect.MessageType {
-	return _fastReflection_MsgCreateValidator_messageType
+func (x *fastReflection_MsgSetPower) Type() protoreflect.MessageType {
+	return _fastReflection_MsgSetPower_messageType
 }
 
 // New returns a newly allocated and mutable empty message.
-func (x *fastReflection_MsgCreateValidator) New() protoreflect.Message {
-	return new(fastReflection_MsgCreateValidator)
+func (x *fastReflection_MsgSetPower) New() protoreflect.Message {
+	return new(fastReflection_MsgSetPower)
 }
 
 // Interface unwraps the message reflection interface and
 // returns the underlying ProtoMessage interface.
-func (x *fastReflection_MsgCreateValidator) Interface() protoreflect.ProtoMessage {
-	return (*MsgCreateValidator)(x)
+func (x *fastReflection_MsgSetPower) Interface() protoreflect.ProtoMessage {
+	return (*MsgSetPower)(x)
 }
 
 // Range iterates over every populated field in an undefined order,
@@ -95,22 +97,22 @@ func (x *fastReflection_MsgCreateValidator) Interface() protoreflect.ProtoMessag
 // Range returns immediately if f returns false.
 // While iterating, mutating operations may only be performed
 // on the current field descriptor.
-func (x *fastReflection_MsgCreateValidator) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
-	if x.Description != nil {
-		value := protoreflect.ValueOfMessage(x.Description.ProtoReflect())
-		if !f(fd_MsgCreateValidator_description, value) {
+func (x *fastReflection_MsgSetPower) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+	if x.FromAddress != "" {
+		value := protoreflect.ValueOfString(x.FromAddress)
+		if !f(fd_MsgSetPower_from_address, value) {
 			return
 		}
 	}
-	if x.Address != "" {
-		value := protoreflect.ValueOfString(x.Address)
-		if !f(fd_MsgCreateValidator_address, value) {
+	if x.ValidatorAddress != "" {
+		value := protoreflect.ValueOfString(x.ValidatorAddress)
+		if !f(fd_MsgSetPower_validator_address, value) {
 			return
 		}
 	}
-	if x.Pubkey != nil {
-		value := protoreflect.ValueOfMessage(x.Pubkey.ProtoReflect())
-		if !f(fd_MsgCreateValidator_pubkey, value) {
+	if x.Power != uint64(0) {
+		value := protoreflect.ValueOfUint64(x.Power)
+		if !f(fd_MsgSetPower_power, value) {
 			return
 		}
 	}
@@ -127,19 +129,19 @@ func (x *fastReflection_MsgCreateValidator) Range(f func(protoreflect.FieldDescr
 // In other cases (aside from the nullable cases above),
 // a proto3 scalar field is populated if it contains a non-zero value, and
 // a repeated field is populated if it is non-empty.
-func (x *fastReflection_MsgCreateValidator) Has(fd protoreflect.FieldDescriptor) bool {
+func (x *fastReflection_MsgSetPower) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
-	case "strangelove_ventures.poa.v1.MsgCreateValidator.description":
-		return x.Description != nil
-	case "strangelove_ventures.poa.v1.MsgCreateValidator.address":
-		return x.Address != ""
-	case "strangelove_ventures.poa.v1.MsgCreateValidator.pubkey":
-		return x.Pubkey != nil
+	case "strangelove_ventures.poa.v1.MsgSetPower.from_address":
+		return x.FromAddress != ""
+	case "strangelove_ventures.poa.v1.MsgSetPower.validator_address":
+		return x.ValidatorAddress != ""
+	case "strangelove_ventures.poa.v1.MsgSetPower.power":
+		return x.Power != uint64(0)
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgCreateValidator"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgSetPower"))
 		}
-		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgCreateValidator does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgSetPower does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -149,19 +151,19 @@ func (x *fastReflection_MsgCreateValidator) Has(fd protoreflect.FieldDescriptor)
 // associated with the given field number.
 //
 // Clear is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgCreateValidator) Clear(fd protoreflect.FieldDescriptor) {
+func (x *fastReflection_MsgSetPower) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
-	case "strangelove_ventures.poa.v1.MsgCreateValidator.description":
-		x.Description = nil
-	case "strangelove_ventures.poa.v1.MsgCreateValidator.address":
-		x.Address = ""
-	case "strangelove_ventures.poa.v1.MsgCreateValidator.pubkey":
-		x.Pubkey = nil
+	case "strangelove_ventures.poa.v1.MsgSetPower.from_address":
+		x.FromAddress = ""
+	case "strangelove_ventures.poa.v1.MsgSetPower.validator_address":
+		x.ValidatorAddress = ""
+	case "strangelove_ventures.poa.v1.MsgSetPower.power":
+		x.Power = uint64(0)
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgCreateValidator"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgSetPower"))
 		}
-		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgCreateValidator does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgSetPower does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -171,22 +173,22 @@ func (x *fastReflection_MsgCreateValidator) Clear(fd protoreflect.FieldDescripto
 // the default value of a bytes scalar is guaranteed to be a copy.
 // For unpopulated composite types, it returns an empty, read-only view
 // of the value; to obtain a mutable reference, use Mutable.
-func (x *fastReflection_MsgCreateValidator) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_MsgSetPower) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
-	case "strangelove_ventures.poa.v1.MsgCreateValidator.description":
-		value := x.Description
-		return protoreflect.ValueOfMessage(value.ProtoReflect())
-	case "strangelove_ventures.poa.v1.MsgCreateValidator.address":
-		value := x.Address
+	case "strangelove_ventures.poa.v1.MsgSetPower.from_address":
+		value := x.FromAddress
 		return protoreflect.ValueOfString(value)
-	case "strangelove_ventures.poa.v1.MsgCreateValidator.pubkey":
-		value := x.Pubkey
-		return protoreflect.ValueOfMessage(value.ProtoReflect())
+	case "strangelove_ventures.poa.v1.MsgSetPower.validator_address":
+		value := x.ValidatorAddress
+		return protoreflect.ValueOfString(value)
+	case "strangelove_ventures.poa.v1.MsgSetPower.power":
+		value := x.Power
+		return protoreflect.ValueOfUint64(value)
 	default:
 		if descriptor.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgCreateValidator"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgSetPower"))
 		}
-		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgCreateValidator does not contain field %s", descriptor.FullName()))
+		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgSetPower does not contain field %s", descriptor.FullName()))
 	}
 }
 
@@ -200,19 +202,19 @@ func (x *fastReflection_MsgCreateValidator) Get(descriptor protoreflect.FieldDes
 // empty, read-only value, then it panics.
 //
 // Set is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgCreateValidator) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
+func (x *fastReflection_MsgSetPower) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
-	case "strangelove_ventures.poa.v1.MsgCreateValidator.description":
-		x.Description = value.Message().Interface().(*Description)
-	case "strangelove_ventures.poa.v1.MsgCreateValidator.address":
-		x.Address = value.Interface().(string)
-	case "strangelove_ventures.poa.v1.MsgCreateValidator.pubkey":
-		x.Pubkey = value.Message().Interface().(*anypb.Any)
+	case "strangelove_ventures.poa.v1.MsgSetPower.from_address":
+		x.FromAddress = value.Interface().(string)
+	case "strangelove_ventures.poa.v1.MsgSetPower.validator_address":
+		x.ValidatorAddress = value.Interface().(string)
+	case "strangelove_ventures.poa.v1.MsgSetPower.power":
+		x.Power = value.Uint()
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgCreateValidator"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgSetPower"))
 		}
-		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgCreateValidator does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgSetPower does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -226,56 +228,48 @@ func (x *fastReflection_MsgCreateValidator) Set(fd protoreflect.FieldDescriptor,
 // It panics if the field does not contain a composite type.
 //
 // Mutable is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgCreateValidator) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_MsgSetPower) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "strangelove_ventures.poa.v1.MsgCreateValidator.description":
-		if x.Description == nil {
-			x.Description = new(Description)
-		}
-		return protoreflect.ValueOfMessage(x.Description.ProtoReflect())
-	case "strangelove_ventures.poa.v1.MsgCreateValidator.pubkey":
-		if x.Pubkey == nil {
-			x.Pubkey = new(anypb.Any)
-		}
-		return protoreflect.ValueOfMessage(x.Pubkey.ProtoReflect())
-	case "strangelove_ventures.poa.v1.MsgCreateValidator.address":
-		panic(fmt.Errorf("field address of message strangelove_ventures.poa.v1.MsgCreateValidator is not mutable"))
+	case "strangelove_ventures.poa.v1.MsgSetPower.from_address":
+		panic(fmt.Errorf("field from_address of message strangelove_ventures.poa.v1.MsgSetPower is not mutable"))
+	case "strangelove_ventures.poa.v1.MsgSetPower.validator_address":
+		panic(fmt.Errorf("field validator_address of message strangelove_ventures.poa.v1.MsgSetPower is not mutable"))
+	case "strangelove_ventures.poa.v1.MsgSetPower.power":
+		panic(fmt.Errorf("field power of message strangelove_ventures.poa.v1.MsgSetPower is not mutable"))
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgCreateValidator"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgSetPower"))
 		}
-		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgCreateValidator does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgSetPower does not contain field %s", fd.FullName()))
 	}
 }
 
 // NewField returns a new value that is assignable to the field
 // for the given descriptor. For scalars, this returns the default value.
 // For lists, maps, and messages, this returns a new, empty, mutable value.
-func (x *fastReflection_MsgCreateValidator) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_MsgSetPower) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "strangelove_ventures.poa.v1.MsgCreateValidator.description":
-		m := new(Description)
-		return protoreflect.ValueOfMessage(m.ProtoReflect())
-	case "strangelove_ventures.poa.v1.MsgCreateValidator.address":
+	case "strangelove_ventures.poa.v1.MsgSetPower.from_address":
 		return protoreflect.ValueOfString("")
-	case "strangelove_ventures.poa.v1.MsgCreateValidator.pubkey":
-		m := new(anypb.Any)
-		return protoreflect.ValueOfMessage(m.ProtoReflect())
+	case "strangelove_ventures.poa.v1.MsgSetPower.validator_address":
+		return protoreflect.ValueOfString("")
+	case "strangelove_ventures.poa.v1.MsgSetPower.power":
+		return protoreflect.ValueOfUint64(uint64(0))
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgCreateValidator"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgSetPower"))
 		}
-		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgCreateValidator does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgSetPower does not contain field %s", fd.FullName()))
 	}
 }
 
 // WhichOneof reports which field within the oneof is populated,
 // returning nil if none are populated.
 // It panics if the oneof descriptor does not belong to this message.
-func (x *fastReflection_MsgCreateValidator) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+func (x *fastReflection_MsgSetPower) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
 	switch d.FullName() {
 	default:
-		panic(fmt.Errorf("%s is not a oneof field in strangelove_ventures.poa.v1.MsgCreateValidator", d.FullName()))
+		panic(fmt.Errorf("%s is not a oneof field in strangelove_ventures.poa.v1.MsgSetPower", d.FullName()))
 	}
 	panic("unreachable")
 }
@@ -283,7 +277,7 @@ func (x *fastReflection_MsgCreateValidator) WhichOneof(d protoreflect.OneofDescr
 // GetUnknown retrieves the entire list of unknown fields.
 // The caller may only mutate the contents of the RawFields
 // if the mutated bytes are stored back into the message with SetUnknown.
-func (x *fastReflection_MsgCreateValidator) GetUnknown() protoreflect.RawFields {
+func (x *fastReflection_MsgSetPower) GetUnknown() protoreflect.RawFields {
 	return x.unknownFields
 }
 
@@ -294,7 +288,7 @@ func (x *fastReflection_MsgCreateValidator) GetUnknown() protoreflect.RawFields 
 // An empty RawFields may be passed to clear the fields.
 //
 // SetUnknown is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgCreateValidator) SetUnknown(fields protoreflect.RawFields) {
+func (x *fastReflection_MsgSetPower) SetUnknown(fields protoreflect.RawFields) {
 	x.unknownFields = fields
 }
 
@@ -306,7 +300,7 @@ func (x *fastReflection_MsgCreateValidator) SetUnknown(fields protoreflect.RawFi
 // message type, but the details are implementation dependent.
 // Validity is not part of the protobuf data model, and may not
 // be preserved in marshaling or other operations.
-func (x *fastReflection_MsgCreateValidator) IsValid() bool {
+func (x *fastReflection_MsgSetPower) IsValid() bool {
 	return x != nil
 }
 
@@ -316,9 +310,9 @@ func (x *fastReflection_MsgCreateValidator) IsValid() bool {
 // The returned methods type is identical to
 // "google.golang.org/protobuf/runtime/protoiface".Methods.
 // Consult the protoiface package documentation for details.
-func (x *fastReflection_MsgCreateValidator) ProtoMethods() *protoiface.Methods {
+func (x *fastReflection_MsgSetPower) ProtoMethods() *protoiface.Methods {
 	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
-		x := input.Message.Interface().(*MsgCreateValidator)
+		x := input.Message.Interface().(*MsgSetPower)
 		if x == nil {
 			return protoiface.SizeOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -330,17 +324,16 @@ func (x *fastReflection_MsgCreateValidator) ProtoMethods() *protoiface.Methods {
 		var n int
 		var l int
 		_ = l
-		if x.Description != nil {
-			l = options.Size(x.Description)
-			n += 1 + l + runtime.Sov(uint64(l))
-		}
-		l = len(x.Address)
+		l = len(x.FromAddress)
 		if l > 0 {
 			n += 1 + l + runtime.Sov(uint64(l))
 		}
-		if x.Pubkey != nil {
-			l = options.Size(x.Pubkey)
+		l = len(x.ValidatorAddress)
+		if l > 0 {
 			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		if x.Power != 0 {
+			n += 1 + runtime.Sov(uint64(x.Power))
 		}
 		if x.unknownFields != nil {
 			n += len(x.unknownFields)
@@ -352,7 +345,7 @@ func (x *fastReflection_MsgCreateValidator) ProtoMethods() *protoiface.Methods {
 	}
 
 	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
-		x := input.Message.Interface().(*MsgCreateValidator)
+		x := input.Message.Interface().(*MsgSetPower)
 		if x == nil {
 			return protoiface.MarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -371,38 +364,22 @@ func (x *fastReflection_MsgCreateValidator) ProtoMethods() *protoiface.Methods {
 			i -= len(x.unknownFields)
 			copy(dAtA[i:], x.unknownFields)
 		}
-		if x.Pubkey != nil {
-			encoded, err := options.Marshal(x.Pubkey)
-			if err != nil {
-				return protoiface.MarshalOutput{
-					NoUnkeyedLiterals: input.NoUnkeyedLiterals,
-					Buf:               input.Buf,
-				}, err
-			}
-			i -= len(encoded)
-			copy(dAtA[i:], encoded)
-			i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
+		if x.Power != 0 {
+			i = runtime.EncodeVarint(dAtA, i, uint64(x.Power))
 			i--
-			dAtA[i] = 0x1a
+			dAtA[i] = 0x18
 		}
-		if len(x.Address) > 0 {
-			i -= len(x.Address)
-			copy(dAtA[i:], x.Address)
-			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Address)))
+		if len(x.ValidatorAddress) > 0 {
+			i -= len(x.ValidatorAddress)
+			copy(dAtA[i:], x.ValidatorAddress)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.ValidatorAddress)))
 			i--
 			dAtA[i] = 0x12
 		}
-		if x.Description != nil {
-			encoded, err := options.Marshal(x.Description)
-			if err != nil {
-				return protoiface.MarshalOutput{
-					NoUnkeyedLiterals: input.NoUnkeyedLiterals,
-					Buf:               input.Buf,
-				}, err
-			}
-			i -= len(encoded)
-			copy(dAtA[i:], encoded)
-			i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
+		if len(x.FromAddress) > 0 {
+			i -= len(x.FromAddress)
+			copy(dAtA[i:], x.FromAddress)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.FromAddress)))
 			i--
 			dAtA[i] = 0xa
 		}
@@ -417,7 +394,7 @@ func (x *fastReflection_MsgCreateValidator) ProtoMethods() *protoiface.Methods {
 		}, nil
 	}
 	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
-		x := input.Message.Interface().(*MsgCreateValidator)
+		x := input.Message.Interface().(*MsgSetPower)
 		if x == nil {
 			return protoiface.UnmarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -449,51 +426,15 @@ func (x *fastReflection_MsgCreateValidator) ProtoMethods() *protoiface.Methods {
 			fieldNum := int32(wire >> 3)
 			wireType := int(wire & 0x7)
 			if wireType == 4 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgCreateValidator: wiretype end group for non-group")
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgSetPower: wiretype end group for non-group")
 			}
 			if fieldNum <= 0 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgCreateValidator: illegal tag %d (wire type %d)", fieldNum, wire)
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgSetPower: illegal tag %d (wire type %d)", fieldNum, wire)
 			}
 			switch fieldNum {
 			case 1:
 				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Description", wireType)
-				}
-				var msglen int
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
-					}
-					if iNdEx >= l {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					msglen |= int(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				if msglen < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				postIndex := iNdEx + msglen
-				if postIndex < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				if postIndex > l {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-				}
-				if x.Description == nil {
-					x.Description = &Description{}
-				}
-				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.Description); err != nil {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
-				}
-				iNdEx = postIndex
-			case 2:
-				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Address", wireType)
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field FromAddress", wireType)
 				}
 				var stringLen uint64
 				for shift := uint(0); ; shift += 7 {
@@ -521,13 +462,13 @@ func (x *fastReflection_MsgCreateValidator) ProtoMethods() *protoiface.Methods {
 				if postIndex > l {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
-				x.Address = string(dAtA[iNdEx:postIndex])
+				x.FromAddress = string(dAtA[iNdEx:postIndex])
 				iNdEx = postIndex
-			case 3:
+			case 2:
 				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Pubkey", wireType)
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field ValidatorAddress", wireType)
 				}
-				var msglen int
+				var stringLen uint64
 				for shift := uint(0); ; shift += 7 {
 					if shift >= 64 {
 						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
@@ -537,28 +478,43 @@ func (x *fastReflection_MsgCreateValidator) ProtoMethods() *protoiface.Methods {
 					}
 					b := dAtA[iNdEx]
 					iNdEx++
-					msglen |= int(b&0x7F) << shift
+					stringLen |= uint64(b&0x7F) << shift
 					if b < 0x80 {
 						break
 					}
 				}
-				if msglen < 0 {
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
 				}
-				postIndex := iNdEx + msglen
+				postIndex := iNdEx + intStringLen
 				if postIndex < 0 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
 				}
 				if postIndex > l {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
-				if x.Pubkey == nil {
-					x.Pubkey = &anypb.Any{}
-				}
-				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.Pubkey); err != nil {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
-				}
+				x.ValidatorAddress = string(dAtA[iNdEx:postIndex])
 				iNdEx = postIndex
+			case 3:
+				if wireType != 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Power", wireType)
+				}
+				x.Power = 0
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					x.Power |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
 			default:
 				iNdEx = preIndex
 				skippy, err := runtime.Skip(dAtA[iNdEx:])
@@ -595,23 +551,23 @@ func (x *fastReflection_MsgCreateValidator) ProtoMethods() *protoiface.Methods {
 }
 
 var (
-	md_MsgCreateValidatorResponse protoreflect.MessageDescriptor
+	md_MsgSetPowerResponse protoreflect.MessageDescriptor
 )
 
 func init() {
 	file_strangelove_ventures_poa_v1_tx_proto_init()
-	md_MsgCreateValidatorResponse = File_strangelove_ventures_poa_v1_tx_proto.Messages().ByName("MsgCreateValidatorResponse")
+	md_MsgSetPowerResponse = File_strangelove_ventures_poa_v1_tx_proto.Messages().ByName("MsgSetPowerResponse")
 }
 
-var _ protoreflect.Message = (*fastReflection_MsgCreateValidatorResponse)(nil)
+var _ protoreflect.Message = (*fastReflection_MsgSetPowerResponse)(nil)
 
-type fastReflection_MsgCreateValidatorResponse MsgCreateValidatorResponse
+type fastReflection_MsgSetPowerResponse MsgSetPowerResponse
 
-func (x *MsgCreateValidatorResponse) ProtoReflect() protoreflect.Message {
-	return (*fastReflection_MsgCreateValidatorResponse)(x)
+func (x *MsgSetPowerResponse) ProtoReflect() protoreflect.Message {
+	return (*fastReflection_MsgSetPowerResponse)(x)
 }
 
-func (x *MsgCreateValidatorResponse) slowProtoReflect() protoreflect.Message {
+func (x *MsgSetPowerResponse) slowProtoReflect() protoreflect.Message {
 	mi := &file_strangelove_ventures_poa_v1_tx_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -623,43 +579,43 @@ func (x *MsgCreateValidatorResponse) slowProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-var _fastReflection_MsgCreateValidatorResponse_messageType fastReflection_MsgCreateValidatorResponse_messageType
-var _ protoreflect.MessageType = fastReflection_MsgCreateValidatorResponse_messageType{}
+var _fastReflection_MsgSetPowerResponse_messageType fastReflection_MsgSetPowerResponse_messageType
+var _ protoreflect.MessageType = fastReflection_MsgSetPowerResponse_messageType{}
 
-type fastReflection_MsgCreateValidatorResponse_messageType struct{}
+type fastReflection_MsgSetPowerResponse_messageType struct{}
 
-func (x fastReflection_MsgCreateValidatorResponse_messageType) Zero() protoreflect.Message {
-	return (*fastReflection_MsgCreateValidatorResponse)(nil)
+func (x fastReflection_MsgSetPowerResponse_messageType) Zero() protoreflect.Message {
+	return (*fastReflection_MsgSetPowerResponse)(nil)
 }
-func (x fastReflection_MsgCreateValidatorResponse_messageType) New() protoreflect.Message {
-	return new(fastReflection_MsgCreateValidatorResponse)
+func (x fastReflection_MsgSetPowerResponse_messageType) New() protoreflect.Message {
+	return new(fastReflection_MsgSetPowerResponse)
 }
-func (x fastReflection_MsgCreateValidatorResponse_messageType) Descriptor() protoreflect.MessageDescriptor {
-	return md_MsgCreateValidatorResponse
+func (x fastReflection_MsgSetPowerResponse_messageType) Descriptor() protoreflect.MessageDescriptor {
+	return md_MsgSetPowerResponse
 }
 
 // Descriptor returns message descriptor, which contains only the protobuf
 // type information for the message.
-func (x *fastReflection_MsgCreateValidatorResponse) Descriptor() protoreflect.MessageDescriptor {
-	return md_MsgCreateValidatorResponse
+func (x *fastReflection_MsgSetPowerResponse) Descriptor() protoreflect.MessageDescriptor {
+	return md_MsgSetPowerResponse
 }
 
 // Type returns the message type, which encapsulates both Go and protobuf
 // type information. If the Go type information is not needed,
 // it is recommended that the message descriptor be used instead.
-func (x *fastReflection_MsgCreateValidatorResponse) Type() protoreflect.MessageType {
-	return _fastReflection_MsgCreateValidatorResponse_messageType
+func (x *fastReflection_MsgSetPowerResponse) Type() protoreflect.MessageType {
+	return _fastReflection_MsgSetPowerResponse_messageType
 }
 
 // New returns a newly allocated and mutable empty message.
-func (x *fastReflection_MsgCreateValidatorResponse) New() protoreflect.Message {
-	return new(fastReflection_MsgCreateValidatorResponse)
+func (x *fastReflection_MsgSetPowerResponse) New() protoreflect.Message {
+	return new(fastReflection_MsgSetPowerResponse)
 }
 
 // Interface unwraps the message reflection interface and
 // returns the underlying ProtoMessage interface.
-func (x *fastReflection_MsgCreateValidatorResponse) Interface() protoreflect.ProtoMessage {
-	return (*MsgCreateValidatorResponse)(x)
+func (x *fastReflection_MsgSetPowerResponse) Interface() protoreflect.ProtoMessage {
+	return (*MsgSetPowerResponse)(x)
 }
 
 // Range iterates over every populated field in an undefined order,
@@ -667,7 +623,7 @@ func (x *fastReflection_MsgCreateValidatorResponse) Interface() protoreflect.Pro
 // Range returns immediately if f returns false.
 // While iterating, mutating operations may only be performed
 // on the current field descriptor.
-func (x *fastReflection_MsgCreateValidatorResponse) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+func (x *fastReflection_MsgSetPowerResponse) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
 }
 
 // Has reports whether a field is populated.
@@ -681,13 +637,13 @@ func (x *fastReflection_MsgCreateValidatorResponse) Range(f func(protoreflect.Fi
 // In other cases (aside from the nullable cases above),
 // a proto3 scalar field is populated if it contains a non-zero value, and
 // a repeated field is populated if it is non-empty.
-func (x *fastReflection_MsgCreateValidatorResponse) Has(fd protoreflect.FieldDescriptor) bool {
+func (x *fastReflection_MsgSetPowerResponse) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgCreateValidatorResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgSetPowerResponse"))
 		}
-		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgCreateValidatorResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgSetPowerResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -697,13 +653,13 @@ func (x *fastReflection_MsgCreateValidatorResponse) Has(fd protoreflect.FieldDes
 // associated with the given field number.
 //
 // Clear is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgCreateValidatorResponse) Clear(fd protoreflect.FieldDescriptor) {
+func (x *fastReflection_MsgSetPowerResponse) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgCreateValidatorResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgSetPowerResponse"))
 		}
-		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgCreateValidatorResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgSetPowerResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -713,13 +669,13 @@ func (x *fastReflection_MsgCreateValidatorResponse) Clear(fd protoreflect.FieldD
 // the default value of a bytes scalar is guaranteed to be a copy.
 // For unpopulated composite types, it returns an empty, read-only view
 // of the value; to obtain a mutable reference, use Mutable.
-func (x *fastReflection_MsgCreateValidatorResponse) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_MsgSetPowerResponse) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
 	default:
 		if descriptor.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgCreateValidatorResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgSetPowerResponse"))
 		}
-		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgCreateValidatorResponse does not contain field %s", descriptor.FullName()))
+		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgSetPowerResponse does not contain field %s", descriptor.FullName()))
 	}
 }
 
@@ -733,13 +689,13 @@ func (x *fastReflection_MsgCreateValidatorResponse) Get(descriptor protoreflect.
 // empty, read-only value, then it panics.
 //
 // Set is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgCreateValidatorResponse) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
+func (x *fastReflection_MsgSetPowerResponse) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgCreateValidatorResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgSetPowerResponse"))
 		}
-		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgCreateValidatorResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgSetPowerResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -753,36 +709,36 @@ func (x *fastReflection_MsgCreateValidatorResponse) Set(fd protoreflect.FieldDes
 // It panics if the field does not contain a composite type.
 //
 // Mutable is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgCreateValidatorResponse) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_MsgSetPowerResponse) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgCreateValidatorResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgSetPowerResponse"))
 		}
-		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgCreateValidatorResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgSetPowerResponse does not contain field %s", fd.FullName()))
 	}
 }
 
 // NewField returns a new value that is assignable to the field
 // for the given descriptor. For scalars, this returns the default value.
 // For lists, maps, and messages, this returns a new, empty, mutable value.
-func (x *fastReflection_MsgCreateValidatorResponse) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_MsgSetPowerResponse) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgCreateValidatorResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgSetPowerResponse"))
 		}
-		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgCreateValidatorResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgSetPowerResponse does not contain field %s", fd.FullName()))
 	}
 }
 
 // WhichOneof reports which field within the oneof is populated,
 // returning nil if none are populated.
 // It panics if the oneof descriptor does not belong to this message.
-func (x *fastReflection_MsgCreateValidatorResponse) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+func (x *fastReflection_MsgSetPowerResponse) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
 	switch d.FullName() {
 	default:
-		panic(fmt.Errorf("%s is not a oneof field in strangelove_ventures.poa.v1.MsgCreateValidatorResponse", d.FullName()))
+		panic(fmt.Errorf("%s is not a oneof field in strangelove_ventures.poa.v1.MsgSetPowerResponse", d.FullName()))
 	}
 	panic("unreachable")
 }
@@ -790,7 +746,7 @@ func (x *fastReflection_MsgCreateValidatorResponse) WhichOneof(d protoreflect.On
 // GetUnknown retrieves the entire list of unknown fields.
 // The caller may only mutate the contents of the RawFields
 // if the mutated bytes are stored back into the message with SetUnknown.
-func (x *fastReflection_MsgCreateValidatorResponse) GetUnknown() protoreflect.RawFields {
+func (x *fastReflection_MsgSetPowerResponse) GetUnknown() protoreflect.RawFields {
 	return x.unknownFields
 }
 
@@ -801,7 +757,7 @@ func (x *fastReflection_MsgCreateValidatorResponse) GetUnknown() protoreflect.Ra
 // An empty RawFields may be passed to clear the fields.
 //
 // SetUnknown is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgCreateValidatorResponse) SetUnknown(fields protoreflect.RawFields) {
+func (x *fastReflection_MsgSetPowerResponse) SetUnknown(fields protoreflect.RawFields) {
 	x.unknownFields = fields
 }
 
@@ -813,7 +769,7 @@ func (x *fastReflection_MsgCreateValidatorResponse) SetUnknown(fields protorefle
 // message type, but the details are implementation dependent.
 // Validity is not part of the protobuf data model, and may not
 // be preserved in marshaling or other operations.
-func (x *fastReflection_MsgCreateValidatorResponse) IsValid() bool {
+func (x *fastReflection_MsgSetPowerResponse) IsValid() bool {
 	return x != nil
 }
 
@@ -823,9 +779,9 @@ func (x *fastReflection_MsgCreateValidatorResponse) IsValid() bool {
 // The returned methods type is identical to
 // "google.golang.org/protobuf/runtime/protoiface".Methods.
 // Consult the protoiface package documentation for details.
-func (x *fastReflection_MsgCreateValidatorResponse) ProtoMethods() *protoiface.Methods {
+func (x *fastReflection_MsgSetPowerResponse) ProtoMethods() *protoiface.Methods {
 	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
-		x := input.Message.Interface().(*MsgCreateValidatorResponse)
+		x := input.Message.Interface().(*MsgSetPowerResponse)
 		if x == nil {
 			return protoiface.SizeOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -847,7 +803,7 @@ func (x *fastReflection_MsgCreateValidatorResponse) ProtoMethods() *protoiface.M
 	}
 
 	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
-		x := input.Message.Interface().(*MsgCreateValidatorResponse)
+		x := input.Message.Interface().(*MsgSetPowerResponse)
 		if x == nil {
 			return protoiface.MarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -877,7 +833,7 @@ func (x *fastReflection_MsgCreateValidatorResponse) ProtoMethods() *protoiface.M
 		}, nil
 	}
 	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
-		x := input.Message.Interface().(*MsgCreateValidatorResponse)
+		x := input.Message.Interface().(*MsgSetPowerResponse)
 		if x == nil {
 			return protoiface.UnmarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -909,10 +865,10 @@ func (x *fastReflection_MsgCreateValidatorResponse) ProtoMethods() *protoiface.M
 			fieldNum := int32(wire >> 3)
 			wireType := int(wire & 0x7)
 			if wireType == 4 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgCreateValidatorResponse: wiretype end group for non-group")
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgSetPowerResponse: wiretype end group for non-group")
 			}
 			if fieldNum <= 0 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgCreateValidatorResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgSetPowerResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 			}
 			switch fieldNum {
 			default:
@@ -951,29 +907,27 @@ func (x *fastReflection_MsgCreateValidatorResponse) ProtoMethods() *protoiface.M
 }
 
 var (
-	md_MsgVouchValidator                   protoreflect.MessageDescriptor
-	fd_MsgVouchValidator_voucher_address   protoreflect.FieldDescriptor
-	fd_MsgVouchValidator_in_favor          protoreflect.FieldDescriptor
-	fd_MsgVouchValidator_candidate_address protoreflect.FieldDescriptor
+	md_MsgRemoveValidator                   protoreflect.MessageDescriptor
+	fd_MsgRemoveValidator_from_address      protoreflect.FieldDescriptor
+	fd_MsgRemoveValidator_validator_address protoreflect.FieldDescriptor
 )
 
 func init() {
 	file_strangelove_ventures_poa_v1_tx_proto_init()
-	md_MsgVouchValidator = File_strangelove_ventures_poa_v1_tx_proto.Messages().ByName("MsgVouchValidator")
-	fd_MsgVouchValidator_voucher_address = md_MsgVouchValidator.Fields().ByName("voucher_address")
-	fd_MsgVouchValidator_in_favor = md_MsgVouchValidator.Fields().ByName("in_favor")
-	fd_MsgVouchValidator_candidate_address = md_MsgVouchValidator.Fields().ByName("candidate_address")
+	md_MsgRemoveValidator = File_strangelove_ventures_poa_v1_tx_proto.Messages().ByName("MsgRemoveValidator")
+	fd_MsgRemoveValidator_from_address = md_MsgRemoveValidator.Fields().ByName("from_address")
+	fd_MsgRemoveValidator_validator_address = md_MsgRemoveValidator.Fields().ByName("validator_address")
 }
 
-var _ protoreflect.Message = (*fastReflection_MsgVouchValidator)(nil)
+var _ protoreflect.Message = (*fastReflection_MsgRemoveValidator)(nil)
 
-type fastReflection_MsgVouchValidator MsgVouchValidator
+type fastReflection_MsgRemoveValidator MsgRemoveValidator
 
-func (x *MsgVouchValidator) ProtoReflect() protoreflect.Message {
-	return (*fastReflection_MsgVouchValidator)(x)
+func (x *MsgRemoveValidator) ProtoReflect() protoreflect.Message {
+	return (*fastReflection_MsgRemoveValidator)(x)
 }
 
-func (x *MsgVouchValidator) slowProtoReflect() protoreflect.Message {
+func (x *MsgRemoveValidator) slowProtoReflect() protoreflect.Message {
 	mi := &file_strangelove_ventures_poa_v1_tx_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -985,43 +939,43 @@ func (x *MsgVouchValidator) slowProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-var _fastReflection_MsgVouchValidator_messageType fastReflection_MsgVouchValidator_messageType
-var _ protoreflect.MessageType = fastReflection_MsgVouchValidator_messageType{}
+var _fastReflection_MsgRemoveValidator_messageType fastReflection_MsgRemoveValidator_messageType
+var _ protoreflect.MessageType = fastReflection_MsgRemoveValidator_messageType{}
 
-type fastReflection_MsgVouchValidator_messageType struct{}
+type fastReflection_MsgRemoveValidator_messageType struct{}
 
-func (x fastReflection_MsgVouchValidator_messageType) Zero() protoreflect.Message {
-	return (*fastReflection_MsgVouchValidator)(nil)
+func (x fastReflection_MsgRemoveValidator_messageType) Zero() protoreflect.Message {
+	return (*fastReflection_MsgRemoveValidator)(nil)
 }
-func (x fastReflection_MsgVouchValidator_messageType) New() protoreflect.Message {
-	return new(fastReflection_MsgVouchValidator)
+func (x fastReflection_MsgRemoveValidator_messageType) New() protoreflect.Message {
+	return new(fastReflection_MsgRemoveValidator)
 }
-func (x fastReflection_MsgVouchValidator_messageType) Descriptor() protoreflect.MessageDescriptor {
-	return md_MsgVouchValidator
+func (x fastReflection_MsgRemoveValidator_messageType) Descriptor() protoreflect.MessageDescriptor {
+	return md_MsgRemoveValidator
 }
 
 // Descriptor returns message descriptor, which contains only the protobuf
 // type information for the message.
-func (x *fastReflection_MsgVouchValidator) Descriptor() protoreflect.MessageDescriptor {
-	return md_MsgVouchValidator
+func (x *fastReflection_MsgRemoveValidator) Descriptor() protoreflect.MessageDescriptor {
+	return md_MsgRemoveValidator
 }
 
 // Type returns the message type, which encapsulates both Go and protobuf
 // type information. If the Go type information is not needed,
 // it is recommended that the message descriptor be used instead.
-func (x *fastReflection_MsgVouchValidator) Type() protoreflect.MessageType {
-	return _fastReflection_MsgVouchValidator_messageType
+func (x *fastReflection_MsgRemoveValidator) Type() protoreflect.MessageType {
+	return _fastReflection_MsgRemoveValidator_messageType
 }
 
 // New returns a newly allocated and mutable empty message.
-func (x *fastReflection_MsgVouchValidator) New() protoreflect.Message {
-	return new(fastReflection_MsgVouchValidator)
+func (x *fastReflection_MsgRemoveValidator) New() protoreflect.Message {
+	return new(fastReflection_MsgRemoveValidator)
 }
 
 // Interface unwraps the message reflection interface and
 // returns the underlying ProtoMessage interface.
-func (x *fastReflection_MsgVouchValidator) Interface() protoreflect.ProtoMessage {
-	return (*MsgVouchValidator)(x)
+func (x *fastReflection_MsgRemoveValidator) Interface() protoreflect.ProtoMessage {
+	return (*MsgRemoveValidator)(x)
 }
 
 // Range iterates over every populated field in an undefined order,
@@ -1029,22 +983,16 @@ func (x *fastReflection_MsgVouchValidator) Interface() protoreflect.ProtoMessage
 // Range returns immediately if f returns false.
 // While iterating, mutating operations may only be performed
 // on the current field descriptor.
-func (x *fastReflection_MsgVouchValidator) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
-	if x.VoucherAddress != "" {
-		value := protoreflect.ValueOfString(x.VoucherAddress)
-		if !f(fd_MsgVouchValidator_voucher_address, value) {
+func (x *fastReflection_MsgRemoveValidator) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+	if x.FromAddress != "" {
+		value := protoreflect.ValueOfString(x.FromAddress)
+		if !f(fd_MsgRemoveValidator_from_address, value) {
 			return
 		}
 	}
-	if x.InFavor != false {
-		value := protoreflect.ValueOfBool(x.InFavor)
-		if !f(fd_MsgVouchValidator_in_favor, value) {
-			return
-		}
-	}
-	if x.CandidateAddress != "" {
-		value := protoreflect.ValueOfString(x.CandidateAddress)
-		if !f(fd_MsgVouchValidator_candidate_address, value) {
+	if x.ValidatorAddress != "" {
+		value := protoreflect.ValueOfString(x.ValidatorAddress)
+		if !f(fd_MsgRemoveValidator_validator_address, value) {
 			return
 		}
 	}
@@ -1061,19 +1009,17 @@ func (x *fastReflection_MsgVouchValidator) Range(f func(protoreflect.FieldDescri
 // In other cases (aside from the nullable cases above),
 // a proto3 scalar field is populated if it contains a non-zero value, and
 // a repeated field is populated if it is non-empty.
-func (x *fastReflection_MsgVouchValidator) Has(fd protoreflect.FieldDescriptor) bool {
+func (x *fastReflection_MsgRemoveValidator) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
-	case "strangelove_ventures.poa.v1.MsgVouchValidator.voucher_address":
-		return x.VoucherAddress != ""
-	case "strangelove_ventures.poa.v1.MsgVouchValidator.in_favor":
-		return x.InFavor != false
-	case "strangelove_ventures.poa.v1.MsgVouchValidator.candidate_address":
-		return x.CandidateAddress != ""
+	case "strangelove_ventures.poa.v1.MsgRemoveValidator.from_address":
+		return x.FromAddress != ""
+	case "strangelove_ventures.poa.v1.MsgRemoveValidator.validator_address":
+		return x.ValidatorAddress != ""
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgVouchValidator"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgRemoveValidator"))
 		}
-		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgVouchValidator does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgRemoveValidator does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -1083,19 +1029,17 @@ func (x *fastReflection_MsgVouchValidator) Has(fd protoreflect.FieldDescriptor) 
 // associated with the given field number.
 //
 // Clear is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgVouchValidator) Clear(fd protoreflect.FieldDescriptor) {
+func (x *fastReflection_MsgRemoveValidator) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
-	case "strangelove_ventures.poa.v1.MsgVouchValidator.voucher_address":
-		x.VoucherAddress = ""
-	case "strangelove_ventures.poa.v1.MsgVouchValidator.in_favor":
-		x.InFavor = false
-	case "strangelove_ventures.poa.v1.MsgVouchValidator.candidate_address":
-		x.CandidateAddress = ""
+	case "strangelove_ventures.poa.v1.MsgRemoveValidator.from_address":
+		x.FromAddress = ""
+	case "strangelove_ventures.poa.v1.MsgRemoveValidator.validator_address":
+		x.ValidatorAddress = ""
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgVouchValidator"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgRemoveValidator"))
 		}
-		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgVouchValidator does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgRemoveValidator does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -1105,22 +1049,19 @@ func (x *fastReflection_MsgVouchValidator) Clear(fd protoreflect.FieldDescriptor
 // the default value of a bytes scalar is guaranteed to be a copy.
 // For unpopulated composite types, it returns an empty, read-only view
 // of the value; to obtain a mutable reference, use Mutable.
-func (x *fastReflection_MsgVouchValidator) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_MsgRemoveValidator) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
-	case "strangelove_ventures.poa.v1.MsgVouchValidator.voucher_address":
-		value := x.VoucherAddress
+	case "strangelove_ventures.poa.v1.MsgRemoveValidator.from_address":
+		value := x.FromAddress
 		return protoreflect.ValueOfString(value)
-	case "strangelove_ventures.poa.v1.MsgVouchValidator.in_favor":
-		value := x.InFavor
-		return protoreflect.ValueOfBool(value)
-	case "strangelove_ventures.poa.v1.MsgVouchValidator.candidate_address":
-		value := x.CandidateAddress
+	case "strangelove_ventures.poa.v1.MsgRemoveValidator.validator_address":
+		value := x.ValidatorAddress
 		return protoreflect.ValueOfString(value)
 	default:
 		if descriptor.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgVouchValidator"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgRemoveValidator"))
 		}
-		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgVouchValidator does not contain field %s", descriptor.FullName()))
+		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgRemoveValidator does not contain field %s", descriptor.FullName()))
 	}
 }
 
@@ -1134,19 +1075,17 @@ func (x *fastReflection_MsgVouchValidator) Get(descriptor protoreflect.FieldDesc
 // empty, read-only value, then it panics.
 //
 // Set is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgVouchValidator) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
+func (x *fastReflection_MsgRemoveValidator) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
-	case "strangelove_ventures.poa.v1.MsgVouchValidator.voucher_address":
-		x.VoucherAddress = value.Interface().(string)
-	case "strangelove_ventures.poa.v1.MsgVouchValidator.in_favor":
-		x.InFavor = value.Bool()
-	case "strangelove_ventures.poa.v1.MsgVouchValidator.candidate_address":
-		x.CandidateAddress = value.Interface().(string)
+	case "strangelove_ventures.poa.v1.MsgRemoveValidator.from_address":
+		x.FromAddress = value.Interface().(string)
+	case "strangelove_ventures.poa.v1.MsgRemoveValidator.validator_address":
+		x.ValidatorAddress = value.Interface().(string)
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgVouchValidator"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgRemoveValidator"))
 		}
-		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgVouchValidator does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgRemoveValidator does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -1160,48 +1099,44 @@ func (x *fastReflection_MsgVouchValidator) Set(fd protoreflect.FieldDescriptor, 
 // It panics if the field does not contain a composite type.
 //
 // Mutable is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgVouchValidator) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_MsgRemoveValidator) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "strangelove_ventures.poa.v1.MsgVouchValidator.voucher_address":
-		panic(fmt.Errorf("field voucher_address of message strangelove_ventures.poa.v1.MsgVouchValidator is not mutable"))
-	case "strangelove_ventures.poa.v1.MsgVouchValidator.in_favor":
-		panic(fmt.Errorf("field in_favor of message strangelove_ventures.poa.v1.MsgVouchValidator is not mutable"))
-	case "strangelove_ventures.poa.v1.MsgVouchValidator.candidate_address":
-		panic(fmt.Errorf("field candidate_address of message strangelove_ventures.poa.v1.MsgVouchValidator is not mutable"))
+	case "strangelove_ventures.poa.v1.MsgRemoveValidator.from_address":
+		panic(fmt.Errorf("field from_address of message strangelove_ventures.poa.v1.MsgRemoveValidator is not mutable"))
+	case "strangelove_ventures.poa.v1.MsgRemoveValidator.validator_address":
+		panic(fmt.Errorf("field validator_address of message strangelove_ventures.poa.v1.MsgRemoveValidator is not mutable"))
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgVouchValidator"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgRemoveValidator"))
 		}
-		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgVouchValidator does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgRemoveValidator does not contain field %s", fd.FullName()))
 	}
 }
 
 // NewField returns a new value that is assignable to the field
 // for the given descriptor. For scalars, this returns the default value.
 // For lists, maps, and messages, this returns a new, empty, mutable value.
-func (x *fastReflection_MsgVouchValidator) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_MsgRemoveValidator) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "strangelove_ventures.poa.v1.MsgVouchValidator.voucher_address":
+	case "strangelove_ventures.poa.v1.MsgRemoveValidator.from_address":
 		return protoreflect.ValueOfString("")
-	case "strangelove_ventures.poa.v1.MsgVouchValidator.in_favor":
-		return protoreflect.ValueOfBool(false)
-	case "strangelove_ventures.poa.v1.MsgVouchValidator.candidate_address":
+	case "strangelove_ventures.poa.v1.MsgRemoveValidator.validator_address":
 		return protoreflect.ValueOfString("")
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgVouchValidator"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgRemoveValidator"))
 		}
-		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgVouchValidator does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgRemoveValidator does not contain field %s", fd.FullName()))
 	}
 }
 
 // WhichOneof reports which field within the oneof is populated,
 // returning nil if none are populated.
 // It panics if the oneof descriptor does not belong to this message.
-func (x *fastReflection_MsgVouchValidator) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+func (x *fastReflection_MsgRemoveValidator) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
 	switch d.FullName() {
 	default:
-		panic(fmt.Errorf("%s is not a oneof field in strangelove_ventures.poa.v1.MsgVouchValidator", d.FullName()))
+		panic(fmt.Errorf("%s is not a oneof field in strangelove_ventures.poa.v1.MsgRemoveValidator", d.FullName()))
 	}
 	panic("unreachable")
 }
@@ -1209,7 +1144,7 @@ func (x *fastReflection_MsgVouchValidator) WhichOneof(d protoreflect.OneofDescri
 // GetUnknown retrieves the entire list of unknown fields.
 // The caller may only mutate the contents of the RawFields
 // if the mutated bytes are stored back into the message with SetUnknown.
-func (x *fastReflection_MsgVouchValidator) GetUnknown() protoreflect.RawFields {
+func (x *fastReflection_MsgRemoveValidator) GetUnknown() protoreflect.RawFields {
 	return x.unknownFields
 }
 
@@ -1220,7 +1155,7 @@ func (x *fastReflection_MsgVouchValidator) GetUnknown() protoreflect.RawFields {
 // An empty RawFields may be passed to clear the fields.
 //
 // SetUnknown is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgVouchValidator) SetUnknown(fields protoreflect.RawFields) {
+func (x *fastReflection_MsgRemoveValidator) SetUnknown(fields protoreflect.RawFields) {
 	x.unknownFields = fields
 }
 
@@ -1232,7 +1167,7 @@ func (x *fastReflection_MsgVouchValidator) SetUnknown(fields protoreflect.RawFie
 // message type, but the details are implementation dependent.
 // Validity is not part of the protobuf data model, and may not
 // be preserved in marshaling or other operations.
-func (x *fastReflection_MsgVouchValidator) IsValid() bool {
+func (x *fastReflection_MsgRemoveValidator) IsValid() bool {
 	return x != nil
 }
 
@@ -1242,9 +1177,9 @@ func (x *fastReflection_MsgVouchValidator) IsValid() bool {
 // The returned methods type is identical to
 // "google.golang.org/protobuf/runtime/protoiface".Methods.
 // Consult the protoiface package documentation for details.
-func (x *fastReflection_MsgVouchValidator) ProtoMethods() *protoiface.Methods {
+func (x *fastReflection_MsgRemoveValidator) ProtoMethods() *protoiface.Methods {
 	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
-		x := input.Message.Interface().(*MsgVouchValidator)
+		x := input.Message.Interface().(*MsgRemoveValidator)
 		if x == nil {
 			return protoiface.SizeOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -1256,14 +1191,11 @@ func (x *fastReflection_MsgVouchValidator) ProtoMethods() *protoiface.Methods {
 		var n int
 		var l int
 		_ = l
-		l = len(x.VoucherAddress)
+		l = len(x.FromAddress)
 		if l > 0 {
 			n += 1 + l + runtime.Sov(uint64(l))
 		}
-		if x.InFavor {
-			n += 2
-		}
-		l = len(x.CandidateAddress)
+		l = len(x.ValidatorAddress)
 		if l > 0 {
 			n += 1 + l + runtime.Sov(uint64(l))
 		}
@@ -1277,7 +1209,7 @@ func (x *fastReflection_MsgVouchValidator) ProtoMethods() *protoiface.Methods {
 	}
 
 	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
-		x := input.Message.Interface().(*MsgVouchValidator)
+		x := input.Message.Interface().(*MsgRemoveValidator)
 		if x == nil {
 			return protoiface.MarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -1296,27 +1228,17 @@ func (x *fastReflection_MsgVouchValidator) ProtoMethods() *protoiface.Methods {
 			i -= len(x.unknownFields)
 			copy(dAtA[i:], x.unknownFields)
 		}
-		if len(x.CandidateAddress) > 0 {
-			i -= len(x.CandidateAddress)
-			copy(dAtA[i:], x.CandidateAddress)
-			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.CandidateAddress)))
+		if len(x.ValidatorAddress) > 0 {
+			i -= len(x.ValidatorAddress)
+			copy(dAtA[i:], x.ValidatorAddress)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.ValidatorAddress)))
 			i--
-			dAtA[i] = 0x1a
+			dAtA[i] = 0x12
 		}
-		if x.InFavor {
-			i--
-			if x.InFavor {
-				dAtA[i] = 1
-			} else {
-				dAtA[i] = 0
-			}
-			i--
-			dAtA[i] = 0x10
-		}
-		if len(x.VoucherAddress) > 0 {
-			i -= len(x.VoucherAddress)
-			copy(dAtA[i:], x.VoucherAddress)
-			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.VoucherAddress)))
+		if len(x.FromAddress) > 0 {
+			i -= len(x.FromAddress)
+			copy(dAtA[i:], x.FromAddress)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.FromAddress)))
 			i--
 			dAtA[i] = 0xa
 		}
@@ -1331,7 +1253,7 @@ func (x *fastReflection_MsgVouchValidator) ProtoMethods() *protoiface.Methods {
 		}, nil
 	}
 	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
-		x := input.Message.Interface().(*MsgVouchValidator)
+		x := input.Message.Interface().(*MsgRemoveValidator)
 		if x == nil {
 			return protoiface.UnmarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -1363,15 +1285,15 @@ func (x *fastReflection_MsgVouchValidator) ProtoMethods() *protoiface.Methods {
 			fieldNum := int32(wire >> 3)
 			wireType := int(wire & 0x7)
 			if wireType == 4 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgVouchValidator: wiretype end group for non-group")
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgRemoveValidator: wiretype end group for non-group")
 			}
 			if fieldNum <= 0 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgVouchValidator: illegal tag %d (wire type %d)", fieldNum, wire)
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgRemoveValidator: illegal tag %d (wire type %d)", fieldNum, wire)
 			}
 			switch fieldNum {
 			case 1:
 				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field VoucherAddress", wireType)
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field FromAddress", wireType)
 				}
 				var stringLen uint64
 				for shift := uint(0); ; shift += 7 {
@@ -1399,31 +1321,11 @@ func (x *fastReflection_MsgVouchValidator) ProtoMethods() *protoiface.Methods {
 				if postIndex > l {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
-				x.VoucherAddress = string(dAtA[iNdEx:postIndex])
+				x.FromAddress = string(dAtA[iNdEx:postIndex])
 				iNdEx = postIndex
 			case 2:
-				if wireType != 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field InFavor", wireType)
-				}
-				var v int
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
-					}
-					if iNdEx >= l {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					v |= int(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				x.InFavor = bool(v != 0)
-			case 3:
 				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field CandidateAddress", wireType)
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field ValidatorAddress", wireType)
 				}
 				var stringLen uint64
 				for shift := uint(0); ; shift += 7 {
@@ -1451,7 +1353,7 @@ func (x *fastReflection_MsgVouchValidator) ProtoMethods() *protoiface.Methods {
 				if postIndex > l {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
-				x.CandidateAddress = string(dAtA[iNdEx:postIndex])
+				x.ValidatorAddress = string(dAtA[iNdEx:postIndex])
 				iNdEx = postIndex
 			default:
 				iNdEx = preIndex
@@ -1489,23 +1391,23 @@ func (x *fastReflection_MsgVouchValidator) ProtoMethods() *protoiface.Methods {
 }
 
 var (
-	md_MsgVouchValidatorResponse protoreflect.MessageDescriptor
+	md_MsgRemoveValidatorResponse protoreflect.MessageDescriptor
 )
 
 func init() {
 	file_strangelove_ventures_poa_v1_tx_proto_init()
-	md_MsgVouchValidatorResponse = File_strangelove_ventures_poa_v1_tx_proto.Messages().ByName("MsgVouchValidatorResponse")
+	md_MsgRemoveValidatorResponse = File_strangelove_ventures_poa_v1_tx_proto.Messages().ByName("MsgRemoveValidatorResponse")
 }
 
-var _ protoreflect.Message = (*fastReflection_MsgVouchValidatorResponse)(nil)
+var _ protoreflect.Message = (*fastReflection_MsgRemoveValidatorResponse)(nil)
 
-type fastReflection_MsgVouchValidatorResponse MsgVouchValidatorResponse
+type fastReflection_MsgRemoveValidatorResponse MsgRemoveValidatorResponse
 
-func (x *MsgVouchValidatorResponse) ProtoReflect() protoreflect.Message {
-	return (*fastReflection_MsgVouchValidatorResponse)(x)
+func (x *MsgRemoveValidatorResponse) ProtoReflect() protoreflect.Message {
+	return (*fastReflection_MsgRemoveValidatorResponse)(x)
 }
 
-func (x *MsgVouchValidatorResponse) slowProtoReflect() protoreflect.Message {
+func (x *MsgRemoveValidatorResponse) slowProtoReflect() protoreflect.Message {
 	mi := &file_strangelove_ventures_poa_v1_tx_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -1517,43 +1419,43 @@ func (x *MsgVouchValidatorResponse) slowProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-var _fastReflection_MsgVouchValidatorResponse_messageType fastReflection_MsgVouchValidatorResponse_messageType
-var _ protoreflect.MessageType = fastReflection_MsgVouchValidatorResponse_messageType{}
+var _fastReflection_MsgRemoveValidatorResponse_messageType fastReflection_MsgRemoveValidatorResponse_messageType
+var _ protoreflect.MessageType = fastReflection_MsgRemoveValidatorResponse_messageType{}
 
-type fastReflection_MsgVouchValidatorResponse_messageType struct{}
+type fastReflection_MsgRemoveValidatorResponse_messageType struct{}
 
-func (x fastReflection_MsgVouchValidatorResponse_messageType) Zero() protoreflect.Message {
-	return (*fastReflection_MsgVouchValidatorResponse)(nil)
+func (x fastReflection_MsgRemoveValidatorResponse_messageType) Zero() protoreflect.Message {
+	return (*fastReflection_MsgRemoveValidatorResponse)(nil)
 }
-func (x fastReflection_MsgVouchValidatorResponse_messageType) New() protoreflect.Message {
-	return new(fastReflection_MsgVouchValidatorResponse)
+func (x fastReflection_MsgRemoveValidatorResponse_messageType) New() protoreflect.Message {
+	return new(fastReflection_MsgRemoveValidatorResponse)
 }
-func (x fastReflection_MsgVouchValidatorResponse_messageType) Descriptor() protoreflect.MessageDescriptor {
-	return md_MsgVouchValidatorResponse
+func (x fastReflection_MsgRemoveValidatorResponse_messageType) Descriptor() protoreflect.MessageDescriptor {
+	return md_MsgRemoveValidatorResponse
 }
 
 // Descriptor returns message descriptor, which contains only the protobuf
 // type information for the message.
-func (x *fastReflection_MsgVouchValidatorResponse) Descriptor() protoreflect.MessageDescriptor {
-	return md_MsgVouchValidatorResponse
+func (x *fastReflection_MsgRemoveValidatorResponse) Descriptor() protoreflect.MessageDescriptor {
+	return md_MsgRemoveValidatorResponse
 }
 
 // Type returns the message type, which encapsulates both Go and protobuf
 // type information. If the Go type information is not needed,
 // it is recommended that the message descriptor be used instead.
-func (x *fastReflection_MsgVouchValidatorResponse) Type() protoreflect.MessageType {
-	return _fastReflection_MsgVouchValidatorResponse_messageType
+func (x *fastReflection_MsgRemoveValidatorResponse) Type() protoreflect.MessageType {
+	return _fastReflection_MsgRemoveValidatorResponse_messageType
 }
 
 // New returns a newly allocated and mutable empty message.
-func (x *fastReflection_MsgVouchValidatorResponse) New() protoreflect.Message {
-	return new(fastReflection_MsgVouchValidatorResponse)
+func (x *fastReflection_MsgRemoveValidatorResponse) New() protoreflect.Message {
+	return new(fastReflection_MsgRemoveValidatorResponse)
 }
 
 // Interface unwraps the message reflection interface and
 // returns the underlying ProtoMessage interface.
-func (x *fastReflection_MsgVouchValidatorResponse) Interface() protoreflect.ProtoMessage {
-	return (*MsgVouchValidatorResponse)(x)
+func (x *fastReflection_MsgRemoveValidatorResponse) Interface() protoreflect.ProtoMessage {
+	return (*MsgRemoveValidatorResponse)(x)
 }
 
 // Range iterates over every populated field in an undefined order,
@@ -1561,7 +1463,7 @@ func (x *fastReflection_MsgVouchValidatorResponse) Interface() protoreflect.Prot
 // Range returns immediately if f returns false.
 // While iterating, mutating operations may only be performed
 // on the current field descriptor.
-func (x *fastReflection_MsgVouchValidatorResponse) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+func (x *fastReflection_MsgRemoveValidatorResponse) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
 }
 
 // Has reports whether a field is populated.
@@ -1575,13 +1477,13 @@ func (x *fastReflection_MsgVouchValidatorResponse) Range(f func(protoreflect.Fie
 // In other cases (aside from the nullable cases above),
 // a proto3 scalar field is populated if it contains a non-zero value, and
 // a repeated field is populated if it is non-empty.
-func (x *fastReflection_MsgVouchValidatorResponse) Has(fd protoreflect.FieldDescriptor) bool {
+func (x *fastReflection_MsgRemoveValidatorResponse) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgVouchValidatorResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgRemoveValidatorResponse"))
 		}
-		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgVouchValidatorResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgRemoveValidatorResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -1591,13 +1493,13 @@ func (x *fastReflection_MsgVouchValidatorResponse) Has(fd protoreflect.FieldDesc
 // associated with the given field number.
 //
 // Clear is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgVouchValidatorResponse) Clear(fd protoreflect.FieldDescriptor) {
+func (x *fastReflection_MsgRemoveValidatorResponse) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgVouchValidatorResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgRemoveValidatorResponse"))
 		}
-		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgVouchValidatorResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgRemoveValidatorResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -1607,13 +1509,13 @@ func (x *fastReflection_MsgVouchValidatorResponse) Clear(fd protoreflect.FieldDe
 // the default value of a bytes scalar is guaranteed to be a copy.
 // For unpopulated composite types, it returns an empty, read-only view
 // of the value; to obtain a mutable reference, use Mutable.
-func (x *fastReflection_MsgVouchValidatorResponse) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_MsgRemoveValidatorResponse) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
 	default:
 		if descriptor.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgVouchValidatorResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgRemoveValidatorResponse"))
 		}
-		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgVouchValidatorResponse does not contain field %s", descriptor.FullName()))
+		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgRemoveValidatorResponse does not contain field %s", descriptor.FullName()))
 	}
 }
 
@@ -1627,13 +1529,13 @@ func (x *fastReflection_MsgVouchValidatorResponse) Get(descriptor protoreflect.F
 // empty, read-only value, then it panics.
 //
 // Set is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgVouchValidatorResponse) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
+func (x *fastReflection_MsgRemoveValidatorResponse) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgVouchValidatorResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgRemoveValidatorResponse"))
 		}
-		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgVouchValidatorResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgRemoveValidatorResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -1647,36 +1549,36 @@ func (x *fastReflection_MsgVouchValidatorResponse) Set(fd protoreflect.FieldDesc
 // It panics if the field does not contain a composite type.
 //
 // Mutable is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgVouchValidatorResponse) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_MsgRemoveValidatorResponse) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgVouchValidatorResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgRemoveValidatorResponse"))
 		}
-		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgVouchValidatorResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgRemoveValidatorResponse does not contain field %s", fd.FullName()))
 	}
 }
 
 // NewField returns a new value that is assignable to the field
 // for the given descriptor. For scalars, this returns the default value.
 // For lists, maps, and messages, this returns a new, empty, mutable value.
-func (x *fastReflection_MsgVouchValidatorResponse) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_MsgRemoveValidatorResponse) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgVouchValidatorResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgRemoveValidatorResponse"))
 		}
-		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgVouchValidatorResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgRemoveValidatorResponse does not contain field %s", fd.FullName()))
 	}
 }
 
 // WhichOneof reports which field within the oneof is populated,
 // returning nil if none are populated.
 // It panics if the oneof descriptor does not belong to this message.
-func (x *fastReflection_MsgVouchValidatorResponse) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+func (x *fastReflection_MsgRemoveValidatorResponse) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
 	switch d.FullName() {
 	default:
-		panic(fmt.Errorf("%s is not a oneof field in strangelove_ventures.poa.v1.MsgVouchValidatorResponse", d.FullName()))
+		panic(fmt.Errorf("%s is not a oneof field in strangelove_ventures.poa.v1.MsgRemoveValidatorResponse", d.FullName()))
 	}
 	panic("unreachable")
 }
@@ -1684,7 +1586,7 @@ func (x *fastReflection_MsgVouchValidatorResponse) WhichOneof(d protoreflect.One
 // GetUnknown retrieves the entire list of unknown fields.
 // The caller may only mutate the contents of the RawFields
 // if the mutated bytes are stored back into the message with SetUnknown.
-func (x *fastReflection_MsgVouchValidatorResponse) GetUnknown() protoreflect.RawFields {
+func (x *fastReflection_MsgRemoveValidatorResponse) GetUnknown() protoreflect.RawFields {
 	return x.unknownFields
 }
 
@@ -1695,7 +1597,7 @@ func (x *fastReflection_MsgVouchValidatorResponse) GetUnknown() protoreflect.Raw
 // An empty RawFields may be passed to clear the fields.
 //
 // SetUnknown is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgVouchValidatorResponse) SetUnknown(fields protoreflect.RawFields) {
+func (x *fastReflection_MsgRemoveValidatorResponse) SetUnknown(fields protoreflect.RawFields) {
 	x.unknownFields = fields
 }
 
@@ -1707,7 +1609,7 @@ func (x *fastReflection_MsgVouchValidatorResponse) SetUnknown(fields protoreflec
 // message type, but the details are implementation dependent.
 // Validity is not part of the protobuf data model, and may not
 // be preserved in marshaling or other operations.
-func (x *fastReflection_MsgVouchValidatorResponse) IsValid() bool {
+func (x *fastReflection_MsgRemoveValidatorResponse) IsValid() bool {
 	return x != nil
 }
 
@@ -1717,9 +1619,9 @@ func (x *fastReflection_MsgVouchValidatorResponse) IsValid() bool {
 // The returned methods type is identical to
 // "google.golang.org/protobuf/runtime/protoiface".Methods.
 // Consult the protoiface package documentation for details.
-func (x *fastReflection_MsgVouchValidatorResponse) ProtoMethods() *protoiface.Methods {
+func (x *fastReflection_MsgRemoveValidatorResponse) ProtoMethods() *protoiface.Methods {
 	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
-		x := input.Message.Interface().(*MsgVouchValidatorResponse)
+		x := input.Message.Interface().(*MsgRemoveValidatorResponse)
 		if x == nil {
 			return protoiface.SizeOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -1741,7 +1643,7 @@ func (x *fastReflection_MsgVouchValidatorResponse) ProtoMethods() *protoiface.Me
 	}
 
 	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
-		x := input.Message.Interface().(*MsgVouchValidatorResponse)
+		x := input.Message.Interface().(*MsgRemoveValidatorResponse)
 		if x == nil {
 			return protoiface.MarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -1771,7 +1673,7 @@ func (x *fastReflection_MsgVouchValidatorResponse) ProtoMethods() *protoiface.Me
 		}, nil
 	}
 	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
-		x := input.Message.Interface().(*MsgVouchValidatorResponse)
+		x := input.Message.Interface().(*MsgRemoveValidatorResponse)
 		if x == nil {
 			return protoiface.UnmarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -1803,10 +1705,865 @@ func (x *fastReflection_MsgVouchValidatorResponse) ProtoMethods() *protoiface.Me
 			fieldNum := int32(wire >> 3)
 			wireType := int(wire & 0x7)
 			if wireType == 4 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgVouchValidatorResponse: wiretype end group for non-group")
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgRemoveValidatorResponse: wiretype end group for non-group")
 			}
 			if fieldNum <= 0 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgVouchValidatorResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgRemoveValidatorResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			}
+			switch fieldNum {
+			default:
+				iNdEx = preIndex
+				skippy, err := runtime.Skip(dAtA[iNdEx:])
+				if err != nil {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
+				}
+				if (skippy < 0) || (iNdEx+skippy) < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if (iNdEx + skippy) > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				if !options.DiscardUnknown {
+					x.unknownFields = append(x.unknownFields, dAtA[iNdEx:iNdEx+skippy]...)
+				}
+				iNdEx += skippy
+			}
+		}
+
+		if iNdEx > l {
+			return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+		}
+		return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, nil
+	}
+	return &protoiface.Methods{
+		NoUnkeyedLiterals: struct{}{},
+		Flags:             protoiface.SupportMarshalDeterministic | protoiface.SupportUnmarshalDiscardUnknown,
+		Size:              size,
+		Marshal:           marshal,
+		Unmarshal:         unmarshal,
+		Merge:             nil,
+		CheckInitialized:  nil,
+	}
+}
+
+var (
+	md_MsgUpdateParams              protoreflect.MessageDescriptor
+	fd_MsgUpdateParams_from_address protoreflect.FieldDescriptor
+	fd_MsgUpdateParams_params       protoreflect.FieldDescriptor
+)
+
+func init() {
+	file_strangelove_ventures_poa_v1_tx_proto_init()
+	md_MsgUpdateParams = File_strangelove_ventures_poa_v1_tx_proto.Messages().ByName("MsgUpdateParams")
+	fd_MsgUpdateParams_from_address = md_MsgUpdateParams.Fields().ByName("from_address")
+	fd_MsgUpdateParams_params = md_MsgUpdateParams.Fields().ByName("params")
+}
+
+var _ protoreflect.Message = (*fastReflection_MsgUpdateParams)(nil)
+
+type fastReflection_MsgUpdateParams MsgUpdateParams
+
+func (x *MsgUpdateParams) ProtoReflect() protoreflect.Message {
+	return (*fastReflection_MsgUpdateParams)(x)
+}
+
+func (x *MsgUpdateParams) slowProtoReflect() protoreflect.Message {
+	mi := &file_strangelove_ventures_poa_v1_tx_proto_msgTypes[4]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+var _fastReflection_MsgUpdateParams_messageType fastReflection_MsgUpdateParams_messageType
+var _ protoreflect.MessageType = fastReflection_MsgUpdateParams_messageType{}
+
+type fastReflection_MsgUpdateParams_messageType struct{}
+
+func (x fastReflection_MsgUpdateParams_messageType) Zero() protoreflect.Message {
+	return (*fastReflection_MsgUpdateParams)(nil)
+}
+func (x fastReflection_MsgUpdateParams_messageType) New() protoreflect.Message {
+	return new(fastReflection_MsgUpdateParams)
+}
+func (x fastReflection_MsgUpdateParams_messageType) Descriptor() protoreflect.MessageDescriptor {
+	return md_MsgUpdateParams
+}
+
+// Descriptor returns message descriptor, which contains only the protobuf
+// type information for the message.
+func (x *fastReflection_MsgUpdateParams) Descriptor() protoreflect.MessageDescriptor {
+	return md_MsgUpdateParams
+}
+
+// Type returns the message type, which encapsulates both Go and protobuf
+// type information. If the Go type information is not needed,
+// it is recommended that the message descriptor be used instead.
+func (x *fastReflection_MsgUpdateParams) Type() protoreflect.MessageType {
+	return _fastReflection_MsgUpdateParams_messageType
+}
+
+// New returns a newly allocated and mutable empty message.
+func (x *fastReflection_MsgUpdateParams) New() protoreflect.Message {
+	return new(fastReflection_MsgUpdateParams)
+}
+
+// Interface unwraps the message reflection interface and
+// returns the underlying ProtoMessage interface.
+func (x *fastReflection_MsgUpdateParams) Interface() protoreflect.ProtoMessage {
+	return (*MsgUpdateParams)(x)
+}
+
+// Range iterates over every populated field in an undefined order,
+// calling f for each field descriptor and value encountered.
+// Range returns immediately if f returns false.
+// While iterating, mutating operations may only be performed
+// on the current field descriptor.
+func (x *fastReflection_MsgUpdateParams) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+	if x.FromAddress != "" {
+		value := protoreflect.ValueOfString(x.FromAddress)
+		if !f(fd_MsgUpdateParams_from_address, value) {
+			return
+		}
+	}
+	if x.Params != nil {
+		value := protoreflect.ValueOfMessage(x.Params.ProtoReflect())
+		if !f(fd_MsgUpdateParams_params, value) {
+			return
+		}
+	}
+}
+
+// Has reports whether a field is populated.
+//
+// Some fields have the property of nullability where it is possible to
+// distinguish between the default value of a field and whether the field
+// was explicitly populated with the default value. Singular message fields,
+// member fields of a oneof, and proto2 scalar fields are nullable. Such
+// fields are populated only if explicitly set.
+//
+// In other cases (aside from the nullable cases above),
+// a proto3 scalar field is populated if it contains a non-zero value, and
+// a repeated field is populated if it is non-empty.
+func (x *fastReflection_MsgUpdateParams) Has(fd protoreflect.FieldDescriptor) bool {
+	switch fd.FullName() {
+	case "strangelove_ventures.poa.v1.MsgUpdateParams.from_address":
+		return x.FromAddress != ""
+	case "strangelove_ventures.poa.v1.MsgUpdateParams.params":
+		return x.Params != nil
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgUpdateParams"))
+		}
+		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgUpdateParams does not contain field %s", fd.FullName()))
+	}
+}
+
+// Clear clears the field such that a subsequent Has call reports false.
+//
+// Clearing an extension field clears both the extension type and value
+// associated with the given field number.
+//
+// Clear is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_MsgUpdateParams) Clear(fd protoreflect.FieldDescriptor) {
+	switch fd.FullName() {
+	case "strangelove_ventures.poa.v1.MsgUpdateParams.from_address":
+		x.FromAddress = ""
+	case "strangelove_ventures.poa.v1.MsgUpdateParams.params":
+		x.Params = nil
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgUpdateParams"))
+		}
+		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgUpdateParams does not contain field %s", fd.FullName()))
+	}
+}
+
+// Get retrieves the value for a field.
+//
+// For unpopulated scalars, it returns the default value, where
+// the default value of a bytes scalar is guaranteed to be a copy.
+// For unpopulated composite types, it returns an empty, read-only view
+// of the value; to obtain a mutable reference, use Mutable.
+func (x *fastReflection_MsgUpdateParams) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
+	switch descriptor.FullName() {
+	case "strangelove_ventures.poa.v1.MsgUpdateParams.from_address":
+		value := x.FromAddress
+		return protoreflect.ValueOfString(value)
+	case "strangelove_ventures.poa.v1.MsgUpdateParams.params":
+		value := x.Params
+		return protoreflect.ValueOfMessage(value.ProtoReflect())
+	default:
+		if descriptor.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgUpdateParams"))
+		}
+		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgUpdateParams does not contain field %s", descriptor.FullName()))
+	}
+}
+
+// Set stores the value for a field.
+//
+// For a field belonging to a oneof, it implicitly clears any other field
+// that may be currently set within the same oneof.
+// For extension fields, it implicitly stores the provided ExtensionType.
+// When setting a composite type, it is unspecified whether the stored value
+// aliases the source's memory in any way. If the composite value is an
+// empty, read-only value, then it panics.
+//
+// Set is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_MsgUpdateParams) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
+	switch fd.FullName() {
+	case "strangelove_ventures.poa.v1.MsgUpdateParams.from_address":
+		x.FromAddress = value.Interface().(string)
+	case "strangelove_ventures.poa.v1.MsgUpdateParams.params":
+		x.Params = value.Message().Interface().(*Params)
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgUpdateParams"))
+		}
+		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgUpdateParams does not contain field %s", fd.FullName()))
+	}
+}
+
+// Mutable returns a mutable reference to a composite type.
+//
+// If the field is unpopulated, it may allocate a composite value.
+// For a field belonging to a oneof, it implicitly clears any other field
+// that may be currently set within the same oneof.
+// For extension fields, it implicitly stores the provided ExtensionType
+// if not already stored.
+// It panics if the field does not contain a composite type.
+//
+// Mutable is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_MsgUpdateParams) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
+	switch fd.FullName() {
+	case "strangelove_ventures.poa.v1.MsgUpdateParams.params":
+		if x.Params == nil {
+			x.Params = new(Params)
+		}
+		return protoreflect.ValueOfMessage(x.Params.ProtoReflect())
+	case "strangelove_ventures.poa.v1.MsgUpdateParams.from_address":
+		panic(fmt.Errorf("field from_address of message strangelove_ventures.poa.v1.MsgUpdateParams is not mutable"))
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgUpdateParams"))
+		}
+		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgUpdateParams does not contain field %s", fd.FullName()))
+	}
+}
+
+// NewField returns a new value that is assignable to the field
+// for the given descriptor. For scalars, this returns the default value.
+// For lists, maps, and messages, this returns a new, empty, mutable value.
+func (x *fastReflection_MsgUpdateParams) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
+	switch fd.FullName() {
+	case "strangelove_ventures.poa.v1.MsgUpdateParams.from_address":
+		return protoreflect.ValueOfString("")
+	case "strangelove_ventures.poa.v1.MsgUpdateParams.params":
+		m := new(Params)
+		return protoreflect.ValueOfMessage(m.ProtoReflect())
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgUpdateParams"))
+		}
+		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgUpdateParams does not contain field %s", fd.FullName()))
+	}
+}
+
+// WhichOneof reports which field within the oneof is populated,
+// returning nil if none are populated.
+// It panics if the oneof descriptor does not belong to this message.
+func (x *fastReflection_MsgUpdateParams) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+	switch d.FullName() {
+	default:
+		panic(fmt.Errorf("%s is not a oneof field in strangelove_ventures.poa.v1.MsgUpdateParams", d.FullName()))
+	}
+	panic("unreachable")
+}
+
+// GetUnknown retrieves the entire list of unknown fields.
+// The caller may only mutate the contents of the RawFields
+// if the mutated bytes are stored back into the message with SetUnknown.
+func (x *fastReflection_MsgUpdateParams) GetUnknown() protoreflect.RawFields {
+	return x.unknownFields
+}
+
+// SetUnknown stores an entire list of unknown fields.
+// The raw fields must be syntactically valid according to the wire format.
+// An implementation may panic if this is not the case.
+// Once stored, the caller must not mutate the content of the RawFields.
+// An empty RawFields may be passed to clear the fields.
+//
+// SetUnknown is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_MsgUpdateParams) SetUnknown(fields protoreflect.RawFields) {
+	x.unknownFields = fields
+}
+
+// IsValid reports whether the message is valid.
+//
+// An invalid message is an empty, read-only value.
+//
+// An invalid message often corresponds to a nil pointer of the concrete
+// message type, but the details are implementation dependent.
+// Validity is not part of the protobuf data model, and may not
+// be preserved in marshaling or other operations.
+func (x *fastReflection_MsgUpdateParams) IsValid() bool {
+	return x != nil
+}
+
+// ProtoMethods returns optional fastReflectionFeature-path implementations of various operations.
+// This method may return nil.
+//
+// The returned methods type is identical to
+// "google.golang.org/protobuf/runtime/protoiface".Methods.
+// Consult the protoiface package documentation for details.
+func (x *fastReflection_MsgUpdateParams) ProtoMethods() *protoiface.Methods {
+	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
+		x := input.Message.Interface().(*MsgUpdateParams)
+		if x == nil {
+			return protoiface.SizeOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Size:              0,
+			}
+		}
+		options := runtime.SizeInputToOptions(input)
+		_ = options
+		var n int
+		var l int
+		_ = l
+		l = len(x.FromAddress)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		if x.Params != nil {
+			l = options.Size(x.Params)
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		if x.unknownFields != nil {
+			n += len(x.unknownFields)
+		}
+		return protoiface.SizeOutput{
+			NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+			Size:              n,
+		}
+	}
+
+	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
+		x := input.Message.Interface().(*MsgUpdateParams)
+		if x == nil {
+			return protoiface.MarshalOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Buf:               input.Buf,
+			}, nil
+		}
+		options := runtime.MarshalInputToOptions(input)
+		_ = options
+		size := options.Size(x)
+		dAtA := make([]byte, size)
+		i := len(dAtA)
+		_ = i
+		var l int
+		_ = l
+		if x.unknownFields != nil {
+			i -= len(x.unknownFields)
+			copy(dAtA[i:], x.unknownFields)
+		}
+		if x.Params != nil {
+			encoded, err := options.Marshal(x.Params)
+			if err != nil {
+				return protoiface.MarshalOutput{
+					NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+					Buf:               input.Buf,
+				}, err
+			}
+			i -= len(encoded)
+			copy(dAtA[i:], encoded)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
+			i--
+			dAtA[i] = 0x12
+		}
+		if len(x.FromAddress) > 0 {
+			i -= len(x.FromAddress)
+			copy(dAtA[i:], x.FromAddress)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.FromAddress)))
+			i--
+			dAtA[i] = 0xa
+		}
+		if input.Buf != nil {
+			input.Buf = append(input.Buf, dAtA...)
+		} else {
+			input.Buf = dAtA
+		}
+		return protoiface.MarshalOutput{
+			NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+			Buf:               input.Buf,
+		}, nil
+	}
+	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
+		x := input.Message.Interface().(*MsgUpdateParams)
+		if x == nil {
+			return protoiface.UnmarshalOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Flags:             input.Flags,
+			}, nil
+		}
+		options := runtime.UnmarshalInputToOptions(input)
+		_ = options
+		dAtA := input.Buf
+		l := len(dAtA)
+		iNdEx := 0
+		for iNdEx < l {
+			preIndex := iNdEx
+			var wire uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				wire |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			fieldNum := int32(wire >> 3)
+			wireType := int(wire & 0x7)
+			if wireType == 4 {
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgUpdateParams: wiretype end group for non-group")
+			}
+			if fieldNum <= 0 {
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgUpdateParams: illegal tag %d (wire type %d)", fieldNum, wire)
+			}
+			switch fieldNum {
+			case 1:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field FromAddress", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.FromAddress = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
+			case 2:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Params", wireType)
+				}
+				var msglen int
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					msglen |= int(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				if msglen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + msglen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				if x.Params == nil {
+					x.Params = &Params{}
+				}
+				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.Params); err != nil {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
+				}
+				iNdEx = postIndex
+			default:
+				iNdEx = preIndex
+				skippy, err := runtime.Skip(dAtA[iNdEx:])
+				if err != nil {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
+				}
+				if (skippy < 0) || (iNdEx+skippy) < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if (iNdEx + skippy) > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				if !options.DiscardUnknown {
+					x.unknownFields = append(x.unknownFields, dAtA[iNdEx:iNdEx+skippy]...)
+				}
+				iNdEx += skippy
+			}
+		}
+
+		if iNdEx > l {
+			return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+		}
+		return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, nil
+	}
+	return &protoiface.Methods{
+		NoUnkeyedLiterals: struct{}{},
+		Flags:             protoiface.SupportMarshalDeterministic | protoiface.SupportUnmarshalDiscardUnknown,
+		Size:              size,
+		Marshal:           marshal,
+		Unmarshal:         unmarshal,
+		Merge:             nil,
+		CheckInitialized:  nil,
+	}
+}
+
+var (
+	md_MsgUpdateParamsResponse protoreflect.MessageDescriptor
+)
+
+func init() {
+	file_strangelove_ventures_poa_v1_tx_proto_init()
+	md_MsgUpdateParamsResponse = File_strangelove_ventures_poa_v1_tx_proto.Messages().ByName("MsgUpdateParamsResponse")
+}
+
+var _ protoreflect.Message = (*fastReflection_MsgUpdateParamsResponse)(nil)
+
+type fastReflection_MsgUpdateParamsResponse MsgUpdateParamsResponse
+
+func (x *MsgUpdateParamsResponse) ProtoReflect() protoreflect.Message {
+	return (*fastReflection_MsgUpdateParamsResponse)(x)
+}
+
+func (x *MsgUpdateParamsResponse) slowProtoReflect() protoreflect.Message {
+	mi := &file_strangelove_ventures_poa_v1_tx_proto_msgTypes[5]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+var _fastReflection_MsgUpdateParamsResponse_messageType fastReflection_MsgUpdateParamsResponse_messageType
+var _ protoreflect.MessageType = fastReflection_MsgUpdateParamsResponse_messageType{}
+
+type fastReflection_MsgUpdateParamsResponse_messageType struct{}
+
+func (x fastReflection_MsgUpdateParamsResponse_messageType) Zero() protoreflect.Message {
+	return (*fastReflection_MsgUpdateParamsResponse)(nil)
+}
+func (x fastReflection_MsgUpdateParamsResponse_messageType) New() protoreflect.Message {
+	return new(fastReflection_MsgUpdateParamsResponse)
+}
+func (x fastReflection_MsgUpdateParamsResponse_messageType) Descriptor() protoreflect.MessageDescriptor {
+	return md_MsgUpdateParamsResponse
+}
+
+// Descriptor returns message descriptor, which contains only the protobuf
+// type information for the message.
+func (x *fastReflection_MsgUpdateParamsResponse) Descriptor() protoreflect.MessageDescriptor {
+	return md_MsgUpdateParamsResponse
+}
+
+// Type returns the message type, which encapsulates both Go and protobuf
+// type information. If the Go type information is not needed,
+// it is recommended that the message descriptor be used instead.
+func (x *fastReflection_MsgUpdateParamsResponse) Type() protoreflect.MessageType {
+	return _fastReflection_MsgUpdateParamsResponse_messageType
+}
+
+// New returns a newly allocated and mutable empty message.
+func (x *fastReflection_MsgUpdateParamsResponse) New() protoreflect.Message {
+	return new(fastReflection_MsgUpdateParamsResponse)
+}
+
+// Interface unwraps the message reflection interface and
+// returns the underlying ProtoMessage interface.
+func (x *fastReflection_MsgUpdateParamsResponse) Interface() protoreflect.ProtoMessage {
+	return (*MsgUpdateParamsResponse)(x)
+}
+
+// Range iterates over every populated field in an undefined order,
+// calling f for each field descriptor and value encountered.
+// Range returns immediately if f returns false.
+// While iterating, mutating operations may only be performed
+// on the current field descriptor.
+func (x *fastReflection_MsgUpdateParamsResponse) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+}
+
+// Has reports whether a field is populated.
+//
+// Some fields have the property of nullability where it is possible to
+// distinguish between the default value of a field and whether the field
+// was explicitly populated with the default value. Singular message fields,
+// member fields of a oneof, and proto2 scalar fields are nullable. Such
+// fields are populated only if explicitly set.
+//
+// In other cases (aside from the nullable cases above),
+// a proto3 scalar field is populated if it contains a non-zero value, and
+// a repeated field is populated if it is non-empty.
+func (x *fastReflection_MsgUpdateParamsResponse) Has(fd protoreflect.FieldDescriptor) bool {
+	switch fd.FullName() {
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgUpdateParamsResponse"))
+		}
+		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgUpdateParamsResponse does not contain field %s", fd.FullName()))
+	}
+}
+
+// Clear clears the field such that a subsequent Has call reports false.
+//
+// Clearing an extension field clears both the extension type and value
+// associated with the given field number.
+//
+// Clear is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_MsgUpdateParamsResponse) Clear(fd protoreflect.FieldDescriptor) {
+	switch fd.FullName() {
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgUpdateParamsResponse"))
+		}
+		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgUpdateParamsResponse does not contain field %s", fd.FullName()))
+	}
+}
+
+// Get retrieves the value for a field.
+//
+// For unpopulated scalars, it returns the default value, where
+// the default value of a bytes scalar is guaranteed to be a copy.
+// For unpopulated composite types, it returns an empty, read-only view
+// of the value; to obtain a mutable reference, use Mutable.
+func (x *fastReflection_MsgUpdateParamsResponse) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
+	switch descriptor.FullName() {
+	default:
+		if descriptor.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgUpdateParamsResponse"))
+		}
+		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgUpdateParamsResponse does not contain field %s", descriptor.FullName()))
+	}
+}
+
+// Set stores the value for a field.
+//
+// For a field belonging to a oneof, it implicitly clears any other field
+// that may be currently set within the same oneof.
+// For extension fields, it implicitly stores the provided ExtensionType.
+// When setting a composite type, it is unspecified whether the stored value
+// aliases the source's memory in any way. If the composite value is an
+// empty, read-only value, then it panics.
+//
+// Set is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_MsgUpdateParamsResponse) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
+	switch fd.FullName() {
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgUpdateParamsResponse"))
+		}
+		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgUpdateParamsResponse does not contain field %s", fd.FullName()))
+	}
+}
+
+// Mutable returns a mutable reference to a composite type.
+//
+// If the field is unpopulated, it may allocate a composite value.
+// For a field belonging to a oneof, it implicitly clears any other field
+// that may be currently set within the same oneof.
+// For extension fields, it implicitly stores the provided ExtensionType
+// if not already stored.
+// It panics if the field does not contain a composite type.
+//
+// Mutable is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_MsgUpdateParamsResponse) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
+	switch fd.FullName() {
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgUpdateParamsResponse"))
+		}
+		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgUpdateParamsResponse does not contain field %s", fd.FullName()))
+	}
+}
+
+// NewField returns a new value that is assignable to the field
+// for the given descriptor. For scalars, this returns the default value.
+// For lists, maps, and messages, this returns a new, empty, mutable value.
+func (x *fastReflection_MsgUpdateParamsResponse) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
+	switch fd.FullName() {
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgUpdateParamsResponse"))
+		}
+		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgUpdateParamsResponse does not contain field %s", fd.FullName()))
+	}
+}
+
+// WhichOneof reports which field within the oneof is populated,
+// returning nil if none are populated.
+// It panics if the oneof descriptor does not belong to this message.
+func (x *fastReflection_MsgUpdateParamsResponse) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+	switch d.FullName() {
+	default:
+		panic(fmt.Errorf("%s is not a oneof field in strangelove_ventures.poa.v1.MsgUpdateParamsResponse", d.FullName()))
+	}
+	panic("unreachable")
+}
+
+// GetUnknown retrieves the entire list of unknown fields.
+// The caller may only mutate the contents of the RawFields
+// if the mutated bytes are stored back into the message with SetUnknown.
+func (x *fastReflection_MsgUpdateParamsResponse) GetUnknown() protoreflect.RawFields {
+	return x.unknownFields
+}
+
+// SetUnknown stores an entire list of unknown fields.
+// The raw fields must be syntactically valid according to the wire format.
+// An implementation may panic if this is not the case.
+// Once stored, the caller must not mutate the content of the RawFields.
+// An empty RawFields may be passed to clear the fields.
+//
+// SetUnknown is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_MsgUpdateParamsResponse) SetUnknown(fields protoreflect.RawFields) {
+	x.unknownFields = fields
+}
+
+// IsValid reports whether the message is valid.
+//
+// An invalid message is an empty, read-only value.
+//
+// An invalid message often corresponds to a nil pointer of the concrete
+// message type, but the details are implementation dependent.
+// Validity is not part of the protobuf data model, and may not
+// be preserved in marshaling or other operations.
+func (x *fastReflection_MsgUpdateParamsResponse) IsValid() bool {
+	return x != nil
+}
+
+// ProtoMethods returns optional fastReflectionFeature-path implementations of various operations.
+// This method may return nil.
+//
+// The returned methods type is identical to
+// "google.golang.org/protobuf/runtime/protoiface".Methods.
+// Consult the protoiface package documentation for details.
+func (x *fastReflection_MsgUpdateParamsResponse) ProtoMethods() *protoiface.Methods {
+	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
+		x := input.Message.Interface().(*MsgUpdateParamsResponse)
+		if x == nil {
+			return protoiface.SizeOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Size:              0,
+			}
+		}
+		options := runtime.SizeInputToOptions(input)
+		_ = options
+		var n int
+		var l int
+		_ = l
+		if x.unknownFields != nil {
+			n += len(x.unknownFields)
+		}
+		return protoiface.SizeOutput{
+			NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+			Size:              n,
+		}
+	}
+
+	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
+		x := input.Message.Interface().(*MsgUpdateParamsResponse)
+		if x == nil {
+			return protoiface.MarshalOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Buf:               input.Buf,
+			}, nil
+		}
+		options := runtime.MarshalInputToOptions(input)
+		_ = options
+		size := options.Size(x)
+		dAtA := make([]byte, size)
+		i := len(dAtA)
+		_ = i
+		var l int
+		_ = l
+		if x.unknownFields != nil {
+			i -= len(x.unknownFields)
+			copy(dAtA[i:], x.unknownFields)
+		}
+		if input.Buf != nil {
+			input.Buf = append(input.Buf, dAtA...)
+		} else {
+			input.Buf = dAtA
+		}
+		return protoiface.MarshalOutput{
+			NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+			Buf:               input.Buf,
+		}, nil
+	}
+	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
+		x := input.Message.Interface().(*MsgUpdateParamsResponse)
+		if x == nil {
+			return protoiface.UnmarshalOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Flags:             input.Flags,
+			}, nil
+		}
+		options := runtime.UnmarshalInputToOptions(input)
+		_ = options
+		dAtA := input.Buf
+		l := len(dAtA)
+		iNdEx := 0
+		for iNdEx < l {
+			preIndex := iNdEx
+			var wire uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				wire |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			fieldNum := int32(wire >> 3)
+			wireType := int(wire & 0x7)
+			if wireType == 4 {
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgUpdateParamsResponse: wiretype end group for non-group")
+			}
+			if fieldNum <= 0 {
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgUpdateParamsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 			}
 			switch fieldNum {
 			default:
@@ -1857,19 +2614,19 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type MsgCreateValidator struct {
+// SetPower sets the power of a validator
+type MsgSetPower struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// string name = 1 [(gogoproto.moretags) = "yaml:\"name\""];
-	Description *Description `protobuf:"bytes,1,opt,name=description,proto3" json:"description,omitempty"`
-	Address     string       `protobuf:"bytes,2,opt,name=address,proto3" json:"address,omitempty"`
-	Pubkey      *anypb.Any   `protobuf:"bytes,3,opt,name=pubkey,proto3" json:"pubkey,omitempty"`
+	FromAddress      string `protobuf:"bytes,1,opt,name=from_address,json=fromAddress,proto3" json:"from_address,omitempty"`
+	ValidatorAddress string `protobuf:"bytes,2,opt,name=validator_address,json=validatorAddress,proto3" json:"validator_address,omitempty"`
+	Power            uint64 `protobuf:"varint,3,opt,name=power,proto3" json:"power,omitempty"`
 }
 
-func (x *MsgCreateValidator) Reset() {
-	*x = MsgCreateValidator{}
+func (x *MsgSetPower) Reset() {
+	*x = MsgSetPower{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_strangelove_ventures_poa_v1_tx_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -1877,46 +2634,47 @@ func (x *MsgCreateValidator) Reset() {
 	}
 }
 
-func (x *MsgCreateValidator) String() string {
+func (x *MsgSetPower) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*MsgCreateValidator) ProtoMessage() {}
+func (*MsgSetPower) ProtoMessage() {}
 
-// Deprecated: Use MsgCreateValidator.ProtoReflect.Descriptor instead.
-func (*MsgCreateValidator) Descriptor() ([]byte, []int) {
+// Deprecated: Use MsgSetPower.ProtoReflect.Descriptor instead.
+func (*MsgSetPower) Descriptor() ([]byte, []int) {
 	return file_strangelove_ventures_poa_v1_tx_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *MsgCreateValidator) GetDescription() *Description {
+func (x *MsgSetPower) GetFromAddress() string {
 	if x != nil {
-		return x.Description
-	}
-	return nil
-}
-
-func (x *MsgCreateValidator) GetAddress() string {
-	if x != nil {
-		return x.Address
+		return x.FromAddress
 	}
 	return ""
 }
 
-func (x *MsgCreateValidator) GetPubkey() *anypb.Any {
+func (x *MsgSetPower) GetValidatorAddress() string {
 	if x != nil {
-		return x.Pubkey
+		return x.ValidatorAddress
 	}
-	return nil
+	return ""
 }
 
-type MsgCreateValidatorResponse struct {
+func (x *MsgSetPower) GetPower() uint64 {
+	if x != nil {
+		return x.Power
+	}
+	return 0
+}
+
+// MsgSetPowerResponse
+type MsgSetPowerResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 }
 
-func (x *MsgCreateValidatorResponse) Reset() {
-	*x = MsgCreateValidatorResponse{}
+func (x *MsgSetPowerResponse) Reset() {
+	*x = MsgSetPowerResponse{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_strangelove_ventures_poa_v1_tx_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -1924,30 +2682,30 @@ func (x *MsgCreateValidatorResponse) Reset() {
 	}
 }
 
-func (x *MsgCreateValidatorResponse) String() string {
+func (x *MsgSetPowerResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*MsgCreateValidatorResponse) ProtoMessage() {}
+func (*MsgSetPowerResponse) ProtoMessage() {}
 
-// Deprecated: Use MsgCreateValidatorResponse.ProtoReflect.Descriptor instead.
-func (*MsgCreateValidatorResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use MsgSetPowerResponse.ProtoReflect.Descriptor instead.
+func (*MsgSetPowerResponse) Descriptor() ([]byte, []int) {
 	return file_strangelove_ventures_poa_v1_tx_proto_rawDescGZIP(), []int{1}
 }
 
-type MsgVouchValidator struct {
+// MsgRemoveValidator removes an active validitor from the set
+// jail -> deleted
+type MsgRemoveValidator struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// string name = 1 [(gogoproto.moretags) = "yaml:\"name\""];
-	VoucherAddress   string `protobuf:"bytes,1,opt,name=voucher_address,json=voucherAddress,proto3" json:"voucher_address,omitempty"`
-	InFavor          bool   `protobuf:"varint,2,opt,name=in_favor,json=inFavor,proto3" json:"in_favor,omitempty"`
-	CandidateAddress string `protobuf:"bytes,3,opt,name=candidate_address,json=candidateAddress,proto3" json:"candidate_address,omitempty"`
+	FromAddress      string `protobuf:"bytes,1,opt,name=from_address,json=fromAddress,proto3" json:"from_address,omitempty"`
+	ValidatorAddress string `protobuf:"bytes,2,opt,name=validator_address,json=validatorAddress,proto3" json:"validator_address,omitempty"`
 }
 
-func (x *MsgVouchValidator) Reset() {
-	*x = MsgVouchValidator{}
+func (x *MsgRemoveValidator) Reset() {
+	*x = MsgRemoveValidator{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_strangelove_ventures_poa_v1_tx_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -1955,46 +2713,40 @@ func (x *MsgVouchValidator) Reset() {
 	}
 }
 
-func (x *MsgVouchValidator) String() string {
+func (x *MsgRemoveValidator) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*MsgVouchValidator) ProtoMessage() {}
+func (*MsgRemoveValidator) ProtoMessage() {}
 
-// Deprecated: Use MsgVouchValidator.ProtoReflect.Descriptor instead.
-func (*MsgVouchValidator) Descriptor() ([]byte, []int) {
+// Deprecated: Use MsgRemoveValidator.ProtoReflect.Descriptor instead.
+func (*MsgRemoveValidator) Descriptor() ([]byte, []int) {
 	return file_strangelove_ventures_poa_v1_tx_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *MsgVouchValidator) GetVoucherAddress() string {
+func (x *MsgRemoveValidator) GetFromAddress() string {
 	if x != nil {
-		return x.VoucherAddress
+		return x.FromAddress
 	}
 	return ""
 }
 
-func (x *MsgVouchValidator) GetInFavor() bool {
+func (x *MsgRemoveValidator) GetValidatorAddress() string {
 	if x != nil {
-		return x.InFavor
-	}
-	return false
-}
-
-func (x *MsgVouchValidator) GetCandidateAddress() string {
-	if x != nil {
-		return x.CandidateAddress
+		return x.ValidatorAddress
 	}
 	return ""
 }
 
-type MsgVouchValidatorResponse struct {
+// MsgSetPowerResponse
+type MsgRemoveValidatorResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 }
 
-func (x *MsgVouchValidatorResponse) Reset() {
-	*x = MsgVouchValidatorResponse{}
+func (x *MsgRemoveValidatorResponse) Reset() {
+	*x = MsgRemoveValidatorResponse{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_strangelove_ventures_poa_v1_tx_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -2002,15 +2754,90 @@ func (x *MsgVouchValidatorResponse) Reset() {
 	}
 }
 
-func (x *MsgVouchValidatorResponse) String() string {
+func (x *MsgRemoveValidatorResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*MsgVouchValidatorResponse) ProtoMessage() {}
+func (*MsgRemoveValidatorResponse) ProtoMessage() {}
 
-// Deprecated: Use MsgVouchValidatorResponse.ProtoReflect.Descriptor instead.
-func (*MsgVouchValidatorResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use MsgRemoveValidatorResponse.ProtoReflect.Descriptor instead.
+func (*MsgRemoveValidatorResponse) Descriptor() ([]byte, []int) {
 	return file_strangelove_ventures_poa_v1_tx_proto_rawDescGZIP(), []int{3}
+}
+
+// MsgUpdateParams is the Msg/UpdateParams request type.
+type MsgUpdateParams struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// from_address is the address of the admin account with permission to update.
+	// ex: governance, multisig/DAO, or standard account found in Params.
+	FromAddress string `protobuf:"bytes,1,opt,name=from_address,json=fromAddress,proto3" json:"from_address,omitempty"`
+	// module parameters (all must be supplied).
+	Params *Params `protobuf:"bytes,2,opt,name=params,proto3" json:"params,omitempty"`
+}
+
+func (x *MsgUpdateParams) Reset() {
+	*x = MsgUpdateParams{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_strangelove_ventures_poa_v1_tx_proto_msgTypes[4]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *MsgUpdateParams) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MsgUpdateParams) ProtoMessage() {}
+
+// Deprecated: Use MsgUpdateParams.ProtoReflect.Descriptor instead.
+func (*MsgUpdateParams) Descriptor() ([]byte, []int) {
+	return file_strangelove_ventures_poa_v1_tx_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *MsgUpdateParams) GetFromAddress() string {
+	if x != nil {
+		return x.FromAddress
+	}
+	return ""
+}
+
+func (x *MsgUpdateParams) GetParams() *Params {
+	if x != nil {
+		return x.Params
+	}
+	return nil
+}
+
+// MsgUpdateParamsResponse defines the response structure for executing a
+// MsgUpdateParams message.
+type MsgUpdateParamsResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *MsgUpdateParamsResponse) Reset() {
+	*x = MsgUpdateParamsResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_strangelove_ventures_poa_v1_tx_proto_msgTypes[5]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *MsgUpdateParamsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MsgUpdateParamsResponse) ProtoMessage() {}
+
+// Deprecated: Use MsgUpdateParamsResponse.ProtoReflect.Descriptor instead.
+func (*MsgUpdateParamsResponse) Descriptor() ([]byte, []int) {
+	return file_strangelove_ventures_poa_v1_tx_proto_rawDescGZIP(), []int{5}
 }
 
 var File_strangelove_ventures_poa_v1_tx_proto protoreflect.FileDescriptor
@@ -2025,76 +2852,98 @@ var file_strangelove_ventures_poa_v1_tx_proto_rawDesc = []byte{
 	0x69, 0x6e, 0x67, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x2b, 0x73, 0x74, 0x72, 0x61, 0x6e,
 	0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65, 0x5f, 0x76, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65, 0x73, 0x2f,
 	0x70, 0x6f, 0x61, 0x2f, 0x76, 0x31, 0x2f, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72,
-	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x19, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x5f, 0x70,
-	0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74,
-	0x6f, 0x1a, 0x19, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62,
-	0x75, 0x66, 0x2f, 0x61, 0x6e, 0x79, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x14, 0x67, 0x6f,
-	0x67, 0x6f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x67, 0x6f, 0x67, 0x6f, 0x2e, 0x70, 0x72, 0x6f,
-	0x74, 0x6f, 0x22, 0xec, 0x01, 0x0a, 0x12, 0x4d, 0x73, 0x67, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65,
-	0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x12, 0x50, 0x0a, 0x0b, 0x64, 0x65, 0x73,
-	0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x28,
-	0x2e, 0x73, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65, 0x5f, 0x76, 0x65, 0x6e,
-	0x74, 0x75, 0x72, 0x65, 0x73, 0x2e, 0x70, 0x6f, 0x61, 0x2e, 0x76, 0x31, 0x2e, 0x44, 0x65, 0x73,
-	0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x42, 0x04, 0xc8, 0xde, 0x1f, 0x00, 0x52, 0x0b,
-	0x64, 0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x36, 0x0a, 0x07, 0x61,
-	0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x42, 0x1c, 0xf2, 0xde,
-	0x1f, 0x18, 0x79, 0x61, 0x6d, 0x6c, 0x3a, 0x22, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f,
-	0x72, 0x5f, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x22, 0x52, 0x07, 0x61, 0x64, 0x64, 0x72,
-	0x65, 0x73, 0x73, 0x12, 0x46, 0x0a, 0x06, 0x70, 0x75, 0x62, 0x6b, 0x65, 0x79, 0x18, 0x03, 0x20,
-	0x01, 0x28, 0x0b, 0x32, 0x14, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f,
-	0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x41, 0x6e, 0x79, 0x42, 0x18, 0xca, 0xb4, 0x2d, 0x14, 0x63,
-	0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x63, 0x72, 0x79, 0x70, 0x74, 0x6f, 0x2e, 0x50, 0x75, 0x62,
-	0x4b, 0x65, 0x79, 0x52, 0x06, 0x70, 0x75, 0x62, 0x6b, 0x65, 0x79, 0x3a, 0x04, 0xe8, 0xa0, 0x1f,
-	0x00, 0x22, 0x1c, 0x0a, 0x1a, 0x4d, 0x73, 0x67, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x56, 0x61,
-	0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22,
-	0xd2, 0x01, 0x0a, 0x11, 0x4d, 0x73, 0x67, 0x56, 0x6f, 0x75, 0x63, 0x68, 0x56, 0x61, 0x6c, 0x69,
-	0x64, 0x61, 0x74, 0x6f, 0x72, 0x12, 0x43, 0x0a, 0x0f, 0x76, 0x6f, 0x75, 0x63, 0x68, 0x65, 0x72,
-	0x5f, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x42, 0x1a,
-	0xf2, 0xde, 0x1f, 0x16, 0x79, 0x61, 0x6d, 0x6c, 0x3a, 0x22, 0x76, 0x6f, 0x75, 0x63, 0x68, 0x65,
-	0x72, 0x5f, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x22, 0x52, 0x0e, 0x76, 0x6f, 0x75, 0x63,
-	0x68, 0x65, 0x72, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x12, 0x2d, 0x0a, 0x08, 0x69, 0x6e,
-	0x5f, 0x66, 0x61, 0x76, 0x6f, 0x72, 0x18, 0x02, 0x20, 0x01, 0x28, 0x08, 0x42, 0x12, 0xf2, 0xde,
-	0x1f, 0x0e, 0x79, 0x61, 0x6d, 0x6c, 0x3a, 0x22, 0x69, 0x6e, 0x66, 0x61, 0x76, 0x6f, 0x72, 0x22,
-	0x52, 0x07, 0x69, 0x6e, 0x46, 0x61, 0x76, 0x6f, 0x72, 0x12, 0x49, 0x0a, 0x11, 0x63, 0x61, 0x6e,
-	0x64, 0x69, 0x64, 0x61, 0x74, 0x65, 0x5f, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x18, 0x03,
-	0x20, 0x01, 0x28, 0x09, 0x42, 0x1c, 0xf2, 0xde, 0x1f, 0x18, 0x79, 0x61, 0x6d, 0x6c, 0x3a, 0x22,
-	0x63, 0x61, 0x6e, 0x64, 0x69, 0x64, 0x61, 0x74, 0x65, 0x5f, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73,
-	0x73, 0x22, 0x52, 0x10, 0x63, 0x61, 0x6e, 0x64, 0x69, 0x64, 0x61, 0x74, 0x65, 0x41, 0x64, 0x64,
-	0x72, 0x65, 0x73, 0x73, 0x22, 0x1b, 0x0a, 0x19, 0x4d, 0x73, 0x67, 0x56, 0x6f, 0x75, 0x63, 0x68,
-	0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
-	0x65, 0x32, 0xfc, 0x01, 0x0a, 0x03, 0x4d, 0x73, 0x67, 0x12, 0x7b, 0x0a, 0x0f, 0x43, 0x72, 0x65,
-	0x61, 0x74, 0x65, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x12, 0x2f, 0x2e, 0x73,
-	0x74, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65, 0x5f, 0x76, 0x65, 0x6e, 0x74, 0x75,
-	0x72, 0x65, 0x73, 0x2e, 0x70, 0x6f, 0x61, 0x2e, 0x76, 0x31, 0x2e, 0x4d, 0x73, 0x67, 0x43, 0x72,
-	0x65, 0x61, 0x74, 0x65, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x1a, 0x37, 0x2e,
+	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x28, 0x73, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c,
+	0x6f, 0x76, 0x65, 0x5f, 0x76, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65, 0x73, 0x2f, 0x70, 0x6f, 0x61,
+	0x2f, 0x76, 0x31, 0x2f, 0x70, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f,
+	0x1a, 0x19, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x5f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x63,
+	0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x19, 0x67, 0x6f, 0x6f,
+	0x67, 0x6c, 0x65, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2f, 0x61, 0x6e, 0x79,
+	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x14, 0x67, 0x6f, 0x67, 0x6f, 0x70, 0x72, 0x6f, 0x74,
+	0x6f, 0x2f, 0x67, 0x6f, 0x67, 0x6f, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x17, 0x63, 0x6f,
+	0x73, 0x6d, 0x6f, 0x73, 0x2f, 0x6d, 0x73, 0x67, 0x2f, 0x76, 0x31, 0x2f, 0x6d, 0x73, 0x67, 0x2e,
+	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x11, 0x61, 0x6d, 0x69, 0x6e, 0x6f, 0x2f, 0x61, 0x6d, 0x69,
+	0x6e, 0x6f, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0xd6, 0x01, 0x0a, 0x0b, 0x4d, 0x73, 0x67,
+	0x53, 0x65, 0x74, 0x50, 0x6f, 0x77, 0x65, 0x72, 0x12, 0x3b, 0x0a, 0x0c, 0x66, 0x72, 0x6f, 0x6d,
+	0x5f, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x42, 0x18,
+	0xd2, 0xb4, 0x2d, 0x14, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x41, 0x64, 0x64, 0x72, 0x65,
+	0x73, 0x73, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x52, 0x0b, 0x66, 0x72, 0x6f, 0x6d, 0x41, 0x64,
+	0x64, 0x72, 0x65, 0x73, 0x73, 0x12, 0x45, 0x0a, 0x11, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74,
+	0x6f, 0x72, 0x5f, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09,
+	0x42, 0x18, 0xd2, 0xb4, 0x2d, 0x14, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x41, 0x64, 0x64,
+	0x72, 0x65, 0x73, 0x73, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x52, 0x10, 0x76, 0x61, 0x6c, 0x69,
+	0x64, 0x61, 0x74, 0x6f, 0x72, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x12, 0x14, 0x0a, 0x05,
+	0x70, 0x6f, 0x77, 0x65, 0x72, 0x18, 0x03, 0x20, 0x01, 0x28, 0x04, 0x52, 0x05, 0x70, 0x6f, 0x77,
+	0x65, 0x72, 0x3a, 0x2d, 0x88, 0xa0, 0x1f, 0x00, 0xe8, 0xa0, 0x1f, 0x00, 0x82, 0xe7, 0xb0, 0x2a,
+	0x0c, 0x66, 0x72, 0x6f, 0x6d, 0x5f, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x8a, 0xe7, 0xb0,
+	0x2a, 0x0f, 0x70, 0x6f, 0x61, 0x2f, 0x4d, 0x73, 0x67, 0x53, 0x65, 0x74, 0x50, 0x6f, 0x77, 0x65,
+	0x72, 0x22, 0x15, 0x0a, 0x13, 0x4d, 0x73, 0x67, 0x53, 0x65, 0x74, 0x50, 0x6f, 0x77, 0x65, 0x72,
+	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0xce, 0x01, 0x0a, 0x12, 0x4d, 0x73, 0x67,
+	0x52, 0x65, 0x6d, 0x6f, 0x76, 0x65, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x12,
+	0x3b, 0x0a, 0x0c, 0x66, 0x72, 0x6f, 0x6d, 0x5f, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x09, 0x42, 0x18, 0xd2, 0xb4, 0x2d, 0x14, 0x63, 0x6f, 0x73, 0x6d, 0x6f,
+	0x73, 0x2e, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x52,
+	0x0b, 0x66, 0x72, 0x6f, 0x6d, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x12, 0x45, 0x0a, 0x11,
+	0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x5f, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73,
+	0x73, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x42, 0x18, 0xd2, 0xb4, 0x2d, 0x14, 0x63, 0x6f, 0x73,
+	0x6d, 0x6f, 0x73, 0x2e, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x53, 0x74, 0x72, 0x69, 0x6e,
+	0x67, 0x52, 0x10, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x41, 0x64, 0x64, 0x72,
+	0x65, 0x73, 0x73, 0x3a, 0x34, 0x88, 0xa0, 0x1f, 0x00, 0xe8, 0xa0, 0x1f, 0x00, 0x82, 0xe7, 0xb0,
+	0x2a, 0x0c, 0x66, 0x72, 0x6f, 0x6d, 0x5f, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x8a, 0xe7,
+	0xb0, 0x2a, 0x16, 0x70, 0x6f, 0x61, 0x2f, 0x4d, 0x73, 0x67, 0x52, 0x65, 0x6d, 0x6f, 0x76, 0x65,
+	0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x22, 0x1c, 0x0a, 0x1a, 0x4d, 0x73, 0x67,
+	0x52, 0x65, 0x6d, 0x6f, 0x76, 0x65, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x52,
+	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0xa4, 0x01, 0x0a, 0x0f, 0x4d, 0x73, 0x67, 0x55,
+	0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x12, 0x3b, 0x0a, 0x0c, 0x66,
+	0x72, 0x6f, 0x6d, 0x5f, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28,
+	0x09, 0x42, 0x18, 0xd2, 0xb4, 0x2d, 0x14, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x41, 0x64,
+	0x64, 0x72, 0x65, 0x73, 0x73, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x52, 0x0b, 0x66, 0x72, 0x6f,
+	0x6d, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x12, 0x41, 0x0a, 0x06, 0x70, 0x61, 0x72, 0x61,
+	0x6d, 0x73, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x23, 0x2e, 0x73, 0x74, 0x72, 0x61, 0x6e,
+	0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65, 0x5f, 0x76, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65, 0x73, 0x2e,
+	0x70, 0x6f, 0x61, 0x2e, 0x76, 0x31, 0x2e, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x42, 0x04, 0xc8,
+	0xde, 0x1f, 0x00, 0x52, 0x06, 0x70, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x3a, 0x11, 0x82, 0xe7, 0xb0,
+	0x2a, 0x0c, 0x66, 0x72, 0x6f, 0x6d, 0x5f, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x22, 0x19,
+	0x0a, 0x17, 0x4d, 0x73, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x61, 0x72, 0x61, 0x6d,
+	0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x32, 0xe5, 0x02, 0x0a, 0x03, 0x4d, 0x73,
+	0x67, 0x12, 0x66, 0x0a, 0x08, 0x53, 0x65, 0x74, 0x50, 0x6f, 0x77, 0x65, 0x72, 0x12, 0x28, 0x2e,
 	0x73, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65, 0x5f, 0x76, 0x65, 0x6e, 0x74,
-	0x75, 0x72, 0x65, 0x73, 0x2e, 0x70, 0x6f, 0x61, 0x2e, 0x76, 0x31, 0x2e, 0x4d, 0x73, 0x67, 0x43,
-	0x72, 0x65, 0x61, 0x74, 0x65, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x52, 0x65,
-	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x78, 0x0a, 0x0e, 0x56, 0x6f, 0x75, 0x63, 0x68, 0x56,
-	0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x12, 0x2e, 0x2e, 0x73, 0x74, 0x72, 0x61, 0x6e,
-	0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65, 0x5f, 0x76, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65, 0x73, 0x2e,
-	0x70, 0x6f, 0x61, 0x2e, 0x76, 0x31, 0x2e, 0x4d, 0x73, 0x67, 0x56, 0x6f, 0x75, 0x63, 0x68, 0x56,
-	0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x1a, 0x36, 0x2e, 0x73, 0x74, 0x72, 0x61, 0x6e,
-	0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65, 0x5f, 0x76, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65, 0x73, 0x2e,
-	0x70, 0x6f, 0x61, 0x2e, 0x76, 0x31, 0x2e, 0x4d, 0x73, 0x67, 0x56, 0x6f, 0x75, 0x63, 0x68, 0x56,
-	0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
-	0x42, 0xff, 0x01, 0x0a, 0x1f, 0x63, 0x6f, 0x6d, 0x2e, 0x73, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65,
+	0x75, 0x72, 0x65, 0x73, 0x2e, 0x70, 0x6f, 0x61, 0x2e, 0x76, 0x31, 0x2e, 0x4d, 0x73, 0x67, 0x53,
+	0x65, 0x74, 0x50, 0x6f, 0x77, 0x65, 0x72, 0x1a, 0x30, 0x2e, 0x73, 0x74, 0x72, 0x61, 0x6e, 0x67,
+	0x65, 0x6c, 0x6f, 0x76, 0x65, 0x5f, 0x76, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65, 0x73, 0x2e, 0x70,
+	0x6f, 0x61, 0x2e, 0x76, 0x31, 0x2e, 0x4d, 0x73, 0x67, 0x53, 0x65, 0x74, 0x50, 0x6f, 0x77, 0x65,
+	0x72, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x7b, 0x0a, 0x0f, 0x52, 0x65, 0x6d,
+	0x6f, 0x76, 0x65, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x12, 0x2f, 0x2e, 0x73,
+	0x74, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65, 0x5f, 0x76, 0x65, 0x6e, 0x74, 0x75,
+	0x72, 0x65, 0x73, 0x2e, 0x70, 0x6f, 0x61, 0x2e, 0x76, 0x31, 0x2e, 0x4d, 0x73, 0x67, 0x52, 0x65,
+	0x6d, 0x6f, 0x76, 0x65, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x1a, 0x37, 0x2e,
+	0x73, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65, 0x5f, 0x76, 0x65, 0x6e, 0x74,
+	0x75, 0x72, 0x65, 0x73, 0x2e, 0x70, 0x6f, 0x61, 0x2e, 0x76, 0x31, 0x2e, 0x4d, 0x73, 0x67, 0x52,
+	0x65, 0x6d, 0x6f, 0x76, 0x65, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x52, 0x65,
+	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x72, 0x0a, 0x0c, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65,
+	0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x12, 0x2c, 0x2e, 0x73, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65,
 	0x6c, 0x6f, 0x76, 0x65, 0x5f, 0x76, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65, 0x73, 0x2e, 0x70, 0x6f,
-	0x61, 0x2e, 0x76, 0x31, 0x42, 0x07, 0x54, 0x78, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a,
-	0x49, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x73, 0x74, 0x72, 0x61,
-	0x6e, 0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65, 0x2d, 0x76, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65, 0x73,
-	0x2f, 0x70, 0x6f, 0x61, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x73, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65,
-	0x6c, 0x6f, 0x76, 0x65, 0x5f, 0x76, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65, 0x73, 0x2f, 0x70, 0x6f,
-	0x61, 0x2f, 0x76, 0x31, 0x3b, 0x70, 0x6f, 0x61, 0x76, 0x31, 0xa2, 0x02, 0x03, 0x53, 0x50, 0x58,
-	0xaa, 0x02, 0x1a, 0x53, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65, 0x56, 0x65,
-	0x6e, 0x74, 0x75, 0x72, 0x65, 0x73, 0x2e, 0x50, 0x6f, 0x61, 0x2e, 0x56, 0x31, 0xca, 0x02, 0x1a,
-	0x53, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65, 0x56, 0x65, 0x6e, 0x74, 0x75,
-	0x72, 0x65, 0x73, 0x5c, 0x50, 0x6f, 0x61, 0x5c, 0x56, 0x31, 0xe2, 0x02, 0x26, 0x53, 0x74, 0x72,
-	0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65, 0x56, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65, 0x73,
-	0x5c, 0x50, 0x6f, 0x61, 0x5c, 0x56, 0x31, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64,
-	0x61, 0x74, 0x61, 0xea, 0x02, 0x1c, 0x53, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f, 0x76,
-	0x65, 0x56, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65, 0x73, 0x3a, 0x3a, 0x50, 0x6f, 0x61, 0x3a, 0x3a,
-	0x56, 0x31, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x61, 0x2e, 0x76, 0x31, 0x2e, 0x4d, 0x73, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x61,
+	0x72, 0x61, 0x6d, 0x73, 0x1a, 0x34, 0x2e, 0x73, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f,
+	0x76, 0x65, 0x5f, 0x76, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65, 0x73, 0x2e, 0x70, 0x6f, 0x61, 0x2e,
+	0x76, 0x31, 0x2e, 0x4d, 0x73, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x61, 0x72, 0x61,
+	0x6d, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x1a, 0x05, 0x80, 0xe7, 0xb0, 0x2a,
+	0x01, 0x42, 0xff, 0x01, 0x0a, 0x1f, 0x63, 0x6f, 0x6d, 0x2e, 0x73, 0x74, 0x72, 0x61, 0x6e, 0x67,
+	0x65, 0x6c, 0x6f, 0x76, 0x65, 0x5f, 0x76, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65, 0x73, 0x2e, 0x70,
+	0x6f, 0x61, 0x2e, 0x76, 0x31, 0x42, 0x07, 0x54, 0x78, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01,
+	0x5a, 0x49, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x73, 0x74, 0x72,
+	0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65, 0x2d, 0x76, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65,
+	0x73, 0x2f, 0x70, 0x6f, 0x61, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x73, 0x74, 0x72, 0x61, 0x6e, 0x67,
+	0x65, 0x6c, 0x6f, 0x76, 0x65, 0x5f, 0x76, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65, 0x73, 0x2f, 0x70,
+	0x6f, 0x61, 0x2f, 0x76, 0x31, 0x3b, 0x70, 0x6f, 0x61, 0x76, 0x31, 0xa2, 0x02, 0x03, 0x53, 0x50,
+	0x58, 0xaa, 0x02, 0x1a, 0x53, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65, 0x56,
+	0x65, 0x6e, 0x74, 0x75, 0x72, 0x65, 0x73, 0x2e, 0x50, 0x6f, 0x61, 0x2e, 0x56, 0x31, 0xca, 0x02,
+	0x1a, 0x53, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65, 0x56, 0x65, 0x6e, 0x74,
+	0x75, 0x72, 0x65, 0x73, 0x5c, 0x50, 0x6f, 0x61, 0x5c, 0x56, 0x31, 0xe2, 0x02, 0x26, 0x53, 0x74,
+	0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65, 0x56, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65,
+	0x73, 0x5c, 0x50, 0x6f, 0x61, 0x5c, 0x56, 0x31, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61,
+	0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x1c, 0x53, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f,
+	0x76, 0x65, 0x56, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65, 0x73, 0x3a, 0x3a, 0x50, 0x6f, 0x61, 0x3a,
+	0x3a, 0x56, 0x31, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -2109,27 +2958,29 @@ func file_strangelove_ventures_poa_v1_tx_proto_rawDescGZIP() []byte {
 	return file_strangelove_ventures_poa_v1_tx_proto_rawDescData
 }
 
-var file_strangelove_ventures_poa_v1_tx_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_strangelove_ventures_poa_v1_tx_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_strangelove_ventures_poa_v1_tx_proto_goTypes = []interface{}{
-	(*MsgCreateValidator)(nil),         // 0: strangelove_ventures.poa.v1.MsgCreateValidator
-	(*MsgCreateValidatorResponse)(nil), // 1: strangelove_ventures.poa.v1.MsgCreateValidatorResponse
-	(*MsgVouchValidator)(nil),          // 2: strangelove_ventures.poa.v1.MsgVouchValidator
-	(*MsgVouchValidatorResponse)(nil),  // 3: strangelove_ventures.poa.v1.MsgVouchValidatorResponse
-	(*Description)(nil),                // 4: strangelove_ventures.poa.v1.Description
-	(*anypb.Any)(nil),                  // 5: google.protobuf.Any
+	(*MsgSetPower)(nil),                // 0: strangelove_ventures.poa.v1.MsgSetPower
+	(*MsgSetPowerResponse)(nil),        // 1: strangelove_ventures.poa.v1.MsgSetPowerResponse
+	(*MsgRemoveValidator)(nil),         // 2: strangelove_ventures.poa.v1.MsgRemoveValidator
+	(*MsgRemoveValidatorResponse)(nil), // 3: strangelove_ventures.poa.v1.MsgRemoveValidatorResponse
+	(*MsgUpdateParams)(nil),            // 4: strangelove_ventures.poa.v1.MsgUpdateParams
+	(*MsgUpdateParamsResponse)(nil),    // 5: strangelove_ventures.poa.v1.MsgUpdateParamsResponse
+	(*Params)(nil),                     // 6: strangelove_ventures.poa.v1.Params
 }
 var file_strangelove_ventures_poa_v1_tx_proto_depIdxs = []int32{
-	4, // 0: strangelove_ventures.poa.v1.MsgCreateValidator.description:type_name -> strangelove_ventures.poa.v1.Description
-	5, // 1: strangelove_ventures.poa.v1.MsgCreateValidator.pubkey:type_name -> google.protobuf.Any
-	0, // 2: strangelove_ventures.poa.v1.Msg.CreateValidator:input_type -> strangelove_ventures.poa.v1.MsgCreateValidator
-	2, // 3: strangelove_ventures.poa.v1.Msg.VouchValidator:input_type -> strangelove_ventures.poa.v1.MsgVouchValidator
-	1, // 4: strangelove_ventures.poa.v1.Msg.CreateValidator:output_type -> strangelove_ventures.poa.v1.MsgCreateValidatorResponse
-	3, // 5: strangelove_ventures.poa.v1.Msg.VouchValidator:output_type -> strangelove_ventures.poa.v1.MsgVouchValidatorResponse
-	4, // [4:6] is the sub-list for method output_type
-	2, // [2:4] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	6, // 0: strangelove_ventures.poa.v1.MsgUpdateParams.params:type_name -> strangelove_ventures.poa.v1.Params
+	0, // 1: strangelove_ventures.poa.v1.Msg.SetPower:input_type -> strangelove_ventures.poa.v1.MsgSetPower
+	2, // 2: strangelove_ventures.poa.v1.Msg.RemoveValidator:input_type -> strangelove_ventures.poa.v1.MsgRemoveValidator
+	4, // 3: strangelove_ventures.poa.v1.Msg.UpdateParams:input_type -> strangelove_ventures.poa.v1.MsgUpdateParams
+	1, // 4: strangelove_ventures.poa.v1.Msg.SetPower:output_type -> strangelove_ventures.poa.v1.MsgSetPowerResponse
+	3, // 5: strangelove_ventures.poa.v1.Msg.RemoveValidator:output_type -> strangelove_ventures.poa.v1.MsgRemoveValidatorResponse
+	5, // 6: strangelove_ventures.poa.v1.Msg.UpdateParams:output_type -> strangelove_ventures.poa.v1.MsgUpdateParamsResponse
+	4, // [4:7] is the sub-list for method output_type
+	1, // [1:4] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_strangelove_ventures_poa_v1_tx_proto_init() }
@@ -2138,9 +2989,10 @@ func file_strangelove_ventures_poa_v1_tx_proto_init() {
 		return
 	}
 	file_strangelove_ventures_poa_v1_validator_proto_init()
+	file_strangelove_ventures_poa_v1_params_proto_init()
 	if !protoimpl.UnsafeEnabled {
 		file_strangelove_ventures_poa_v1_tx_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*MsgCreateValidator); i {
+			switch v := v.(*MsgSetPower); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2152,7 +3004,7 @@ func file_strangelove_ventures_poa_v1_tx_proto_init() {
 			}
 		}
 		file_strangelove_ventures_poa_v1_tx_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*MsgCreateValidatorResponse); i {
+			switch v := v.(*MsgSetPowerResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2164,7 +3016,7 @@ func file_strangelove_ventures_poa_v1_tx_proto_init() {
 			}
 		}
 		file_strangelove_ventures_poa_v1_tx_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*MsgVouchValidator); i {
+			switch v := v.(*MsgRemoveValidator); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2176,7 +3028,31 @@ func file_strangelove_ventures_poa_v1_tx_proto_init() {
 			}
 		}
 		file_strangelove_ventures_poa_v1_tx_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*MsgVouchValidatorResponse); i {
+			switch v := v.(*MsgRemoveValidatorResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_strangelove_ventures_poa_v1_tx_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*MsgUpdateParams); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_strangelove_ventures_poa_v1_tx_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*MsgUpdateParamsResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2194,7 +3070,7 @@ func file_strangelove_ventures_poa_v1_tx_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_strangelove_ventures_poa_v1_tx_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   4,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

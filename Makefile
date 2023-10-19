@@ -2,9 +2,11 @@
 
 DOCKER := $(shell which docker)
 
-##################
-###   Build   ####
-##################
+export GO111MODULE = on
+
+####################
+###   Testing   ####
+####################
 
 test:
 	@echo "--> Running tests"
@@ -14,7 +16,15 @@ test-integration:
 	@echo "--> Running integration tests"
 	cd integration; go test -v ./...
 
-.PHONY: test test-integration
+ictest-poa:
+	cd e2e && go clean -testcache && go test -race -v -run TestPOA .
+
+###############################################################################
+###                                  Docker                                 ###
+###############################################################################
+
+local-image:
+	docker build . -t poa:local
 
 ###################
 ###  Protobuf  ####

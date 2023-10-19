@@ -7,6 +7,7 @@ import (
 
 	abci "github.com/cometbft/cometbft/abci/types"
 	gwruntime "github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"github.com/spf13/cobra"
 	"github.com/strangelove-ventures/poa"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -15,6 +16,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 
+	"github.com/strangelove-ventures/poa/client/cli"
 	"github.com/strangelove-ventures/poa/keeper"
 )
 
@@ -38,6 +40,9 @@ func NewAppModuleBasic(m AppModule) module.AppModuleBasic {
 	return module.CoreAppModuleBasicAdaptor(poa.ModuleName, m)
 }
 
+// Name returns the circuit module's name.
+func (AppModule) Name() string { return poa.ModuleName }
+
 // RegisterLegacyAminoCodec registers the circuit module's types on the LegacyAmino codec.
 func (AppModule) RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	poa.RegisterLegacyAminoCodec(cdc)
@@ -48,6 +53,11 @@ func (AppModule) RegisterGRPCGatewayRoutes(clientCtx client.Context, mux *gwrunt
 	if err := poa.RegisterQueryHandlerClient(context.Background(), mux, poa.NewQueryClient(clientCtx)); err != nil {
 		panic(err)
 	}
+}
+
+// GetTxCmd returns the root tx command for the bank module.
+func (AppModule) GetTxCmd() *cobra.Command {
+	return cli.NewTxCmd()
 }
 
 // RegisterInterfaces registers interfaces and implementations of the circuit module.

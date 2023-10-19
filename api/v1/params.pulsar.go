@@ -8,27 +8,67 @@ import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoiface "google.golang.org/protobuf/runtime/protoiface"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	durationpb "google.golang.org/protobuf/types/known/durationpb"
+	_ "google.golang.org/protobuf/types/known/durationpb"
 	io "io"
 	reflect "reflect"
 	sync "sync"
 )
 
+var _ protoreflect.List = (*_Params_1_list)(nil)
+
+type _Params_1_list struct {
+	list *[]string
+}
+
+func (x *_Params_1_list) Len() int {
+	if x.list == nil {
+		return 0
+	}
+	return len(*x.list)
+}
+
+func (x *_Params_1_list) Get(i int) protoreflect.Value {
+	return protoreflect.ValueOfString((*x.list)[i])
+}
+
+func (x *_Params_1_list) Set(i int, value protoreflect.Value) {
+	valueUnwrapped := value.String()
+	concreteValue := valueUnwrapped
+	(*x.list)[i] = concreteValue
+}
+
+func (x *_Params_1_list) Append(value protoreflect.Value) {
+	valueUnwrapped := value.String()
+	concreteValue := valueUnwrapped
+	*x.list = append(*x.list, concreteValue)
+}
+
+func (x *_Params_1_list) AppendMutable() protoreflect.Value {
+	panic(fmt.Errorf("AppendMutable can not be called on message Params at list field Admins as it is not of Message kind"))
+}
+
+func (x *_Params_1_list) Truncate(n int) {
+	*x.list = (*x.list)[:n]
+}
+
+func (x *_Params_1_list) NewElement() protoreflect.Value {
+	v := ""
+	return protoreflect.ValueOfString(v)
+}
+
+func (x *_Params_1_list) IsValid() bool {
+	return x.list != nil
+}
+
 var (
-	md_Params                    protoreflect.MessageDescriptor
-	fd_Params_unbonding_period   protoreflect.FieldDescriptor
-	fd_Params_max_validators     protoreflect.FieldDescriptor
-	fd_Params_quorum             protoreflect.FieldDescriptor
-	fd_Params_historical_entries protoreflect.FieldDescriptor
+	md_Params        protoreflect.MessageDescriptor
+	fd_Params_admins protoreflect.FieldDescriptor
 )
 
 func init() {
 	file_strangelove_ventures_poa_v1_params_proto_init()
 	md_Params = File_strangelove_ventures_poa_v1_params_proto.Messages().ByName("Params")
-	fd_Params_unbonding_period = md_Params.Fields().ByName("unbonding_period")
-	fd_Params_max_validators = md_Params.Fields().ByName("max_validators")
-	fd_Params_quorum = md_Params.Fields().ByName("quorum")
-	fd_Params_historical_entries = md_Params.Fields().ByName("historical_entries")
+	fd_Params_admins = md_Params.Fields().ByName("admins")
 }
 
 var _ protoreflect.Message = (*fastReflection_Params)(nil)
@@ -96,27 +136,9 @@ func (x *fastReflection_Params) Interface() protoreflect.ProtoMessage {
 // While iterating, mutating operations may only be performed
 // on the current field descriptor.
 func (x *fastReflection_Params) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
-	if x.UnbondingPeriod != nil {
-		value := protoreflect.ValueOfMessage(x.UnbondingPeriod.ProtoReflect())
-		if !f(fd_Params_unbonding_period, value) {
-			return
-		}
-	}
-	if x.MaxValidators != uint32(0) {
-		value := protoreflect.ValueOfUint32(x.MaxValidators)
-		if !f(fd_Params_max_validators, value) {
-			return
-		}
-	}
-	if x.Quorum != uint32(0) {
-		value := protoreflect.ValueOfUint32(x.Quorum)
-		if !f(fd_Params_quorum, value) {
-			return
-		}
-	}
-	if x.HistoricalEntries != uint32(0) {
-		value := protoreflect.ValueOfUint32(x.HistoricalEntries)
-		if !f(fd_Params_historical_entries, value) {
+	if len(x.Admins) != 0 {
+		value := protoreflect.ValueOfList(&_Params_1_list{list: &x.Admins})
+		if !f(fd_Params_admins, value) {
 			return
 		}
 	}
@@ -135,14 +157,8 @@ func (x *fastReflection_Params) Range(f func(protoreflect.FieldDescriptor, proto
 // a repeated field is populated if it is non-empty.
 func (x *fastReflection_Params) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
-	case "strangelove_ventures.poa.v1.Params.unbonding_period":
-		return x.UnbondingPeriod != nil
-	case "strangelove_ventures.poa.v1.Params.max_validators":
-		return x.MaxValidators != uint32(0)
-	case "strangelove_ventures.poa.v1.Params.quorum":
-		return x.Quorum != uint32(0)
-	case "strangelove_ventures.poa.v1.Params.historical_entries":
-		return x.HistoricalEntries != uint32(0)
+	case "strangelove_ventures.poa.v1.Params.admins":
+		return len(x.Admins) != 0
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.Params"))
@@ -159,14 +175,8 @@ func (x *fastReflection_Params) Has(fd protoreflect.FieldDescriptor) bool {
 // Clear is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_Params) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
-	case "strangelove_ventures.poa.v1.Params.unbonding_period":
-		x.UnbondingPeriod = nil
-	case "strangelove_ventures.poa.v1.Params.max_validators":
-		x.MaxValidators = uint32(0)
-	case "strangelove_ventures.poa.v1.Params.quorum":
-		x.Quorum = uint32(0)
-	case "strangelove_ventures.poa.v1.Params.historical_entries":
-		x.HistoricalEntries = uint32(0)
+	case "strangelove_ventures.poa.v1.Params.admins":
+		x.Admins = nil
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.Params"))
@@ -183,18 +193,12 @@ func (x *fastReflection_Params) Clear(fd protoreflect.FieldDescriptor) {
 // of the value; to obtain a mutable reference, use Mutable.
 func (x *fastReflection_Params) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
-	case "strangelove_ventures.poa.v1.Params.unbonding_period":
-		value := x.UnbondingPeriod
-		return protoreflect.ValueOfMessage(value.ProtoReflect())
-	case "strangelove_ventures.poa.v1.Params.max_validators":
-		value := x.MaxValidators
-		return protoreflect.ValueOfUint32(value)
-	case "strangelove_ventures.poa.v1.Params.quorum":
-		value := x.Quorum
-		return protoreflect.ValueOfUint32(value)
-	case "strangelove_ventures.poa.v1.Params.historical_entries":
-		value := x.HistoricalEntries
-		return protoreflect.ValueOfUint32(value)
+	case "strangelove_ventures.poa.v1.Params.admins":
+		if len(x.Admins) == 0 {
+			return protoreflect.ValueOfList(&_Params_1_list{})
+		}
+		listValue := &_Params_1_list{list: &x.Admins}
+		return protoreflect.ValueOfList(listValue)
 	default:
 		if descriptor.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.Params"))
@@ -215,14 +219,10 @@ func (x *fastReflection_Params) Get(descriptor protoreflect.FieldDescriptor) pro
 // Set is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_Params) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
-	case "strangelove_ventures.poa.v1.Params.unbonding_period":
-		x.UnbondingPeriod = value.Message().Interface().(*durationpb.Duration)
-	case "strangelove_ventures.poa.v1.Params.max_validators":
-		x.MaxValidators = uint32(value.Uint())
-	case "strangelove_ventures.poa.v1.Params.quorum":
-		x.Quorum = uint32(value.Uint())
-	case "strangelove_ventures.poa.v1.Params.historical_entries":
-		x.HistoricalEntries = uint32(value.Uint())
+	case "strangelove_ventures.poa.v1.Params.admins":
+		lv := value.List()
+		clv := lv.(*_Params_1_list)
+		x.Admins = *clv.list
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.Params"))
@@ -243,17 +243,12 @@ func (x *fastReflection_Params) Set(fd protoreflect.FieldDescriptor, value proto
 // Mutable is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_Params) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "strangelove_ventures.poa.v1.Params.unbonding_period":
-		if x.UnbondingPeriod == nil {
-			x.UnbondingPeriod = new(durationpb.Duration)
+	case "strangelove_ventures.poa.v1.Params.admins":
+		if x.Admins == nil {
+			x.Admins = []string{}
 		}
-		return protoreflect.ValueOfMessage(x.UnbondingPeriod.ProtoReflect())
-	case "strangelove_ventures.poa.v1.Params.max_validators":
-		panic(fmt.Errorf("field max_validators of message strangelove_ventures.poa.v1.Params is not mutable"))
-	case "strangelove_ventures.poa.v1.Params.quorum":
-		panic(fmt.Errorf("field quorum of message strangelove_ventures.poa.v1.Params is not mutable"))
-	case "strangelove_ventures.poa.v1.Params.historical_entries":
-		panic(fmt.Errorf("field historical_entries of message strangelove_ventures.poa.v1.Params is not mutable"))
+		value := &_Params_1_list{list: &x.Admins}
+		return protoreflect.ValueOfList(value)
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.Params"))
@@ -267,15 +262,9 @@ func (x *fastReflection_Params) Mutable(fd protoreflect.FieldDescriptor) protore
 // For lists, maps, and messages, this returns a new, empty, mutable value.
 func (x *fastReflection_Params) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "strangelove_ventures.poa.v1.Params.unbonding_period":
-		m := new(durationpb.Duration)
-		return protoreflect.ValueOfMessage(m.ProtoReflect())
-	case "strangelove_ventures.poa.v1.Params.max_validators":
-		return protoreflect.ValueOfUint32(uint32(0))
-	case "strangelove_ventures.poa.v1.Params.quorum":
-		return protoreflect.ValueOfUint32(uint32(0))
-	case "strangelove_ventures.poa.v1.Params.historical_entries":
-		return protoreflect.ValueOfUint32(uint32(0))
+	case "strangelove_ventures.poa.v1.Params.admins":
+		list := []string{}
+		return protoreflect.ValueOfList(&_Params_1_list{list: &list})
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.Params"))
@@ -345,18 +334,11 @@ func (x *fastReflection_Params) ProtoMethods() *protoiface.Methods {
 		var n int
 		var l int
 		_ = l
-		if x.UnbondingPeriod != nil {
-			l = options.Size(x.UnbondingPeriod)
-			n += 1 + l + runtime.Sov(uint64(l))
-		}
-		if x.MaxValidators != 0 {
-			n += 1 + runtime.Sov(uint64(x.MaxValidators))
-		}
-		if x.Quorum != 0 {
-			n += 1 + runtime.Sov(uint64(x.Quorum))
-		}
-		if x.HistoricalEntries != 0 {
-			n += 1 + runtime.Sov(uint64(x.HistoricalEntries))
+		if len(x.Admins) > 0 {
+			for _, s := range x.Admins {
+				l = len(s)
+				n += 1 + l + runtime.Sov(uint64(l))
+			}
 		}
 		if x.unknownFields != nil {
 			n += len(x.unknownFields)
@@ -387,34 +369,14 @@ func (x *fastReflection_Params) ProtoMethods() *protoiface.Methods {
 			i -= len(x.unknownFields)
 			copy(dAtA[i:], x.unknownFields)
 		}
-		if x.HistoricalEntries != 0 {
-			i = runtime.EncodeVarint(dAtA, i, uint64(x.HistoricalEntries))
-			i--
-			dAtA[i] = 0x20
-		}
-		if x.Quorum != 0 {
-			i = runtime.EncodeVarint(dAtA, i, uint64(x.Quorum))
-			i--
-			dAtA[i] = 0x18
-		}
-		if x.MaxValidators != 0 {
-			i = runtime.EncodeVarint(dAtA, i, uint64(x.MaxValidators))
-			i--
-			dAtA[i] = 0x10
-		}
-		if x.UnbondingPeriod != nil {
-			encoded, err := options.Marshal(x.UnbondingPeriod)
-			if err != nil {
-				return protoiface.MarshalOutput{
-					NoUnkeyedLiterals: input.NoUnkeyedLiterals,
-					Buf:               input.Buf,
-				}, err
+		if len(x.Admins) > 0 {
+			for iNdEx := len(x.Admins) - 1; iNdEx >= 0; iNdEx-- {
+				i -= len(x.Admins[iNdEx])
+				copy(dAtA[i:], x.Admins[iNdEx])
+				i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Admins[iNdEx])))
+				i--
+				dAtA[i] = 0xa
 			}
-			i -= len(encoded)
-			copy(dAtA[i:], encoded)
-			i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
-			i--
-			dAtA[i] = 0xa
 		}
 		if input.Buf != nil {
 			input.Buf = append(input.Buf, dAtA...)
@@ -467,9 +429,9 @@ func (x *fastReflection_Params) ProtoMethods() *protoiface.Methods {
 			switch fieldNum {
 			case 1:
 				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field UnbondingPeriod", wireType)
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Admins", wireType)
 				}
-				var msglen int
+				var stringLen uint64
 				for shift := uint(0); ; shift += 7 {
 					if shift >= 64 {
 						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
@@ -479,85 +441,24 @@ func (x *fastReflection_Params) ProtoMethods() *protoiface.Methods {
 					}
 					b := dAtA[iNdEx]
 					iNdEx++
-					msglen |= int(b&0x7F) << shift
+					stringLen |= uint64(b&0x7F) << shift
 					if b < 0x80 {
 						break
 					}
 				}
-				if msglen < 0 {
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
 				}
-				postIndex := iNdEx + msglen
+				postIndex := iNdEx + intStringLen
 				if postIndex < 0 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
 				}
 				if postIndex > l {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
-				if x.UnbondingPeriod == nil {
-					x.UnbondingPeriod = &durationpb.Duration{}
-				}
-				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.UnbondingPeriod); err != nil {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
-				}
+				x.Admins = append(x.Admins, string(dAtA[iNdEx:postIndex]))
 				iNdEx = postIndex
-			case 2:
-				if wireType != 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field MaxValidators", wireType)
-				}
-				x.MaxValidators = 0
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
-					}
-					if iNdEx >= l {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					x.MaxValidators |= uint32(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-			case 3:
-				if wireType != 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Quorum", wireType)
-				}
-				x.Quorum = 0
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
-					}
-					if iNdEx >= l {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					x.Quorum |= uint32(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-			case 4:
-				if wireType != 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field HistoricalEntries", wireType)
-				}
-				x.HistoricalEntries = 0
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
-					}
-					if iNdEx >= l {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					x.HistoricalEntries |= uint32(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
 			default:
 				iNdEx = preIndex
 				skippy, err := runtime.Skip(dAtA[iNdEx:])
@@ -612,15 +513,8 @@ type Params struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// unbonding_time is the time duration of unbonding.
-	UnbondingPeriod *durationpb.Duration `protobuf:"bytes,1,opt,name=unbonding_period,json=unbondingPeriod,proto3" json:"unbonding_period,omitempty"`
-	// max_validators is the maximum number of validators.
-	MaxValidators uint32 `protobuf:"varint,2,opt,name=max_validators,json=maxValidators,proto3" json:"max_validators,omitempty"`
-	// quorum is the percentage of validators that must vouch for
-	// another validator for them to enter the active set.
-	Quorum uint32 `protobuf:"varint,3,opt,name=quorum,proto3" json:"quorum,omitempty"`
-	// historical_entries is the number of historical entries to persist.
-	HistoricalEntries uint32 `protobuf:"varint,4,opt,name=historical_entries,json=historicalEntries,proto3" json:"historical_entries,omitempty"`
+	// array of accounts that can update the set. ex: governance, mulitisigs, etc.
+	Admins []string `protobuf:"bytes,1,rep,name=admins,proto3" json:"admins,omitempty"`
 }
 
 func (x *Params) Reset() {
@@ -643,32 +537,11 @@ func (*Params) Descriptor() ([]byte, []int) {
 	return file_strangelove_ventures_poa_v1_params_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *Params) GetUnbondingPeriod() *durationpb.Duration {
+func (x *Params) GetAdmins() []string {
 	if x != nil {
-		return x.UnbondingPeriod
+		return x.Admins
 	}
 	return nil
-}
-
-func (x *Params) GetMaxValidators() uint32 {
-	if x != nil {
-		return x.MaxValidators
-	}
-	return 0
-}
-
-func (x *Params) GetQuorum() uint32 {
-	if x != nil {
-		return x.Quorum
-	}
-	return 0
-}
-
-func (x *Params) GetHistoricalEntries() uint32 {
-	if x != nil {
-		return x.HistoricalEntries
-	}
-	return 0
 }
 
 var File_strangelove_ventures_poa_v1_params_proto protoreflect.FileDescriptor
@@ -681,44 +554,27 @@ var file_strangelove_ventures_poa_v1_params_proto_rawDesc = []byte{
 	0x2e, 0x70, 0x6f, 0x61, 0x2e, 0x76, 0x31, 0x1a, 0x14, 0x67, 0x6f, 0x67, 0x6f, 0x70, 0x72, 0x6f,
 	0x74, 0x6f, 0x2f, 0x67, 0x6f, 0x67, 0x6f, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x1e, 0x67,
 	0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2f, 0x64,
-	0x75, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0xb4, 0x02,
-	0x0a, 0x06, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x12, 0x69, 0x0a, 0x10, 0x75, 0x6e, 0x62, 0x6f,
-	0x6e, 0x64, 0x69, 0x6e, 0x67, 0x5f, 0x70, 0x65, 0x72, 0x69, 0x6f, 0x64, 0x18, 0x01, 0x20, 0x01,
-	0x28, 0x0b, 0x32, 0x19, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74,
-	0x6f, 0x62, 0x75, 0x66, 0x2e, 0x44, 0x75, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x42, 0x23, 0xc8,
-	0xde, 0x1f, 0x00, 0xf2, 0xde, 0x1f, 0x17, 0x79, 0x61, 0x6d, 0x6c, 0x3a, 0x22, 0x75, 0x6e, 0x62,
-	0x6f, 0x6e, 0x64, 0x69, 0x6e, 0x67, 0x5f, 0x70, 0x65, 0x72, 0x69, 0x6f, 0x64, 0x22, 0x98, 0xdf,
-	0x1f, 0x01, 0x52, 0x0f, 0x75, 0x6e, 0x62, 0x6f, 0x6e, 0x64, 0x69, 0x6e, 0x67, 0x50, 0x65, 0x72,
-	0x69, 0x6f, 0x64, 0x12, 0x40, 0x0a, 0x0e, 0x6d, 0x61, 0x78, 0x5f, 0x76, 0x61, 0x6c, 0x69, 0x64,
-	0x61, 0x74, 0x6f, 0x72, 0x73, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0d, 0x42, 0x19, 0xf2, 0xde, 0x1f,
-	0x15, 0x79, 0x61, 0x6d, 0x6c, 0x3a, 0x22, 0x6d, 0x61, 0x78, 0x5f, 0x76, 0x61, 0x6c, 0x69, 0x64,
-	0x61, 0x74, 0x6f, 0x72, 0x73, 0x22, 0x52, 0x0d, 0x6d, 0x61, 0x78, 0x56, 0x61, 0x6c, 0x69, 0x64,
-	0x61, 0x74, 0x6f, 0x72, 0x73, 0x12, 0x29, 0x0a, 0x06, 0x71, 0x75, 0x6f, 0x72, 0x75, 0x6d, 0x18,
-	0x03, 0x20, 0x01, 0x28, 0x0d, 0x42, 0x11, 0xf2, 0xde, 0x1f, 0x0d, 0x79, 0x61, 0x6d, 0x6c, 0x3a,
-	0x22, 0x71, 0x75, 0x6f, 0x72, 0x75, 0x6d, 0x22, 0x52, 0x06, 0x71, 0x75, 0x6f, 0x72, 0x75, 0x6d,
-	0x12, 0x4c, 0x0a, 0x12, 0x68, 0x69, 0x73, 0x74, 0x6f, 0x72, 0x69, 0x63, 0x61, 0x6c, 0x5f, 0x65,
-	0x6e, 0x74, 0x72, 0x69, 0x65, 0x73, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0d, 0x42, 0x1d, 0xf2, 0xde,
-	0x1f, 0x19, 0x79, 0x61, 0x6d, 0x6c, 0x3a, 0x22, 0x68, 0x69, 0x73, 0x74, 0x6f, 0x72, 0x69, 0x63,
-	0x61, 0x6c, 0x5f, 0x65, 0x6e, 0x74, 0x72, 0x69, 0x65, 0x73, 0x22, 0x52, 0x11, 0x68, 0x69, 0x73,
-	0x74, 0x6f, 0x72, 0x69, 0x63, 0x61, 0x6c, 0x45, 0x6e, 0x74, 0x72, 0x69, 0x65, 0x73, 0x3a, 0x04,
-	0xe8, 0xa0, 0x1f, 0x01, 0x42, 0x83, 0x02, 0x0a, 0x1f, 0x63, 0x6f, 0x6d, 0x2e, 0x73, 0x74, 0x72,
-	0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65, 0x5f, 0x76, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65,
-	0x73, 0x2e, 0x70, 0x6f, 0x61, 0x2e, 0x76, 0x31, 0x42, 0x0b, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73,
-	0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x49, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e,
-	0x63, 0x6f, 0x6d, 0x2f, 0x73, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65, 0x2d,
-	0x76, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65, 0x73, 0x2f, 0x70, 0x6f, 0x61, 0x2f, 0x61, 0x70, 0x69,
-	0x2f, 0x73, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65, 0x5f, 0x76, 0x65, 0x6e,
-	0x74, 0x75, 0x72, 0x65, 0x73, 0x2f, 0x70, 0x6f, 0x61, 0x2f, 0x76, 0x31, 0x3b, 0x70, 0x6f, 0x61,
-	0x76, 0x31, 0xa2, 0x02, 0x03, 0x53, 0x50, 0x58, 0xaa, 0x02, 0x1a, 0x53, 0x74, 0x72, 0x61, 0x6e,
-	0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65, 0x56, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65, 0x73, 0x2e, 0x50,
-	0x6f, 0x61, 0x2e, 0x56, 0x31, 0xca, 0x02, 0x1a, 0x53, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c,
-	0x6f, 0x76, 0x65, 0x56, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65, 0x73, 0x5c, 0x50, 0x6f, 0x61, 0x5c,
-	0x56, 0x31, 0xe2, 0x02, 0x26, 0x53, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65,
-	0x56, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65, 0x73, 0x5c, 0x50, 0x6f, 0x61, 0x5c, 0x56, 0x31, 0x5c,
-	0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x1c, 0x53, 0x74,
-	0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65, 0x56, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65,
-	0x73, 0x3a, 0x3a, 0x50, 0x6f, 0x61, 0x3a, 0x3a, 0x56, 0x31, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74,
-	0x6f, 0x33,
+	0x75, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x2a, 0x0a,
+	0x06, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x12, 0x16, 0x0a, 0x06, 0x61, 0x64, 0x6d, 0x69, 0x6e,
+	0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x09, 0x52, 0x06, 0x61, 0x64, 0x6d, 0x69, 0x6e, 0x73, 0x3a,
+	0x08, 0x98, 0xa0, 0x1f, 0x00, 0xe8, 0xa0, 0x1f, 0x01, 0x42, 0x83, 0x02, 0x0a, 0x1f, 0x63, 0x6f,
+	0x6d, 0x2e, 0x73, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65, 0x5f, 0x76, 0x65,
+	0x6e, 0x74, 0x75, 0x72, 0x65, 0x73, 0x2e, 0x70, 0x6f, 0x61, 0x2e, 0x76, 0x31, 0x42, 0x0b, 0x50,
+	0x61, 0x72, 0x61, 0x6d, 0x73, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x49, 0x67, 0x69,
+	0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x73, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65,
+	0x6c, 0x6f, 0x76, 0x65, 0x2d, 0x76, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65, 0x73, 0x2f, 0x70, 0x6f,
+	0x61, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x73, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f, 0x76,
+	0x65, 0x5f, 0x76, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65, 0x73, 0x2f, 0x70, 0x6f, 0x61, 0x2f, 0x76,
+	0x31, 0x3b, 0x70, 0x6f, 0x61, 0x76, 0x31, 0xa2, 0x02, 0x03, 0x53, 0x50, 0x58, 0xaa, 0x02, 0x1a,
+	0x53, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65, 0x56, 0x65, 0x6e, 0x74, 0x75,
+	0x72, 0x65, 0x73, 0x2e, 0x50, 0x6f, 0x61, 0x2e, 0x56, 0x31, 0xca, 0x02, 0x1a, 0x53, 0x74, 0x72,
+	0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65, 0x56, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65, 0x73,
+	0x5c, 0x50, 0x6f, 0x61, 0x5c, 0x56, 0x31, 0xe2, 0x02, 0x26, 0x53, 0x74, 0x72, 0x61, 0x6e, 0x67,
+	0x65, 0x6c, 0x6f, 0x76, 0x65, 0x56, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65, 0x73, 0x5c, 0x50, 0x6f,
+	0x61, 0x5c, 0x56, 0x31, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61,
+	0xea, 0x02, 0x1c, 0x53, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65, 0x56, 0x65,
+	0x6e, 0x74, 0x75, 0x72, 0x65, 0x73, 0x3a, 0x3a, 0x50, 0x6f, 0x61, 0x3a, 0x3a, 0x56, 0x31, 0x62,
+	0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -735,16 +591,14 @@ func file_strangelove_ventures_poa_v1_params_proto_rawDescGZIP() []byte {
 
 var file_strangelove_ventures_poa_v1_params_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_strangelove_ventures_poa_v1_params_proto_goTypes = []interface{}{
-	(*Params)(nil),              // 0: strangelove_ventures.poa.v1.Params
-	(*durationpb.Duration)(nil), // 1: google.protobuf.Duration
+	(*Params)(nil), // 0: strangelove_ventures.poa.v1.Params
 }
 var file_strangelove_ventures_poa_v1_params_proto_depIdxs = []int32{
-	1, // 0: strangelove_ventures.poa.v1.Params.unbonding_period:type_name -> google.protobuf.Duration
-	1, // [1:1] is the sub-list for method output_type
-	1, // [1:1] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	0, // [0:0] is the sub-list for method output_type
+	0, // [0:0] is the sub-list for method input_type
+	0, // [0:0] is the sub-list for extension type_name
+	0, // [0:0] is the sub-list for extension extendee
+	0, // [0:0] is the sub-list for field type_name
 }
 
 func init() { file_strangelove_ventures_poa_v1_params_proto_init() }
