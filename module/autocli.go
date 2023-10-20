@@ -2,23 +2,15 @@ package module
 
 import (
 	autocliv1 "cosmossdk.io/api/cosmos/autocli/v1"
-	examplev1 "github.com/strangelove-ventures/poa/api/v1"
+	poav1 "github.com/strangelove-ventures/poa/api/v1"
 )
 
 // AutoCLIOptions implements the autocli.HasAutoCLIConfig interface.
 func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 	return &autocliv1.ModuleOptions{
 		Query: &autocliv1.ServiceCommandDescriptor{
-			Service:           examplev1.Query_ServiceDesc.ServiceName,
+			Service:           poav1.Query_ServiceDesc.ServiceName,
 			RpcCommandOptions: []*autocliv1.RpcCommandOptions{
-				// {
-				// 	RpcMethod: "Counter",
-				// 	Use:       "counter [address]",
-				// 	Short:     "Get the current value of the counter for an address",
-				// 	PositionalArgs: []*autocliv1.PositionalArgDescriptor{
-				// 		{ProtoField: "address"},
-				// 	},
-				// },
 				// {
 				// 	RpcMethod: "Params",
 				// 	Use:       "params",
@@ -27,17 +19,27 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 			},
 		},
 		Tx: &autocliv1.ServiceCommandDescriptor{
-			Service:           examplev1.Msg_ServiceDesc.ServiceName,
+			Service: poav1.Msg_ServiceDesc.ServiceName,
 			RpcCommandOptions: []*autocliv1.RpcCommandOptions{
-				// {
-				// 	RpcMethod: "IncrementCounter",
-				// 	Use:       "counter [sender]",
-				// 	Short:     "Increments the counter by 1 for the sender",
-				// 	PositionalArgs: []*autocliv1.PositionalArgDescriptor{
-				// 		{ProtoField: "sender"},
-				// 	},
-				// },
-				// The UpdateParams tx is purposely left empty, the MsgUpdateParams is gov gated.
+				{
+					RpcMethod: "SetPower",
+					Use:       "set-power [validator] [power]",
+					Short:     "Sets a validators network power",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{
+						{ProtoField: "sender"},
+						{ProtoField: "validator"},
+						{ProtoField: "power"},
+					},
+				},
+				{
+					RpcMethod: "RemoveValidator",
+					Use:       "remove [validator]",
+					Short:     "Remove an active validator from the set",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{
+						{ProtoField: "validator"},
+					},
+				},
+				// TODO: Params
 			},
 		},
 	}

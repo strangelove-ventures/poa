@@ -1,57 +1,68 @@
 package keeper
 
 import (
-	"fmt"
+	"context"
 
-	"cosmossdk.io/collections"
-	"cosmossdk.io/core/address"
 	storetypes "cosmossdk.io/core/store"
 	"github.com/cosmos/cosmos-sdk/codec"
+	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	"github.com/strangelove-ventures/poa"
 )
 
 type Keeper struct {
 	cdc          codec.BinaryCodec
-	addressCodec address.Codec
+	storeService storetypes.KVStoreService
 
-	// authority is the address capable of executing a MsgUpdateParams and other authority-gated message.
-	// typically, this should be the x/gov module account.
-	authority string
-
-	// state management
-	Schema     collections.Schema
-	Params     collections.Item[poa.Params]
-	Validators collections.Map[string, poa.Validator]
-	Vouches    collections.Map[string, poa.Vouch]
+	stakingKeeper *stakingkeeper.Keeper
 }
 
 // NewKeeper creates a new Keeper instance
-func NewKeeper(cdc codec.BinaryCodec, addressCodec address.Codec, storeService storetypes.KVStoreService, authority string) Keeper {
-	if _, err := addressCodec.StringToBytes(authority); err != nil {
-		panic(fmt.Errorf("invalid authority address: %w", err))
-	}
-
-	sb := collections.NewSchemaBuilder(storeService)
+func NewKeeper(
+	cdc codec.BinaryCodec,
+	storeService storetypes.KVStoreService,
+	sk *stakingkeeper.Keeper,
+) Keeper {
 	k := Keeper{
-		cdc:          cdc,
-		addressCodec: addressCodec,
-		authority:    authority,
-		Params:       collections.NewItem(sb, poa.ParamsKey, "params", codec.CollValue[poa.Params](cdc)),
-		Validators:   collections.NewMap(sb, poa.ValidatorsKey, "validators", collections.StringKey, codec.CollValue[poa.Validator](cdc)),
-		Vouches:      collections.NewMap(sb, poa.VouchesKey, "vouches", collections.StringKey, codec.CollValue[poa.Vouch](cdc)),
+		cdc:           cdc,
+		storeService:  storeService,
+		stakingKeeper: sk,
 	}
-
-	schema, err := sb.Build()
-	if err != nil {
-		panic(err)
-	}
-
-	k.Schema = schema
 
 	return k
 }
 
-// GetAuthority returns the module's authority.
-func (k Keeper) GetAuthority() string {
-	return k.authority
+// SetParams sets the module parameters.
+func (k Keeper) SetParams(ctx context.Context, p poa.Params) error {
+	if err := p.Validate(); err != nil {
+		return err
+	}
+
+	store := k.storeService.OpenKVStore(ctx)
+	bz := k.cdc.MustMarshal(&p)
+	return store.Set(poa.ParamsKey, bz)
+}
+
+// GetParams returns the current module parameters.
+func (k Keeper) GetParams(ctx context.Context) (poa.Params, error) {
+	store := k.storeService.OpenKVStore(ctx)
+
+	bz, err := store.Get(poa.ParamsKey)
+	if err != nil || bz == nil {
+		return poa.DefaultParams(), err
+	}
+
+	var p poa.Params
+	k.cdc.MustUnmarshal(bz, &p)
+	return p, nil
+}
+
+// GetAdmins returns the module's administrators with delegation of power control.
+func (k Keeper) GetAdmins(ctx context.Context) []string {
+	p, err := k.GetParams(ctx)
+	if err != nil {
+		// panic(err) ?
+		return []string{}
+	}
+
+	return p.Admins
 }

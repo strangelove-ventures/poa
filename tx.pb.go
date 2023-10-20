@@ -7,7 +7,9 @@ import (
 	context "context"
 	fmt "fmt"
 	_ "github.com/cosmos/cosmos-proto"
-	types "github.com/cosmos/cosmos-sdk/codec/types"
+	_ "github.com/cosmos/cosmos-sdk/codec/types"
+	_ "github.com/cosmos/cosmos-sdk/types/msgservice"
+	_ "github.com/cosmos/cosmos-sdk/types/tx/amino"
 	_ "github.com/cosmos/cosmos-sdk/x/staking/types"
 	_ "github.com/cosmos/gogoproto/gogoproto"
 	grpc1 "github.com/cosmos/gogoproto/grpc"
@@ -31,25 +33,25 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-type MsgCreateValidator struct {
-	// string name = 1 [(gogoproto.moretags) = "yaml:\"name\""];
-	Description Description `protobuf:"bytes,1,opt,name=description,proto3" json:"description"`
-	Address     string      `protobuf:"bytes,2,opt,name=address,proto3" json:"address,omitempty" yaml:"validator_address"`
-	Pubkey      *types.Any  `protobuf:"bytes,3,opt,name=pubkey,proto3" json:"pubkey,omitempty"`
+// SetPower sets the power of a validator
+type MsgSetPower struct {
+	FromAddress      string `protobuf:"bytes,1,opt,name=from_address,json=fromAddress,proto3" json:"from_address,omitempty"`
+	ValidatorAddress string `protobuf:"bytes,2,opt,name=validator_address,json=validatorAddress,proto3" json:"validator_address,omitempty"`
+	Power            uint64 `protobuf:"varint,3,opt,name=power,proto3" json:"power,omitempty"`
 }
 
-func (m *MsgCreateValidator) Reset()         { *m = MsgCreateValidator{} }
-func (m *MsgCreateValidator) String() string { return proto.CompactTextString(m) }
-func (*MsgCreateValidator) ProtoMessage()    {}
-func (*MsgCreateValidator) Descriptor() ([]byte, []int) {
+func (m *MsgSetPower) Reset()         { *m = MsgSetPower{} }
+func (m *MsgSetPower) String() string { return proto.CompactTextString(m) }
+func (*MsgSetPower) ProtoMessage()    {}
+func (*MsgSetPower) Descriptor() ([]byte, []int) {
 	return fileDescriptor_9035304c91ee78c4, []int{0}
 }
-func (m *MsgCreateValidator) XXX_Unmarshal(b []byte) error {
+func (m *MsgSetPower) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgCreateValidator) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgSetPower) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgCreateValidator.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgSetPower.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -59,54 +61,34 @@ func (m *MsgCreateValidator) XXX_Marshal(b []byte, deterministic bool) ([]byte, 
 		return b[:n], nil
 	}
 }
-func (m *MsgCreateValidator) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgCreateValidator.Merge(m, src)
+func (m *MsgSetPower) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgSetPower.Merge(m, src)
 }
-func (m *MsgCreateValidator) XXX_Size() int {
+func (m *MsgSetPower) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgCreateValidator) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgCreateValidator.DiscardUnknown(m)
+func (m *MsgSetPower) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgSetPower.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgCreateValidator proto.InternalMessageInfo
+var xxx_messageInfo_MsgSetPower proto.InternalMessageInfo
 
-func (m *MsgCreateValidator) GetDescription() Description {
-	if m != nil {
-		return m.Description
-	}
-	return Description{}
+// MsgSetPowerResponse
+type MsgSetPowerResponse struct {
 }
 
-func (m *MsgCreateValidator) GetAddress() string {
-	if m != nil {
-		return m.Address
-	}
-	return ""
-}
-
-func (m *MsgCreateValidator) GetPubkey() *types.Any {
-	if m != nil {
-		return m.Pubkey
-	}
-	return nil
-}
-
-type MsgCreateValidatorResponse struct {
-}
-
-func (m *MsgCreateValidatorResponse) Reset()         { *m = MsgCreateValidatorResponse{} }
-func (m *MsgCreateValidatorResponse) String() string { return proto.CompactTextString(m) }
-func (*MsgCreateValidatorResponse) ProtoMessage()    {}
-func (*MsgCreateValidatorResponse) Descriptor() ([]byte, []int) {
+func (m *MsgSetPowerResponse) Reset()         { *m = MsgSetPowerResponse{} }
+func (m *MsgSetPowerResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgSetPowerResponse) ProtoMessage()    {}
+func (*MsgSetPowerResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_9035304c91ee78c4, []int{1}
 }
-func (m *MsgCreateValidatorResponse) XXX_Unmarshal(b []byte) error {
+func (m *MsgSetPowerResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgCreateValidatorResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgSetPowerResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgCreateValidatorResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgSetPowerResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -116,37 +98,37 @@ func (m *MsgCreateValidatorResponse) XXX_Marshal(b []byte, deterministic bool) (
 		return b[:n], nil
 	}
 }
-func (m *MsgCreateValidatorResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgCreateValidatorResponse.Merge(m, src)
+func (m *MsgSetPowerResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgSetPowerResponse.Merge(m, src)
 }
-func (m *MsgCreateValidatorResponse) XXX_Size() int {
+func (m *MsgSetPowerResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgCreateValidatorResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgCreateValidatorResponse.DiscardUnknown(m)
+func (m *MsgSetPowerResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgSetPowerResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgCreateValidatorResponse proto.InternalMessageInfo
+var xxx_messageInfo_MsgSetPowerResponse proto.InternalMessageInfo
 
-type MsgVouchValidator struct {
-	// string name = 1 [(gogoproto.moretags) = "yaml:\"name\""];
-	VoucherAddress   string `protobuf:"bytes,1,opt,name=voucher_address,json=voucherAddress,proto3" json:"voucher_address,omitempty" yaml:"voucher_address"`
-	InFavor          bool   `protobuf:"varint,2,opt,name=in_favor,json=inFavor,proto3" json:"in_favor,omitempty" yaml:"infavor"`
-	CandidateAddress string `protobuf:"bytes,3,opt,name=candidate_address,json=candidateAddress,proto3" json:"candidate_address,omitempty" yaml:"candidate_address"`
+// MsgRemoveValidator removes an active validitor from the set
+// jail -> deleted
+type MsgRemoveValidator struct {
+	FromAddress      string `protobuf:"bytes,1,opt,name=from_address,json=fromAddress,proto3" json:"from_address,omitempty"`
+	ValidatorAddress string `protobuf:"bytes,2,opt,name=validator_address,json=validatorAddress,proto3" json:"validator_address,omitempty"`
 }
 
-func (m *MsgVouchValidator) Reset()         { *m = MsgVouchValidator{} }
-func (m *MsgVouchValidator) String() string { return proto.CompactTextString(m) }
-func (*MsgVouchValidator) ProtoMessage()    {}
-func (*MsgVouchValidator) Descriptor() ([]byte, []int) {
+func (m *MsgRemoveValidator) Reset()         { *m = MsgRemoveValidator{} }
+func (m *MsgRemoveValidator) String() string { return proto.CompactTextString(m) }
+func (*MsgRemoveValidator) ProtoMessage()    {}
+func (*MsgRemoveValidator) Descriptor() ([]byte, []int) {
 	return fileDescriptor_9035304c91ee78c4, []int{2}
 }
-func (m *MsgVouchValidator) XXX_Unmarshal(b []byte) error {
+func (m *MsgRemoveValidator) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgVouchValidator) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgRemoveValidator) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgVouchValidator.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgRemoveValidator.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -156,54 +138,34 @@ func (m *MsgVouchValidator) XXX_Marshal(b []byte, deterministic bool) ([]byte, e
 		return b[:n], nil
 	}
 }
-func (m *MsgVouchValidator) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgVouchValidator.Merge(m, src)
+func (m *MsgRemoveValidator) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgRemoveValidator.Merge(m, src)
 }
-func (m *MsgVouchValidator) XXX_Size() int {
+func (m *MsgRemoveValidator) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgVouchValidator) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgVouchValidator.DiscardUnknown(m)
+func (m *MsgRemoveValidator) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgRemoveValidator.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgVouchValidator proto.InternalMessageInfo
+var xxx_messageInfo_MsgRemoveValidator proto.InternalMessageInfo
 
-func (m *MsgVouchValidator) GetVoucherAddress() string {
-	if m != nil {
-		return m.VoucherAddress
-	}
-	return ""
+// MsgSetPowerResponse
+type MsgRemoveValidatorResponse struct {
 }
 
-func (m *MsgVouchValidator) GetInFavor() bool {
-	if m != nil {
-		return m.InFavor
-	}
-	return false
-}
-
-func (m *MsgVouchValidator) GetCandidateAddress() string {
-	if m != nil {
-		return m.CandidateAddress
-	}
-	return ""
-}
-
-type MsgVouchValidatorResponse struct {
-}
-
-func (m *MsgVouchValidatorResponse) Reset()         { *m = MsgVouchValidatorResponse{} }
-func (m *MsgVouchValidatorResponse) String() string { return proto.CompactTextString(m) }
-func (*MsgVouchValidatorResponse) ProtoMessage()    {}
-func (*MsgVouchValidatorResponse) Descriptor() ([]byte, []int) {
+func (m *MsgRemoveValidatorResponse) Reset()         { *m = MsgRemoveValidatorResponse{} }
+func (m *MsgRemoveValidatorResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgRemoveValidatorResponse) ProtoMessage()    {}
+func (*MsgRemoveValidatorResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_9035304c91ee78c4, []int{3}
 }
-func (m *MsgVouchValidatorResponse) XXX_Unmarshal(b []byte) error {
+func (m *MsgRemoveValidatorResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgVouchValidatorResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgRemoveValidatorResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgVouchValidatorResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgRemoveValidatorResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -213,23 +175,119 @@ func (m *MsgVouchValidatorResponse) XXX_Marshal(b []byte, deterministic bool) ([
 		return b[:n], nil
 	}
 }
-func (m *MsgVouchValidatorResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgVouchValidatorResponse.Merge(m, src)
+func (m *MsgRemoveValidatorResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgRemoveValidatorResponse.Merge(m, src)
 }
-func (m *MsgVouchValidatorResponse) XXX_Size() int {
+func (m *MsgRemoveValidatorResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgVouchValidatorResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgVouchValidatorResponse.DiscardUnknown(m)
+func (m *MsgRemoveValidatorResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgRemoveValidatorResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgVouchValidatorResponse proto.InternalMessageInfo
+var xxx_messageInfo_MsgRemoveValidatorResponse proto.InternalMessageInfo
+
+// MsgUpdateParams is the Msg/UpdateParams request type.
+type MsgUpdateParams struct {
+	// from_address is the address of the admin account with permission to update.
+	// ex: governance, multisig/DAO, or standard account found in Params.
+	FromAddress string `protobuf:"bytes,1,opt,name=from_address,json=fromAddress,proto3" json:"from_address,omitempty"`
+	// module parameters (all must be supplied).
+	Params Params `protobuf:"bytes,2,opt,name=params,proto3" json:"params"`
+}
+
+func (m *MsgUpdateParams) Reset()         { *m = MsgUpdateParams{} }
+func (m *MsgUpdateParams) String() string { return proto.CompactTextString(m) }
+func (*MsgUpdateParams) ProtoMessage()    {}
+func (*MsgUpdateParams) Descriptor() ([]byte, []int) {
+	return fileDescriptor_9035304c91ee78c4, []int{4}
+}
+func (m *MsgUpdateParams) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgUpdateParams) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgUpdateParams.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgUpdateParams) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgUpdateParams.Merge(m, src)
+}
+func (m *MsgUpdateParams) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgUpdateParams) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgUpdateParams.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgUpdateParams proto.InternalMessageInfo
+
+func (m *MsgUpdateParams) GetFromAddress() string {
+	if m != nil {
+		return m.FromAddress
+	}
+	return ""
+}
+
+func (m *MsgUpdateParams) GetParams() Params {
+	if m != nil {
+		return m.Params
+	}
+	return Params{}
+}
+
+// MsgUpdateParamsResponse defines the response structure for executing a
+// MsgUpdateParams message.
+type MsgUpdateParamsResponse struct {
+}
+
+func (m *MsgUpdateParamsResponse) Reset()         { *m = MsgUpdateParamsResponse{} }
+func (m *MsgUpdateParamsResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgUpdateParamsResponse) ProtoMessage()    {}
+func (*MsgUpdateParamsResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_9035304c91ee78c4, []int{5}
+}
+func (m *MsgUpdateParamsResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgUpdateParamsResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgUpdateParamsResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgUpdateParamsResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgUpdateParamsResponse.Merge(m, src)
+}
+func (m *MsgUpdateParamsResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgUpdateParamsResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgUpdateParamsResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgUpdateParamsResponse proto.InternalMessageInfo
 
 func init() {
-	proto.RegisterType((*MsgCreateValidator)(nil), "strangelove_ventures.poa.v1.MsgCreateValidator")
-	proto.RegisterType((*MsgCreateValidatorResponse)(nil), "strangelove_ventures.poa.v1.MsgCreateValidatorResponse")
-	proto.RegisterType((*MsgVouchValidator)(nil), "strangelove_ventures.poa.v1.MsgVouchValidator")
-	proto.RegisterType((*MsgVouchValidatorResponse)(nil), "strangelove_ventures.poa.v1.MsgVouchValidatorResponse")
+	proto.RegisterType((*MsgSetPower)(nil), "strangelove_ventures.poa.v1.MsgSetPower")
+	proto.RegisterType((*MsgSetPowerResponse)(nil), "strangelove_ventures.poa.v1.MsgSetPowerResponse")
+	proto.RegisterType((*MsgRemoveValidator)(nil), "strangelove_ventures.poa.v1.MsgRemoveValidator")
+	proto.RegisterType((*MsgRemoveValidatorResponse)(nil), "strangelove_ventures.poa.v1.MsgRemoveValidatorResponse")
+	proto.RegisterType((*MsgUpdateParams)(nil), "strangelove_ventures.poa.v1.MsgUpdateParams")
+	proto.RegisterType((*MsgUpdateParamsResponse)(nil), "strangelove_ventures.poa.v1.MsgUpdateParamsResponse")
 }
 
 func init() {
@@ -237,40 +295,41 @@ func init() {
 }
 
 var fileDescriptor_9035304c91ee78c4 = []byte{
-	// 521 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x93, 0x3d, 0x6b, 0xdb, 0x40,
-	0x18, 0xc7, 0xa5, 0x3a, 0xe4, 0xe5, 0x02, 0x4e, 0x23, 0x4c, 0x51, 0x94, 0x20, 0x05, 0x35, 0x83,
-	0xa1, 0xf8, 0x0e, 0xa7, 0x90, 0x42, 0xa0, 0x43, 0x94, 0x12, 0x28, 0xc5, 0x10, 0x34, 0x64, 0xe8,
-	0x62, 0x4e, 0xd2, 0xe5, 0x22, 0x62, 0xdf, 0x09, 0xdd, 0x49, 0x44, 0xf4, 0x4b, 0xf4, 0x23, 0xf4,
-	0x43, 0xf4, 0x43, 0x84, 0x4e, 0xa1, 0x53, 0x27, 0x53, 0xec, 0xa5, 0x43, 0x27, 0xcf, 0x1d, 0x8a,
-	0xf5, 0xe2, 0x38, 0x76, 0x71, 0xf1, 0x76, 0xcf, 0x73, 0xff, 0xe7, 0xe5, 0xf7, 0xd7, 0x09, 0x1c,
-	0x09, 0x19, 0x63, 0x46, 0x49, 0x8f, 0xa7, 0xa4, 0x9b, 0x12, 0x26, 0x93, 0x98, 0x08, 0x14, 0x71,
-	0x8c, 0xd2, 0x36, 0x92, 0x77, 0x30, 0x8a, 0xb9, 0xe4, 0xda, 0xfe, 0xbf, 0x54, 0x30, 0xe2, 0x18,
-	0xa6, 0x6d, 0xe3, 0xc8, 0xe7, 0xa2, 0xcf, 0x05, 0x12, 0x12, 0xdf, 0x86, 0x8c, 0xa2, 0xb4, 0xed,
-	0x11, 0x89, 0xdb, 0x55, 0x5c, 0xb4, 0x30, 0x5e, 0x2d, 0x1b, 0x94, 0xe2, 0x5e, 0x18, 0x60, 0xc9,
-	0xe3, 0x52, 0xbc, 0x57, 0xb4, 0xec, 0xe6, 0x11, 0x2a, 0x82, 0xea, 0x8a, 0x72, 0x4e, 0x7b, 0x04,
-	0xe5, 0x91, 0x97, 0x5c, 0x23, 0xcc, 0xb2, 0xf2, 0xaa, 0x41, 0x39, 0xe5, 0x45, 0xc9, 0xe4, 0x54,
-	0x64, 0xed, 0xdf, 0x2a, 0xd0, 0x3a, 0x82, 0x9e, 0xc7, 0x04, 0x4b, 0x72, 0x55, 0x0d, 0xd2, 0x2e,
-	0xc1, 0x76, 0x40, 0x84, 0x1f, 0x87, 0x91, 0x0c, 0x39, 0xd3, 0xd5, 0x43, 0xb5, 0xb9, 0x7d, 0xdc,
-	0x84, 0x4b, 0x40, 0xe1, 0xbb, 0x47, 0xbd, 0xb3, 0x76, 0x3f, 0xb0, 0x14, 0x77, 0xb6, 0x85, 0x76,
-	0x02, 0x36, 0x70, 0x10, 0xc4, 0x44, 0x08, 0xfd, 0xd9, 0xa1, 0xda, 0xdc, 0x72, 0x0e, 0xc6, 0x03,
-	0x4b, 0xcf, 0x70, 0xbf, 0x77, 0x6a, 0x4f, 0x01, 0xbb, 0xa5, 0xc4, 0x76, 0x2b, 0xb1, 0x76, 0x01,
-	0xd6, 0xa3, 0xc4, 0xbb, 0x25, 0x99, 0x5e, 0xcb, 0x97, 0x68, 0xc0, 0x02, 0x11, 0x56, 0x88, 0xf0,
-	0x8c, 0x65, 0x8e, 0xfe, 0xed, 0x6b, 0xab, 0x51, 0x3a, 0xe1, 0xc7, 0x59, 0x24, 0x39, 0xbc, 0x4c,
-	0xbc, 0x0f, 0x24, 0x73, 0xcb, 0xea, 0xd3, 0xb5, 0x5f, 0x5f, 0x2c, 0xc5, 0x3e, 0x00, 0xc6, 0x22,
-	0xad, 0x4b, 0x44, 0xc4, 0x99, 0x20, 0xf6, 0x77, 0x15, 0xec, 0x76, 0x04, 0xbd, 0xe2, 0x89, 0x7f,
-	0xf3, 0xe8, 0xc5, 0x39, 0xd8, 0x49, 0x27, 0x19, 0x32, 0x5d, 0x2f, 0xf7, 0x63, 0xcb, 0x31, 0xc6,
-	0x03, 0xeb, 0x45, 0x49, 0xf0, 0x54, 0x60, 0xbb, 0xf5, 0x32, 0x73, 0x56, 0x62, 0xb4, 0xc0, 0x66,
-	0xc8, 0xba, 0xd7, 0x38, 0xe5, 0x71, 0xce, 0xbf, 0xe9, 0x68, 0xe3, 0x81, 0x55, 0x2f, 0xaa, 0x43,
-	0x96, 0x5f, 0xd8, 0xee, 0x46, 0xc8, 0x2e, 0x26, 0x27, 0xed, 0x3d, 0xd8, 0xf5, 0x31, 0x0b, 0x26,
-	0x1b, 0x90, 0xe9, 0xd4, 0xda, 0xbc, 0x6f, 0x0b, 0x12, 0xdb, 0x7d, 0x3e, 0xcd, 0x95, 0x93, 0xed,
-	0x7d, 0xb0, 0xb7, 0xc0, 0x54, 0x11, 0x1f, 0xff, 0x51, 0x41, 0xad, 0x23, 0xa8, 0xf6, 0x09, 0xec,
-	0xcc, 0x3f, 0x01, 0xb4, 0xf4, 0x6b, 0x2f, 0xba, 0x68, 0xbc, 0x59, 0xb1, 0xa0, 0x5a, 0x42, 0xbb,
-	0x03, 0xf5, 0x39, 0xcb, 0xe1, 0xff, 0x5a, 0x3d, 0xd5, 0x1b, 0x27, 0xab, 0xe9, 0xab, 0xc9, 0xce,
-	0xdb, 0xfb, 0xa1, 0xa9, 0x3e, 0x0c, 0x4d, 0xf5, 0xe7, 0xd0, 0x54, 0x3f, 0x8f, 0x4c, 0xe5, 0x61,
-	0x64, 0x2a, 0x3f, 0x46, 0xa6, 0xf2, 0xf1, 0x25, 0x0d, 0xe5, 0x4d, 0xe2, 0x41, 0x9f, 0xf7, 0xd1,
-	0x4c, 0xef, 0xd6, 0xec, 0xbf, 0xe9, 0xad, 0xe7, 0x6f, 0xf0, 0xf5, 0xdf, 0x00, 0x00, 0x00, 0xff,
-	0xff, 0x18, 0xa0, 0x76, 0xc1, 0x27, 0x04, 0x00, 0x00,
+	// 541 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x54, 0x4f, 0x6b, 0x13, 0x41,
+	0x14, 0xdf, 0xe9, 0x3f, 0x74, 0x52, 0x88, 0x59, 0xa3, 0x4d, 0x57, 0xd9, 0x94, 0xb4, 0x87, 0x10,
+	0xcd, 0x8e, 0xa9, 0x05, 0x21, 0xe2, 0xa1, 0x01, 0x8f, 0x81, 0x92, 0xa2, 0x07, 0x2f, 0x61, 0xd2,
+	0x4c, 0xc6, 0xc5, 0xec, 0xce, 0x32, 0x33, 0x59, 0x15, 0x2f, 0xe2, 0x49, 0x3c, 0xf9, 0x11, 0x7a,
+	0xf0, 0x03, 0xe4, 0xe0, 0x87, 0xe8, 0x49, 0x8a, 0x07, 0xf1, 0x24, 0x92, 0x20, 0xf1, 0x63, 0xc8,
+	0xee, 0xce, 0x2e, 0xdb, 0x54, 0x36, 0x16, 0x2f, 0xbd, 0x24, 0x79, 0xef, 0xfd, 0xde, 0xef, 0xf7,
+	0x7e, 0x33, 0x2f, 0x03, 0x77, 0x84, 0xe4, 0xd8, 0xa5, 0x64, 0xc8, 0x7c, 0xd2, 0xf5, 0x89, 0x2b,
+	0x47, 0x9c, 0x08, 0xe4, 0x31, 0x8c, 0xfc, 0x06, 0x92, 0xaf, 0x2c, 0x8f, 0x33, 0xc9, 0xf4, 0x5b,
+	0x7f, 0x43, 0x59, 0x1e, 0xc3, 0x96, 0xdf, 0x30, 0x76, 0x8e, 0x98, 0x70, 0x98, 0x40, 0x42, 0xe2,
+	0x17, 0xb6, 0x4b, 0x91, 0xdf, 0xe8, 0x11, 0x89, 0x1b, 0x71, 0x1c, 0x51, 0x18, 0x77, 0xb2, 0x84,
+	0x7c, 0x3c, 0xb4, 0xfb, 0x58, 0x32, 0xae, 0xc0, 0xd5, 0x2c, 0xb0, 0x87, 0x39, 0x76, 0x84, 0x42,
+	0x6e, 0x46, 0xe2, 0xdd, 0x30, 0x42, 0x51, 0x10, 0x97, 0x28, 0x63, 0x74, 0x48, 0x50, 0x18, 0xf5,
+	0x46, 0x03, 0x84, 0xdd, 0xd7, 0xaa, 0x54, 0xa4, 0x8c, 0xb2, 0xa8, 0x25, 0xf8, 0xa5, 0xb2, 0x1b,
+	0xca, 0x88, 0x23, 0x02, 0x13, 0xc1, 0x97, 0x2a, 0x14, 0xb0, 0x63, 0xbb, 0x0c, 0x85, 0x9f, 0x51,
+	0xaa, 0xf2, 0x0d, 0xc0, 0x5c, 0x5b, 0xd0, 0x43, 0x22, 0x0f, 0xd8, 0x4b, 0xc2, 0xf5, 0x87, 0x70,
+	0x7d, 0xc0, 0x99, 0xd3, 0xc5, 0xfd, 0x3e, 0x27, 0x42, 0x94, 0xc0, 0x16, 0xa8, 0x5e, 0x6d, 0x95,
+	0xbe, 0x7e, 0xae, 0x17, 0xd5, 0x50, 0xfb, 0x51, 0xe5, 0x50, 0x72, 0xdb, 0xa5, 0x9d, 0x5c, 0x80,
+	0x56, 0x29, 0xfd, 0x31, 0x2c, 0x24, 0x27, 0x90, 0x30, 0x2c, 0x2d, 0x60, 0xb8, 0x96, 0xb4, 0xc4,
+	0x34, 0x45, 0xb8, 0xea, 0x05, 0xc3, 0x94, 0x96, 0xb7, 0x40, 0x75, 0xa5, 0x13, 0x05, 0xcd, 0xfa,
+	0xfb, 0xe3, 0xb2, 0xf6, 0xfb, 0xb8, 0xac, 0xbd, 0x9b, 0x8d, 0x6b, 0x67, 0x86, 0xfc, 0x30, 0x1b,
+	0xd7, 0xf2, 0xc1, 0xa1, 0xa6, 0x8c, 0x54, 0x6e, 0xc0, 0xeb, 0xa9, 0xb0, 0x43, 0x84, 0xc7, 0x5c,
+	0x41, 0x2a, 0x5f, 0x00, 0xd4, 0xdb, 0x82, 0x76, 0x88, 0xc3, 0x7c, 0xf2, 0x34, 0x56, 0xbe, 0x0c,
+	0xb6, 0x9b, 0x7b, 0x99, 0x06, 0x6f, 0x2a, 0x83, 0x73, 0x93, 0x57, 0x6e, 0x43, 0xe3, 0x7c, 0x36,
+	0xb1, 0xfb, 0x09, 0xc0, 0x7c, 0x5b, 0xd0, 0x27, 0x5e, 0x1f, 0x4b, 0x72, 0x10, 0x2e, 0xdc, 0xff,
+	0x79, 0xdd, 0x87, 0x6b, 0xd1, 0xde, 0x86, 0x06, 0x73, 0xbb, 0xdb, 0x56, 0xc6, 0x5f, 0xca, 0x8a,
+	0x14, 0x5b, 0x2b, 0x27, 0x3f, 0xca, 0x5a, 0x47, 0x35, 0x36, 0x0b, 0xe7, 0xfc, 0x55, 0x36, 0xe1,
+	0xc6, 0xdc, 0x94, 0xb1, 0x83, 0xdd, 0x5f, 0x4b, 0x70, 0xb9, 0x2d, 0xa8, 0x3e, 0x80, 0x57, 0x92,
+	0x25, 0xad, 0x66, 0x8a, 0xa6, 0xae, 0xdd, 0xb8, 0xf7, 0xaf, 0xc8, 0x58, 0x4f, 0x7f, 0x03, 0xf3,
+	0xf3, 0xcb, 0x81, 0x16, 0x91, 0xcc, 0x35, 0x18, 0x0f, 0x2e, 0xd8, 0x90, 0x88, 0x73, 0xb8, 0x7e,
+	0xe6, 0xaa, 0xee, 0x2e, 0x22, 0x4a, 0xa3, 0x8d, 0xbd, 0x8b, 0xa0, 0x63, 0x4d, 0x63, 0xf5, 0xed,
+	0x6c, 0x5c, 0x03, 0xad, 0x47, 0x27, 0x13, 0x13, 0x9c, 0x4e, 0x4c, 0xf0, 0x73, 0x62, 0x82, 0x8f,
+	0x53, 0x53, 0x3b, 0x9d, 0x9a, 0xda, 0xf7, 0xa9, 0xa9, 0x3d, 0xdb, 0xa6, 0xb6, 0x7c, 0x3e, 0xea,
+	0x59, 0x47, 0xcc, 0x41, 0x29, 0x81, 0x7a, 0xfa, 0x3d, 0xeb, 0xad, 0x85, 0xcf, 0xc9, 0xfd, 0x3f,
+	0x01, 0x00, 0x00, 0xff, 0xff, 0x63, 0x05, 0x92, 0x94, 0x88, 0x05, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -285,8 +344,12 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type MsgClient interface {
-	CreateValidator(ctx context.Context, in *MsgCreateValidator, opts ...grpc.CallOption) (*MsgCreateValidatorResponse, error)
-	VouchValidator(ctx context.Context, in *MsgVouchValidator, opts ...grpc.CallOption) (*MsgVouchValidatorResponse, error)
+	// SetPower sets the new power of a validator.
+	SetPower(ctx context.Context, in *MsgSetPower, opts ...grpc.CallOption) (*MsgSetPowerResponse, error)
+	// RemoveValidator removes a validator from the active set and unbonds their delegations.
+	RemoveValidator(ctx context.Context, in *MsgRemoveValidator, opts ...grpc.CallOption) (*MsgRemoveValidatorResponse, error)
+	// UpdateParams updates the module parameters.
+	UpdateParams(ctx context.Context, in *MsgUpdateParams, opts ...grpc.CallOption) (*MsgUpdateParamsResponse, error)
 }
 
 type msgClient struct {
@@ -297,18 +360,27 @@ func NewMsgClient(cc grpc1.ClientConn) MsgClient {
 	return &msgClient{cc}
 }
 
-func (c *msgClient) CreateValidator(ctx context.Context, in *MsgCreateValidator, opts ...grpc.CallOption) (*MsgCreateValidatorResponse, error) {
-	out := new(MsgCreateValidatorResponse)
-	err := c.cc.Invoke(ctx, "/strangelove_ventures.poa.v1.Msg/CreateValidator", in, out, opts...)
+func (c *msgClient) SetPower(ctx context.Context, in *MsgSetPower, opts ...grpc.CallOption) (*MsgSetPowerResponse, error) {
+	out := new(MsgSetPowerResponse)
+	err := c.cc.Invoke(ctx, "/strangelove_ventures.poa.v1.Msg/SetPower", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *msgClient) VouchValidator(ctx context.Context, in *MsgVouchValidator, opts ...grpc.CallOption) (*MsgVouchValidatorResponse, error) {
-	out := new(MsgVouchValidatorResponse)
-	err := c.cc.Invoke(ctx, "/strangelove_ventures.poa.v1.Msg/VouchValidator", in, out, opts...)
+func (c *msgClient) RemoveValidator(ctx context.Context, in *MsgRemoveValidator, opts ...grpc.CallOption) (*MsgRemoveValidatorResponse, error) {
+	out := new(MsgRemoveValidatorResponse)
+	err := c.cc.Invoke(ctx, "/strangelove_ventures.poa.v1.Msg/RemoveValidator", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) UpdateParams(ctx context.Context, in *MsgUpdateParams, opts ...grpc.CallOption) (*MsgUpdateParamsResponse, error) {
+	out := new(MsgUpdateParamsResponse)
+	err := c.cc.Invoke(ctx, "/strangelove_ventures.poa.v1.Msg/UpdateParams", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -317,57 +389,82 @@ func (c *msgClient) VouchValidator(ctx context.Context, in *MsgVouchValidator, o
 
 // MsgServer is the server API for Msg service.
 type MsgServer interface {
-	CreateValidator(context.Context, *MsgCreateValidator) (*MsgCreateValidatorResponse, error)
-	VouchValidator(context.Context, *MsgVouchValidator) (*MsgVouchValidatorResponse, error)
+	// SetPower sets the new power of a validator.
+	SetPower(context.Context, *MsgSetPower) (*MsgSetPowerResponse, error)
+	// RemoveValidator removes a validator from the active set and unbonds their delegations.
+	RemoveValidator(context.Context, *MsgRemoveValidator) (*MsgRemoveValidatorResponse, error)
+	// UpdateParams updates the module parameters.
+	UpdateParams(context.Context, *MsgUpdateParams) (*MsgUpdateParamsResponse, error)
 }
 
 // UnimplementedMsgServer can be embedded to have forward compatible implementations.
 type UnimplementedMsgServer struct {
 }
 
-func (*UnimplementedMsgServer) CreateValidator(ctx context.Context, req *MsgCreateValidator) (*MsgCreateValidatorResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CreateValidator not implemented")
+func (*UnimplementedMsgServer) SetPower(ctx context.Context, req *MsgSetPower) (*MsgSetPowerResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetPower not implemented")
 }
-func (*UnimplementedMsgServer) VouchValidator(ctx context.Context, req *MsgVouchValidator) (*MsgVouchValidatorResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method VouchValidator not implemented")
+func (*UnimplementedMsgServer) RemoveValidator(ctx context.Context, req *MsgRemoveValidator) (*MsgRemoveValidatorResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RemoveValidator not implemented")
+}
+func (*UnimplementedMsgServer) UpdateParams(ctx context.Context, req *MsgUpdateParams) (*MsgUpdateParamsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateParams not implemented")
 }
 
 func RegisterMsgServer(s grpc1.Server, srv MsgServer) {
 	s.RegisterService(&_Msg_serviceDesc, srv)
 }
 
-func _Msg_CreateValidator_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgCreateValidator)
+func _Msg_SetPower_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgSetPower)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MsgServer).CreateValidator(ctx, in)
+		return srv.(MsgServer).SetPower(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/strangelove_ventures.poa.v1.Msg/CreateValidator",
+		FullMethod: "/strangelove_ventures.poa.v1.Msg/SetPower",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).CreateValidator(ctx, req.(*MsgCreateValidator))
+		return srv.(MsgServer).SetPower(ctx, req.(*MsgSetPower))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Msg_VouchValidator_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgVouchValidator)
+func _Msg_RemoveValidator_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgRemoveValidator)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MsgServer).VouchValidator(ctx, in)
+		return srv.(MsgServer).RemoveValidator(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/strangelove_ventures.poa.v1.Msg/VouchValidator",
+		FullMethod: "/strangelove_ventures.poa.v1.Msg/RemoveValidator",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).VouchValidator(ctx, req.(*MsgVouchValidator))
+		return srv.(MsgServer).RemoveValidator(ctx, req.(*MsgRemoveValidator))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_UpdateParams_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgUpdateParams)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).UpdateParams(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/strangelove_ventures.poa.v1.Msg/UpdateParams",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).UpdateParams(ctx, req.(*MsgUpdateParams))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -377,19 +474,23 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 	HandlerType: (*MsgServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "CreateValidator",
-			Handler:    _Msg_CreateValidator_Handler,
+			MethodName: "SetPower",
+			Handler:    _Msg_SetPower_Handler,
 		},
 		{
-			MethodName: "VouchValidator",
-			Handler:    _Msg_VouchValidator_Handler,
+			MethodName: "RemoveValidator",
+			Handler:    _Msg_RemoveValidator_Handler,
+		},
+		{
+			MethodName: "UpdateParams",
+			Handler:    _Msg_UpdateParams_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "strangelove_ventures/poa/v1/tx.proto",
 }
 
-func (m *MsgCreateValidator) Marshal() (dAtA []byte, err error) {
+func (m *MsgSetPower) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -399,37 +500,143 @@ func (m *MsgCreateValidator) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgCreateValidator) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgSetPower) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgCreateValidator) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgSetPower) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.Pubkey != nil {
-		{
-			size, err := m.Pubkey.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintTx(dAtA, i, uint64(size))
-		}
+	if m.Power != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.Power))
 		i--
-		dAtA[i] = 0x1a
+		dAtA[i] = 0x18
 	}
-	if len(m.Address) > 0 {
-		i -= len(m.Address)
-		copy(dAtA[i:], m.Address)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.Address)))
+	if len(m.ValidatorAddress) > 0 {
+		i -= len(m.ValidatorAddress)
+		copy(dAtA[i:], m.ValidatorAddress)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.ValidatorAddress)))
 		i--
 		dAtA[i] = 0x12
 	}
+	if len(m.FromAddress) > 0 {
+		i -= len(m.FromAddress)
+		copy(dAtA[i:], m.FromAddress)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.FromAddress)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgSetPowerResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgSetPowerResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgSetPowerResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgRemoveValidator) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgRemoveValidator) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgRemoveValidator) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.ValidatorAddress) > 0 {
+		i -= len(m.ValidatorAddress)
+		copy(dAtA[i:], m.ValidatorAddress)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.ValidatorAddress)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.FromAddress) > 0 {
+		i -= len(m.FromAddress)
+		copy(dAtA[i:], m.FromAddress)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.FromAddress)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgRemoveValidatorResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgRemoveValidatorResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgRemoveValidatorResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgUpdateParams) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgUpdateParams) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgUpdateParams) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
 	{
-		size, err := m.Description.MarshalToSizedBuffer(dAtA[:i])
+		size, err := m.Params.MarshalToSizedBuffer(dAtA[:i])
 		if err != nil {
 			return 0, err
 		}
@@ -437,81 +644,18 @@ func (m *MsgCreateValidator) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i = encodeVarintTx(dAtA, i, uint64(size))
 	}
 	i--
-	dAtA[i] = 0xa
-	return len(dAtA) - i, nil
-}
-
-func (m *MsgCreateValidatorResponse) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *MsgCreateValidatorResponse) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *MsgCreateValidatorResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	return len(dAtA) - i, nil
-}
-
-func (m *MsgVouchValidator) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *MsgVouchValidator) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *MsgVouchValidator) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.CandidateAddress) > 0 {
-		i -= len(m.CandidateAddress)
-		copy(dAtA[i:], m.CandidateAddress)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.CandidateAddress)))
-		i--
-		dAtA[i] = 0x1a
-	}
-	if m.InFavor {
-		i--
-		if m.InFavor {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i--
-		dAtA[i] = 0x10
-	}
-	if len(m.VoucherAddress) > 0 {
-		i -= len(m.VoucherAddress)
-		copy(dAtA[i:], m.VoucherAddress)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.VoucherAddress)))
+	dAtA[i] = 0x12
+	if len(m.FromAddress) > 0 {
+		i -= len(m.FromAddress)
+		copy(dAtA[i:], m.FromAddress)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.FromAddress)))
 		i--
 		dAtA[i] = 0xa
 	}
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgVouchValidatorResponse) Marshal() (dAtA []byte, err error) {
+func (m *MsgUpdateParamsResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -521,12 +665,12 @@ func (m *MsgVouchValidatorResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgVouchValidatorResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgUpdateParamsResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgVouchValidatorResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgUpdateParamsResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -545,55 +689,77 @@ func encodeVarintTx(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
-func (m *MsgCreateValidator) Size() (n int) {
+func (m *MsgSetPower) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	l = m.Description.Size()
+	l = len(m.FromAddress)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.ValidatorAddress)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if m.Power != 0 {
+		n += 1 + sovTx(uint64(m.Power))
+	}
+	return n
+}
+
+func (m *MsgSetPowerResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *MsgRemoveValidator) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.FromAddress)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.ValidatorAddress)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	return n
+}
+
+func (m *MsgRemoveValidatorResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *MsgUpdateParams) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.FromAddress)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = m.Params.Size()
 	n += 1 + l + sovTx(uint64(l))
-	l = len(m.Address)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
-	}
-	if m.Pubkey != nil {
-		l = m.Pubkey.Size()
-		n += 1 + l + sovTx(uint64(l))
-	}
 	return n
 }
 
-func (m *MsgCreateValidatorResponse) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	return n
-}
-
-func (m *MsgVouchValidator) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.VoucherAddress)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
-	}
-	if m.InFavor {
-		n += 2
-	}
-	l = len(m.CandidateAddress)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
-	}
-	return n
-}
-
-func (m *MsgVouchValidatorResponse) Size() (n int) {
+func (m *MsgUpdateParamsResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -608,7 +774,7 @@ func sovTx(x uint64) (n int) {
 func sozTx(x uint64) (n int) {
 	return sovTx(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
-func (m *MsgCreateValidator) Unmarshal(dAtA []byte) error {
+func (m *MsgSetPower) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -631,48 +797,15 @@ func (m *MsgCreateValidator) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgCreateValidator: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgSetPower: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgCreateValidator: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgSetPower: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Description", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.Description.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Address", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field FromAddress", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -700,181 +833,45 @@ func (m *MsgCreateValidator) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Address = string(dAtA[iNdEx:postIndex])
+			m.FromAddress = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ValidatorAddress", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ValidatorAddress = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Pubkey", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Pubkey == nil {
-				m.Pubkey = &types.Any{}
-			}
-			if err := m.Pubkey.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipTx(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *MsgCreateValidatorResponse) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowTx
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: MsgCreateValidatorResponse: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgCreateValidatorResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		default:
-			iNdEx = preIndex
-			skippy, err := skipTx(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *MsgVouchValidator) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowTx
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: MsgVouchValidator: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgVouchValidator: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field VoucherAddress", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.VoucherAddress = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field InFavor", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Power", wireType)
 			}
-			var v int
+			m.Power = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowTx
@@ -884,15 +881,114 @@ func (m *MsgVouchValidator) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				v |= int(b&0x7F) << shift
+				m.Power |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			m.InFavor = bool(v != 0)
-		case 3:
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgSetPowerResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgSetPowerResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgSetPowerResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgRemoveValidator) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgRemoveValidator: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgRemoveValidator: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field CandidateAddress", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field FromAddress", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -920,7 +1016,39 @@ func (m *MsgVouchValidator) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.CandidateAddress = string(dAtA[iNdEx:postIndex])
+			m.FromAddress = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ValidatorAddress", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ValidatorAddress = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -943,7 +1071,7 @@ func (m *MsgVouchValidator) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgVouchValidatorResponse) Unmarshal(dAtA []byte) error {
+func (m *MsgRemoveValidatorResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -966,10 +1094,175 @@ func (m *MsgVouchValidatorResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgVouchValidatorResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgRemoveValidatorResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgVouchValidatorResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgRemoveValidatorResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgUpdateParams) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgUpdateParams: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgUpdateParams: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field FromAddress", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.FromAddress = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Params", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.Params.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgUpdateParamsResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgUpdateParamsResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgUpdateParamsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:

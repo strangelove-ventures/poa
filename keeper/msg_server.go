@@ -4,8 +4,10 @@ import (
 	"context"
 	"fmt"
 
-	sdkerrors "cosmossdk.io/errors"
+	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+
 	"github.com/strangelove-ventures/poa"
 )
 
@@ -20,99 +22,122 @@ func NewMsgServerImpl(keeper Keeper) poa.MsgServer {
 	return &msgServer{k: keeper}
 }
 
-func (ms msgServer) CreateValidator(goCtx context.Context, msg *poa.MsgCreateValidator) (*poa.MsgCreateValidatorResponse, error) {
-	ctx := sdk.UnwrapSDKContext(goCtx)
+// ! IMPORTANT: if set to low the chain halts (delegations must be above 1_000_000stake atm)
+func (ms msgServer) SetPower(ctx context.Context, msg *poa.MsgSetPower) (*poa.MsgSetPowerResponse, error) {
+	if ok, err := ms.isAdmin(ctx, msg.FromAddress); err != nil {
+		return nil, err
+	} else if !ok {
+		return nil, fmt.Errorf("not an authority")
+	}
 
-	valAddr, err := sdk.AccAddressFromBech32(msg.Address)
+	valAddr, err := sdk.ValAddressFromBech32(msg.ValidatorAddress)
 	if err != nil {
-		return nil, fmt.Errorf("failed to decode address as bech32: %w", err)
+		return nil, fmt.Errorf("ValAddressFromBech32 failed: %w", err)
 	}
 
-	if _, found := ms.k.GetValidator(ctx, valAddr); found {
-		return nil, sdkerrors.Wrap(poa.ErrBadValidatorAddr, fmt.Sprintf("%s validator already exists: %T", poa.ModuleName, msg))
-	}
-
-	validator := &poa.Validator{
-		Description: msg.Description,
-		Address:     valAddr,
-		Pubkey:      msg.Pubkey,
-	}
-
-	ms.k.SaveValidator(ctx, validator)
-
-	// Validators vouch for themselves
-	ms.k.SetVouch(ctx, &poa.Vouch{
-		VoucherAddress:   valAddr,
-		CandidateAddress: valAddr,
-		InFavor:          true,
-	})
-
-	// call the after-creation hook
-	k.AfterValidatorCreated(ctx, validator.GetOperator())
-
-	consAddr, err := validator.GetConsAddr()
+	val, err := ms.k.stakingKeeper.GetValidator(ctx, valAddr)
 	if err != nil {
-		return nil, sdkerrors.Wrap(types.ErrBadValidatorPubKey, err.Error())
+		return nil, fmt.Errorf("GetValidator failed: %w", err)
 	}
 
-	k.AfterValidatorBonded(ctx, consAddr, validator.GetOperator())
+	delegations, err := ms.k.stakingKeeper.GetValidatorDelegations(ctx, valAddr)
+	if err != nil {
+		return nil, err
+	}
 
-	// ctx.EventManager().EmitEvents(sdk.Events{
-	// 	sdk.NewEvent(
-	// 		stakingtypes.EventTypeCreateValidator,
-	// 		sdk.NewAttribute(stakingtypes.AttributeKeyValidator, msg.Address.String()),
-	// 		sdk.NewAttribute(sdk.AttributeKeySender, msg.Owner.String()),
-	// 	),
-	// })
+	// this should never happen, make sure of it even if something goes wrong
+	if len(delegations) != 1 {
+		return nil, fmt.Errorf("delegations should only be len of 1: %+v", delegations)
+	}
 
-	err = ctx.EventManager().EmitTypedEvent(msg)
+	del := delegations[0]
+	decAmt := math.LegacyNewDecFromInt(math.NewIntFromUint64(msg.Power))
 
-	return &types.MsgCreateValidatorResponse{}, err
+	// TODO: Do not allow setting lower than 1_000_000 ?
+	// TODO: does this cause any invariance issues?
+	del.Shares = decAmt
+	val.DelegatorShares = decAmt
+	val.Tokens = math.NewIntFromUint64(msg.Power)
 
-	return nil, nil
+	if err := ms.k.stakingKeeper.SetDelegation(ctx, del); err != nil {
+		return nil, err
+	}
+
+	if err := ms.k.stakingKeeper.SetValidator(ctx, val); err != nil {
+		return nil, err
+	}
+
+	return &poa.MsgSetPowerResponse{}, nil
 }
 
-func (ms msgServer) VouchValidator(context.Context, *poa.MsgVouchValidator) (*poa.MsgVouchValidatorResponse, error) {
-	return nil, nil
+func (ms msgServer) RemoveValidator(ctx context.Context, msg *poa.MsgRemoveValidator) (*poa.MsgRemoveValidatorResponse, error) {
+	if ok, err := ms.isAdmin(ctx, msg.FromAddress); err != nil {
+		return nil, err
+	} else if !ok {
+		return nil, fmt.Errorf("not an authority")
+	}
+
+	valAddr, err := sdk.ValAddressFromBech32(msg.ValidatorAddress)
+	if err != nil {
+		return nil, fmt.Errorf("ValAddressFromBech32 failed: %w", err)
+	}
+
+	if err := ms.clearValidator(ctx, valAddr); err != nil {
+		return nil, fmt.Errorf("clearValidator failed: %w", err)
+	}
+
+	return &poa.MsgRemoveValidatorResponse{}, nil
 }
 
-// // IncrementCounter defines the handler for the MsgIncrementCounter message.
-// func (ms msgServer) IncrementCounter(ctx context.Context, msg *poa.MsgIncrementCounter) (*poa.MsgIncrementCounterResponse, error) {
-// 	if _, err := ms.k.addressCodec.StringToBytes(msg.Sender); err != nil {
-// 		return nil, fmt.Errorf("invalid sender address: %w", err)
-// 	}
+func (ms msgServer) clearValidator(ctx context.Context, valAddr sdk.ValAddress) error {
+	val, err := ms.k.stakingKeeper.GetValidator(ctx, valAddr)
+	if err != nil {
+		return fmt.Errorf("GetValidator failed: %w", err)
+	}
 
-// 	counter, err := ms.k.Counter.Get(ctx, msg.Sender)
-// 	if err != nil && !errors.Is(err, collections.ErrNotFound) {
-// 		return nil, err
-// 	}
+	delegations, err := ms.k.stakingKeeper.GetValidatorDelegations(ctx, valAddr)
+	if err != nil {
+		return fmt.Errorf("GetValidatorDelegations failed: %w", err)
+	}
 
-// 	counter++
+	for _, del := range delegations {
+		if err := ms.k.stakingKeeper.RemoveDelegation(ctx, del); err != nil {
+			return fmt.Errorf("RemoveDelegation failed: %w", err)
+		}
+	}
 
-// 	if err := ms.k.Counter.Set(ctx, msg.Sender, counter); err != nil {
-// 		return nil, err
-// 	}
+	val.Status = stakingtypes.Unbonded
+	val.Tokens = math.ZeroInt()
+	val.DelegatorShares = math.LegacyNewDecFromInt(math.ZeroInt())
+	if err := ms.k.stakingKeeper.SetValidator(ctx, val); err != nil {
+		return fmt.Errorf("SetValidator failed: %w", err)
+	}
 
-// 	return &poa.MsgIncrementCounterResponse{}, nil
-// }
+	// Do we handle? or does the sdk do this (may need to wait until the next block?)
+	// validator record not found for address: 67AE8730FE9C4A8E67FB699F61EEA7F90627B34F\n
+	// if err := ms.k.stakingKeeper.RemoveValidator(ctx, valAddr); err != nil {
+	// 	return fmt.Errorf("removevalidator failed: %w", err)
+	// }
 
-// // UpdateParams params is defining the handler for the MsgUpdateParams message.
-// func (ms msgServer) UpdateParams(ctx context.Context, msg *poa.MsgUpdateParams) (*poa.MsgUpdateParamsResponse, error) {
-// 	if _, err := ms.k.addressCodec.StringToBytes(msg.Authority); err != nil {
-// 		return nil, fmt.Errorf("invalid authority address: %w", err)
-// 	}
+	return nil
+}
 
-// 	if authority := ms.k.GetAuthority(); !strings.EqualFold(msg.Authority, authority) {
-// 		return nil, fmt.Errorf("unauthorized, authority does not match the module's authority: got %s, want %s", msg.Authority, authority)
-// 	}
+func (ms msgServer) UpdateParams(ctx context.Context, msg *poa.MsgUpdateParams) (*poa.MsgUpdateParamsResponse, error) {
+	if ok, err := ms.isAdmin(ctx, msg.FromAddress); err != nil {
+		return nil, err
+	} else if !ok {
+		return nil, fmt.Errorf("not an authority")
+	}
 
-// 	if err := msg.Params.Validate(); err != nil {
-// 		return nil, err
-// 	}
+	return &poa.MsgUpdateParamsResponse{}, ms.k.SetParams(ctx, msg.Params)
+}
 
-// 	if err := ms.k.Params.Set(ctx, msg.Params); err != nil {
-// 		return nil, err
-// 	}
+func (ms msgServer) isAdmin(ctx context.Context, fromAddr string) (bool, error) {
+	for _, auth := range ms.k.GetAdmins(ctx) {
+		if auth == fromAddr {
+			return true, nil
+		}
+	}
 
-// 	return &example.MsgUpdateParamsResponse{}, nil
-// }
+	return false, nil
+}
