@@ -5,12 +5,19 @@ import (
 	errorsmod "cosmossdk.io/errors"
 	"cosmossdk.io/math"
 
+	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
+	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/staking/types"
 )
 
+var (
+	_ codectypes.UnpackInterfacesMessage = (*MsgCreatePOAValidator)(nil)
+	_ codectypes.UnpackInterfacesMessage = (*Validator)(nil)
+)
+
 // Validate validates the MsgCreateValidator sdk msg.
-func (msg MsgCreateValidator) Validate(ac address.Codec) error {
+func (msg MsgCreatePOAValidator) Validate(ac address.Codec) error {
 	// note that unmarshaling from bech32 ensures both non-empty and valid
 	_, err := ac.StringToBytes(msg.ValidatorAddress)
 	if err != nil {
@@ -20,10 +27,6 @@ func (msg MsgCreateValidator) Validate(ac address.Codec) error {
 	if msg.Pubkey == nil {
 		return types.ErrEmptyValidatorPubKey
 	}
-
-	// if !msg.Value.IsValid() || !msg.Value.Amount.IsPositive() {
-	// 	return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "invalid delegation amount")
-	// }
 
 	if msg.Description == (Description{}) {
 		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "empty description")
@@ -43,10 +46,6 @@ func (msg MsgCreateValidator) Validate(ac address.Codec) error {
 			"minimum self delegation must be a positive integer",
 		)
 	}
-
-	// if msg.Value.Amount.LT(msg.MinSelfDelegation) {
-	// 	return types.ErrSelfDelegationBelowMinimum
-	// }
 
 	return nil
 }
@@ -106,4 +105,114 @@ func (d Description) EnsureLength() (Description, error) {
 	}
 
 	return d, nil
+}
+
+func NewDescription(moniker, identity, website, securityContact, details string) Description {
+	return Description{
+		Moniker:         moniker,
+		Identity:        identity,
+		Website:         website,
+		SecurityContact: securityContact,
+		Details:         details,
+	}
+}
+
+func NewCommissionRates(rate, maxRate, maxChangeRate math.LegacyDec) CommissionRates {
+	return CommissionRates{
+		Rate:          rate,
+		MaxRate:       maxRate,
+		MaxChangeRate: maxChangeRate,
+	}
+}
+
+// NewMsgCreatePOAValidator creates a new MsgCreatePOAValidator instance.
+// Delegator address and validator address are the same.
+func NewMsgCreatePOAValidator(
+	valAddr string, pubKey cryptotypes.PubKey, description Description, commission CommissionRates, minSelfDelegation math.Int,
+) (*MsgCreatePOAValidator, error) {
+	var pkAny *codectypes.Any
+	if pubKey != nil {
+		var err error
+		if pkAny, err = codectypes.NewAnyWithValue(pubKey); err != nil {
+			return nil, err
+		}
+	}
+	return &MsgCreatePOAValidator{
+		Description:       description,
+		ValidatorAddress:  valAddr,
+		Pubkey:            pkAny,
+		Commission:        commission,
+		MinSelfDelegation: minSelfDelegation,
+	}, nil
+}
+
+// UnpackInterfaces implements UnpackInterfacesMessage.UnpackInterfaces
+func (msg MsgCreatePOAValidator) UnpackInterfaces(unpacker codectypes.AnyUnpacker) error {
+	var pubKey cryptotypes.PubKey
+	return unpacker.UnpackAny(msg.Pubkey, &pubKey)
+}
+
+// UnpackInterfaces implements UnpackInterfacesMessage.UnpackInterfaces
+func (v Validator) UnpackInterfaces(unpacker codectypes.AnyUnpacker) error {
+	var pk cryptotypes.PubKey
+	return unpacker.UnpackAny(v.ConsensusPubkey, &pk)
+}
+
+// TODO: ideally we should remove this need?
+func ConvertStakingValidatorToPOA(poa Validator) types.Validator {
+	return types.Validator{
+		OperatorAddress: poa.OperatorAddress,
+		ConsensusPubkey: poa.ConsensusPubkey,
+		Jailed:          poa.Jailed,
+		Status:          types.BondStatus(poa.Status),
+		Tokens:          poa.Tokens,
+		DelegatorShares: poa.DelegatorShares,
+		Description: types.NewDescription(
+			poa.Description.Moniker,
+			poa.Description.Identity,
+			poa.Description.Website,
+			poa.Description.SecurityContact,
+			poa.Description.Details,
+		),
+		UnbondingHeight: poa.UnbondingHeight,
+		UnbondingTime:   poa.UnbondingTime,
+		Commission: types.NewCommission(
+			poa.Commission.CommissionRates.Rate,
+			poa.Commission.CommissionRates.MaxRate,
+			poa.Commission.CommissionRates.MaxChangeRate,
+		),
+		MinSelfDelegation:       poa.MinSelfDelegation,
+		UnbondingOnHoldRefCount: poa.UnbondingOnHoldRefCount,
+		UnbondingIds:            poa.UnbondingIds,
+	}
+}
+
+func ConvertPOAToStakingValidator(val types.Validator) *Validator {
+	return &Validator{
+		OperatorAddress: val.OperatorAddress,
+		ConsensusPubkey: val.ConsensusPubkey,
+		Jailed:          val.Jailed,
+		Status:          BondStatus(val.Status),
+		Tokens:          val.Tokens,
+		DelegatorShares: val.DelegatorShares,
+		Description: Description{
+			Moniker:         val.Description.Moniker,
+			Identity:        val.Description.Identity,
+			Website:         val.Description.Website,
+			SecurityContact: val.Description.SecurityContact,
+			Details:         val.Description.Details,
+		},
+		UnbondingHeight: val.UnbondingHeight,
+		UnbondingTime:   val.UnbondingTime,
+		Commission: Commission{
+			CommissionRates: CommissionRates{
+				Rate:          val.Commission.Rate,
+				MaxRate:       val.Commission.MaxRate,
+				MaxChangeRate: val.Commission.MaxChangeRate,
+			},
+		},
+		MinSelfDelegation:       val.MinSelfDelegation,
+		UnbondingOnHoldRefCount: val.UnbondingOnHoldRefCount,
+		UnbondingIds:            val.UnbondingIds,
+	}
 }

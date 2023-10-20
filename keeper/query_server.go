@@ -17,11 +17,21 @@ type queryServer struct {
 	k Keeper
 }
 
-func (qs queryServer) Params(ctx context.Context, msg *poa.QueryParamsRequest) (*poa.QueryParamsResponse, error) {
+// PendingValidators implements poa.QueryServer.
+func (qs queryServer) PendingValidators(ctx context.Context, _ *poa.QueryPendingValidatorsRequest) (*poa.PendingValidatorsResponse, error) {
+	pending, err := qs.k.GetPendingValidators(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return &poa.PendingValidatorsResponse{Pending: pending.Validators}, nil
+}
+
+func (qs queryServer) Params(ctx context.Context, msg *poa.QueryParamsRequest) (*poa.ParamsResponse, error) {
 	params, err := qs.k.GetParams(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	return &poa.QueryParamsResponse{Params: params}, nil
+	return &poa.ParamsResponse{Params: params}, nil
 }

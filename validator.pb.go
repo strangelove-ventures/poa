@@ -7,26 +7,65 @@ import (
 	cosmossdk_io_math "cosmossdk.io/math"
 	fmt "fmt"
 	_ "github.com/cosmos/cosmos-proto"
-	_ "github.com/cosmos/cosmos-sdk/codec/types"
+	types "github.com/cosmos/cosmos-sdk/codec/types"
 	_ "github.com/cosmos/cosmos-sdk/types/tx/amino"
 	_ "github.com/cosmos/gogoproto/gogoproto"
 	proto "github.com/cosmos/gogoproto/proto"
+	github_com_cosmos_gogoproto_types "github.com/cosmos/gogoproto/types"
 	_ "google.golang.org/protobuf/types/known/timestamppb"
 	io "io"
 	math "math"
 	math_bits "math/bits"
+	time "time"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
+var _ = time.Kitchen
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
+
+// BondStatus is the status of a validator.
+type BondStatus int32
+
+const (
+	// UNSPECIFIED defines an invalid validator status.
+	Unspecified BondStatus = 0
+	// UNBONDED defines a validator that is not bonded.
+	Unbonded BondStatus = 1
+	// UNBONDING defines a validator that is unbonding.
+	Unbonding BondStatus = 2
+	// BONDED defines a validator that is bonded.
+	Bonded BondStatus = 3
+)
+
+var BondStatus_name = map[int32]string{
+	0: "BOND_STATUS_UNSPECIFIED",
+	1: "BOND_STATUS_UNBONDED",
+	2: "BOND_STATUS_UNBONDING",
+	3: "BOND_STATUS_BONDED",
+}
+
+var BondStatus_value = map[string]int32{
+	"BOND_STATUS_UNSPECIFIED": 0,
+	"BOND_STATUS_UNBONDED":    1,
+	"BOND_STATUS_UNBONDING":   2,
+	"BOND_STATUS_BONDED":      3,
+}
+
+func (x BondStatus) String() string {
+	return proto.EnumName(BondStatus_name, int32(x))
+}
+
+func (BondStatus) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor_239839702462c302, []int{0}
+}
 
 // Description defines a validator description.
 type Description struct {
@@ -154,9 +193,132 @@ func (m *CommissionRates) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_CommissionRates proto.InternalMessageInfo
 
+// Commission defines commission parameters for a given validator.
+type Commission struct {
+	// commission_rates defines the initial commission rates to be used for creating a validator.
+	CommissionRates `protobuf:"bytes,1,opt,name=commission_rates,json=commissionRates,proto3,embedded=commission_rates" json:"commission_rates"`
+	// update_time is the last time the commission rate was changed.
+	UpdateTime time.Time `protobuf:"bytes,2,opt,name=update_time,json=updateTime,proto3,stdtime" json:"update_time"`
+}
+
+func (m *Commission) Reset()         { *m = Commission{} }
+func (m *Commission) String() string { return proto.CompactTextString(m) }
+func (*Commission) ProtoMessage()    {}
+func (*Commission) Descriptor() ([]byte, []int) {
+	return fileDescriptor_239839702462c302, []int{2}
+}
+func (m *Commission) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *Commission) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_Commission.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *Commission) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Commission.Merge(m, src)
+}
+func (m *Commission) XXX_Size() int {
+	return m.Size()
+}
+func (m *Commission) XXX_DiscardUnknown() {
+	xxx_messageInfo_Commission.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Commission proto.InternalMessageInfo
+
+func (m *Commission) GetUpdateTime() time.Time {
+	if m != nil {
+		return m.UpdateTime
+	}
+	return time.Time{}
+}
+
+// Validator defines a validator, together with the total amount of the
+// Validator's bond shares and their exchange rate to coins. Slashing results in
+// a decrease in the exchange rate, allowing correct calculation of future
+// undelegations without iterating over delegators. When coins are delegated to
+// this validator, the validator is credited with a delegation whose number of
+// bond shares is based on the amount of coins delegated divided by the current
+// exchange rate. Voting power can be calculated as total bonded shares
+// multiplied by exchange rate.
+type Validator struct {
+	// operator_address defines the address of the validator's operator; bech encoded in JSON.
+	OperatorAddress string `protobuf:"bytes,1,opt,name=operator_address,json=operatorAddress,proto3" json:"operator_address,omitempty"`
+	// consensus_pubkey is the consensus public key of the validator, as a Protobuf Any.
+	ConsensusPubkey *types.Any `protobuf:"bytes,2,opt,name=consensus_pubkey,json=consensusPubkey,proto3" json:"consensus_pubkey,omitempty"`
+	// jailed defined whether the validator has been jailed from bonded status or not.
+	Jailed bool `protobuf:"varint,3,opt,name=jailed,proto3" json:"jailed,omitempty"`
+	// status is the validator status (bonded/unbonding/unbonded).
+	Status BondStatus `protobuf:"varint,4,opt,name=status,proto3,enum=strangelove_ventures.poa.v1.BondStatus" json:"status,omitempty"`
+	// tokens define the delegated tokens (incl. self-delegation).
+	Tokens cosmossdk_io_math.Int `protobuf:"bytes,5,opt,name=tokens,proto3,customtype=cosmossdk.io/math.Int" json:"tokens"`
+	// delegator_shares defines total shares issued to a validator's delegators.
+	DelegatorShares cosmossdk_io_math.LegacyDec `protobuf:"bytes,6,opt,name=delegator_shares,json=delegatorShares,proto3,customtype=cosmossdk.io/math.LegacyDec" json:"delegator_shares"`
+	// description defines the description terms for the validator.
+	Description Description `protobuf:"bytes,7,opt,name=description,proto3" json:"description"`
+	// unbonding_height defines, if unbonding, the height at which this validator has begun unbonding.
+	UnbondingHeight int64 `protobuf:"varint,8,opt,name=unbonding_height,json=unbondingHeight,proto3" json:"unbonding_height,omitempty"`
+	// unbonding_time defines, if unbonding, the min time for the validator to complete unbonding.
+	UnbondingTime time.Time `protobuf:"bytes,9,opt,name=unbonding_time,json=unbondingTime,proto3,stdtime" json:"unbonding_time"`
+	// commission defines the commission parameters.
+	Commission Commission `protobuf:"bytes,10,opt,name=commission,proto3" json:"commission"`
+	// min_self_delegation is the validator's self declared minimum self delegation.
+	//
+	// Since: cosmos-sdk 0.46
+	MinSelfDelegation cosmossdk_io_math.Int `protobuf:"bytes,11,opt,name=min_self_delegation,json=minSelfDelegation,proto3,customtype=cosmossdk.io/math.Int" json:"min_self_delegation"`
+	// strictly positive if this validator's unbonding has been stopped by external modules
+	UnbondingOnHoldRefCount int64 `protobuf:"varint,12,opt,name=unbonding_on_hold_ref_count,json=unbondingOnHoldRefCount,proto3" json:"unbonding_on_hold_ref_count,omitempty"`
+	// list of unbonding ids, each uniquely identifing an unbonding of this validator
+	UnbondingIds []uint64 `protobuf:"varint,13,rep,packed,name=unbonding_ids,json=unbondingIds,proto3" json:"unbonding_ids,omitempty"`
+}
+
+func (m *Validator) Reset()         { *m = Validator{} }
+func (m *Validator) String() string { return proto.CompactTextString(m) }
+func (*Validator) ProtoMessage()    {}
+func (*Validator) Descriptor() ([]byte, []int) {
+	return fileDescriptor_239839702462c302, []int{3}
+}
+func (m *Validator) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *Validator) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_Validator.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *Validator) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Validator.Merge(m, src)
+}
+func (m *Validator) XXX_Size() int {
+	return m.Size()
+}
+func (m *Validator) XXX_DiscardUnknown() {
+	xxx_messageInfo_Validator.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Validator proto.InternalMessageInfo
+
 func init() {
+	proto.RegisterEnum("strangelove_ventures.poa.v1.BondStatus", BondStatus_name, BondStatus_value)
 	proto.RegisterType((*Description)(nil), "strangelove_ventures.poa.v1.Description")
 	proto.RegisterType((*CommissionRates)(nil), "strangelove_ventures.poa.v1.CommissionRates")
+	proto.RegisterType((*Commission)(nil), "strangelove_ventures.poa.v1.Commission")
+	proto.RegisterType((*Validator)(nil), "strangelove_ventures.poa.v1.Validator")
 }
 
 func init() {
@@ -164,34 +326,69 @@ func init() {
 }
 
 var fileDescriptor_239839702462c302 = []byte{
-	// 431 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xa4, 0x92, 0xbf, 0x6e, 0x13, 0x41,
-	0x10, 0xc6, 0x7d, 0x8e, 0x21, 0x61, 0x11, 0x32, 0x9c, 0x28, 0x2e, 0x8e, 0x74, 0x46, 0xa1, 0xe1,
-	0x8f, 0x72, 0xab, 0x08, 0x89, 0x02, 0x89, 0x26, 0x76, 0x85, 0x68, 0x70, 0x49, 0x81, 0x35, 0x5e,
-	0x0f, 0xe7, 0x55, 0xbc, 0x3b, 0xa7, 0xdb, 0xf1, 0x61, 0xbf, 0x05, 0x15, 0x35, 0x65, 0x4a, 0x0a,
-	0x1e, 0x22, 0x65, 0x44, 0x85, 0x28, 0x22, 0x64, 0x17, 0xf0, 0x18, 0xe8, 0x76, 0x2f, 0x28, 0x42,
-	0x74, 0x6e, 0x4e, 0xf7, 0x7d, 0xf3, 0xcd, 0x4f, 0xa3, 0xd9, 0x11, 0x4f, 0x1d, 0x97, 0x60, 0x73,
-	0x9c, 0x53, 0x85, 0xe3, 0x0a, 0x2d, 0x2f, 0x4a, 0x74, 0xb2, 0x20, 0x90, 0xd5, 0xb1, 0xac, 0x60,
-	0xae, 0xa7, 0xc0, 0x54, 0x66, 0x45, 0x49, 0x4c, 0xf1, 0xc1, 0xff, 0xc2, 0x59, 0x41, 0x90, 0x55,
-	0xc7, 0xbd, 0x7d, 0x45, 0xce, 0x90, 0x1b, 0xfb, 0xa8, 0x0c, 0x22, 0xf4, 0xf5, 0xf6, 0x73, 0xa2,
-	0x7c, 0x8e, 0xd2, 0xab, 0xc9, 0xe2, 0xbd, 0x04, 0xbb, 0x6a, 0x4a, 0xfd, 0x7f, 0x4b, 0xac, 0x0d,
-	0x3a, 0x06, 0x53, 0x34, 0x81, 0xfb, 0x39, 0xe5, 0x14, 0x98, 0xf5, 0x5f, 0xe3, 0xde, 0x03, 0xa3,
-	0x2d, 0x49, 0xff, 0x0d, 0xd6, 0xe1, 0x59, 0x24, 0x6e, 0x0f, 0xd1, 0xa9, 0x52, 0x17, 0xac, 0xc9,
-	0xc6, 0x89, 0xd8, 0x35, 0x64, 0xf5, 0x29, 0x96, 0x49, 0xf4, 0x20, 0x7a, 0x74, 0x6b, 0x74, 0x25,
-	0xe3, 0x9e, 0xd8, 0xd3, 0x53, 0xb4, 0xac, 0x79, 0x95, 0xb4, 0x7d, 0xe9, 0xaf, 0xae, 0xbb, 0x3e,
-	0xe0, 0xc4, 0x69, 0xc6, 0x64, 0x27, 0x74, 0x35, 0x32, 0x7e, 0x2c, 0xee, 0x3a, 0x54, 0x8b, 0x52,
-	0xf3, 0x6a, 0xac, 0xc8, 0x32, 0x28, 0x4e, 0x3a, 0x3e, 0xd2, 0xbd, 0xf2, 0x07, 0xc1, 0xae, 0x21,
-	0x53, 0x64, 0xd0, 0x73, 0x97, 0xdc, 0x08, 0x90, 0x46, 0xbe, 0xe8, 0xfc, 0xfe, 0xdc, 0x8f, 0x0e,
-	0x3f, 0xb5, 0x45, 0x77, 0x40, 0xc6, 0x68, 0xe7, 0x34, 0xd9, 0x11, 0x30, 0xba, 0xf8, 0x95, 0xe8,
-	0x94, 0xc0, 0x18, 0x66, 0x3d, 0x79, 0x7e, 0x7e, 0xd9, 0x6f, 0xfd, 0xb8, 0xec, 0x1f, 0x84, 0x3d,
-	0xba, 0xe9, 0x69, 0xa6, 0x49, 0x1a, 0xe0, 0x59, 0xf6, 0x1a, 0x73, 0x50, 0xab, 0x21, 0xaa, 0x6f,
-	0x5f, 0x8f, 0x44, 0xb3, 0xe6, 0x21, 0xaa, 0xb3, 0x5f, 0x5f, 0x9e, 0x44, 0x23, 0xcf, 0x88, 0xdf,
-	0x88, 0x3d, 0x03, 0xcb, 0xb1, 0xe7, 0xb5, 0xb7, 0xe2, 0xed, 0x1a, 0x58, 0xd6, 0xf3, 0xc5, 0xef,
-	0x44, 0xb7, 0x46, 0xaa, 0x59, 0xfd, 0xfe, 0x81, 0xbc, 0xb3, 0x15, 0xf9, 0x8e, 0x81, 0xe5, 0xc0,
-	0xd3, 0x6a, 0x7e, 0x58, 0xcc, 0xc9, 0xcb, 0xf3, 0x75, 0x1a, 0x5d, 0xac, 0xd3, 0xe8, 0xe7, 0x3a,
-	0x8d, 0x3e, 0x6e, 0xd2, 0xd6, 0xc5, 0x26, 0x6d, 0x7d, 0xdf, 0xa4, 0xad, 0xb7, 0x0f, 0x73, 0xcd,
-	0xb3, 0xc5, 0x24, 0x53, 0x64, 0xe4, 0xb5, 0x2b, 0x3c, 0xba, 0x7e, 0xb2, 0x93, 0x9b, 0xfe, 0x12,
-	0x9e, 0xfd, 0x09, 0x00, 0x00, 0xff, 0xff, 0xf7, 0x18, 0x36, 0x2c, 0xd5, 0x02, 0x00, 0x00,
+	// 988 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xa4, 0x95, 0xcf, 0x6f, 0x1b, 0x45,
+	0x14, 0xc7, 0xbd, 0x89, 0x71, 0xec, 0x71, 0x5c, 0xbb, 0x43, 0x4a, 0xb7, 0x8e, 0x64, 0x5b, 0xa9,
+	0x44, 0x4d, 0xdb, 0xac, 0x95, 0x20, 0x71, 0xa8, 0x40, 0x28, 0xb6, 0x03, 0x35, 0xa0, 0x34, 0xac,
+	0x63, 0x24, 0x7e, 0x88, 0xd5, 0x78, 0x77, 0xbc, 0x1e, 0xb2, 0x3b, 0xb3, 0xda, 0x99, 0x35, 0xf1,
+	0x7f, 0x50, 0xe5, 0xd4, 0x13, 0x12, 0x87, 0x48, 0x91, 0xb8, 0xf4, 0xc8, 0xa1, 0xe2, 0x4f, 0x40,
+	0x15, 0xa7, 0xa8, 0x27, 0xc4, 0x21, 0xa0, 0xe4, 0x40, 0xff, 0x0c, 0xb4, 0xb3, 0xe3, 0x1f, 0x34,
+	0x28, 0x22, 0xea, 0xc5, 0xda, 0xf7, 0xe6, 0xbd, 0xcf, 0xbe, 0xf9, 0xce, 0x77, 0xc7, 0xe0, 0x1e,
+	0x17, 0x21, 0xa2, 0x2e, 0xf6, 0xd8, 0x08, 0x5b, 0x23, 0x4c, 0x45, 0x14, 0x62, 0xde, 0x08, 0x18,
+	0x6a, 0x8c, 0x36, 0x1a, 0x23, 0xe4, 0x11, 0x07, 0x09, 0x16, 0x1a, 0x41, 0xc8, 0x04, 0x83, 0xab,
+	0xff, 0x55, 0x6c, 0x04, 0x0c, 0x19, 0xa3, 0x8d, 0xf2, 0x2d, 0x9b, 0x71, 0x9f, 0x71, 0x4b, 0x96,
+	0x36, 0x92, 0x20, 0xe9, 0x2b, 0xdf, 0x72, 0x19, 0x73, 0x3d, 0xdc, 0x90, 0x51, 0x3f, 0x1a, 0x34,
+	0x10, 0x1d, 0xab, 0xa5, 0xea, 0xab, 0x4b, 0x82, 0xf8, 0x98, 0x0b, 0xe4, 0x07, 0xaa, 0x60, 0xc5,
+	0x65, 0x2e, 0x4b, 0x98, 0xf1, 0x93, 0xca, 0x5e, 0x47, 0x3e, 0xa1, 0xac, 0x21, 0x7f, 0x93, 0xd4,
+	0xda, 0x53, 0x0d, 0xe4, 0xdb, 0x98, 0xdb, 0x21, 0x09, 0x04, 0x61, 0x14, 0xea, 0x60, 0xc9, 0x67,
+	0x94, 0xec, 0xe3, 0x50, 0xd7, 0x6a, 0x5a, 0x3d, 0x67, 0x4e, 0x42, 0x58, 0x06, 0x59, 0xe2, 0x60,
+	0x2a, 0x88, 0x18, 0xeb, 0x0b, 0x72, 0x69, 0x1a, 0xc7, 0x5d, 0xdf, 0xe3, 0x3e, 0x27, 0x02, 0xeb,
+	0x8b, 0x49, 0x97, 0x0a, 0xe1, 0x3b, 0xa0, 0xc4, 0xb1, 0x1d, 0x85, 0x44, 0x8c, 0x2d, 0x9b, 0x51,
+	0x81, 0x6c, 0xa1, 0xa7, 0x65, 0x49, 0x71, 0x92, 0x6f, 0x25, 0xe9, 0x18, 0xe2, 0x60, 0x81, 0x88,
+	0xc7, 0xf5, 0x37, 0x12, 0x88, 0x0a, 0x1f, 0xa4, 0x5f, 0x1e, 0x57, 0xb5, 0xb5, 0x1f, 0x16, 0x40,
+	0xb1, 0xc5, 0x7c, 0x9f, 0x70, 0x4e, 0x18, 0x35, 0x91, 0xc0, 0x1c, 0x7e, 0x02, 0xd2, 0x21, 0x12,
+	0x38, 0x99, 0xb5, 0xf9, 0xde, 0xf3, 0xd3, 0x6a, 0xea, 0x8f, 0xd3, 0xea, 0x6a, 0xa2, 0x23, 0x77,
+	0xf6, 0x0d, 0xc2, 0x1a, 0x3e, 0x12, 0x43, 0xe3, 0x33, 0xec, 0x22, 0x7b, 0xdc, 0xc6, 0xf6, 0x8b,
+	0x67, 0xeb, 0x40, 0xc9, 0xdc, 0xc6, 0xf6, 0xd3, 0xbf, 0x7f, 0xbe, 0xab, 0x99, 0x92, 0x01, 0x3f,
+	0x07, 0x59, 0x1f, 0x1d, 0x58, 0x92, 0xb7, 0xf0, 0x5a, 0xbc, 0x25, 0x1f, 0x1d, 0xc4, 0xf3, 0xc1,
+	0x6f, 0x41, 0x31, 0x46, 0xda, 0xc3, 0xf8, 0xfc, 0x13, 0xf2, 0xe2, 0x6b, 0x91, 0x0b, 0x3e, 0x3a,
+	0x68, 0x49, 0x5a, 0xcc, 0x57, 0xc2, 0xfc, 0xaa, 0x01, 0x30, 0x13, 0x06, 0x0e, 0x40, 0xc9, 0x9e,
+	0x46, 0xf2, 0xa5, 0x5c, 0xea, 0x93, 0xdf, 0xbc, 0x6f, 0x5c, 0x62, 0x45, 0xe3, 0x15, 0x6d, 0x9b,
+	0x85, 0x78, 0xc6, 0x93, 0xd3, 0xaa, 0x96, 0xbc, 0xba, 0x68, 0x5f, 0xd0, 0x3e, 0x1f, 0x05, 0x0e,
+	0x12, 0xd8, 0x8a, 0xdd, 0x27, 0x25, 0xcb, 0x6f, 0x96, 0x8d, 0xc4, 0x9a, 0xc6, 0xc4, 0x9a, 0xc6,
+	0xde, 0xc4, 0x9a, 0x09, 0xf0, 0xc9, 0x9f, 0x13, 0x20, 0x48, 0xba, 0xe3, 0x75, 0xb5, 0x91, 0x1f,
+	0x97, 0x40, 0xee, 0x8b, 0xc9, 0xd7, 0x03, 0x5b, 0xa0, 0xc4, 0x02, 0x1c, 0xc6, 0xcf, 0x16, 0x72,
+	0x9c, 0x10, 0x73, 0xae, 0xce, 0x59, 0x7f, 0xf1, 0x6c, 0x7d, 0x45, 0x49, 0xb3, 0x95, 0xac, 0x74,
+	0x45, 0x48, 0xa8, 0x6b, 0x16, 0x27, 0x1d, 0x2a, 0x0d, 0xbf, 0x8c, 0xc5, 0xa0, 0x1c, 0x53, 0x1e,
+	0x71, 0x2b, 0x88, 0xfa, 0xfb, 0x78, 0xac, 0x26, 0x5d, 0xb9, 0x30, 0xe9, 0x16, 0x1d, 0x37, 0xf5,
+	0xdf, 0x66, 0x68, 0x3b, 0x1c, 0x07, 0x82, 0x19, 0xbb, 0x51, 0xff, 0x53, 0x3c, 0x8e, 0xf7, 0xaf,
+	0x38, 0xbb, 0x12, 0x03, 0xdf, 0x02, 0x99, 0xef, 0x10, 0xf1, 0xb0, 0x23, 0xcf, 0x34, 0x6b, 0xaa,
+	0x08, 0x7e, 0x08, 0x32, 0x5c, 0x20, 0x11, 0x71, 0x69, 0xf4, 0x6b, 0x9b, 0x77, 0x2e, 0x55, 0xbd,
+	0xc9, 0xa8, 0xd3, 0x95, 0xe5, 0xa6, 0x6a, 0x83, 0x2d, 0x90, 0x11, 0x6c, 0x1f, 0x53, 0xf5, 0x1d,
+	0x34, 0xef, 0x29, 0xb3, 0xdc, 0xb8, 0x68, 0x96, 0x0e, 0x15, 0x73, 0x36, 0xe9, 0x50, 0x61, 0xaa,
+	0x56, 0xf8, 0x0d, 0x28, 0x39, 0xd8, 0xc3, 0xae, 0x94, 0x8f, 0x0f, 0x51, 0x88, 0xb9, 0x9e, 0x91,
+	0xb8, 0x8d, 0x2b, 0x7b, 0xcf, 0x2c, 0x4e, 0x51, 0x5d, 0x49, 0x82, 0x3d, 0x90, 0x77, 0x66, 0xb7,
+	0x86, 0xbe, 0x24, 0x15, 0xad, 0x5f, 0xba, 0xd1, 0xb9, 0x5b, 0xa6, 0x99, 0x8b, 0x47, 0x48, 0x5c,
+	0x30, 0xcf, 0x89, 0x6f, 0x8b, 0x88, 0xf6, 0x19, 0x75, 0x08, 0x75, 0xad, 0x21, 0x26, 0xee, 0x50,
+	0xe8, 0xd9, 0x9a, 0x56, 0x5f, 0x34, 0x8b, 0xd3, 0xfc, 0x43, 0x99, 0x86, 0xbb, 0xe0, 0xda, 0xac,
+	0x54, 0x1a, 0x30, 0x77, 0x55, 0x03, 0x16, 0xa6, 0x80, 0xb8, 0x04, 0x9a, 0x00, 0xcc, 0x2c, 0xae,
+	0x03, 0x49, 0xbb, 0xf3, 0x3f, 0xbf, 0x98, 0xf9, 0x1d, 0xcd, 0x51, 0xe0, 0xd7, 0xe0, 0x4d, 0x9f,
+	0x50, 0x8b, 0x63, 0x6f, 0x60, 0x29, 0x0d, 0x63, 0x78, 0xfe, 0xea, 0xe7, 0x7a, 0xdd, 0x27, 0xb4,
+	0x8b, 0xbd, 0x41, 0x7b, 0x4a, 0x81, 0xef, 0x83, 0xd5, 0x99, 0x04, 0x8c, 0x5a, 0x43, 0xe6, 0x39,
+	0x56, 0x88, 0x07, 0x96, 0xcd, 0x22, 0x2a, 0xf4, 0x65, 0x29, 0xdc, 0xcd, 0x69, 0xc9, 0x23, 0xfa,
+	0x90, 0x79, 0x8e, 0x89, 0x07, 0xad, 0x78, 0x19, 0xde, 0x06, 0xb3, 0xfd, 0x5b, 0xc4, 0xe1, 0x7a,
+	0xa1, 0xb6, 0x58, 0x4f, 0x9b, 0xcb, 0xd3, 0x64, 0xc7, 0xe1, 0x0f, 0xb2, 0x8f, 0x8f, 0xab, 0xa9,
+	0x97, 0xc7, 0xd5, 0xd4, 0xdd, 0x5f, 0x34, 0x00, 0x66, 0x5e, 0x85, 0xf7, 0xc1, 0xcd, 0xe6, 0xa3,
+	0x9d, 0xb6, 0xd5, 0xdd, 0xdb, 0xda, 0xeb, 0x75, 0xad, 0xde, 0x4e, 0x77, 0x77, 0xbb, 0xd5, 0xf9,
+	0xa8, 0xb3, 0xdd, 0x2e, 0xa5, 0xca, 0xc5, 0xc3, 0xa3, 0x5a, 0xbe, 0x47, 0x79, 0x80, 0x6d, 0x32,
+	0x20, 0xd8, 0x81, 0x6f, 0x83, 0x95, 0x7f, 0x57, 0xc7, 0xd1, 0x76, 0xbb, 0xa4, 0x95, 0x97, 0x0f,
+	0x8f, 0x6a, 0xd9, 0x9e, 0x7c, 0x25, 0x76, 0x60, 0x1d, 0xdc, 0xb8, 0x58, 0xd7, 0xd9, 0xf9, 0xb8,
+	0xb4, 0x50, 0x2e, 0x1c, 0x1e, 0xd5, 0x72, 0xbd, 0xc9, 0x6c, 0x70, 0x0d, 0xc0, 0xf9, 0x4a, 0xc5,
+	0x5b, 0x2c, 0x83, 0xc3, 0xa3, 0x5a, 0xa6, 0x29, 0x69, 0xe5, 0xf4, 0xe3, 0x9f, 0x2a, 0xa9, 0xe6,
+	0x07, 0xcf, 0xcf, 0x2a, 0xda, 0xc9, 0x59, 0x45, 0xfb, 0xeb, 0xac, 0xa2, 0x3d, 0x39, 0xaf, 0xa4,
+	0x4e, 0xce, 0x2b, 0xa9, 0xdf, 0xcf, 0x2b, 0xa9, 0xaf, 0x6e, 0xbb, 0x44, 0x0c, 0xa3, 0xbe, 0x61,
+	0x33, 0xbf, 0x31, 0x77, 0xcc, 0xeb, 0xf3, 0x7f, 0xe8, 0xfd, 0x8c, 0xf4, 0xd1, 0xbb, 0xff, 0x04,
+	0x00, 0x00, 0xff, 0xff, 0xca, 0xc1, 0xbe, 0x90, 0xf3, 0x07, 0x00, 0x00,
 }
 
 func (this *Description) Equal(that interface{}) bool {
@@ -256,6 +453,33 @@ func (this *CommissionRates) Equal(that interface{}) bool {
 		return false
 	}
 	if !this.MaxChangeRate.Equal(that1.MaxChangeRate) {
+		return false
+	}
+	return true
+}
+func (this *Commission) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*Commission)
+	if !ok {
+		that2, ok := that.(Commission)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if !this.CommissionRates.Equal(&that1.CommissionRates) {
+		return false
+	}
+	if !this.UpdateTime.Equal(that1.UpdateTime) {
 		return false
 	}
 	return true
@@ -371,6 +595,190 @@ func (m *CommissionRates) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
+func (m *Commission) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *Commission) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Commission) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	n1, err1 := github_com_cosmos_gogoproto_types.StdTimeMarshalTo(m.UpdateTime, dAtA[i-github_com_cosmos_gogoproto_types.SizeOfStdTime(m.UpdateTime):])
+	if err1 != nil {
+		return 0, err1
+	}
+	i -= n1
+	i = encodeVarintValidator(dAtA, i, uint64(n1))
+	i--
+	dAtA[i] = 0x12
+	{
+		size, err := m.CommissionRates.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintValidator(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
+}
+
+func (m *Validator) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *Validator) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Validator) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.UnbondingIds) > 0 {
+		dAtA4 := make([]byte, len(m.UnbondingIds)*10)
+		var j3 int
+		for _, num := range m.UnbondingIds {
+			for num >= 1<<7 {
+				dAtA4[j3] = uint8(uint64(num)&0x7f | 0x80)
+				num >>= 7
+				j3++
+			}
+			dAtA4[j3] = uint8(num)
+			j3++
+		}
+		i -= j3
+		copy(dAtA[i:], dAtA4[:j3])
+		i = encodeVarintValidator(dAtA, i, uint64(j3))
+		i--
+		dAtA[i] = 0x6a
+	}
+	if m.UnbondingOnHoldRefCount != 0 {
+		i = encodeVarintValidator(dAtA, i, uint64(m.UnbondingOnHoldRefCount))
+		i--
+		dAtA[i] = 0x60
+	}
+	{
+		size := m.MinSelfDelegation.Size()
+		i -= size
+		if _, err := m.MinSelfDelegation.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintValidator(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x5a
+	{
+		size, err := m.Commission.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintValidator(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x52
+	n6, err6 := github_com_cosmos_gogoproto_types.StdTimeMarshalTo(m.UnbondingTime, dAtA[i-github_com_cosmos_gogoproto_types.SizeOfStdTime(m.UnbondingTime):])
+	if err6 != nil {
+		return 0, err6
+	}
+	i -= n6
+	i = encodeVarintValidator(dAtA, i, uint64(n6))
+	i--
+	dAtA[i] = 0x4a
+	if m.UnbondingHeight != 0 {
+		i = encodeVarintValidator(dAtA, i, uint64(m.UnbondingHeight))
+		i--
+		dAtA[i] = 0x40
+	}
+	{
+		size, err := m.Description.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintValidator(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x3a
+	{
+		size := m.DelegatorShares.Size()
+		i -= size
+		if _, err := m.DelegatorShares.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintValidator(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x32
+	{
+		size := m.Tokens.Size()
+		i -= size
+		if _, err := m.Tokens.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintValidator(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x2a
+	if m.Status != 0 {
+		i = encodeVarintValidator(dAtA, i, uint64(m.Status))
+		i--
+		dAtA[i] = 0x20
+	}
+	if m.Jailed {
+		i--
+		if m.Jailed {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x18
+	}
+	if m.ConsensusPubkey != nil {
+		{
+			size, err := m.ConsensusPubkey.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintValidator(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.OperatorAddress) > 0 {
+		i -= len(m.OperatorAddress)
+		copy(dAtA[i:], m.OperatorAddress)
+		i = encodeVarintValidator(dAtA, i, uint64(len(m.OperatorAddress)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintValidator(dAtA []byte, offset int, v uint64) int {
 	offset -= sovValidator(v)
 	base := offset
@@ -423,6 +831,67 @@ func (m *CommissionRates) Size() (n int) {
 	n += 1 + l + sovValidator(uint64(l))
 	l = m.MaxChangeRate.Size()
 	n += 1 + l + sovValidator(uint64(l))
+	return n
+}
+
+func (m *Commission) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = m.CommissionRates.Size()
+	n += 1 + l + sovValidator(uint64(l))
+	l = github_com_cosmos_gogoproto_types.SizeOfStdTime(m.UpdateTime)
+	n += 1 + l + sovValidator(uint64(l))
+	return n
+}
+
+func (m *Validator) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.OperatorAddress)
+	if l > 0 {
+		n += 1 + l + sovValidator(uint64(l))
+	}
+	if m.ConsensusPubkey != nil {
+		l = m.ConsensusPubkey.Size()
+		n += 1 + l + sovValidator(uint64(l))
+	}
+	if m.Jailed {
+		n += 2
+	}
+	if m.Status != 0 {
+		n += 1 + sovValidator(uint64(m.Status))
+	}
+	l = m.Tokens.Size()
+	n += 1 + l + sovValidator(uint64(l))
+	l = m.DelegatorShares.Size()
+	n += 1 + l + sovValidator(uint64(l))
+	l = m.Description.Size()
+	n += 1 + l + sovValidator(uint64(l))
+	if m.UnbondingHeight != 0 {
+		n += 1 + sovValidator(uint64(m.UnbondingHeight))
+	}
+	l = github_com_cosmos_gogoproto_types.SizeOfStdTime(m.UnbondingTime)
+	n += 1 + l + sovValidator(uint64(l))
+	l = m.Commission.Size()
+	n += 1 + l + sovValidator(uint64(l))
+	l = m.MinSelfDelegation.Size()
+	n += 1 + l + sovValidator(uint64(l))
+	if m.UnbondingOnHoldRefCount != 0 {
+		n += 1 + sovValidator(uint64(m.UnbondingOnHoldRefCount))
+	}
+	if len(m.UnbondingIds) > 0 {
+		l = 0
+		for _, e := range m.UnbondingIds {
+			l += sovValidator(uint64(e))
+		}
+		n += 1 + sovValidator(uint64(l)) + l
+	}
 	return n
 }
 
@@ -773,6 +1242,594 @@ func (m *CommissionRates) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipValidator(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthValidator
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *Commission) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowValidator
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: Commission: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: Commission: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CommissionRates", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowValidator
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthValidator
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthValidator
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.CommissionRates.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field UpdateTime", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowValidator
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthValidator
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthValidator
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := github_com_cosmos_gogoproto_types.StdTimeUnmarshal(&m.UpdateTime, dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipValidator(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthValidator
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *Validator) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowValidator
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: Validator: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: Validator: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field OperatorAddress", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowValidator
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthValidator
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthValidator
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.OperatorAddress = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ConsensusPubkey", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowValidator
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthValidator
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthValidator
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.ConsensusPubkey == nil {
+				m.ConsensusPubkey = &types.Any{}
+			}
+			if err := m.ConsensusPubkey.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Jailed", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowValidator
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.Jailed = bool(v != 0)
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Status", wireType)
+			}
+			m.Status = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowValidator
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Status |= BondStatus(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Tokens", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowValidator
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthValidator
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthValidator
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.Tokens.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DelegatorShares", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowValidator
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthValidator
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthValidator
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.DelegatorShares.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 7:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Description", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowValidator
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthValidator
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthValidator
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.Description.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 8:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field UnbondingHeight", wireType)
+			}
+			m.UnbondingHeight = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowValidator
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.UnbondingHeight |= int64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 9:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field UnbondingTime", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowValidator
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthValidator
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthValidator
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := github_com_cosmos_gogoproto_types.StdTimeUnmarshal(&m.UnbondingTime, dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 10:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Commission", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowValidator
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthValidator
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthValidator
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.Commission.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 11:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MinSelfDelegation", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowValidator
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthValidator
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthValidator
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.MinSelfDelegation.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 12:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field UnbondingOnHoldRefCount", wireType)
+			}
+			m.UnbondingOnHoldRefCount = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowValidator
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.UnbondingOnHoldRefCount |= int64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 13:
+			if wireType == 0 {
+				var v uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowValidator
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					v |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				m.UnbondingIds = append(m.UnbondingIds, v)
+			} else if wireType == 2 {
+				var packedLen int
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowValidator
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					packedLen |= int(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				if packedLen < 0 {
+					return ErrInvalidLengthValidator
+				}
+				postIndex := iNdEx + packedLen
+				if postIndex < 0 {
+					return ErrInvalidLengthValidator
+				}
+				if postIndex > l {
+					return io.ErrUnexpectedEOF
+				}
+				var elementCount int
+				var count int
+				for _, integer := range dAtA[iNdEx:postIndex] {
+					if integer < 128 {
+						count++
+					}
+				}
+				elementCount = count
+				if elementCount != 0 && len(m.UnbondingIds) == 0 {
+					m.UnbondingIds = make([]uint64, 0, elementCount)
+				}
+				for iNdEx < postIndex {
+					var v uint64
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowValidator
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						v |= uint64(b&0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					m.UnbondingIds = append(m.UnbondingIds, v)
+				}
+			} else {
+				return fmt.Errorf("proto: wrong wireType = %d for field UnbondingIds", wireType)
+			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skipValidator(dAtA[iNdEx:])

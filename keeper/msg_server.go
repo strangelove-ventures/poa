@@ -9,7 +9,6 @@ import (
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/cosmos/cosmos-sdk/x/staking/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
 	"github.com/strangelove-ventures/poa"
@@ -34,6 +33,18 @@ func (ms msgServer) SetPower(ctx context.Context, msg *poa.MsgSetPower) (*poa.Ms
 		return nil, fmt.Errorf("not an authority")
 	}
 
+	isPending, err := ms.k.IsValidatorPending(ctx, msg.ValidatorAddress)
+	if err != nil {
+		return nil, err
+	}
+
+	if isPending {
+		if err := ms.acceptNewValidator(ctx, msg.ValidatorAddress, msg.Power); err != nil {
+			return nil, err
+		}
+
+	}
+
 	valAddr, err := sdk.ValAddressFromBech32(msg.ValidatorAddress)
 	if err != nil {
 		return nil, fmt.Errorf("ValAddressFromBech32 failed: %w", err)
@@ -49,11 +60,35 @@ func (ms msgServer) SetPower(ctx context.Context, msg *poa.MsgSetPower) (*poa.Ms
 		return nil, err
 	}
 
-	// this should never happen, make sure of it even if something goes wrong
-	if len(delegations) != 1 {
-		return nil, fmt.Errorf("delegations should only be len of 1: %+v", delegations)
+	// TODO: do this in the acceptNewValidator function? or always do this here in case of any issues.
+	if len(delegations) == 0 {
+		vAddr, err := ms.k.validatorAddressCodec.StringToBytes(val.GetOperator())
+		if err != nil {
+			return nil, sdkerrors.ErrInvalidAddress.Wrapf("invalid validator address: %s", err)
+		}
+
+		del := stakingtypes.Delegation{
+			DelegatorAddress: sdk.AccAddress(vAddr).String(),
+			ValidatorAddress: val.OperatorAddress,
+			Shares:           math.LegacyNewDec(int64(msg.Power)),
+		}
+
+		err = ms.k.stakingKeeper.SetDelegation(ctx, del)
+		if err != nil {
+			return nil, err
+		}
+
+	} else if len(delegations) != 1 {
+		return nil, fmt.Errorf("delegations should only be len of 1: got %d", len(delegations))
 	}
 
+	// updated delegations
+	delegations, err = ms.k.stakingKeeper.GetValidatorDelegations(ctx, valAddr)
+	if err != nil {
+		return nil, err
+	}
+
+	// TODO; or just always hardcode it here so we can reduce from acceptNewValidator function?
 	del := delegations[0]
 	decAmt := math.LegacyNewDecFromInt(math.NewIntFromUint64(msg.Power))
 
@@ -94,7 +129,7 @@ func (ms msgServer) RemoveValidator(ctx context.Context, msg *poa.MsgRemoveValid
 }
 
 // CreateValidator implements poa.MsgServer.
-func (ms msgServer) CreateValidator(ctx context.Context, msg *poa.MsgCreateValidator) (*poa.MsgCreateValidatorResponse, error) {
+func (ms msgServer) CreateValidator(ctx context.Context, msg *poa.MsgCreatePOAValidator) (*poa.MsgCreatePOAValidatorResponse, error) {
 	valAddr, err := ms.k.validatorAddressCodec.StringToBytes(msg.ValidatorAddress)
 	if err != nil {
 		return nil, sdkerrors.ErrInvalidAddress.Wrapf("invalid validator address: %s", err)
@@ -110,21 +145,21 @@ func (ms msgServer) CreateValidator(ctx context.Context, msg *poa.MsgCreateValid
 	}
 
 	if msg.Commission.Rate.LT(minCommRate) {
-		return nil, errorsmod.Wrapf(types.ErrCommissionLTMinRate, "cannot set validator commission to less than minimum rate of %s", minCommRate)
+		return nil, errorsmod.Wrapf(stakingtypes.ErrCommissionLTMinRate, "cannot set validator commission to less than minimum rate of %s", minCommRate)
 	}
 
 	// check to see if the pubkey or sender has been registered before
 	if _, err := ms.k.stakingKeeper.GetValidator(ctx, valAddr); err == nil {
-		return nil, types.ErrValidatorOwnerExists
+		return nil, stakingtypes.ErrValidatorOwnerExists
 	}
 
 	pk, ok := msg.Pubkey.GetCachedValue().(cryptotypes.PubKey)
 	if !ok {
-		return nil, errorsmod.Wrapf(sdkerrors.ErrInvalidType, "Expecting cryptotypes.PubKey, got %T", pk)
+		return nil, errorsmod.Wrapf(sdkerrors.ErrInvalidType, "AHH Expecting cryptotypes.PubKey, got %T", pk)
 	}
 
 	if _, err := ms.k.stakingKeeper.GetValidatorByConsAddr(ctx, sdk.GetConsAddress(pk)); err == nil {
-		return nil, types.ErrValidatorPubKeyExists
+		return nil, stakingtypes.ErrValidatorPubKeyExists
 	}
 
 	if _, err := msg.Description.EnsureLength(); err != nil {
@@ -144,13 +179,13 @@ func (ms msgServer) CreateValidator(ctx context.Context, msg *poa.MsgCreateValid
 		}
 		if !hasKeyType {
 			return nil, errorsmod.Wrapf(
-				types.ErrValidatorPubKeyTypeNotSupported,
+				stakingtypes.ErrValidatorPubKeyTypeNotSupported,
 				"got: %s, expected: %s", pk.Type(), cp.Validator.PubKeyTypes,
 			)
 		}
 	}
 
-	validator, err := types.NewValidator(msg.ValidatorAddress, pk, stakingtypes.Description{
+	validator, err := stakingtypes.NewValidator(msg.ValidatorAddress, pk, stakingtypes.Description{
 		Moniker:         msg.Description.Moniker,
 		Identity:        msg.Description.Identity,
 		Website:         msg.Description.Website,
@@ -161,7 +196,7 @@ func (ms msgServer) CreateValidator(ctx context.Context, msg *poa.MsgCreateValid
 		return nil, err
 	}
 
-	commission := types.NewCommissionWithTime(
+	commission := stakingtypes.NewCommissionWithTime(
 		msg.Commission.Rate, msg.Commission.MaxRate,
 		msg.Commission.MaxChangeRate, sdkCtx.BlockHeader().Time,
 	)
@@ -173,57 +208,67 @@ func (ms msgServer) CreateValidator(ctx context.Context, msg *poa.MsgCreateValid
 
 	validator.MinSelfDelegation = msg.MinSelfDelegation
 
-	err = ms.k.stakingKeeper.SetValidator(ctx, validator)
-	if err != nil {
+	// the validator is now pending approval to be let into the set.
+	// Until then, they are not apart of the set.
+	if err := ms.k.AddPendingValidator(ctx, ms.k.validatorAddressCodec, validator, pk); err != nil {
 		return nil, err
 	}
 
-	err = ms.k.stakingKeeper.SetValidatorByConsAddr(ctx, validator)
+	return &poa.MsgCreatePOAValidatorResponse{}, nil
+}
+
+// takes in a validator address & sees if they are pending approval.
+// if so, we create them now.
+// TODO: use stakingtypes.Validator in GetPendingValidator?
+func (ms msgServer) acceptNewValidator(ctx context.Context, operatingAddress string, power uint64) error {
+	sdkCtx := sdk.UnwrapSDKContext(ctx)
+
+	poaVal, err := ms.k.GetPendingValidator(ctx, operatingAddress)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	err = ms.k.stakingKeeper.SetNewValidatorByPowerIndex(ctx, validator)
+	// ideally we just save the type
+	val := poa.ConvertStakingValidatorToPOA(poaVal)
+
+	valAddr, err := ms.k.validatorAddressCodec.StringToBytes(val.OperatorAddress) // this is the same as the ValidatorAddress yes?
 	if err != nil {
-		return nil, err
+		return sdkerrors.ErrInvalidAddress.Wrapf("invalid validator address: %s", err)
+	}
+
+	err = ms.k.stakingKeeper.SetValidator(ctx, val)
+	if err != nil {
+		return err
+	}
+
+	err = ms.k.stakingKeeper.SetValidatorByConsAddr(ctx, val)
+	if err != nil {
+		return err
+	}
+
+	err = ms.k.stakingKeeper.SetNewValidatorByPowerIndex(ctx, val)
+	if err != nil {
+		return err
 	}
 
 	// call the after-creation hook
 	if err := ms.k.stakingKeeper.Hooks().AfterValidatorCreated(ctx, valAddr); err != nil {
-		return nil, err
+		return err
 	}
 
-	// TODO: temp - REMOVE ME
-	bondDenom, err := ms.k.stakingKeeper.BondDenom(ctx)
-	if err != nil {
-		return nil, err
-	}
-	if err := ms.k.bankKeeper.MintCoins(ctx, types.ModuleName, sdk.NewCoins(sdk.NewCoin(bondDenom, math.NewInt(1)))); err != nil {
-		return nil, err
-	}
-	if err := ms.k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, sdk.AccAddress(valAddr), sdk.NewCoins(sdk.NewCoin(bondDenom, math.NewInt(1)))); err != nil {
-		return nil, err
-	}
-	// TODO: end of /temp
-
-	// move coins from the msg.Address account to a (self-delegation) delegator account
-	// the validator account and global shares are updated within here
-	// NOTE source will always be from a wallet which are unbonded
-	// TODO: Force set delegation instead? (do this later after AcceptValidator function is written)
-	_, err = ms.k.stakingKeeper.Delegate(ctx, sdk.AccAddress(valAddr), math.NewInt(1), types.Unbonded, validator, true)
-	if err != nil {
-		return nil, err
+	if err := ms.k.RemovePendingValidator(ctx, val.OperatorAddress); err != nil {
+		return err
 	}
 
 	sdkCtx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
-			types.EventTypeCreateValidator,
-			sdk.NewAttribute(types.AttributeKeyValidator, msg.ValidatorAddress),
-			sdk.NewAttribute(sdk.AttributeKeyAmount, "1"),
+			stakingtypes.EventTypeCreateValidator,
+			sdk.NewAttribute(stakingtypes.AttributeKeyValidator, val.OperatorAddress),
+			sdk.NewAttribute(sdk.AttributeKeyAmount, fmt.Sprintf("%d", power)),
 		),
 	})
 
-	return &poa.MsgCreateValidatorResponse{}, nil
+	return nil
 }
 
 func (ms msgServer) UpdateParams(ctx context.Context, msg *poa.MsgUpdateParams) (*poa.MsgUpdateParamsResponse, error) {

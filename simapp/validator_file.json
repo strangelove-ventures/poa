@@ -1,5 +1,5 @@
 {
-    "pubkey": {"@type":"/cosmos.crypto.ed25519.PubKey","key":"oWg2ISpLF405Jcm2vXV+2v4fnjodh6aafuIdeoW+rUw="},
+    "pubkey": {"@type":"/cosmos.crypto.ed25519.PubKey","key":"pl3Q8OQwtC7G2dSqRqsUrO5VZul7l40I+MKUcejqRsg="},
     "amount": "0stake",
     "moniker": "mytestval",
     "identity": "",

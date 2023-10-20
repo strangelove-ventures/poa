@@ -8,7 +8,6 @@ import (
 	flag "github.com/spf13/pflag"
 
 	"cosmossdk.io/core/address"
-	"cosmossdk.io/math"
 	"github.com/spf13/cobra"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -16,7 +15,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/version"
-	"github.com/cosmos/cosmos-sdk/x/staking/types"
 
 	"github.com/strangelove-ventures/poa"
 )
@@ -174,11 +172,10 @@ where we can get the pubkey using "%s tendermint show-validator"
 
 	return cmd
 }
-
-func newBuildCreateValidatorMsg(clientCtx client.Context, txf tx.Factory, fs *flag.FlagSet, val validator, valAc address.Codec) (tx.Factory, *types.MsgCreateValidator, error) {
+func newBuildCreateValidatorMsg(clientCtx client.Context, txf tx.Factory, fs *flag.FlagSet, val validator, valAc address.Codec) (tx.Factory, *poa.MsgCreatePOAValidator, error) {
 	valAddr := clientCtx.GetFromAddress()
 
-	description := types.NewDescription(
+	description := poa.NewDescription(
 		val.Moniker,
 		val.Identity,
 		val.Website,
@@ -186,12 +183,18 @@ func newBuildCreateValidatorMsg(clientCtx client.Context, txf tx.Factory, fs *fl
 		val.Details,
 	)
 
+	commissionRates := poa.NewCommissionRates(
+		val.CommissionRates.Rate,
+		val.CommissionRates.MaxRate,
+		val.CommissionRates.MaxChangeRate,
+	)
+
 	valStr, err := valAc.BytesToString(sdk.ValAddress(valAddr))
 	if err != nil {
 		return txf, nil, err
 	}
-	msg, err := types.NewMsgCreateValidator(
-		valStr, val.PubKey, sdk.NewCoin(val.Amount.Denom, math.NewInt(1)), description, val.CommissionRates, val.MinSelfDelegation,
+	msg, err := poa.NewMsgCreatePOAValidator(
+		valStr, val.PubKey, description, commissionRates, val.MinSelfDelegation,
 	)
 	if err != nil {
 		return txf, nil, err

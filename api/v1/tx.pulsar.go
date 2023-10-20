@@ -2602,35 +2602,35 @@ func (x *fastReflection_MsgUpdateParamsResponse) ProtoMethods() *protoiface.Meth
 }
 
 var (
-	md_MsgCreateValidator                     protoreflect.MessageDescriptor
-	fd_MsgCreateValidator_description         protoreflect.FieldDescriptor
-	fd_MsgCreateValidator_commission          protoreflect.FieldDescriptor
-	fd_MsgCreateValidator_min_self_delegation protoreflect.FieldDescriptor
-	fd_MsgCreateValidator_delegator_address   protoreflect.FieldDescriptor
-	fd_MsgCreateValidator_validator_address   protoreflect.FieldDescriptor
-	fd_MsgCreateValidator_pubkey              protoreflect.FieldDescriptor
+	md_MsgCreatePOAValidator                     protoreflect.MessageDescriptor
+	fd_MsgCreatePOAValidator_description         protoreflect.FieldDescriptor
+	fd_MsgCreatePOAValidator_commission          protoreflect.FieldDescriptor
+	fd_MsgCreatePOAValidator_min_self_delegation protoreflect.FieldDescriptor
+	fd_MsgCreatePOAValidator_delegator_address   protoreflect.FieldDescriptor
+	fd_MsgCreatePOAValidator_validator_address   protoreflect.FieldDescriptor
+	fd_MsgCreatePOAValidator_pubkey              protoreflect.FieldDescriptor
 )
 
 func init() {
 	file_strangelove_ventures_poa_v1_tx_proto_init()
-	md_MsgCreateValidator = File_strangelove_ventures_poa_v1_tx_proto.Messages().ByName("MsgCreateValidator")
-	fd_MsgCreateValidator_description = md_MsgCreateValidator.Fields().ByName("description")
-	fd_MsgCreateValidator_commission = md_MsgCreateValidator.Fields().ByName("commission")
-	fd_MsgCreateValidator_min_self_delegation = md_MsgCreateValidator.Fields().ByName("min_self_delegation")
-	fd_MsgCreateValidator_delegator_address = md_MsgCreateValidator.Fields().ByName("delegator_address")
-	fd_MsgCreateValidator_validator_address = md_MsgCreateValidator.Fields().ByName("validator_address")
-	fd_MsgCreateValidator_pubkey = md_MsgCreateValidator.Fields().ByName("pubkey")
+	md_MsgCreatePOAValidator = File_strangelove_ventures_poa_v1_tx_proto.Messages().ByName("MsgCreatePOAValidator")
+	fd_MsgCreatePOAValidator_description = md_MsgCreatePOAValidator.Fields().ByName("description")
+	fd_MsgCreatePOAValidator_commission = md_MsgCreatePOAValidator.Fields().ByName("commission")
+	fd_MsgCreatePOAValidator_min_self_delegation = md_MsgCreatePOAValidator.Fields().ByName("min_self_delegation")
+	fd_MsgCreatePOAValidator_delegator_address = md_MsgCreatePOAValidator.Fields().ByName("delegator_address")
+	fd_MsgCreatePOAValidator_validator_address = md_MsgCreatePOAValidator.Fields().ByName("validator_address")
+	fd_MsgCreatePOAValidator_pubkey = md_MsgCreatePOAValidator.Fields().ByName("pubkey")
 }
 
-var _ protoreflect.Message = (*fastReflection_MsgCreateValidator)(nil)
+var _ protoreflect.Message = (*fastReflection_MsgCreatePOAValidator)(nil)
 
-type fastReflection_MsgCreateValidator MsgCreateValidator
+type fastReflection_MsgCreatePOAValidator MsgCreatePOAValidator
 
-func (x *MsgCreateValidator) ProtoReflect() protoreflect.Message {
-	return (*fastReflection_MsgCreateValidator)(x)
+func (x *MsgCreatePOAValidator) ProtoReflect() protoreflect.Message {
+	return (*fastReflection_MsgCreatePOAValidator)(x)
 }
 
-func (x *MsgCreateValidator) slowProtoReflect() protoreflect.Message {
+func (x *MsgCreatePOAValidator) slowProtoReflect() protoreflect.Message {
 	mi := &file_strangelove_ventures_poa_v1_tx_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -2642,43 +2642,43 @@ func (x *MsgCreateValidator) slowProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-var _fastReflection_MsgCreateValidator_messageType fastReflection_MsgCreateValidator_messageType
-var _ protoreflect.MessageType = fastReflection_MsgCreateValidator_messageType{}
+var _fastReflection_MsgCreatePOAValidator_messageType fastReflection_MsgCreatePOAValidator_messageType
+var _ protoreflect.MessageType = fastReflection_MsgCreatePOAValidator_messageType{}
 
-type fastReflection_MsgCreateValidator_messageType struct{}
+type fastReflection_MsgCreatePOAValidator_messageType struct{}
 
-func (x fastReflection_MsgCreateValidator_messageType) Zero() protoreflect.Message {
-	return (*fastReflection_MsgCreateValidator)(nil)
+func (x fastReflection_MsgCreatePOAValidator_messageType) Zero() protoreflect.Message {
+	return (*fastReflection_MsgCreatePOAValidator)(nil)
 }
-func (x fastReflection_MsgCreateValidator_messageType) New() protoreflect.Message {
-	return new(fastReflection_MsgCreateValidator)
+func (x fastReflection_MsgCreatePOAValidator_messageType) New() protoreflect.Message {
+	return new(fastReflection_MsgCreatePOAValidator)
 }
-func (x fastReflection_MsgCreateValidator_messageType) Descriptor() protoreflect.MessageDescriptor {
-	return md_MsgCreateValidator
+func (x fastReflection_MsgCreatePOAValidator_messageType) Descriptor() protoreflect.MessageDescriptor {
+	return md_MsgCreatePOAValidator
 }
 
 // Descriptor returns message descriptor, which contains only the protobuf
 // type information for the message.
-func (x *fastReflection_MsgCreateValidator) Descriptor() protoreflect.MessageDescriptor {
-	return md_MsgCreateValidator
+func (x *fastReflection_MsgCreatePOAValidator) Descriptor() protoreflect.MessageDescriptor {
+	return md_MsgCreatePOAValidator
 }
 
 // Type returns the message type, which encapsulates both Go and protobuf
 // type information. If the Go type information is not needed,
 // it is recommended that the message descriptor be used instead.
-func (x *fastReflection_MsgCreateValidator) Type() protoreflect.MessageType {
-	return _fastReflection_MsgCreateValidator_messageType
+func (x *fastReflection_MsgCreatePOAValidator) Type() protoreflect.MessageType {
+	return _fastReflection_MsgCreatePOAValidator_messageType
 }
 
 // New returns a newly allocated and mutable empty message.
-func (x *fastReflection_MsgCreateValidator) New() protoreflect.Message {
-	return new(fastReflection_MsgCreateValidator)
+func (x *fastReflection_MsgCreatePOAValidator) New() protoreflect.Message {
+	return new(fastReflection_MsgCreatePOAValidator)
 }
 
 // Interface unwraps the message reflection interface and
 // returns the underlying ProtoMessage interface.
-func (x *fastReflection_MsgCreateValidator) Interface() protoreflect.ProtoMessage {
-	return (*MsgCreateValidator)(x)
+func (x *fastReflection_MsgCreatePOAValidator) Interface() protoreflect.ProtoMessage {
+	return (*MsgCreatePOAValidator)(x)
 }
 
 // Range iterates over every populated field in an undefined order,
@@ -2686,40 +2686,40 @@ func (x *fastReflection_MsgCreateValidator) Interface() protoreflect.ProtoMessag
 // Range returns immediately if f returns false.
 // While iterating, mutating operations may only be performed
 // on the current field descriptor.
-func (x *fastReflection_MsgCreateValidator) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+func (x *fastReflection_MsgCreatePOAValidator) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
 	if x.Description != nil {
 		value := protoreflect.ValueOfMessage(x.Description.ProtoReflect())
-		if !f(fd_MsgCreateValidator_description, value) {
+		if !f(fd_MsgCreatePOAValidator_description, value) {
 			return
 		}
 	}
 	if x.Commission != nil {
 		value := protoreflect.ValueOfMessage(x.Commission.ProtoReflect())
-		if !f(fd_MsgCreateValidator_commission, value) {
+		if !f(fd_MsgCreatePOAValidator_commission, value) {
 			return
 		}
 	}
 	if x.MinSelfDelegation != "" {
 		value := protoreflect.ValueOfString(x.MinSelfDelegation)
-		if !f(fd_MsgCreateValidator_min_self_delegation, value) {
+		if !f(fd_MsgCreatePOAValidator_min_self_delegation, value) {
 			return
 		}
 	}
 	if x.DelegatorAddress != "" {
 		value := protoreflect.ValueOfString(x.DelegatorAddress)
-		if !f(fd_MsgCreateValidator_delegator_address, value) {
+		if !f(fd_MsgCreatePOAValidator_delegator_address, value) {
 			return
 		}
 	}
 	if x.ValidatorAddress != "" {
 		value := protoreflect.ValueOfString(x.ValidatorAddress)
-		if !f(fd_MsgCreateValidator_validator_address, value) {
+		if !f(fd_MsgCreatePOAValidator_validator_address, value) {
 			return
 		}
 	}
 	if x.Pubkey != nil {
 		value := protoreflect.ValueOfMessage(x.Pubkey.ProtoReflect())
-		if !f(fd_MsgCreateValidator_pubkey, value) {
+		if !f(fd_MsgCreatePOAValidator_pubkey, value) {
 			return
 		}
 	}
@@ -2736,25 +2736,25 @@ func (x *fastReflection_MsgCreateValidator) Range(f func(protoreflect.FieldDescr
 // In other cases (aside from the nullable cases above),
 // a proto3 scalar field is populated if it contains a non-zero value, and
 // a repeated field is populated if it is non-empty.
-func (x *fastReflection_MsgCreateValidator) Has(fd protoreflect.FieldDescriptor) bool {
+func (x *fastReflection_MsgCreatePOAValidator) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
-	case "strangelove_ventures.poa.v1.MsgCreateValidator.description":
+	case "strangelove_ventures.poa.v1.MsgCreatePOAValidator.description":
 		return x.Description != nil
-	case "strangelove_ventures.poa.v1.MsgCreateValidator.commission":
+	case "strangelove_ventures.poa.v1.MsgCreatePOAValidator.commission":
 		return x.Commission != nil
-	case "strangelove_ventures.poa.v1.MsgCreateValidator.min_self_delegation":
+	case "strangelove_ventures.poa.v1.MsgCreatePOAValidator.min_self_delegation":
 		return x.MinSelfDelegation != ""
-	case "strangelove_ventures.poa.v1.MsgCreateValidator.delegator_address":
+	case "strangelove_ventures.poa.v1.MsgCreatePOAValidator.delegator_address":
 		return x.DelegatorAddress != ""
-	case "strangelove_ventures.poa.v1.MsgCreateValidator.validator_address":
+	case "strangelove_ventures.poa.v1.MsgCreatePOAValidator.validator_address":
 		return x.ValidatorAddress != ""
-	case "strangelove_ventures.poa.v1.MsgCreateValidator.pubkey":
+	case "strangelove_ventures.poa.v1.MsgCreatePOAValidator.pubkey":
 		return x.Pubkey != nil
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgCreateValidator"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgCreatePOAValidator"))
 		}
-		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgCreateValidator does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgCreatePOAValidator does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -2764,25 +2764,25 @@ func (x *fastReflection_MsgCreateValidator) Has(fd protoreflect.FieldDescriptor)
 // associated with the given field number.
 //
 // Clear is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgCreateValidator) Clear(fd protoreflect.FieldDescriptor) {
+func (x *fastReflection_MsgCreatePOAValidator) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
-	case "strangelove_ventures.poa.v1.MsgCreateValidator.description":
+	case "strangelove_ventures.poa.v1.MsgCreatePOAValidator.description":
 		x.Description = nil
-	case "strangelove_ventures.poa.v1.MsgCreateValidator.commission":
+	case "strangelove_ventures.poa.v1.MsgCreatePOAValidator.commission":
 		x.Commission = nil
-	case "strangelove_ventures.poa.v1.MsgCreateValidator.min_self_delegation":
+	case "strangelove_ventures.poa.v1.MsgCreatePOAValidator.min_self_delegation":
 		x.MinSelfDelegation = ""
-	case "strangelove_ventures.poa.v1.MsgCreateValidator.delegator_address":
+	case "strangelove_ventures.poa.v1.MsgCreatePOAValidator.delegator_address":
 		x.DelegatorAddress = ""
-	case "strangelove_ventures.poa.v1.MsgCreateValidator.validator_address":
+	case "strangelove_ventures.poa.v1.MsgCreatePOAValidator.validator_address":
 		x.ValidatorAddress = ""
-	case "strangelove_ventures.poa.v1.MsgCreateValidator.pubkey":
+	case "strangelove_ventures.poa.v1.MsgCreatePOAValidator.pubkey":
 		x.Pubkey = nil
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgCreateValidator"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgCreatePOAValidator"))
 		}
-		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgCreateValidator does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgCreatePOAValidator does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -2792,31 +2792,31 @@ func (x *fastReflection_MsgCreateValidator) Clear(fd protoreflect.FieldDescripto
 // the default value of a bytes scalar is guaranteed to be a copy.
 // For unpopulated composite types, it returns an empty, read-only view
 // of the value; to obtain a mutable reference, use Mutable.
-func (x *fastReflection_MsgCreateValidator) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_MsgCreatePOAValidator) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
-	case "strangelove_ventures.poa.v1.MsgCreateValidator.description":
+	case "strangelove_ventures.poa.v1.MsgCreatePOAValidator.description":
 		value := x.Description
 		return protoreflect.ValueOfMessage(value.ProtoReflect())
-	case "strangelove_ventures.poa.v1.MsgCreateValidator.commission":
+	case "strangelove_ventures.poa.v1.MsgCreatePOAValidator.commission":
 		value := x.Commission
 		return protoreflect.ValueOfMessage(value.ProtoReflect())
-	case "strangelove_ventures.poa.v1.MsgCreateValidator.min_self_delegation":
+	case "strangelove_ventures.poa.v1.MsgCreatePOAValidator.min_self_delegation":
 		value := x.MinSelfDelegation
 		return protoreflect.ValueOfString(value)
-	case "strangelove_ventures.poa.v1.MsgCreateValidator.delegator_address":
+	case "strangelove_ventures.poa.v1.MsgCreatePOAValidator.delegator_address":
 		value := x.DelegatorAddress
 		return protoreflect.ValueOfString(value)
-	case "strangelove_ventures.poa.v1.MsgCreateValidator.validator_address":
+	case "strangelove_ventures.poa.v1.MsgCreatePOAValidator.validator_address":
 		value := x.ValidatorAddress
 		return protoreflect.ValueOfString(value)
-	case "strangelove_ventures.poa.v1.MsgCreateValidator.pubkey":
+	case "strangelove_ventures.poa.v1.MsgCreatePOAValidator.pubkey":
 		value := x.Pubkey
 		return protoreflect.ValueOfMessage(value.ProtoReflect())
 	default:
 		if descriptor.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgCreateValidator"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgCreatePOAValidator"))
 		}
-		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgCreateValidator does not contain field %s", descriptor.FullName()))
+		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgCreatePOAValidator does not contain field %s", descriptor.FullName()))
 	}
 }
 
@@ -2830,25 +2830,25 @@ func (x *fastReflection_MsgCreateValidator) Get(descriptor protoreflect.FieldDes
 // empty, read-only value, then it panics.
 //
 // Set is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgCreateValidator) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
+func (x *fastReflection_MsgCreatePOAValidator) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
-	case "strangelove_ventures.poa.v1.MsgCreateValidator.description":
+	case "strangelove_ventures.poa.v1.MsgCreatePOAValidator.description":
 		x.Description = value.Message().Interface().(*Description)
-	case "strangelove_ventures.poa.v1.MsgCreateValidator.commission":
+	case "strangelove_ventures.poa.v1.MsgCreatePOAValidator.commission":
 		x.Commission = value.Message().Interface().(*CommissionRates)
-	case "strangelove_ventures.poa.v1.MsgCreateValidator.min_self_delegation":
+	case "strangelove_ventures.poa.v1.MsgCreatePOAValidator.min_self_delegation":
 		x.MinSelfDelegation = value.Interface().(string)
-	case "strangelove_ventures.poa.v1.MsgCreateValidator.delegator_address":
+	case "strangelove_ventures.poa.v1.MsgCreatePOAValidator.delegator_address":
 		x.DelegatorAddress = value.Interface().(string)
-	case "strangelove_ventures.poa.v1.MsgCreateValidator.validator_address":
+	case "strangelove_ventures.poa.v1.MsgCreatePOAValidator.validator_address":
 		x.ValidatorAddress = value.Interface().(string)
-	case "strangelove_ventures.poa.v1.MsgCreateValidator.pubkey":
+	case "strangelove_ventures.poa.v1.MsgCreatePOAValidator.pubkey":
 		x.Pubkey = value.Message().Interface().(*anypb.Any)
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgCreateValidator"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgCreatePOAValidator"))
 		}
-		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgCreateValidator does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgCreatePOAValidator does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -2862,72 +2862,72 @@ func (x *fastReflection_MsgCreateValidator) Set(fd protoreflect.FieldDescriptor,
 // It panics if the field does not contain a composite type.
 //
 // Mutable is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgCreateValidator) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_MsgCreatePOAValidator) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "strangelove_ventures.poa.v1.MsgCreateValidator.description":
+	case "strangelove_ventures.poa.v1.MsgCreatePOAValidator.description":
 		if x.Description == nil {
 			x.Description = new(Description)
 		}
 		return protoreflect.ValueOfMessage(x.Description.ProtoReflect())
-	case "strangelove_ventures.poa.v1.MsgCreateValidator.commission":
+	case "strangelove_ventures.poa.v1.MsgCreatePOAValidator.commission":
 		if x.Commission == nil {
 			x.Commission = new(CommissionRates)
 		}
 		return protoreflect.ValueOfMessage(x.Commission.ProtoReflect())
-	case "strangelove_ventures.poa.v1.MsgCreateValidator.pubkey":
+	case "strangelove_ventures.poa.v1.MsgCreatePOAValidator.pubkey":
 		if x.Pubkey == nil {
 			x.Pubkey = new(anypb.Any)
 		}
 		return protoreflect.ValueOfMessage(x.Pubkey.ProtoReflect())
-	case "strangelove_ventures.poa.v1.MsgCreateValidator.min_self_delegation":
-		panic(fmt.Errorf("field min_self_delegation of message strangelove_ventures.poa.v1.MsgCreateValidator is not mutable"))
-	case "strangelove_ventures.poa.v1.MsgCreateValidator.delegator_address":
-		panic(fmt.Errorf("field delegator_address of message strangelove_ventures.poa.v1.MsgCreateValidator is not mutable"))
-	case "strangelove_ventures.poa.v1.MsgCreateValidator.validator_address":
-		panic(fmt.Errorf("field validator_address of message strangelove_ventures.poa.v1.MsgCreateValidator is not mutable"))
+	case "strangelove_ventures.poa.v1.MsgCreatePOAValidator.min_self_delegation":
+		panic(fmt.Errorf("field min_self_delegation of message strangelove_ventures.poa.v1.MsgCreatePOAValidator is not mutable"))
+	case "strangelove_ventures.poa.v1.MsgCreatePOAValidator.delegator_address":
+		panic(fmt.Errorf("field delegator_address of message strangelove_ventures.poa.v1.MsgCreatePOAValidator is not mutable"))
+	case "strangelove_ventures.poa.v1.MsgCreatePOAValidator.validator_address":
+		panic(fmt.Errorf("field validator_address of message strangelove_ventures.poa.v1.MsgCreatePOAValidator is not mutable"))
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgCreateValidator"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgCreatePOAValidator"))
 		}
-		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgCreateValidator does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgCreatePOAValidator does not contain field %s", fd.FullName()))
 	}
 }
 
 // NewField returns a new value that is assignable to the field
 // for the given descriptor. For scalars, this returns the default value.
 // For lists, maps, and messages, this returns a new, empty, mutable value.
-func (x *fastReflection_MsgCreateValidator) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_MsgCreatePOAValidator) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "strangelove_ventures.poa.v1.MsgCreateValidator.description":
+	case "strangelove_ventures.poa.v1.MsgCreatePOAValidator.description":
 		m := new(Description)
 		return protoreflect.ValueOfMessage(m.ProtoReflect())
-	case "strangelove_ventures.poa.v1.MsgCreateValidator.commission":
+	case "strangelove_ventures.poa.v1.MsgCreatePOAValidator.commission":
 		m := new(CommissionRates)
 		return protoreflect.ValueOfMessage(m.ProtoReflect())
-	case "strangelove_ventures.poa.v1.MsgCreateValidator.min_self_delegation":
+	case "strangelove_ventures.poa.v1.MsgCreatePOAValidator.min_self_delegation":
 		return protoreflect.ValueOfString("")
-	case "strangelove_ventures.poa.v1.MsgCreateValidator.delegator_address":
+	case "strangelove_ventures.poa.v1.MsgCreatePOAValidator.delegator_address":
 		return protoreflect.ValueOfString("")
-	case "strangelove_ventures.poa.v1.MsgCreateValidator.validator_address":
+	case "strangelove_ventures.poa.v1.MsgCreatePOAValidator.validator_address":
 		return protoreflect.ValueOfString("")
-	case "strangelove_ventures.poa.v1.MsgCreateValidator.pubkey":
+	case "strangelove_ventures.poa.v1.MsgCreatePOAValidator.pubkey":
 		m := new(anypb.Any)
 		return protoreflect.ValueOfMessage(m.ProtoReflect())
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgCreateValidator"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgCreatePOAValidator"))
 		}
-		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgCreateValidator does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgCreatePOAValidator does not contain field %s", fd.FullName()))
 	}
 }
 
 // WhichOneof reports which field within the oneof is populated,
 // returning nil if none are populated.
 // It panics if the oneof descriptor does not belong to this message.
-func (x *fastReflection_MsgCreateValidator) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+func (x *fastReflection_MsgCreatePOAValidator) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
 	switch d.FullName() {
 	default:
-		panic(fmt.Errorf("%s is not a oneof field in strangelove_ventures.poa.v1.MsgCreateValidator", d.FullName()))
+		panic(fmt.Errorf("%s is not a oneof field in strangelove_ventures.poa.v1.MsgCreatePOAValidator", d.FullName()))
 	}
 	panic("unreachable")
 }
@@ -2935,7 +2935,7 @@ func (x *fastReflection_MsgCreateValidator) WhichOneof(d protoreflect.OneofDescr
 // GetUnknown retrieves the entire list of unknown fields.
 // The caller may only mutate the contents of the RawFields
 // if the mutated bytes are stored back into the message with SetUnknown.
-func (x *fastReflection_MsgCreateValidator) GetUnknown() protoreflect.RawFields {
+func (x *fastReflection_MsgCreatePOAValidator) GetUnknown() protoreflect.RawFields {
 	return x.unknownFields
 }
 
@@ -2946,7 +2946,7 @@ func (x *fastReflection_MsgCreateValidator) GetUnknown() protoreflect.RawFields 
 // An empty RawFields may be passed to clear the fields.
 //
 // SetUnknown is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgCreateValidator) SetUnknown(fields protoreflect.RawFields) {
+func (x *fastReflection_MsgCreatePOAValidator) SetUnknown(fields protoreflect.RawFields) {
 	x.unknownFields = fields
 }
 
@@ -2958,7 +2958,7 @@ func (x *fastReflection_MsgCreateValidator) SetUnknown(fields protoreflect.RawFi
 // message type, but the details are implementation dependent.
 // Validity is not part of the protobuf data model, and may not
 // be preserved in marshaling or other operations.
-func (x *fastReflection_MsgCreateValidator) IsValid() bool {
+func (x *fastReflection_MsgCreatePOAValidator) IsValid() bool {
 	return x != nil
 }
 
@@ -2968,9 +2968,9 @@ func (x *fastReflection_MsgCreateValidator) IsValid() bool {
 // The returned methods type is identical to
 // "google.golang.org/protobuf/runtime/protoiface".Methods.
 // Consult the protoiface package documentation for details.
-func (x *fastReflection_MsgCreateValidator) ProtoMethods() *protoiface.Methods {
+func (x *fastReflection_MsgCreatePOAValidator) ProtoMethods() *protoiface.Methods {
 	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
-		x := input.Message.Interface().(*MsgCreateValidator)
+		x := input.Message.Interface().(*MsgCreatePOAValidator)
 		if x == nil {
 			return protoiface.SizeOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -3016,7 +3016,7 @@ func (x *fastReflection_MsgCreateValidator) ProtoMethods() *protoiface.Methods {
 	}
 
 	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
-		x := input.Message.Interface().(*MsgCreateValidator)
+		x := input.Message.Interface().(*MsgCreatePOAValidator)
 		if x == nil {
 			return protoiface.MarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -3109,7 +3109,7 @@ func (x *fastReflection_MsgCreateValidator) ProtoMethods() *protoiface.Methods {
 		}, nil
 	}
 	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
-		x := input.Message.Interface().(*MsgCreateValidator)
+		x := input.Message.Interface().(*MsgCreatePOAValidator)
 		if x == nil {
 			return protoiface.UnmarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -3141,10 +3141,10 @@ func (x *fastReflection_MsgCreateValidator) ProtoMethods() *protoiface.Methods {
 			fieldNum := int32(wire >> 3)
 			wireType := int(wire & 0x7)
 			if wireType == 4 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgCreateValidator: wiretype end group for non-group")
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgCreatePOAValidator: wiretype end group for non-group")
 			}
 			if fieldNum <= 0 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgCreateValidator: illegal tag %d (wire type %d)", fieldNum, wire)
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgCreatePOAValidator: illegal tag %d (wire type %d)", fieldNum, wire)
 			}
 			switch fieldNum {
 			case 1:
@@ -3387,23 +3387,23 @@ func (x *fastReflection_MsgCreateValidator) ProtoMethods() *protoiface.Methods {
 }
 
 var (
-	md_MsgCreateValidatorResponse protoreflect.MessageDescriptor
+	md_MsgCreatePOAValidatorResponse protoreflect.MessageDescriptor
 )
 
 func init() {
 	file_strangelove_ventures_poa_v1_tx_proto_init()
-	md_MsgCreateValidatorResponse = File_strangelove_ventures_poa_v1_tx_proto.Messages().ByName("MsgCreateValidatorResponse")
+	md_MsgCreatePOAValidatorResponse = File_strangelove_ventures_poa_v1_tx_proto.Messages().ByName("MsgCreatePOAValidatorResponse")
 }
 
-var _ protoreflect.Message = (*fastReflection_MsgCreateValidatorResponse)(nil)
+var _ protoreflect.Message = (*fastReflection_MsgCreatePOAValidatorResponse)(nil)
 
-type fastReflection_MsgCreateValidatorResponse MsgCreateValidatorResponse
+type fastReflection_MsgCreatePOAValidatorResponse MsgCreatePOAValidatorResponse
 
-func (x *MsgCreateValidatorResponse) ProtoReflect() protoreflect.Message {
-	return (*fastReflection_MsgCreateValidatorResponse)(x)
+func (x *MsgCreatePOAValidatorResponse) ProtoReflect() protoreflect.Message {
+	return (*fastReflection_MsgCreatePOAValidatorResponse)(x)
 }
 
-func (x *MsgCreateValidatorResponse) slowProtoReflect() protoreflect.Message {
+func (x *MsgCreatePOAValidatorResponse) slowProtoReflect() protoreflect.Message {
 	mi := &file_strangelove_ventures_poa_v1_tx_proto_msgTypes[7]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -3415,43 +3415,43 @@ func (x *MsgCreateValidatorResponse) slowProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-var _fastReflection_MsgCreateValidatorResponse_messageType fastReflection_MsgCreateValidatorResponse_messageType
-var _ protoreflect.MessageType = fastReflection_MsgCreateValidatorResponse_messageType{}
+var _fastReflection_MsgCreatePOAValidatorResponse_messageType fastReflection_MsgCreatePOAValidatorResponse_messageType
+var _ protoreflect.MessageType = fastReflection_MsgCreatePOAValidatorResponse_messageType{}
 
-type fastReflection_MsgCreateValidatorResponse_messageType struct{}
+type fastReflection_MsgCreatePOAValidatorResponse_messageType struct{}
 
-func (x fastReflection_MsgCreateValidatorResponse_messageType) Zero() protoreflect.Message {
-	return (*fastReflection_MsgCreateValidatorResponse)(nil)
+func (x fastReflection_MsgCreatePOAValidatorResponse_messageType) Zero() protoreflect.Message {
+	return (*fastReflection_MsgCreatePOAValidatorResponse)(nil)
 }
-func (x fastReflection_MsgCreateValidatorResponse_messageType) New() protoreflect.Message {
-	return new(fastReflection_MsgCreateValidatorResponse)
+func (x fastReflection_MsgCreatePOAValidatorResponse_messageType) New() protoreflect.Message {
+	return new(fastReflection_MsgCreatePOAValidatorResponse)
 }
-func (x fastReflection_MsgCreateValidatorResponse_messageType) Descriptor() protoreflect.MessageDescriptor {
-	return md_MsgCreateValidatorResponse
+func (x fastReflection_MsgCreatePOAValidatorResponse_messageType) Descriptor() protoreflect.MessageDescriptor {
+	return md_MsgCreatePOAValidatorResponse
 }
 
 // Descriptor returns message descriptor, which contains only the protobuf
 // type information for the message.
-func (x *fastReflection_MsgCreateValidatorResponse) Descriptor() protoreflect.MessageDescriptor {
-	return md_MsgCreateValidatorResponse
+func (x *fastReflection_MsgCreatePOAValidatorResponse) Descriptor() protoreflect.MessageDescriptor {
+	return md_MsgCreatePOAValidatorResponse
 }
 
 // Type returns the message type, which encapsulates both Go and protobuf
 // type information. If the Go type information is not needed,
 // it is recommended that the message descriptor be used instead.
-func (x *fastReflection_MsgCreateValidatorResponse) Type() protoreflect.MessageType {
-	return _fastReflection_MsgCreateValidatorResponse_messageType
+func (x *fastReflection_MsgCreatePOAValidatorResponse) Type() protoreflect.MessageType {
+	return _fastReflection_MsgCreatePOAValidatorResponse_messageType
 }
 
 // New returns a newly allocated and mutable empty message.
-func (x *fastReflection_MsgCreateValidatorResponse) New() protoreflect.Message {
-	return new(fastReflection_MsgCreateValidatorResponse)
+func (x *fastReflection_MsgCreatePOAValidatorResponse) New() protoreflect.Message {
+	return new(fastReflection_MsgCreatePOAValidatorResponse)
 }
 
 // Interface unwraps the message reflection interface and
 // returns the underlying ProtoMessage interface.
-func (x *fastReflection_MsgCreateValidatorResponse) Interface() protoreflect.ProtoMessage {
-	return (*MsgCreateValidatorResponse)(x)
+func (x *fastReflection_MsgCreatePOAValidatorResponse) Interface() protoreflect.ProtoMessage {
+	return (*MsgCreatePOAValidatorResponse)(x)
 }
 
 // Range iterates over every populated field in an undefined order,
@@ -3459,7 +3459,7 @@ func (x *fastReflection_MsgCreateValidatorResponse) Interface() protoreflect.Pro
 // Range returns immediately if f returns false.
 // While iterating, mutating operations may only be performed
 // on the current field descriptor.
-func (x *fastReflection_MsgCreateValidatorResponse) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+func (x *fastReflection_MsgCreatePOAValidatorResponse) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
 }
 
 // Has reports whether a field is populated.
@@ -3473,13 +3473,13 @@ func (x *fastReflection_MsgCreateValidatorResponse) Range(f func(protoreflect.Fi
 // In other cases (aside from the nullable cases above),
 // a proto3 scalar field is populated if it contains a non-zero value, and
 // a repeated field is populated if it is non-empty.
-func (x *fastReflection_MsgCreateValidatorResponse) Has(fd protoreflect.FieldDescriptor) bool {
+func (x *fastReflection_MsgCreatePOAValidatorResponse) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgCreateValidatorResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgCreatePOAValidatorResponse"))
 		}
-		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgCreateValidatorResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgCreatePOAValidatorResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -3489,13 +3489,13 @@ func (x *fastReflection_MsgCreateValidatorResponse) Has(fd protoreflect.FieldDes
 // associated with the given field number.
 //
 // Clear is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgCreateValidatorResponse) Clear(fd protoreflect.FieldDescriptor) {
+func (x *fastReflection_MsgCreatePOAValidatorResponse) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgCreateValidatorResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgCreatePOAValidatorResponse"))
 		}
-		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgCreateValidatorResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgCreatePOAValidatorResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -3505,13 +3505,13 @@ func (x *fastReflection_MsgCreateValidatorResponse) Clear(fd protoreflect.FieldD
 // the default value of a bytes scalar is guaranteed to be a copy.
 // For unpopulated composite types, it returns an empty, read-only view
 // of the value; to obtain a mutable reference, use Mutable.
-func (x *fastReflection_MsgCreateValidatorResponse) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_MsgCreatePOAValidatorResponse) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
 	default:
 		if descriptor.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgCreateValidatorResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgCreatePOAValidatorResponse"))
 		}
-		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgCreateValidatorResponse does not contain field %s", descriptor.FullName()))
+		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgCreatePOAValidatorResponse does not contain field %s", descriptor.FullName()))
 	}
 }
 
@@ -3525,13 +3525,13 @@ func (x *fastReflection_MsgCreateValidatorResponse) Get(descriptor protoreflect.
 // empty, read-only value, then it panics.
 //
 // Set is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgCreateValidatorResponse) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
+func (x *fastReflection_MsgCreatePOAValidatorResponse) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgCreateValidatorResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgCreatePOAValidatorResponse"))
 		}
-		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgCreateValidatorResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgCreatePOAValidatorResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -3545,36 +3545,36 @@ func (x *fastReflection_MsgCreateValidatorResponse) Set(fd protoreflect.FieldDes
 // It panics if the field does not contain a composite type.
 //
 // Mutable is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgCreateValidatorResponse) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_MsgCreatePOAValidatorResponse) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgCreateValidatorResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgCreatePOAValidatorResponse"))
 		}
-		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgCreateValidatorResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgCreatePOAValidatorResponse does not contain field %s", fd.FullName()))
 	}
 }
 
 // NewField returns a new value that is assignable to the field
 // for the given descriptor. For scalars, this returns the default value.
 // For lists, maps, and messages, this returns a new, empty, mutable value.
-func (x *fastReflection_MsgCreateValidatorResponse) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_MsgCreatePOAValidatorResponse) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgCreateValidatorResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.MsgCreatePOAValidatorResponse"))
 		}
-		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgCreateValidatorResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message strangelove_ventures.poa.v1.MsgCreatePOAValidatorResponse does not contain field %s", fd.FullName()))
 	}
 }
 
 // WhichOneof reports which field within the oneof is populated,
 // returning nil if none are populated.
 // It panics if the oneof descriptor does not belong to this message.
-func (x *fastReflection_MsgCreateValidatorResponse) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+func (x *fastReflection_MsgCreatePOAValidatorResponse) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
 	switch d.FullName() {
 	default:
-		panic(fmt.Errorf("%s is not a oneof field in strangelove_ventures.poa.v1.MsgCreateValidatorResponse", d.FullName()))
+		panic(fmt.Errorf("%s is not a oneof field in strangelove_ventures.poa.v1.MsgCreatePOAValidatorResponse", d.FullName()))
 	}
 	panic("unreachable")
 }
@@ -3582,7 +3582,7 @@ func (x *fastReflection_MsgCreateValidatorResponse) WhichOneof(d protoreflect.On
 // GetUnknown retrieves the entire list of unknown fields.
 // The caller may only mutate the contents of the RawFields
 // if the mutated bytes are stored back into the message with SetUnknown.
-func (x *fastReflection_MsgCreateValidatorResponse) GetUnknown() protoreflect.RawFields {
+func (x *fastReflection_MsgCreatePOAValidatorResponse) GetUnknown() protoreflect.RawFields {
 	return x.unknownFields
 }
 
@@ -3593,7 +3593,7 @@ func (x *fastReflection_MsgCreateValidatorResponse) GetUnknown() protoreflect.Ra
 // An empty RawFields may be passed to clear the fields.
 //
 // SetUnknown is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgCreateValidatorResponse) SetUnknown(fields protoreflect.RawFields) {
+func (x *fastReflection_MsgCreatePOAValidatorResponse) SetUnknown(fields protoreflect.RawFields) {
 	x.unknownFields = fields
 }
 
@@ -3605,7 +3605,7 @@ func (x *fastReflection_MsgCreateValidatorResponse) SetUnknown(fields protorefle
 // message type, but the details are implementation dependent.
 // Validity is not part of the protobuf data model, and may not
 // be preserved in marshaling or other operations.
-func (x *fastReflection_MsgCreateValidatorResponse) IsValid() bool {
+func (x *fastReflection_MsgCreatePOAValidatorResponse) IsValid() bool {
 	return x != nil
 }
 
@@ -3615,9 +3615,9 @@ func (x *fastReflection_MsgCreateValidatorResponse) IsValid() bool {
 // The returned methods type is identical to
 // "google.golang.org/protobuf/runtime/protoiface".Methods.
 // Consult the protoiface package documentation for details.
-func (x *fastReflection_MsgCreateValidatorResponse) ProtoMethods() *protoiface.Methods {
+func (x *fastReflection_MsgCreatePOAValidatorResponse) ProtoMethods() *protoiface.Methods {
 	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
-		x := input.Message.Interface().(*MsgCreateValidatorResponse)
+		x := input.Message.Interface().(*MsgCreatePOAValidatorResponse)
 		if x == nil {
 			return protoiface.SizeOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -3639,7 +3639,7 @@ func (x *fastReflection_MsgCreateValidatorResponse) ProtoMethods() *protoiface.M
 	}
 
 	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
-		x := input.Message.Interface().(*MsgCreateValidatorResponse)
+		x := input.Message.Interface().(*MsgCreatePOAValidatorResponse)
 		if x == nil {
 			return protoiface.MarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -3669,7 +3669,7 @@ func (x *fastReflection_MsgCreateValidatorResponse) ProtoMethods() *protoiface.M
 		}, nil
 	}
 	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
-		x := input.Message.Interface().(*MsgCreateValidatorResponse)
+		x := input.Message.Interface().(*MsgCreatePOAValidatorResponse)
 		if x == nil {
 			return protoiface.UnmarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -3701,10 +3701,10 @@ func (x *fastReflection_MsgCreateValidatorResponse) ProtoMethods() *protoiface.M
 			fieldNum := int32(wire >> 3)
 			wireType := int(wire & 0x7)
 			if wireType == 4 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgCreateValidatorResponse: wiretype end group for non-group")
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgCreatePOAValidatorResponse: wiretype end group for non-group")
 			}
 			if fieldNum <= 0 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgCreateValidatorResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgCreatePOAValidatorResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 			}
 			switch fieldNum {
 			default:
@@ -3983,7 +3983,7 @@ func (*MsgUpdateParamsResponse) Descriptor() ([]byte, []int) {
 
 // cosmos-sdk/proto/staking/v1beta1/tx.proto
 // MsgCreateValidator defines a SDK message for creating a new validator.
-type MsgCreateValidator struct {
+type MsgCreatePOAValidator struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -4001,8 +4001,8 @@ type MsgCreateValidator struct {
 	Pubkey           *anypb.Any `protobuf:"bytes,6,opt,name=pubkey,proto3" json:"pubkey,omitempty"`
 }
 
-func (x *MsgCreateValidator) Reset() {
-	*x = MsgCreateValidator{}
+func (x *MsgCreatePOAValidator) Reset() {
+	*x = MsgCreatePOAValidator{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_strangelove_ventures_poa_v1_tx_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -4010,32 +4010,32 @@ func (x *MsgCreateValidator) Reset() {
 	}
 }
 
-func (x *MsgCreateValidator) String() string {
+func (x *MsgCreatePOAValidator) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*MsgCreateValidator) ProtoMessage() {}
+func (*MsgCreatePOAValidator) ProtoMessage() {}
 
-// Deprecated: Use MsgCreateValidator.ProtoReflect.Descriptor instead.
-func (*MsgCreateValidator) Descriptor() ([]byte, []int) {
+// Deprecated: Use MsgCreatePOAValidator.ProtoReflect.Descriptor instead.
+func (*MsgCreatePOAValidator) Descriptor() ([]byte, []int) {
 	return file_strangelove_ventures_poa_v1_tx_proto_rawDescGZIP(), []int{6}
 }
 
-func (x *MsgCreateValidator) GetDescription() *Description {
+func (x *MsgCreatePOAValidator) GetDescription() *Description {
 	if x != nil {
 		return x.Description
 	}
 	return nil
 }
 
-func (x *MsgCreateValidator) GetCommission() *CommissionRates {
+func (x *MsgCreatePOAValidator) GetCommission() *CommissionRates {
 	if x != nil {
 		return x.Commission
 	}
 	return nil
 }
 
-func (x *MsgCreateValidator) GetMinSelfDelegation() string {
+func (x *MsgCreatePOAValidator) GetMinSelfDelegation() string {
 	if x != nil {
 		return x.MinSelfDelegation
 	}
@@ -4043,21 +4043,21 @@ func (x *MsgCreateValidator) GetMinSelfDelegation() string {
 }
 
 // Deprecated: Do not use.
-func (x *MsgCreateValidator) GetDelegatorAddress() string {
+func (x *MsgCreatePOAValidator) GetDelegatorAddress() string {
 	if x != nil {
 		return x.DelegatorAddress
 	}
 	return ""
 }
 
-func (x *MsgCreateValidator) GetValidatorAddress() string {
+func (x *MsgCreatePOAValidator) GetValidatorAddress() string {
 	if x != nil {
 		return x.ValidatorAddress
 	}
 	return ""
 }
 
-func (x *MsgCreateValidator) GetPubkey() *anypb.Any {
+func (x *MsgCreatePOAValidator) GetPubkey() *anypb.Any {
 	if x != nil {
 		return x.Pubkey
 	}
@@ -4065,14 +4065,14 @@ func (x *MsgCreateValidator) GetPubkey() *anypb.Any {
 }
 
 // MsgCreateValidatorResponse
-type MsgCreateValidatorResponse struct {
+type MsgCreatePOAValidatorResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 }
 
-func (x *MsgCreateValidatorResponse) Reset() {
-	*x = MsgCreateValidatorResponse{}
+func (x *MsgCreatePOAValidatorResponse) Reset() {
+	*x = MsgCreatePOAValidatorResponse{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_strangelove_ventures_poa_v1_tx_proto_msgTypes[7]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -4080,14 +4080,14 @@ func (x *MsgCreateValidatorResponse) Reset() {
 	}
 }
 
-func (x *MsgCreateValidatorResponse) String() string {
+func (x *MsgCreatePOAValidatorResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*MsgCreateValidatorResponse) ProtoMessage() {}
+func (*MsgCreatePOAValidatorResponse) ProtoMessage() {}
 
-// Deprecated: Use MsgCreateValidatorResponse.ProtoReflect.Descriptor instead.
-func (*MsgCreateValidatorResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use MsgCreatePOAValidatorResponse.ProtoReflect.Descriptor instead.
+func (*MsgCreatePOAValidatorResponse) Descriptor() ([]byte, []int) {
 	return file_strangelove_ventures_poa_v1_tx_proto_rawDescGZIP(), []int{7}
 }
 
@@ -4155,92 +4155,93 @@ var file_strangelove_ventures_poa_v1_tx_proto_rawDesc = []byte{
 	0x61, 0x72, 0x61, 0x6d, 0x73, 0x3a, 0x11, 0x82, 0xe7, 0xb0, 0x2a, 0x0c, 0x66, 0x72, 0x6f, 0x6d,
 	0x5f, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x22, 0x19, 0x0a, 0x17, 0x4d, 0x73, 0x67, 0x55,
 	0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f,
-	0x6e, 0x73, 0x65, 0x22, 0xc2, 0x04, 0x0a, 0x12, 0x4d, 0x73, 0x67, 0x43, 0x72, 0x65, 0x61, 0x74,
-	0x65, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x12, 0x55, 0x0a, 0x0b, 0x64, 0x65,
-	0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32,
-	0x28, 0x2e, 0x73, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65, 0x5f, 0x76, 0x65,
-	0x6e, 0x74, 0x75, 0x72, 0x65, 0x73, 0x2e, 0x70, 0x6f, 0x61, 0x2e, 0x76, 0x31, 0x2e, 0x44, 0x65,
-	0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x42, 0x09, 0xc8, 0xde, 0x1f, 0x00, 0xa8,
-	0xe7, 0xb0, 0x2a, 0x01, 0x52, 0x0b, 0x64, 0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f,
-	0x6e, 0x12, 0x57, 0x0a, 0x0a, 0x63, 0x6f, 0x6d, 0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x18,
-	0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x2c, 0x2e, 0x73, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c,
-	0x6f, 0x76, 0x65, 0x5f, 0x76, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65, 0x73, 0x2e, 0x70, 0x6f, 0x61,
-	0x2e, 0x76, 0x31, 0x2e, 0x43, 0x6f, 0x6d, 0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x61,
-	0x74, 0x65, 0x73, 0x42, 0x09, 0xc8, 0xde, 0x1f, 0x00, 0xa8, 0xe7, 0xb0, 0x2a, 0x01, 0x52, 0x0a,
-	0x63, 0x6f, 0x6d, 0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x12, 0x60, 0x0a, 0x13, 0x6d, 0x69,
-	0x6e, 0x5f, 0x73, 0x65, 0x6c, 0x66, 0x5f, 0x64, 0x65, 0x6c, 0x65, 0x67, 0x61, 0x74, 0x69, 0x6f,
-	0x6e, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x42, 0x30, 0xc8, 0xde, 0x1f, 0x00, 0xda, 0xde, 0x1f,
-	0x15, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x73, 0x64, 0x6b, 0x2e, 0x69, 0x6f, 0x2f, 0x6d, 0x61,
-	0x74, 0x68, 0x2e, 0x49, 0x6e, 0x74, 0xd2, 0xb4, 0x2d, 0x0a, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73,
-	0x2e, 0x49, 0x6e, 0x74, 0xa8, 0xe7, 0xb0, 0x2a, 0x01, 0x52, 0x11, 0x6d, 0x69, 0x6e, 0x53, 0x65,
-	0x6c, 0x66, 0x44, 0x65, 0x6c, 0x65, 0x67, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x47, 0x0a, 0x11,
-	0x64, 0x65, 0x6c, 0x65, 0x67, 0x61, 0x74, 0x6f, 0x72, 0x5f, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73,
-	0x73, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x42, 0x1a, 0x18, 0x01, 0xd2, 0xb4, 0x2d, 0x14, 0x63,
-	0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x53, 0x74, 0x72,
-	0x69, 0x6e, 0x67, 0x52, 0x10, 0x64, 0x65, 0x6c, 0x65, 0x67, 0x61, 0x74, 0x6f, 0x72, 0x41, 0x64,
-	0x64, 0x72, 0x65, 0x73, 0x73, 0x12, 0x4e, 0x0a, 0x11, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74,
-	0x6f, 0x72, 0x5f, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x18, 0x05, 0x20, 0x01, 0x28, 0x09,
-	0x42, 0x21, 0xd2, 0xb4, 0x2d, 0x1d, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x56, 0x61, 0x6c,
-	0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x53, 0x74, 0x72,
-	0x69, 0x6e, 0x67, 0x52, 0x10, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x41, 0x64,
-	0x64, 0x72, 0x65, 0x73, 0x73, 0x12, 0x46, 0x0a, 0x06, 0x70, 0x75, 0x62, 0x6b, 0x65, 0x79, 0x18,
-	0x06, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x14, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70,
-	0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x41, 0x6e, 0x79, 0x42, 0x18, 0xca, 0xb4, 0x2d,
-	0x14, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x63, 0x72, 0x79, 0x70, 0x74, 0x6f, 0x2e, 0x50,
-	0x75, 0x62, 0x4b, 0x65, 0x79, 0x52, 0x06, 0x70, 0x75, 0x62, 0x6b, 0x65, 0x79, 0x3a, 0x39, 0x88,
-	0xa0, 0x1f, 0x00, 0xe8, 0xa0, 0x1f, 0x00, 0x82, 0xe7, 0xb0, 0x2a, 0x11, 0x76, 0x61, 0x6c, 0x69,
-	0x64, 0x61, 0x74, 0x6f, 0x72, 0x5f, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x8a, 0xe7, 0xb0,
-	0x2a, 0x16, 0x70, 0x6f, 0x61, 0x2f, 0x4d, 0x73, 0x67, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x56,
-	0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x22, 0x1c, 0x0a, 0x1a, 0x4d, 0x73, 0x67, 0x43,
-	0x72, 0x65, 0x61, 0x74, 0x65, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x52, 0x65,
-	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x32, 0xe2, 0x03, 0x0a, 0x03, 0x4d, 0x73, 0x67, 0x12, 0x7b,
-	0x0a, 0x0f, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f,
-	0x72, 0x12, 0x2f, 0x2e, 0x73, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65, 0x5f,
-	0x76, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65, 0x73, 0x2e, 0x70, 0x6f, 0x61, 0x2e, 0x76, 0x31, 0x2e,
-	0x4d, 0x73, 0x67, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74,
-	0x6f, 0x72, 0x1a, 0x37, 0x2e, 0x73, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65,
+	0x6e, 0x73, 0x65, 0x22, 0xc5, 0x04, 0x0a, 0x15, 0x4d, 0x73, 0x67, 0x43, 0x72, 0x65, 0x61, 0x74,
+	0x65, 0x50, 0x4f, 0x41, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x12, 0x55, 0x0a,
+	0x0b, 0x64, 0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x01, 0x20, 0x01,
+	0x28, 0x0b, 0x32, 0x28, 0x2e, 0x73, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65,
 	0x5f, 0x76, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65, 0x73, 0x2e, 0x70, 0x6f, 0x61, 0x2e, 0x76, 0x31,
-	0x2e, 0x4d, 0x73, 0x67, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61,
-	0x74, 0x6f, 0x72, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x66, 0x0a, 0x08, 0x53,
-	0x65, 0x74, 0x50, 0x6f, 0x77, 0x65, 0x72, 0x12, 0x28, 0x2e, 0x73, 0x74, 0x72, 0x61, 0x6e, 0x67,
-	0x65, 0x6c, 0x6f, 0x76, 0x65, 0x5f, 0x76, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65, 0x73, 0x2e, 0x70,
-	0x6f, 0x61, 0x2e, 0x76, 0x31, 0x2e, 0x4d, 0x73, 0x67, 0x53, 0x65, 0x74, 0x50, 0x6f, 0x77, 0x65,
-	0x72, 0x1a, 0x30, 0x2e, 0x73, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65, 0x5f,
-	0x76, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65, 0x73, 0x2e, 0x70, 0x6f, 0x61, 0x2e, 0x76, 0x31, 0x2e,
-	0x4d, 0x73, 0x67, 0x53, 0x65, 0x74, 0x50, 0x6f, 0x77, 0x65, 0x72, 0x52, 0x65, 0x73, 0x70, 0x6f,
-	0x6e, 0x73, 0x65, 0x12, 0x7b, 0x0a, 0x0f, 0x52, 0x65, 0x6d, 0x6f, 0x76, 0x65, 0x56, 0x61, 0x6c,
-	0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x12, 0x2f, 0x2e, 0x73, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65,
-	0x6c, 0x6f, 0x76, 0x65, 0x5f, 0x76, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65, 0x73, 0x2e, 0x70, 0x6f,
-	0x61, 0x2e, 0x76, 0x31, 0x2e, 0x4d, 0x73, 0x67, 0x52, 0x65, 0x6d, 0x6f, 0x76, 0x65, 0x56, 0x61,
-	0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x1a, 0x37, 0x2e, 0x73, 0x74, 0x72, 0x61, 0x6e, 0x67,
-	0x65, 0x6c, 0x6f, 0x76, 0x65, 0x5f, 0x76, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65, 0x73, 0x2e, 0x70,
-	0x6f, 0x61, 0x2e, 0x76, 0x31, 0x2e, 0x4d, 0x73, 0x67, 0x52, 0x65, 0x6d, 0x6f, 0x76, 0x65, 0x56,
-	0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
-	0x12, 0x72, 0x0a, 0x0c, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73,
-	0x12, 0x2c, 0x2e, 0x73, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65, 0x5f, 0x76,
-	0x65, 0x6e, 0x74, 0x75, 0x72, 0x65, 0x73, 0x2e, 0x70, 0x6f, 0x61, 0x2e, 0x76, 0x31, 0x2e, 0x4d,
-	0x73, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x1a, 0x34,
+	0x2e, 0x44, 0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x42, 0x09, 0xc8, 0xde,
+	0x1f, 0x00, 0xa8, 0xe7, 0xb0, 0x2a, 0x01, 0x52, 0x0b, 0x64, 0x65, 0x73, 0x63, 0x72, 0x69, 0x70,
+	0x74, 0x69, 0x6f, 0x6e, 0x12, 0x57, 0x0a, 0x0a, 0x63, 0x6f, 0x6d, 0x6d, 0x69, 0x73, 0x73, 0x69,
+	0x6f, 0x6e, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x2c, 0x2e, 0x73, 0x74, 0x72, 0x61, 0x6e,
+	0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65, 0x5f, 0x76, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65, 0x73, 0x2e,
+	0x70, 0x6f, 0x61, 0x2e, 0x76, 0x31, 0x2e, 0x43, 0x6f, 0x6d, 0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f,
+	0x6e, 0x52, 0x61, 0x74, 0x65, 0x73, 0x42, 0x09, 0xc8, 0xde, 0x1f, 0x00, 0xa8, 0xe7, 0xb0, 0x2a,
+	0x01, 0x52, 0x0a, 0x63, 0x6f, 0x6d, 0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x12, 0x60, 0x0a,
+	0x13, 0x6d, 0x69, 0x6e, 0x5f, 0x73, 0x65, 0x6c, 0x66, 0x5f, 0x64, 0x65, 0x6c, 0x65, 0x67, 0x61,
+	0x74, 0x69, 0x6f, 0x6e, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x42, 0x30, 0xc8, 0xde, 0x1f, 0x00,
+	0xda, 0xde, 0x1f, 0x15, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x73, 0x64, 0x6b, 0x2e, 0x69, 0x6f,
+	0x2f, 0x6d, 0x61, 0x74, 0x68, 0x2e, 0x49, 0x6e, 0x74, 0xd2, 0xb4, 0x2d, 0x0a, 0x63, 0x6f, 0x73,
+	0x6d, 0x6f, 0x73, 0x2e, 0x49, 0x6e, 0x74, 0xa8, 0xe7, 0xb0, 0x2a, 0x01, 0x52, 0x11, 0x6d, 0x69,
+	0x6e, 0x53, 0x65, 0x6c, 0x66, 0x44, 0x65, 0x6c, 0x65, 0x67, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x12,
+	0x47, 0x0a, 0x11, 0x64, 0x65, 0x6c, 0x65, 0x67, 0x61, 0x74, 0x6f, 0x72, 0x5f, 0x61, 0x64, 0x64,
+	0x72, 0x65, 0x73, 0x73, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x42, 0x1a, 0x18, 0x01, 0xd2, 0xb4,
+	0x2d, 0x14, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73,
+	0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x52, 0x10, 0x64, 0x65, 0x6c, 0x65, 0x67, 0x61, 0x74, 0x6f,
+	0x72, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x12, 0x4e, 0x0a, 0x11, 0x76, 0x61, 0x6c, 0x69,
+	0x64, 0x61, 0x74, 0x6f, 0x72, 0x5f, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x18, 0x05, 0x20,
+	0x01, 0x28, 0x09, 0x42, 0x21, 0xd2, 0xb4, 0x2d, 0x1d, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e,
+	0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73,
+	0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x52, 0x10, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f,
+	0x72, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x12, 0x46, 0x0a, 0x06, 0x70, 0x75, 0x62, 0x6b,
+	0x65, 0x79, 0x18, 0x06, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x14, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c,
+	0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x41, 0x6e, 0x79, 0x42, 0x18,
+	0xca, 0xb4, 0x2d, 0x14, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x63, 0x72, 0x79, 0x70, 0x74,
+	0x6f, 0x2e, 0x50, 0x75, 0x62, 0x4b, 0x65, 0x79, 0x52, 0x06, 0x70, 0x75, 0x62, 0x6b, 0x65, 0x79,
+	0x3a, 0x39, 0x88, 0xa0, 0x1f, 0x00, 0xe8, 0xa0, 0x1f, 0x00, 0x82, 0xe7, 0xb0, 0x2a, 0x11, 0x76,
+	0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x5f, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73,
+	0x8a, 0xe7, 0xb0, 0x2a, 0x16, 0x70, 0x6f, 0x61, 0x2f, 0x4d, 0x73, 0x67, 0x43, 0x72, 0x65, 0x61,
+	0x74, 0x65, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x22, 0x1f, 0x0a, 0x1d, 0x4d,
+	0x73, 0x67, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x50, 0x4f, 0x41, 0x56, 0x61, 0x6c, 0x69, 0x64,
+	0x61, 0x74, 0x6f, 0x72, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x32, 0xe9, 0x03, 0x0a,
+	0x03, 0x4d, 0x73, 0x67, 0x12, 0x81, 0x01, 0x0a, 0x0f, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x56,
+	0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x12, 0x32, 0x2e, 0x73, 0x74, 0x72, 0x61, 0x6e,
+	0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65, 0x5f, 0x76, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65, 0x73, 0x2e,
+	0x70, 0x6f, 0x61, 0x2e, 0x76, 0x31, 0x2e, 0x4d, 0x73, 0x67, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65,
+	0x50, 0x4f, 0x41, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x1a, 0x3a, 0x2e, 0x73,
+	0x74, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65, 0x5f, 0x76, 0x65, 0x6e, 0x74, 0x75,
+	0x72, 0x65, 0x73, 0x2e, 0x70, 0x6f, 0x61, 0x2e, 0x76, 0x31, 0x2e, 0x4d, 0x73, 0x67, 0x43, 0x72,
+	0x65, 0x61, 0x74, 0x65, 0x50, 0x4f, 0x41, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72,
+	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x66, 0x0a, 0x08, 0x53, 0x65, 0x74, 0x50,
+	0x6f, 0x77, 0x65, 0x72, 0x12, 0x28, 0x2e, 0x73, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f,
+	0x76, 0x65, 0x5f, 0x76, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65, 0x73, 0x2e, 0x70, 0x6f, 0x61, 0x2e,
+	0x76, 0x31, 0x2e, 0x4d, 0x73, 0x67, 0x53, 0x65, 0x74, 0x50, 0x6f, 0x77, 0x65, 0x72, 0x1a, 0x30,
 	0x2e, 0x73, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65, 0x5f, 0x76, 0x65, 0x6e,
 	0x74, 0x75, 0x72, 0x65, 0x73, 0x2e, 0x70, 0x6f, 0x61, 0x2e, 0x76, 0x31, 0x2e, 0x4d, 0x73, 0x67,
-	0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x52, 0x65, 0x73, 0x70,
-	0x6f, 0x6e, 0x73, 0x65, 0x1a, 0x05, 0x80, 0xe7, 0xb0, 0x2a, 0x01, 0x42, 0xff, 0x01, 0x0a, 0x1f,
-	0x63, 0x6f, 0x6d, 0x2e, 0x73, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65, 0x5f,
-	0x76, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65, 0x73, 0x2e, 0x70, 0x6f, 0x61, 0x2e, 0x76, 0x31, 0x42,
-	0x07, 0x54, 0x78, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x49, 0x67, 0x69, 0x74, 0x68,
-	0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x73, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f,
-	0x76, 0x65, 0x2d, 0x76, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65, 0x73, 0x2f, 0x70, 0x6f, 0x61, 0x2f,
-	0x61, 0x70, 0x69, 0x2f, 0x73, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65, 0x5f,
-	0x76, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65, 0x73, 0x2f, 0x70, 0x6f, 0x61, 0x2f, 0x76, 0x31, 0x3b,
-	0x70, 0x6f, 0x61, 0x76, 0x31, 0xa2, 0x02, 0x03, 0x53, 0x50, 0x58, 0xaa, 0x02, 0x1a, 0x53, 0x74,
-	0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65, 0x56, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65,
-	0x73, 0x2e, 0x50, 0x6f, 0x61, 0x2e, 0x56, 0x31, 0xca, 0x02, 0x1a, 0x53, 0x74, 0x72, 0x61, 0x6e,
-	0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65, 0x56, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65, 0x73, 0x5c, 0x50,
-	0x6f, 0x61, 0x5c, 0x56, 0x31, 0xe2, 0x02, 0x26, 0x53, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c,
+	0x53, 0x65, 0x74, 0x50, 0x6f, 0x77, 0x65, 0x72, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
+	0x12, 0x7b, 0x0a, 0x0f, 0x52, 0x65, 0x6d, 0x6f, 0x76, 0x65, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61,
+	0x74, 0x6f, 0x72, 0x12, 0x2f, 0x2e, 0x73, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f, 0x76,
+	0x65, 0x5f, 0x76, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65, 0x73, 0x2e, 0x70, 0x6f, 0x61, 0x2e, 0x76,
+	0x31, 0x2e, 0x4d, 0x73, 0x67, 0x52, 0x65, 0x6d, 0x6f, 0x76, 0x65, 0x56, 0x61, 0x6c, 0x69, 0x64,
+	0x61, 0x74, 0x6f, 0x72, 0x1a, 0x37, 0x2e, 0x73, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f,
+	0x76, 0x65, 0x5f, 0x76, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65, 0x73, 0x2e, 0x70, 0x6f, 0x61, 0x2e,
+	0x76, 0x31, 0x2e, 0x4d, 0x73, 0x67, 0x52, 0x65, 0x6d, 0x6f, 0x76, 0x65, 0x56, 0x61, 0x6c, 0x69,
+	0x64, 0x61, 0x74, 0x6f, 0x72, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x72, 0x0a,
+	0x0c, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x12, 0x2c, 0x2e,
+	0x73, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65, 0x5f, 0x76, 0x65, 0x6e, 0x74,
+	0x75, 0x72, 0x65, 0x73, 0x2e, 0x70, 0x6f, 0x61, 0x2e, 0x76, 0x31, 0x2e, 0x4d, 0x73, 0x67, 0x55,
+	0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x1a, 0x34, 0x2e, 0x73, 0x74,
+	0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65, 0x5f, 0x76, 0x65, 0x6e, 0x74, 0x75, 0x72,
+	0x65, 0x73, 0x2e, 0x70, 0x6f, 0x61, 0x2e, 0x76, 0x31, 0x2e, 0x4d, 0x73, 0x67, 0x55, 0x70, 0x64,
+	0x61, 0x74, 0x65, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
+	0x65, 0x1a, 0x05, 0x80, 0xe7, 0xb0, 0x2a, 0x01, 0x42, 0xff, 0x01, 0x0a, 0x1f, 0x63, 0x6f, 0x6d,
+	0x2e, 0x73, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65, 0x5f, 0x76, 0x65, 0x6e,
+	0x74, 0x75, 0x72, 0x65, 0x73, 0x2e, 0x70, 0x6f, 0x61, 0x2e, 0x76, 0x31, 0x42, 0x07, 0x54, 0x78,
+	0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x49, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e,
+	0x63, 0x6f, 0x6d, 0x2f, 0x73, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65, 0x2d,
+	0x76, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65, 0x73, 0x2f, 0x70, 0x6f, 0x61, 0x2f, 0x61, 0x70, 0x69,
+	0x2f, 0x73, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65, 0x5f, 0x76, 0x65, 0x6e,
+	0x74, 0x75, 0x72, 0x65, 0x73, 0x2f, 0x70, 0x6f, 0x61, 0x2f, 0x76, 0x31, 0x3b, 0x70, 0x6f, 0x61,
+	0x76, 0x31, 0xa2, 0x02, 0x03, 0x53, 0x50, 0x58, 0xaa, 0x02, 0x1a, 0x53, 0x74, 0x72, 0x61, 0x6e,
+	0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65, 0x56, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65, 0x73, 0x2e, 0x50,
+	0x6f, 0x61, 0x2e, 0x56, 0x31, 0xca, 0x02, 0x1a, 0x53, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c,
 	0x6f, 0x76, 0x65, 0x56, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65, 0x73, 0x5c, 0x50, 0x6f, 0x61, 0x5c,
-	0x56, 0x31, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02,
-	0x1c, 0x53, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65, 0x56, 0x65, 0x6e, 0x74,
-	0x75, 0x72, 0x65, 0x73, 0x3a, 0x3a, 0x50, 0x6f, 0x61, 0x3a, 0x3a, 0x56, 0x31, 0x62, 0x06, 0x70,
-	0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x56, 0x31, 0xe2, 0x02, 0x26, 0x53, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65,
+	0x56, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65, 0x73, 0x5c, 0x50, 0x6f, 0x61, 0x5c, 0x56, 0x31, 0x5c,
+	0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x1c, 0x53, 0x74,
+	0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65, 0x56, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65,
+	0x73, 0x3a, 0x3a, 0x50, 0x6f, 0x61, 0x3a, 0x3a, 0x56, 0x31, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74,
+	0x6f, 0x33,
 }
 
 var (
@@ -4257,29 +4258,29 @@ func file_strangelove_ventures_poa_v1_tx_proto_rawDescGZIP() []byte {
 
 var file_strangelove_ventures_poa_v1_tx_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_strangelove_ventures_poa_v1_tx_proto_goTypes = []interface{}{
-	(*MsgSetPower)(nil),                // 0: strangelove_ventures.poa.v1.MsgSetPower
-	(*MsgSetPowerResponse)(nil),        // 1: strangelove_ventures.poa.v1.MsgSetPowerResponse
-	(*MsgRemoveValidator)(nil),         // 2: strangelove_ventures.poa.v1.MsgRemoveValidator
-	(*MsgRemoveValidatorResponse)(nil), // 3: strangelove_ventures.poa.v1.MsgRemoveValidatorResponse
-	(*MsgUpdateParams)(nil),            // 4: strangelove_ventures.poa.v1.MsgUpdateParams
-	(*MsgUpdateParamsResponse)(nil),    // 5: strangelove_ventures.poa.v1.MsgUpdateParamsResponse
-	(*MsgCreateValidator)(nil),         // 6: strangelove_ventures.poa.v1.MsgCreateValidator
-	(*MsgCreateValidatorResponse)(nil), // 7: strangelove_ventures.poa.v1.MsgCreateValidatorResponse
-	(*Params)(nil),                     // 8: strangelove_ventures.poa.v1.Params
-	(*Description)(nil),                // 9: strangelove_ventures.poa.v1.Description
-	(*CommissionRates)(nil),            // 10: strangelove_ventures.poa.v1.CommissionRates
-	(*anypb.Any)(nil),                  // 11: google.protobuf.Any
+	(*MsgSetPower)(nil),                   // 0: strangelove_ventures.poa.v1.MsgSetPower
+	(*MsgSetPowerResponse)(nil),           // 1: strangelove_ventures.poa.v1.MsgSetPowerResponse
+	(*MsgRemoveValidator)(nil),            // 2: strangelove_ventures.poa.v1.MsgRemoveValidator
+	(*MsgRemoveValidatorResponse)(nil),    // 3: strangelove_ventures.poa.v1.MsgRemoveValidatorResponse
+	(*MsgUpdateParams)(nil),               // 4: strangelove_ventures.poa.v1.MsgUpdateParams
+	(*MsgUpdateParamsResponse)(nil),       // 5: strangelove_ventures.poa.v1.MsgUpdateParamsResponse
+	(*MsgCreatePOAValidator)(nil),         // 6: strangelove_ventures.poa.v1.MsgCreatePOAValidator
+	(*MsgCreatePOAValidatorResponse)(nil), // 7: strangelove_ventures.poa.v1.MsgCreatePOAValidatorResponse
+	(*Params)(nil),                        // 8: strangelove_ventures.poa.v1.Params
+	(*Description)(nil),                   // 9: strangelove_ventures.poa.v1.Description
+	(*CommissionRates)(nil),               // 10: strangelove_ventures.poa.v1.CommissionRates
+	(*anypb.Any)(nil),                     // 11: google.protobuf.Any
 }
 var file_strangelove_ventures_poa_v1_tx_proto_depIdxs = []int32{
 	8,  // 0: strangelove_ventures.poa.v1.MsgUpdateParams.params:type_name -> strangelove_ventures.poa.v1.Params
-	9,  // 1: strangelove_ventures.poa.v1.MsgCreateValidator.description:type_name -> strangelove_ventures.poa.v1.Description
-	10, // 2: strangelove_ventures.poa.v1.MsgCreateValidator.commission:type_name -> strangelove_ventures.poa.v1.CommissionRates
-	11, // 3: strangelove_ventures.poa.v1.MsgCreateValidator.pubkey:type_name -> google.protobuf.Any
-	6,  // 4: strangelove_ventures.poa.v1.Msg.CreateValidator:input_type -> strangelove_ventures.poa.v1.MsgCreateValidator
+	9,  // 1: strangelove_ventures.poa.v1.MsgCreatePOAValidator.description:type_name -> strangelove_ventures.poa.v1.Description
+	10, // 2: strangelove_ventures.poa.v1.MsgCreatePOAValidator.commission:type_name -> strangelove_ventures.poa.v1.CommissionRates
+	11, // 3: strangelove_ventures.poa.v1.MsgCreatePOAValidator.pubkey:type_name -> google.protobuf.Any
+	6,  // 4: strangelove_ventures.poa.v1.Msg.CreateValidator:input_type -> strangelove_ventures.poa.v1.MsgCreatePOAValidator
 	0,  // 5: strangelove_ventures.poa.v1.Msg.SetPower:input_type -> strangelove_ventures.poa.v1.MsgSetPower
 	2,  // 6: strangelove_ventures.poa.v1.Msg.RemoveValidator:input_type -> strangelove_ventures.poa.v1.MsgRemoveValidator
 	4,  // 7: strangelove_ventures.poa.v1.Msg.UpdateParams:input_type -> strangelove_ventures.poa.v1.MsgUpdateParams
-	7,  // 8: strangelove_ventures.poa.v1.Msg.CreateValidator:output_type -> strangelove_ventures.poa.v1.MsgCreateValidatorResponse
+	7,  // 8: strangelove_ventures.poa.v1.Msg.CreateValidator:output_type -> strangelove_ventures.poa.v1.MsgCreatePOAValidatorResponse
 	1,  // 9: strangelove_ventures.poa.v1.Msg.SetPower:output_type -> strangelove_ventures.poa.v1.MsgSetPowerResponse
 	3,  // 10: strangelove_ventures.poa.v1.Msg.RemoveValidator:output_type -> strangelove_ventures.poa.v1.MsgRemoveValidatorResponse
 	5,  // 11: strangelove_ventures.poa.v1.Msg.UpdateParams:output_type -> strangelove_ventures.poa.v1.MsgUpdateParamsResponse
@@ -4371,7 +4372,7 @@ func file_strangelove_ventures_poa_v1_tx_proto_init() {
 			}
 		}
 		file_strangelove_ventures_poa_v1_tx_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*MsgCreateValidator); i {
+			switch v := v.(*MsgCreatePOAValidator); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -4383,7 +4384,7 @@ func file_strangelove_ventures_poa_v1_tx_proto_init() {
 			}
 		}
 		file_strangelove_ventures_poa_v1_tx_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*MsgCreateValidatorResponse); i {
+			switch v := v.(*MsgCreatePOAValidatorResponse); i {
 			case 0:
 				return &v.state
 			case 1:
