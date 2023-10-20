@@ -3,6 +3,9 @@ module github.com/strangelove-ventures/poa/simapp
 go 1.21
 
 replace (
+
+	// v50 fix
+	cosmossdk.io/core => cosmossdk.io/core v0.11.0
 	// use cosmos fork of keyring
 	github.com/99designs/keyring => github.com/cosmos/keyring v1.2.0
 	// Fix upstream GHSA-h395-qcrw-5vmq and GHSA-3vp4-m3rf-835h vulnerabilities.
