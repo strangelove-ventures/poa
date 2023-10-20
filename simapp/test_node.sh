@@ -51,6 +51,12 @@ BINARY config set client chain-id $CHAIN_ID
 from_scratch () {
   # Fresh install on current branch
   go install ./...
+  status=$?
+  if [ $status -ne 0 ]; then
+    echo "Failed to install binary"
+    exit $status
+  fi
+
 
   # remove existing daemon.
   rm -rf $HOME_DIR && echo "Removed $HOME_DIR"  

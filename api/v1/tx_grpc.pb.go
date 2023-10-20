@@ -30,7 +30,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type MsgClient interface {
 	// x/staking wrappers (future)
-	CreateValidator(ctx context.Context, in *MsgCreatePOAValidator, opts ...grpc.CallOption) (*MsgCreatePOAValidatorResponse, error)
+	CreateValidator(ctx context.Context, in *MsgCreateValidator, opts ...grpc.CallOption) (*MsgCreateValidatorResponse, error)
 	// SetPower sets the new power of a validator.
 	// This also doubles as a way to accept pending validators
 	SetPower(ctx context.Context, in *MsgSetPower, opts ...grpc.CallOption) (*MsgSetPowerResponse, error)
@@ -48,8 +48,8 @@ func NewMsgClient(cc grpc.ClientConnInterface) MsgClient {
 	return &msgClient{cc}
 }
 
-func (c *msgClient) CreateValidator(ctx context.Context, in *MsgCreatePOAValidator, opts ...grpc.CallOption) (*MsgCreatePOAValidatorResponse, error) {
-	out := new(MsgCreatePOAValidatorResponse)
+func (c *msgClient) CreateValidator(ctx context.Context, in *MsgCreateValidator, opts ...grpc.CallOption) (*MsgCreateValidatorResponse, error) {
+	out := new(MsgCreateValidatorResponse)
 	err := c.cc.Invoke(ctx, Msg_CreateValidator_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -89,7 +89,7 @@ func (c *msgClient) UpdateParams(ctx context.Context, in *MsgUpdateParams, opts 
 // for forward compatibility
 type MsgServer interface {
 	// x/staking wrappers (future)
-	CreateValidator(context.Context, *MsgCreatePOAValidator) (*MsgCreatePOAValidatorResponse, error)
+	CreateValidator(context.Context, *MsgCreateValidator) (*MsgCreateValidatorResponse, error)
 	// SetPower sets the new power of a validator.
 	// This also doubles as a way to accept pending validators
 	SetPower(context.Context, *MsgSetPower) (*MsgSetPowerResponse, error)
@@ -104,7 +104,7 @@ type MsgServer interface {
 type UnimplementedMsgServer struct {
 }
 
-func (UnimplementedMsgServer) CreateValidator(context.Context, *MsgCreatePOAValidator) (*MsgCreatePOAValidatorResponse, error) {
+func (UnimplementedMsgServer) CreateValidator(context.Context, *MsgCreateValidator) (*MsgCreateValidatorResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateValidator not implemented")
 }
 func (UnimplementedMsgServer) SetPower(context.Context, *MsgSetPower) (*MsgSetPowerResponse, error) {
@@ -130,7 +130,7 @@ func RegisterMsgServer(s grpc.ServiceRegistrar, srv MsgServer) {
 }
 
 func _Msg_CreateValidator_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgCreatePOAValidator)
+	in := new(MsgCreateValidator)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -142,7 +142,7 @@ func _Msg_CreateValidator_Handler(srv interface{}, ctx context.Context, dec func
 		FullMethod: Msg_CreateValidator_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).CreateValidator(ctx, req.(*MsgCreatePOAValidator))
+		return srv.(MsgServer).CreateValidator(ctx, req.(*MsgCreateValidator))
 	}
 	return interceptor(ctx, in, info, handler)
 }

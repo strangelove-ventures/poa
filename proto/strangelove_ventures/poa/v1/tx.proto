@@ -18,7 +18,7 @@ service Msg {
   option (cosmos.msg.v1.service) = true;  
 
   // x/staking wrappers (future)
-  rpc CreateValidator(MsgCreatePOAValidator) returns (MsgCreatePOAValidatorResponse);  
+  rpc CreateValidator(MsgCreateValidator) returns (MsgCreateValidatorResponse);  
   
   // SetPower sets the new power of a validator.
   // This also doubles as a way to accept pending validators
@@ -79,7 +79,7 @@ message MsgUpdateParamsResponse {}
 
 // cosmos-sdk/proto/staking/v1beta1/tx.proto
 // MsgCreateValidator defines a SDK message for creating a new validator.
-message MsgCreatePOAValidator {
+message MsgCreateValidator {
   option (cosmos.msg.v1.signer) = "validator_address";
   option (amino.name)           = "poa/MsgCreateValidator";
 
@@ -103,4 +103,4 @@ message MsgCreatePOAValidator {
 }
 
 // MsgCreateValidatorResponse
-message MsgCreatePOAValidatorResponse {}
+message MsgCreateValidatorResponse {}

@@ -3,7 +3,6 @@ package keeper
 import (
 	"context"
 
-	"cosmossdk.io/core/address"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
@@ -19,7 +18,7 @@ func DefaultPendingValidators() poa.PendingValidators {
 }
 
 // AddPendingValidator
-func (k Keeper) AddPendingValidator(ctx context.Context, ac address.Codec, newVal stakingtypes.Validator, pubKey cryptotypes.PubKey) error {
+func (k Keeper) AddPendingValidator(ctx context.Context, newVal stakingtypes.Validator, pubKey cryptotypes.PubKey) error {
 	store := k.storeService.OpenKVStore(ctx)
 
 	vals, err := k.GetPendingValidators(ctx)

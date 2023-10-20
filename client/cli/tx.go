@@ -172,7 +172,7 @@ where we can get the pubkey using "%s tendermint show-validator"
 
 	return cmd
 }
-func newBuildCreateValidatorMsg(clientCtx client.Context, txf tx.Factory, fs *flag.FlagSet, val validator, valAc address.Codec) (tx.Factory, *poa.MsgCreatePOAValidator, error) {
+func newBuildCreateValidatorMsg(clientCtx client.Context, txf tx.Factory, fs *flag.FlagSet, val validator, valAc address.Codec) (tx.Factory, *poa.MsgCreateValidator, error) {
 	valAddr := clientCtx.GetFromAddress()
 
 	description := poa.NewDescription(
@@ -193,7 +193,8 @@ func newBuildCreateValidatorMsg(clientCtx client.Context, txf tx.Factory, fs *fl
 	if err != nil {
 		return txf, nil, err
 	}
-	msg, err := poa.NewMsgCreatePOAValidator(
+	msg, err := poa.NewMsgCreateValidator(
+		// TODO: force set min delegation at the params level?
 		valStr, val.PubKey, description, commissionRates, val.MinSelfDelegation,
 	)
 	if err != nil {

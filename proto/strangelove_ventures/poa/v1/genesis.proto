@@ -14,7 +14,7 @@ message GenesisState {
   // params
   Params params = 1 [(gogoproto.nullable) = false];  
   // pending_validators
-  Validator pending_validators = 2 [(gogoproto.nullable) = false];
+  repeated Validator pending_validators = 2 [(gogoproto.nullable) = false];
 }
 
 

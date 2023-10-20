@@ -14,6 +14,57 @@ import (
 	sync "sync"
 )
 
+var _ protoreflect.List = (*_GenesisState_2_list)(nil)
+
+type _GenesisState_2_list struct {
+	list *[]*Validator
+}
+
+func (x *_GenesisState_2_list) Len() int {
+	if x.list == nil {
+		return 0
+	}
+	return len(*x.list)
+}
+
+func (x *_GenesisState_2_list) Get(i int) protoreflect.Value {
+	return protoreflect.ValueOfMessage((*x.list)[i].ProtoReflect())
+}
+
+func (x *_GenesisState_2_list) Set(i int, value protoreflect.Value) {
+	valueUnwrapped := value.Message()
+	concreteValue := valueUnwrapped.Interface().(*Validator)
+	(*x.list)[i] = concreteValue
+}
+
+func (x *_GenesisState_2_list) Append(value protoreflect.Value) {
+	valueUnwrapped := value.Message()
+	concreteValue := valueUnwrapped.Interface().(*Validator)
+	*x.list = append(*x.list, concreteValue)
+}
+
+func (x *_GenesisState_2_list) AppendMutable() protoreflect.Value {
+	v := new(Validator)
+	*x.list = append(*x.list, v)
+	return protoreflect.ValueOfMessage(v.ProtoReflect())
+}
+
+func (x *_GenesisState_2_list) Truncate(n int) {
+	for i := n; i < len(*x.list); i++ {
+		(*x.list)[i] = nil
+	}
+	*x.list = (*x.list)[:n]
+}
+
+func (x *_GenesisState_2_list) NewElement() protoreflect.Value {
+	v := new(Validator)
+	return protoreflect.ValueOfMessage(v.ProtoReflect())
+}
+
+func (x *_GenesisState_2_list) IsValid() bool {
+	return x.list != nil
+}
+
 var (
 	md_GenesisState                    protoreflect.MessageDescriptor
 	fd_GenesisState_params             protoreflect.FieldDescriptor
@@ -98,8 +149,8 @@ func (x *fastReflection_GenesisState) Range(f func(protoreflect.FieldDescriptor,
 			return
 		}
 	}
-	if x.PendingValidators != nil {
-		value := protoreflect.ValueOfMessage(x.PendingValidators.ProtoReflect())
+	if len(x.PendingValidators) != 0 {
+		value := protoreflect.ValueOfList(&_GenesisState_2_list{list: &x.PendingValidators})
 		if !f(fd_GenesisState_pending_validators, value) {
 			return
 		}
@@ -122,7 +173,7 @@ func (x *fastReflection_GenesisState) Has(fd protoreflect.FieldDescriptor) bool 
 	case "strangelove_ventures.poa.v1.GenesisState.params":
 		return x.Params != nil
 	case "strangelove_ventures.poa.v1.GenesisState.pending_validators":
-		return x.PendingValidators != nil
+		return len(x.PendingValidators) != 0
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.GenesisState"))
@@ -163,8 +214,11 @@ func (x *fastReflection_GenesisState) Get(descriptor protoreflect.FieldDescripto
 		value := x.Params
 		return protoreflect.ValueOfMessage(value.ProtoReflect())
 	case "strangelove_ventures.poa.v1.GenesisState.pending_validators":
-		value := x.PendingValidators
-		return protoreflect.ValueOfMessage(value.ProtoReflect())
+		if len(x.PendingValidators) == 0 {
+			return protoreflect.ValueOfList(&_GenesisState_2_list{})
+		}
+		listValue := &_GenesisState_2_list{list: &x.PendingValidators}
+		return protoreflect.ValueOfList(listValue)
 	default:
 		if descriptor.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.GenesisState"))
@@ -188,7 +242,9 @@ func (x *fastReflection_GenesisState) Set(fd protoreflect.FieldDescriptor, value
 	case "strangelove_ventures.poa.v1.GenesisState.params":
 		x.Params = value.Message().Interface().(*Params)
 	case "strangelove_ventures.poa.v1.GenesisState.pending_validators":
-		x.PendingValidators = value.Message().Interface().(*Validator)
+		lv := value.List()
+		clv := lv.(*_GenesisState_2_list)
+		x.PendingValidators = *clv.list
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.GenesisState"))
@@ -216,9 +272,10 @@ func (x *fastReflection_GenesisState) Mutable(fd protoreflect.FieldDescriptor) p
 		return protoreflect.ValueOfMessage(x.Params.ProtoReflect())
 	case "strangelove_ventures.poa.v1.GenesisState.pending_validators":
 		if x.PendingValidators == nil {
-			x.PendingValidators = new(Validator)
+			x.PendingValidators = []*Validator{}
 		}
-		return protoreflect.ValueOfMessage(x.PendingValidators.ProtoReflect())
+		value := &_GenesisState_2_list{list: &x.PendingValidators}
+		return protoreflect.ValueOfList(value)
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.GenesisState"))
@@ -236,8 +293,8 @@ func (x *fastReflection_GenesisState) NewField(fd protoreflect.FieldDescriptor) 
 		m := new(Params)
 		return protoreflect.ValueOfMessage(m.ProtoReflect())
 	case "strangelove_ventures.poa.v1.GenesisState.pending_validators":
-		m := new(Validator)
-		return protoreflect.ValueOfMessage(m.ProtoReflect())
+		list := []*Validator{}
+		return protoreflect.ValueOfList(&_GenesisState_2_list{list: &list})
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.GenesisState"))
@@ -311,9 +368,11 @@ func (x *fastReflection_GenesisState) ProtoMethods() *protoiface.Methods {
 			l = options.Size(x.Params)
 			n += 1 + l + runtime.Sov(uint64(l))
 		}
-		if x.PendingValidators != nil {
-			l = options.Size(x.PendingValidators)
-			n += 1 + l + runtime.Sov(uint64(l))
+		if len(x.PendingValidators) > 0 {
+			for _, e := range x.PendingValidators {
+				l = options.Size(e)
+				n += 1 + l + runtime.Sov(uint64(l))
+			}
 		}
 		if x.unknownFields != nil {
 			n += len(x.unknownFields)
@@ -344,19 +403,21 @@ func (x *fastReflection_GenesisState) ProtoMethods() *protoiface.Methods {
 			i -= len(x.unknownFields)
 			copy(dAtA[i:], x.unknownFields)
 		}
-		if x.PendingValidators != nil {
-			encoded, err := options.Marshal(x.PendingValidators)
-			if err != nil {
-				return protoiface.MarshalOutput{
-					NoUnkeyedLiterals: input.NoUnkeyedLiterals,
-					Buf:               input.Buf,
-				}, err
+		if len(x.PendingValidators) > 0 {
+			for iNdEx := len(x.PendingValidators) - 1; iNdEx >= 0; iNdEx-- {
+				encoded, err := options.Marshal(x.PendingValidators[iNdEx])
+				if err != nil {
+					return protoiface.MarshalOutput{
+						NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+						Buf:               input.Buf,
+					}, err
+				}
+				i -= len(encoded)
+				copy(dAtA[i:], encoded)
+				i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
+				i--
+				dAtA[i] = 0x12
 			}
-			i -= len(encoded)
-			copy(dAtA[i:], encoded)
-			i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
-			i--
-			dAtA[i] = 0x12
 		}
 		if x.Params != nil {
 			encoded, err := options.Marshal(x.Params)
@@ -486,10 +547,8 @@ func (x *fastReflection_GenesisState) ProtoMethods() *protoiface.Methods {
 				if postIndex > l {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
-				if x.PendingValidators == nil {
-					x.PendingValidators = &Validator{}
-				}
-				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.PendingValidators); err != nil {
+				x.PendingValidators = append(x.PendingValidators, &Validator{})
+				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.PendingValidators[len(x.PendingValidators)-1]); err != nil {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
 				}
 				iNdEx = postIndex
@@ -1044,7 +1103,7 @@ type GenesisState struct {
 	// params
 	Params *Params `protobuf:"bytes,1,opt,name=params,proto3" json:"params,omitempty"`
 	// pending_validators
-	PendingValidators *Validator `protobuf:"bytes,2,opt,name=pending_validators,json=pendingValidators,proto3" json:"pending_validators,omitempty"`
+	PendingValidators []*Validator `protobuf:"bytes,2,rep,name=pending_validators,json=pendingValidators,proto3" json:"pending_validators,omitempty"`
 }
 
 func (x *GenesisState) Reset() {
@@ -1074,7 +1133,7 @@ func (x *GenesisState) GetParams() *Params {
 	return nil
 }
 
-func (x *GenesisState) GetPendingValidators() *Validator {
+func (x *GenesisState) GetPendingValidators() []*Validator {
 	if x != nil {
 		return x.PendingValidators
 	}
@@ -1143,7 +1202,7 @@ var file_strangelove_ventures_poa_v1_genesis_proto_rawDesc = []byte{
 	0x5f, 0x76, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65, 0x73, 0x2e, 0x70, 0x6f, 0x61, 0x2e, 0x76, 0x31,
 	0x2e, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x42, 0x04, 0xc8, 0xde, 0x1f, 0x00, 0x52, 0x06, 0x70,
 	0x61, 0x72, 0x61, 0x6d, 0x73, 0x12, 0x5b, 0x0a, 0x12, 0x70, 0x65, 0x6e, 0x64, 0x69, 0x6e, 0x67,
-	0x5f, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x73, 0x18, 0x02, 0x20, 0x01, 0x28,
+	0x5f, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x73, 0x18, 0x02, 0x20, 0x03, 0x28,
 	0x0b, 0x32, 0x26, 0x2e, 0x73, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65, 0x5f,
 	0x76, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65, 0x73, 0x2e, 0x70, 0x6f, 0x61, 0x2e, 0x76, 0x31, 0x2e,
 	0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x42, 0x04, 0xc8, 0xde, 0x1f, 0x00, 0x52,

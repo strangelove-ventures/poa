@@ -76,6 +76,7 @@ func (ms msgServer) SetPower(ctx context.Context, msg *poa.MsgSetPower) (*poa.Ms
 	// TODO: does this cause any invariance issues?
 	val.DelegatorShares = delegation.Shares
 	val.Tokens = math.NewIntFromUint64(msg.Power)
+	val.Status = stakingtypes.Bonded
 
 	if err := ms.k.stakingKeeper.SetDelegation(ctx, delegation); err != nil {
 		return nil, err
@@ -117,7 +118,7 @@ func (ms msgServer) RemoveValidator(ctx context.Context, msg *poa.MsgRemoveValid
 }
 
 // CreateValidator implements poa.MsgServer.
-func (ms msgServer) CreateValidator(ctx context.Context, msg *poa.MsgCreatePOAValidator) (*poa.MsgCreatePOAValidatorResponse, error) {
+func (ms msgServer) CreateValidator(ctx context.Context, msg *poa.MsgCreateValidator) (*poa.MsgCreateValidatorResponse, error) {
 	valAddr, err := ms.k.validatorAddressCodec.StringToBytes(msg.ValidatorAddress)
 	if err != nil {
 		return nil, sdkerrors.ErrInvalidAddress.Wrapf("invalid validator address: %s", err)
@@ -143,7 +144,7 @@ func (ms msgServer) CreateValidator(ctx context.Context, msg *poa.MsgCreatePOAVa
 
 	pk, ok := msg.Pubkey.GetCachedValue().(cryptotypes.PubKey)
 	if !ok {
-		return nil, errorsmod.Wrapf(sdkerrors.ErrInvalidType, "AHH Expecting cryptotypes.PubKey, got %T", pk)
+		return nil, errorsmod.Wrapf(sdkerrors.ErrInvalidType, "CreateValidator expecting cryptotypes.PubKey, got %T. developer note: make sure to impl codectypes.UnpackInterfacesMessage", pk)
 	}
 
 	if _, err := ms.k.stakingKeeper.GetValidatorByConsAddr(ctx, sdk.GetConsAddress(pk)); err == nil {
@@ -198,11 +199,11 @@ func (ms msgServer) CreateValidator(ctx context.Context, msg *poa.MsgCreatePOAVa
 
 	// the validator is now pending approval to be let into the set.
 	// Until then, they are not apart of the set.
-	if err := ms.k.AddPendingValidator(ctx, ms.k.validatorAddressCodec, validator, pk); err != nil {
+	if err := ms.k.AddPendingValidator(ctx, validator, pk); err != nil {
 		return nil, err
 	}
 
-	return &poa.MsgCreatePOAValidatorResponse{}, nil
+	return &poa.MsgCreateValidatorResponse{}, nil
 }
 
 // takes in a validator address & sees if they are pending approval.
@@ -217,7 +218,7 @@ func (ms msgServer) acceptNewValidator(ctx context.Context, operatingAddress str
 	}
 
 	// ideally we just save the type
-	val := poa.ConvertStakingValidatorToPOA(poaVal)
+	val := poa.ConvertPOAToStaking(poaVal)
 
 	valAddr, err := ms.k.validatorAddressCodec.StringToBytes(val.OperatorAddress) // this is the same as the ValidatorAddress yes?
 	if err != nil {

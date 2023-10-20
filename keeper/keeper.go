@@ -6,7 +6,6 @@ import (
 	addresscodec "cosmossdk.io/core/address"
 	storetypes "cosmossdk.io/core/store"
 	"github.com/cosmos/cosmos-sdk/codec"
-	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	"github.com/strangelove-ventures/poa"
 )
@@ -17,7 +16,6 @@ type Keeper struct {
 	validatorAddressCodec addresscodec.Codec
 
 	stakingKeeper *stakingkeeper.Keeper
-	bankKeeper    bankkeeper.Keeper // todo: temp
 }
 
 // NewKeeper creates a new Keeper instance
@@ -25,7 +23,6 @@ func NewKeeper(
 	cdc codec.BinaryCodec,
 	storeService storetypes.KVStoreService,
 	sk *stakingkeeper.Keeper,
-	bankKeeper bankkeeper.Keeper,
 	validatorAddressCodec addresscodec.Codec,
 ) Keeper {
 	k := Keeper{
@@ -33,7 +30,6 @@ func NewKeeper(
 		storeService:          storeService,
 		stakingKeeper:         sk,
 		validatorAddressCodec: validatorAddressCodec,
-		bankKeeper:            bankKeeper,
 	}
 
 	return k

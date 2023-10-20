@@ -12,12 +12,12 @@ import (
 )
 
 var (
-	_ codectypes.UnpackInterfacesMessage = (*MsgCreatePOAValidator)(nil)
+	_ codectypes.UnpackInterfacesMessage = (*MsgCreateValidator)(nil)
 	_ codectypes.UnpackInterfacesMessage = (*Validator)(nil)
 )
 
 // Validate validates the MsgCreateValidator sdk msg.
-func (msg MsgCreatePOAValidator) Validate(ac address.Codec) error {
+func (msg MsgCreateValidator) Validate(ac address.Codec) error {
 	// note that unmarshaling from bech32 ensures both non-empty and valid
 	_, err := ac.StringToBytes(msg.ValidatorAddress)
 	if err != nil {
@@ -125,11 +125,11 @@ func NewCommissionRates(rate, maxRate, maxChangeRate math.LegacyDec) CommissionR
 	}
 }
 
-// NewMsgCreatePOAValidator creates a new MsgCreatePOAValidator instance.
+// NewMsgCreateValidator creates a new MsgCreateValidator instance.
 // Delegator address and validator address are the same.
-func NewMsgCreatePOAValidator(
+func NewMsgCreateValidator(
 	valAddr string, pubKey cryptotypes.PubKey, description Description, commission CommissionRates, minSelfDelegation math.Int,
-) (*MsgCreatePOAValidator, error) {
+) (*MsgCreateValidator, error) {
 	var pkAny *codectypes.Any
 	if pubKey != nil {
 		var err error
@@ -137,7 +137,7 @@ func NewMsgCreatePOAValidator(
 			return nil, err
 		}
 	}
-	return &MsgCreatePOAValidator{
+	return &MsgCreateValidator{
 		Description:       description,
 		ValidatorAddress:  valAddr,
 		Pubkey:            pkAny,
@@ -147,7 +147,7 @@ func NewMsgCreatePOAValidator(
 }
 
 // UnpackInterfaces implements UnpackInterfacesMessage.UnpackInterfaces
-func (msg MsgCreatePOAValidator) UnpackInterfaces(unpacker codectypes.AnyUnpacker) error {
+func (msg MsgCreateValidator) UnpackInterfaces(unpacker codectypes.AnyUnpacker) error {
 	var pubKey cryptotypes.PubKey
 	return unpacker.UnpackAny(msg.Pubkey, &pubKey)
 }
@@ -159,7 +159,7 @@ func (v Validator) UnpackInterfaces(unpacker codectypes.AnyUnpacker) error {
 }
 
 // TODO: ideally we should remove this need?
-func ConvertStakingValidatorToPOA(poa Validator) types.Validator {
+func ConvertPOAToStaking(poa Validator) types.Validator {
 	return types.Validator{
 		OperatorAddress: poa.OperatorAddress,
 		ConsensusPubkey: poa.ConsensusPubkey,
@@ -187,7 +187,7 @@ func ConvertStakingValidatorToPOA(poa Validator) types.Validator {
 	}
 }
 
-func ConvertPOAToStakingValidator(val types.Validator) *Validator {
+func ConvertStakingToPOA(val types.Validator) *Validator {
 	return &Validator{
 		OperatorAddress: val.OperatorAddress,
 		ConsensusPubkey: val.ConsensusPubkey,
