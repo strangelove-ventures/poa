@@ -55,55 +55,43 @@ func (ms msgServer) SetPower(ctx context.Context, msg *poa.MsgSetPower) (*poa.Ms
 		return nil, fmt.Errorf("GetValidator failed: %w", err)
 	}
 
+	// clean delegations up
 	delegations, err := ms.k.stakingKeeper.GetValidatorDelegations(ctx, valAddr)
 	if err != nil {
 		return nil, err
 	}
-
-	// TODO: do this in the acceptNewValidator function? or always do this here in case of any issues.
-	if len(delegations) == 0 {
-		vAddr, err := ms.k.validatorAddressCodec.StringToBytes(val.GetOperator())
-		if err != nil {
-			return nil, sdkerrors.ErrInvalidAddress.Wrapf("invalid validator address: %s", err)
-		}
-
-		del := stakingtypes.Delegation{
-			DelegatorAddress: sdk.AccAddress(vAddr).String(),
-			ValidatorAddress: val.OperatorAddress,
-			Shares:           math.LegacyNewDec(int64(msg.Power)),
-		}
-
-		err = ms.k.stakingKeeper.SetDelegation(ctx, del)
-		if err != nil {
+	for _, del := range delegations {
+		if err := ms.k.stakingKeeper.RemoveDelegation(ctx, del); err != nil {
 			return nil, err
 		}
-
-	} else if len(delegations) != 1 {
-		return nil, fmt.Errorf("delegations should only be len of 1: got %d", len(delegations))
 	}
 
-	// updated delegations
-	delegations, err = ms.k.stakingKeeper.GetValidatorDelegations(ctx, valAddr)
-	if err != nil {
-		return nil, err
+	delegation := stakingtypes.Delegation{
+		DelegatorAddress: sdk.AccAddress(valAddr.Bytes()).String(),
+		ValidatorAddress: val.OperatorAddress,
+		Shares:           math.LegacyNewDec(int64(msg.Power)),
 	}
-
-	// TODO; or just always hardcode it here so we can reduce from acceptNewValidator function?
-	del := delegations[0]
-	decAmt := math.LegacyNewDecFromInt(math.NewIntFromUint64(msg.Power))
 
 	// TODO: Do not allow setting lower than 1_000_000 ?
 	// TODO: does this cause any invariance issues?
-	del.Shares = decAmt
-	val.DelegatorShares = decAmt
+	val.DelegatorShares = delegation.Shares
 	val.Tokens = math.NewIntFromUint64(msg.Power)
 
-	if err := ms.k.stakingKeeper.SetDelegation(ctx, del); err != nil {
+	if err := ms.k.stakingKeeper.SetDelegation(ctx, delegation); err != nil {
 		return nil, err
 	}
 
 	if err := ms.k.stakingKeeper.SetValidator(ctx, val); err != nil {
 		return nil, err
+	}
+
+	delegations, err = ms.k.stakingKeeper.GetValidatorDelegations(ctx, valAddr)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(delegations) != 1 {
+		return nil, fmt.Errorf("delegation error, expected 1, got %d", len(delegations))
 	}
 
 	return &poa.MsgSetPowerResponse{}, nil
