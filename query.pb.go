@@ -6,6 +6,7 @@ package poa
 import (
 	context "context"
 	fmt "fmt"
+	_ "github.com/cosmos/gogoproto/gogoproto"
 	grpc1 "github.com/cosmos/gogoproto/grpc"
 	proto "github.com/cosmos/gogoproto/proto"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
@@ -28,22 +29,22 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-type QueryRemoveMeRequest struct {
-	CandidateAddress string `protobuf:"bytes,1,opt,name=candidate_address,json=candidateAddress,proto3" json:"candidate_address,omitempty"`
+// QueryParamsRequest is the request type for the Query/Params RPC method.
+type QueryParamsRequest struct {
 }
 
-func (m *QueryRemoveMeRequest) Reset()         { *m = QueryRemoveMeRequest{} }
-func (m *QueryRemoveMeRequest) String() string { return proto.CompactTextString(m) }
-func (*QueryRemoveMeRequest) ProtoMessage()    {}
-func (*QueryRemoveMeRequest) Descriptor() ([]byte, []int) {
+func (m *QueryParamsRequest) Reset()         { *m = QueryParamsRequest{} }
+func (m *QueryParamsRequest) String() string { return proto.CompactTextString(m) }
+func (*QueryParamsRequest) ProtoMessage()    {}
+func (*QueryParamsRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_676fcce3868e4c52, []int{0}
 }
-func (m *QueryRemoveMeRequest) XXX_Unmarshal(b []byte) error {
+func (m *QueryParamsRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryRemoveMeRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryParamsRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryRemoveMeRequest.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryParamsRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -53,41 +54,36 @@ func (m *QueryRemoveMeRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte
 		return b[:n], nil
 	}
 }
-func (m *QueryRemoveMeRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryRemoveMeRequest.Merge(m, src)
+func (m *QueryParamsRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryParamsRequest.Merge(m, src)
 }
-func (m *QueryRemoveMeRequest) XXX_Size() int {
+func (m *QueryParamsRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryRemoveMeRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryRemoveMeRequest.DiscardUnknown(m)
+func (m *QueryParamsRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryParamsRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryRemoveMeRequest proto.InternalMessageInfo
+var xxx_messageInfo_QueryParamsRequest proto.InternalMessageInfo
 
-func (m *QueryRemoveMeRequest) GetCandidateAddress() string {
-	if m != nil {
-		return m.CandidateAddress
-	}
-	return ""
+// QueryParamsResponse is the response type for the Query/Params RPC method.
+type QueryParamsResponse struct {
+	// params is the returned parameter from the module
+	Params Params `protobuf:"bytes,1,opt,name=params,proto3" json:"params"`
 }
 
-type QueryRemoveMeResponse struct {
-	RemoveMe string `protobuf:"bytes,1,opt,name=remove_me,json=removeMe,proto3" json:"remove_me,omitempty"`
-}
-
-func (m *QueryRemoveMeResponse) Reset()         { *m = QueryRemoveMeResponse{} }
-func (m *QueryRemoveMeResponse) String() string { return proto.CompactTextString(m) }
-func (*QueryRemoveMeResponse) ProtoMessage()    {}
-func (*QueryRemoveMeResponse) Descriptor() ([]byte, []int) {
+func (m *QueryParamsResponse) Reset()         { *m = QueryParamsResponse{} }
+func (m *QueryParamsResponse) String() string { return proto.CompactTextString(m) }
+func (*QueryParamsResponse) ProtoMessage()    {}
+func (*QueryParamsResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_676fcce3868e4c52, []int{1}
 }
-func (m *QueryRemoveMeResponse) XXX_Unmarshal(b []byte) error {
+func (m *QueryParamsResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryRemoveMeResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryParamsResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryRemoveMeResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryParamsResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -97,28 +93,28 @@ func (m *QueryRemoveMeResponse) XXX_Marshal(b []byte, deterministic bool) ([]byt
 		return b[:n], nil
 	}
 }
-func (m *QueryRemoveMeResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryRemoveMeResponse.Merge(m, src)
+func (m *QueryParamsResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryParamsResponse.Merge(m, src)
 }
-func (m *QueryRemoveMeResponse) XXX_Size() int {
+func (m *QueryParamsResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryRemoveMeResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryRemoveMeResponse.DiscardUnknown(m)
+func (m *QueryParamsResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryParamsResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryRemoveMeResponse proto.InternalMessageInfo
+var xxx_messageInfo_QueryParamsResponse proto.InternalMessageInfo
 
-func (m *QueryRemoveMeResponse) GetRemoveMe() string {
+func (m *QueryParamsResponse) GetParams() Params {
 	if m != nil {
-		return m.RemoveMe
+		return m.Params
 	}
-	return ""
+	return Params{}
 }
 
 func init() {
-	proto.RegisterType((*QueryRemoveMeRequest)(nil), "strangelove_ventures.poa.v1.QueryRemoveMeRequest")
-	proto.RegisterType((*QueryRemoveMeResponse)(nil), "strangelove_ventures.poa.v1.QueryRemoveMeResponse")
+	proto.RegisterType((*QueryParamsRequest)(nil), "strangelove_ventures.poa.v1.QueryParamsRequest")
+	proto.RegisterType((*QueryParamsResponse)(nil), "strangelove_ventures.poa.v1.QueryParamsResponse")
 }
 
 func init() {
@@ -126,25 +122,25 @@ func init() {
 }
 
 var fileDescriptor_676fcce3868e4c52 = []byte{
-	// 283 bytes of a gzipped FileDescriptorProto
+	// 276 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x52, 0x2f, 0x2e, 0x29, 0x4a,
 	0xcc, 0x4b, 0x4f, 0xcd, 0xc9, 0x2f, 0x4b, 0x8d, 0x2f, 0x4b, 0xcd, 0x2b, 0x29, 0x2d, 0x4a, 0x2d,
 	0xd6, 0x2f, 0xc8, 0x4f, 0xd4, 0x2f, 0x33, 0xd4, 0x2f, 0x2c, 0x4d, 0x2d, 0xaa, 0xd4, 0x2b, 0x28,
 	0xca, 0x2f, 0xc9, 0x17, 0x92, 0xc6, 0xa6, 0x50, 0xaf, 0x20, 0x3f, 0x51, 0xaf, 0xcc, 0x50, 0x4a,
-	0x26, 0x3d, 0x3f, 0x3f, 0x3d, 0x27, 0x55, 0x3f, 0xb1, 0x20, 0x53, 0x3f, 0x31, 0x2f, 0x2f, 0xbf,
-	0x24, 0xb1, 0x24, 0x33, 0x3f, 0xaf, 0x18, 0xa2, 0x55, 0xc9, 0x99, 0x4b, 0x24, 0x10, 0x64, 0x52,
-	0x50, 0x6a, 0x6e, 0x7e, 0x59, 0xaa, 0x6f, 0x6a, 0x50, 0x6a, 0x61, 0x69, 0x6a, 0x71, 0x89, 0x90,
-	0x36, 0x97, 0x60, 0x72, 0x62, 0x5e, 0x4a, 0x66, 0x4a, 0x62, 0x49, 0x6a, 0x7c, 0x62, 0x4a, 0x4a,
-	0x51, 0x6a, 0x71, 0xb1, 0x04, 0xa3, 0x02, 0xa3, 0x06, 0x67, 0x90, 0x00, 0x5c, 0xc2, 0x11, 0x22,
-	0xae, 0x64, 0xc2, 0x25, 0x8a, 0x66, 0x48, 0x71, 0x41, 0x7e, 0x5e, 0x71, 0xaa, 0x90, 0x34, 0x17,
-	0x67, 0x11, 0x58, 0x2c, 0x3e, 0x37, 0x15, 0xaa, 0x9b, 0xa3, 0x08, 0xaa, 0xc8, 0x68, 0x06, 0x23,
-	0x17, 0x2b, 0x58, 0x9b, 0x50, 0x1f, 0x23, 0x17, 0x2f, 0x8a, 0x01, 0x42, 0x86, 0x7a, 0x78, 0xbc,
-	0xa4, 0x87, 0xcd, 0xc5, 0x52, 0x46, 0xa4, 0x68, 0x81, 0xb8, 0x4f, 0x49, 0xac, 0xe9, 0xf2, 0x93,
-	0xc9, 0x4c, 0x02, 0x42, 0x7c, 0xe0, 0x50, 0x85, 0x3b, 0xd5, 0xc9, 0xf6, 0xc4, 0x23, 0x39, 0xc6,
-	0x0b, 0x8f, 0xe4, 0x18, 0x1f, 0x3c, 0x92, 0x63, 0x9c, 0xf0, 0x58, 0x8e, 0xe1, 0xc2, 0x63, 0x39,
-	0x86, 0x1b, 0x8f, 0xe5, 0x18, 0xa2, 0x94, 0xd3, 0x33, 0x4b, 0x32, 0x4a, 0x93, 0xf4, 0x92, 0xf3,
-	0x73, 0xf5, 0x91, 0xec, 0xd3, 0x45, 0x8e, 0x9e, 0x24, 0x36, 0x70, 0xd8, 0x1a, 0x03, 0x02, 0x00,
-	0x00, 0xff, 0xff, 0xa8, 0x1b, 0x06, 0xb4, 0xc1, 0x01, 0x00, 0x00,
+	0x24, 0x3d, 0x3f, 0x3d, 0x1f, 0xac, 0x4e, 0x1f, 0xc4, 0x82, 0x68, 0x91, 0x92, 0x49, 0xcf, 0xcf,
+	0x4f, 0xcf, 0x49, 0xd5, 0x4f, 0x2c, 0xc8, 0xd4, 0x4f, 0xcc, 0xcb, 0xcb, 0x2f, 0x49, 0x2c, 0xc9,
+	0xcc, 0xcf, 0x2b, 0x86, 0xca, 0x6a, 0xe0, 0xb3, 0xb9, 0x20, 0xb1, 0x28, 0x31, 0x17, 0xaa, 0x52,
+	0x49, 0x84, 0x4b, 0x28, 0x10, 0xe4, 0x92, 0x00, 0xb0, 0x60, 0x50, 0x6a, 0x61, 0x69, 0x6a, 0x71,
+	0x89, 0x52, 0x04, 0x97, 0x30, 0x8a, 0x68, 0x71, 0x41, 0x7e, 0x5e, 0x71, 0xaa, 0x90, 0x23, 0x17,
+	0x1b, 0x44, 0xb3, 0x04, 0xa3, 0x02, 0xa3, 0x06, 0xb7, 0x91, 0xb2, 0x1e, 0x1e, 0x87, 0xeb, 0x41,
+	0x34, 0x3b, 0xb1, 0x9c, 0xb8, 0x27, 0xcf, 0x10, 0x04, 0xd5, 0x68, 0xd4, 0xcb, 0xc8, 0xc5, 0x0a,
+	0x36, 0x5a, 0xa8, 0x99, 0x91, 0x8b, 0x0d, 0xa2, 0x44, 0x48, 0x1f, 0xaf, 0x39, 0x98, 0xee, 0x93,
+	0x32, 0x20, 0x5e, 0x03, 0xc4, 0xe9, 0x4a, 0x62, 0x4d, 0x97, 0x9f, 0x4c, 0x66, 0x12, 0x10, 0xe2,
+	0x43, 0x0d, 0x05, 0x27, 0xdb, 0x13, 0x8f, 0xe4, 0x18, 0x2f, 0x3c, 0x92, 0x63, 0x7c, 0xf0, 0x48,
+	0x8e, 0x71, 0xc2, 0x63, 0x39, 0x86, 0x0b, 0x8f, 0xe5, 0x18, 0x6e, 0x3c, 0x96, 0x63, 0x88, 0x52,
+	0x4e, 0xcf, 0x2c, 0xc9, 0x28, 0x4d, 0xd2, 0x4b, 0xce, 0xcf, 0xd5, 0x47, 0xb2, 0x4d, 0x17, 0x39,
+	0x38, 0x93, 0xd8, 0xc0, 0xa1, 0x68, 0x0c, 0x08, 0x00, 0x00, 0xff, 0xff, 0xef, 0x87, 0x99, 0x46,
+	0xeb, 0x01, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -159,8 +155,8 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type QueryClient interface {
-	// random query just to make the SDK happy
-	QueryRemoveMe(ctx context.Context, in *QueryRemoveMeRequest, opts ...grpc.CallOption) (*QueryRemoveMeResponse, error)
+	// Params returns the current params of the module.
+	Params(ctx context.Context, in *QueryParamsRequest, opts ...grpc.CallOption) (*QueryParamsResponse, error)
 }
 
 type queryClient struct {
@@ -171,9 +167,9 @@ func NewQueryClient(cc grpc1.ClientConn) QueryClient {
 	return &queryClient{cc}
 }
 
-func (c *queryClient) QueryRemoveMe(ctx context.Context, in *QueryRemoveMeRequest, opts ...grpc.CallOption) (*QueryRemoveMeResponse, error) {
-	out := new(QueryRemoveMeResponse)
-	err := c.cc.Invoke(ctx, "/strangelove_ventures.poa.v1.Query/QueryRemoveMe", in, out, opts...)
+func (c *queryClient) Params(ctx context.Context, in *QueryParamsRequest, opts ...grpc.CallOption) (*QueryParamsResponse, error) {
+	out := new(QueryParamsResponse)
+	err := c.cc.Invoke(ctx, "/strangelove_ventures.poa.v1.Query/Params", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -182,36 +178,36 @@ func (c *queryClient) QueryRemoveMe(ctx context.Context, in *QueryRemoveMeReques
 
 // QueryServer is the server API for Query service.
 type QueryServer interface {
-	// random query just to make the SDK happy
-	QueryRemoveMe(context.Context, *QueryRemoveMeRequest) (*QueryRemoveMeResponse, error)
+	// Params returns the current params of the module.
+	Params(context.Context, *QueryParamsRequest) (*QueryParamsResponse, error)
 }
 
 // UnimplementedQueryServer can be embedded to have forward compatible implementations.
 type UnimplementedQueryServer struct {
 }
 
-func (*UnimplementedQueryServer) QueryRemoveMe(ctx context.Context, req *QueryRemoveMeRequest) (*QueryRemoveMeResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method QueryRemoveMe not implemented")
+func (*UnimplementedQueryServer) Params(ctx context.Context, req *QueryParamsRequest) (*QueryParamsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Params not implemented")
 }
 
 func RegisterQueryServer(s grpc1.Server, srv QueryServer) {
 	s.RegisterService(&_Query_serviceDesc, srv)
 }
 
-func _Query_QueryRemoveMe_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryRemoveMeRequest)
+func _Query_Params_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryParamsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(QueryServer).QueryRemoveMe(ctx, in)
+		return srv.(QueryServer).Params(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/strangelove_ventures.poa.v1.Query/QueryRemoveMe",
+		FullMethod: "/strangelove_ventures.poa.v1.Query/Params",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).QueryRemoveMe(ctx, req.(*QueryRemoveMeRequest))
+		return srv.(QueryServer).Params(ctx, req.(*QueryParamsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -221,15 +217,15 @@ var _Query_serviceDesc = grpc.ServiceDesc{
 	HandlerType: (*QueryServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "QueryRemoveMe",
-			Handler:    _Query_QueryRemoveMe_Handler,
+			MethodName: "Params",
+			Handler:    _Query_Params_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "strangelove_ventures/poa/v1/query.proto",
 }
 
-func (m *QueryRemoveMeRequest) Marshal() (dAtA []byte, err error) {
+func (m *QueryParamsRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -239,27 +235,20 @@ func (m *QueryRemoveMeRequest) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *QueryRemoveMeRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryParamsRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryRemoveMeRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryParamsRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.CandidateAddress) > 0 {
-		i -= len(m.CandidateAddress)
-		copy(dAtA[i:], m.CandidateAddress)
-		i = encodeVarintQuery(dAtA, i, uint64(len(m.CandidateAddress)))
-		i--
-		dAtA[i] = 0xa
-	}
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryRemoveMeResponse) Marshal() (dAtA []byte, err error) {
+func (m *QueryParamsResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -269,23 +258,26 @@ func (m *QueryRemoveMeResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *QueryRemoveMeResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryParamsResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryRemoveMeResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryParamsResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.RemoveMe) > 0 {
-		i -= len(m.RemoveMe)
-		copy(dAtA[i:], m.RemoveMe)
-		i = encodeVarintQuery(dAtA, i, uint64(len(m.RemoveMe)))
-		i--
-		dAtA[i] = 0xa
+	{
+		size, err := m.Params.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintQuery(dAtA, i, uint64(size))
 	}
+	i--
+	dAtA[i] = 0xa
 	return len(dAtA) - i, nil
 }
 
@@ -300,29 +292,23 @@ func encodeVarintQuery(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
-func (m *QueryRemoveMeRequest) Size() (n int) {
+func (m *QueryParamsRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	l = len(m.CandidateAddress)
-	if l > 0 {
-		n += 1 + l + sovQuery(uint64(l))
-	}
 	return n
 }
 
-func (m *QueryRemoveMeResponse) Size() (n int) {
+func (m *QueryParamsResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	l = len(m.RemoveMe)
-	if l > 0 {
-		n += 1 + l + sovQuery(uint64(l))
-	}
+	l = m.Params.Size()
+	n += 1 + l + sovQuery(uint64(l))
 	return n
 }
 
@@ -332,7 +318,7 @@ func sovQuery(x uint64) (n int) {
 func sozQuery(x uint64) (n int) {
 	return sovQuery(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
-func (m *QueryRemoveMeRequest) Unmarshal(dAtA []byte) error {
+func (m *QueryParamsRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -355,44 +341,12 @@ func (m *QueryRemoveMeRequest) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryRemoveMeRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryParamsRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryRemoveMeRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryParamsRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field CandidateAddress", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowQuery
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthQuery
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.CandidateAddress = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipQuery(dAtA[iNdEx:])
@@ -414,7 +368,7 @@ func (m *QueryRemoveMeRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *QueryRemoveMeResponse) Unmarshal(dAtA []byte) error {
+func (m *QueryParamsResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -437,17 +391,17 @@ func (m *QueryRemoveMeResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryRemoveMeResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryParamsResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryRemoveMeResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryParamsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field RemoveMe", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Params", wireType)
 			}
-			var stringLen uint64
+			var msglen int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowQuery
@@ -457,23 +411,24 @@ func (m *QueryRemoveMeResponse) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
+			if msglen < 0 {
 				return ErrInvalidLengthQuery
 			}
-			postIndex := iNdEx + intStringLen
+			postIndex := iNdEx + msglen
 			if postIndex < 0 {
 				return ErrInvalidLengthQuery
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.RemoveMe = string(dAtA[iNdEx:postIndex])
+			if err := m.Params.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex

@@ -17,7 +17,11 @@ type queryServer struct {
 	k Keeper
 }
 
-// QueryRemoveMe implements poa.QueryServer.
-func (queryServer) QueryRemoveMe(context.Context, *poa.QueryRemoveMeRequest) (*poa.QueryRemoveMeResponse, error) {
-	panic("unimplemented")
+func (qs queryServer) Params(ctx context.Context, msg *poa.QueryParamsRequest) (*poa.QueryParamsResponse, error) {
+	params, err := qs.k.GetParams(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return &poa.QueryParamsResponse{Params: params}, nil
 }

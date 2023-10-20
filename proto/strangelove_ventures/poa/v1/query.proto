@@ -1,21 +1,25 @@
 syntax = "proto3";
 package strangelove_ventures.poa.v1;
 
+import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
+import "strangelove_ventures/poa/v1/params.proto";
 
 option go_package = "github.com/strangelove-ventures/poa";
 
+// Query defines the gRPC querier service.
 service Query {
-  // random query just to make the SDK happy
-  rpc QueryRemoveMe(QueryRemoveMeRequest) returns (QueryRemoveMeResponse) {
-    option (google.api.http).get = "/poa/remove_me";
+  // Params returns the current params of the module.
+  rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
+    option (google.api.http).get = "/poa/v1/params";
   }
 }
 
-message QueryRemoveMeRequest {
-  string candidate_address = 1;
-}
+// QueryParamsRequest is the request type for the Query/Params RPC method.
+message QueryParamsRequest {}
 
-message QueryRemoveMeResponse {
-  string remove_me = 1;
+// QueryParamsResponse is the response type for the Query/Params RPC method.
+message QueryParamsResponse {
+  // params is the returned parameter from the module
+  Params params = 1 [ (gogoproto.nullable) = false ];
 }

@@ -19,10 +19,13 @@ service Msg {
   // x/staking wrappers (future)
   // rpc CreateValidator(MsgCreateValidator) returns (MsgCreateValidatorResponse);  
   
-  // x/poa specific setters
+  // SetPower sets the new power of a validator.
   rpc SetPower(MsgSetPower) returns (MsgSetPowerResponse);
+
+  // RemoveValidator removes a validator from the active set and unbonds their delegations.
   rpc RemoveValidator(MsgRemoveValidator) returns (MsgRemoveValidatorResponse);
 
+  // UpdateParams updates the module parameters.
   rpc UpdateParams(MsgUpdateParams) returns (MsgUpdateParamsResponse);
 }
 
