@@ -316,7 +316,6 @@ func NewSimApp(
 		appCodec,
 		runtime.NewKVStoreService(keys[poatypes.StoreKey]),
 		app.StakingKeeper,
-		// app.BankKeeper,
 	)
 	poaAppModule := poamodule.NewAppModule(appCodec, app.POAModule)
 
