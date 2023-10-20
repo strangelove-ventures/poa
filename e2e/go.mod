@@ -11,13 +11,14 @@ replace (
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 
 	github.com/strangelove-ventures/poa => ../.
-	github.com/vedhavyas/go-subkey => github.com/strangelove-ventures/go-subkey v1.0.7	
+	github.com/vedhavyas/go-subkey => github.com/strangelove-ventures/go-subkey v1.0.7
 )
 
 require (
 	github.com/cosmos/cosmos-sdk v0.50.0-rc.1
 	github.com/strangelove-ventures/interchaintest/v8 v8.0.0-20231018160911-cbabe40c85b1
 	github.com/strangelove-ventures/poa v0.0.0-00010101000000-000000000000
+	github.com/stretchr/testify v1.8.4
 )
 
 require (
@@ -205,7 +206,6 @@ require (
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/spf13/viper v1.16.0 // indirect
-	github.com/stretchr/testify v1.8.4 // indirect
 	github.com/subosito/gotenv v1.4.2 // indirect
 	github.com/syndtr/goleveldb v1.0.1-0.20220721030215-126854af5e6d // indirect
 	github.com/tendermint/go-amino v0.16.0 // indirect

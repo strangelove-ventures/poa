@@ -1,9 +1,8 @@
 package poaante
 
 import (
-	"fmt"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/strangelove-ventures/poa"
 
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 )
@@ -29,7 +28,7 @@ func (msfd MsgStakingFilterDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, sim
 	}
 
 	if invalid {
-		return ctx, fmt.Errorf("staking actions are now allowed on this authority chain")
+		return ctx, poa.ErrStakingActionNotAllowed
 	}
 
 	return next(ctx, tx, simulate)

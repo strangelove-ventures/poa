@@ -1,35 +1,26 @@
 package e2e
 
 import (
+	"context"
 	"fmt"
 	"testing"
 
-	moduletestutil "github.com/cosmos/cosmos-sdk/types/module/testutil"
 	"github.com/strangelove-ventures/interchaintest/v8"
 	"github.com/strangelove-ventures/interchaintest/v8/chain/cosmos"
-	"github.com/strangelove-ventures/interchaintest/v8/ibc"
-	"github.com/strangelove-ventures/interchaintest/v8/testutil"
+	"github.com/strangelove-ventures/poa"
 	"github.com/strangelove-ventures/poa/e2e/helpers"
 	"github.com/stretchr/testify/require"
-
-	poa "github.com/strangelove-ventures/poa"
 )
 
 // TODO: test 50/50 split, set one node too 0. Ensure network halt
 // add in safe guards for this ^^
 
-func poaEncoding() *moduletestutil.TestEncodingConfig {
-	cfg := cosmos.DefaultEncoding()
-	poa.RegisterInterfaces(cfg.InterfaceRegistry)
-	return &cfg
-}
-
 const (
 	// cosmos1hj5fveer5cjtn4wd6wstzugjfdxzl0xpxvjjvr (test_node.sh)
-	acc_mnemonic = "decorate bright ozone fork gallery riot bus exhaust worth way bone indoor calm squirrel merry zero scheme cotton until shop any excess stage laundry"
-	userFunds    = 10_000_000_000
-	numVals      = 2
-	numNodes     = 0
+	accMnemonic = "decorate bright ozone fork gallery riot bus exhaust worth way bone indoor calm squirrel merry zero scheme cotton until shop any excess stage laundry"
+	userFunds   = 10_000_000_000
+	numVals     = 2
+	numNodes    = 0
 )
 
 func TestPOA(t *testing.T) {
@@ -39,51 +30,22 @@ func TestPOA(t *testing.T) {
 
 	t.Parallel()
 
-	cfg := ibc.ChainConfig{
-		Images: []ibc.DockerImage{
-			{
-				Repository: "poa",
-				Version:    "local",
-				UidGid:     "1025:1025",
-			},
-		},
-		ModifyGenesis: cosmos.ModifyGenesis([]cosmos.GenesisKV{
-			{
-				Key: "app_state.poa.params.admins",
-				Value: []string{
-					"cosmos10d07y265gmmuvt4z0w9aw880jnsr700j6zn9kn", // gov
-					"cosmos1hj5fveer5cjtn4wd6wstzugjfdxzl0xpxvjjvr", // testing account
-				},
-			},
-		}),
-		// TODO: modify gentxs / genesis account amounts?
-		EncodingConfig: poaEncoding(),
-		Type:           "cosmos",
-		Name:           "poa",
-		ChainID:        "poa-1",
-		Bin:            "poad",
-		Bech32Prefix:   "cosmos",
-		Denom:          "stake", // maybe poa?
-		CoinType:       "118",
-		GasPrices:      "0stake,0utest",
-		TrustingPeriod: "330h",
-	}
-
-	chains := interchaintest.CreateChainWithConfig(t, numVals, numNodes, "poa", "", cfg)
+	chains := interchaintest.CreateChainWithConfig(t, numVals, numNodes, "poa", "", POACfg)
 	chain := chains[0].(*cosmos.CosmosChain)
 
 	enableBlockDB := false
 	ctx, _, _, _ := interchaintest.BuildInitialChain(t, chains, enableBlockDB)
 
-	acc0, err := interchaintest.GetAndFundTestUserWithMnemonic(ctx, "acc0", acc_mnemonic, userFunds, chain)
+	acc0, err := interchaintest.GetAndFundTestUserWithMnemonic(ctx, "acc0", accMnemonic, userFunds, chain)
 	if err != nil {
 		t.Fatal(err)
 	}
 
+	// Validate all validators are signing blocks
+	requiredSignatures(t, ctx, chain, numVals)
+
 	users := interchaintest.GetAndFundTestUsers(t, ctx, t.Name(), userFunds, chain)
 	incorrectUser := users[0]
-
-	// TODO: validate all staking commands are disabled.
 
 	validators := []string{}
 	for _, v := range helpers.GetValidators(t, ctx, chain).Validators {
@@ -93,6 +55,10 @@ func TestPOA(t *testing.T) {
 	t.Log(validators)
 	require.Equal(t, len(validators), numVals)
 
+	// === Staking Commands Disabled (ante) ===
+	txRes := helpers.StakeTokens(t, ctx, chain, acc0, validators[0], "1stake")
+	require.Contains(t, txRes.RawLog, poa.ErrStakingActionNotAllowed.Error())
+
 	// === Setting Power Test ===
 	powerOne := int64(9_000_000_000_000)
 	powerTwo := int64(2500)
@@ -100,7 +66,6 @@ func TestPOA(t *testing.T) {
 	helpers.POASetPower(t, ctx, chain, acc0, validators[0], powerOne)
 	helpers.POASetPower(t, ctx, chain, acc0, validators[1], powerTwo)
 	helpers.POASetPower(t, ctx, chain, incorrectUser, validators[1], 11111111) // err.
-	testutil.WaitForBlocks(ctx, 2, chain)
 
 	vals := helpers.GetValidators(t, ctx, chain).Validators
 	require.Equal(t, vals[0].Tokens, fmt.Sprintf("%d", powerOne))
@@ -108,7 +73,6 @@ func TestPOA(t *testing.T) {
 
 	// === Remove Validator Test ===
 	helpers.POARemove(t, ctx, chain, acc0, validators[1])
-	testutil.WaitForBlocks(ctx, 2, chain)
 
 	vals = helpers.GetValidators(t, ctx, chain).Validators
 	require.Equal(t, vals[0].Tokens, fmt.Sprintf("%d", powerOne))
@@ -117,4 +81,15 @@ func TestPOA(t *testing.T) {
 	for _, v := range vals {
 		t.Log(v.OperatorAddress, v.Tokens)
 	}
+
+	// Validate only 1 validator is signing blocks
+	requiredSignatures(t, ctx, chain, 1)
+}
+
+// requiredSignatures asserts that the current block has the exact number of signatures as expected
+func requiredSignatures(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, expectedSigs int) {
+	height, err := chain.GetNode().Height(ctx)
+	require.NoError(t, err)
+	block := helpers.GetBlockData(t, ctx, chain, height)
+	require.Equal(t, len(block.LastCommit.Signatures), expectedSigs)
 }

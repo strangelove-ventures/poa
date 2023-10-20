@@ -12,9 +12,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// move this upstream
 func StakeTokens(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, user ibc.Wallet, valoper, coinAmt string) TxResponse {
-	// amount is #utoken
 	cmd := []string{chain.Config().Bin, "tx", "staking", "delegate", valoper, coinAmt,
 		"--node", chain.GetRPCAddress(),
 		"--home", chain.HomeDir(),
