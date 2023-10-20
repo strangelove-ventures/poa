@@ -5,11 +5,12 @@ import (
 	fmt "fmt"
 	_ "github.com/cosmos/cosmos-proto"
 	runtime "github.com/cosmos/cosmos-proto/runtime"
+	_ "github.com/cosmos/cosmos-sdk/types/tx/amino"
 	_ "github.com/cosmos/gogoproto/gogoproto"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoiface "google.golang.org/protobuf/runtime/protoiface"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	anypb "google.golang.org/protobuf/types/known/anypb"
+	_ "google.golang.org/protobuf/types/known/anypb"
 	_ "google.golang.org/protobuf/types/known/timestamppb"
 	io "io"
 	reflect "reflect"
@@ -693,37 +694,29 @@ func (x *fastReflection_Description) ProtoMethods() *protoiface.Methods {
 }
 
 var (
-	md_Validator             protoreflect.MessageDescriptor
-	fd_Validator_description protoreflect.FieldDescriptor
-	fd_Validator_address     protoreflect.FieldDescriptor
-	fd_Validator_pubkey      protoreflect.FieldDescriptor
-	fd_Validator_in_set      protoreflect.FieldDescriptor
-	fd_Validator_is_accepted protoreflect.FieldDescriptor
-	fd_Validator_jailed      protoreflect.FieldDescriptor
-	fd_Validator_jail_count  protoreflect.FieldDescriptor
+	md_CommissionRates                 protoreflect.MessageDescriptor
+	fd_CommissionRates_rate            protoreflect.FieldDescriptor
+	fd_CommissionRates_max_rate        protoreflect.FieldDescriptor
+	fd_CommissionRates_max_change_rate protoreflect.FieldDescriptor
 )
 
 func init() {
 	file_strangelove_ventures_poa_v1_validator_proto_init()
-	md_Validator = File_strangelove_ventures_poa_v1_validator_proto.Messages().ByName("Validator")
-	fd_Validator_description = md_Validator.Fields().ByName("description")
-	fd_Validator_address = md_Validator.Fields().ByName("address")
-	fd_Validator_pubkey = md_Validator.Fields().ByName("pubkey")
-	fd_Validator_in_set = md_Validator.Fields().ByName("in_set")
-	fd_Validator_is_accepted = md_Validator.Fields().ByName("is_accepted")
-	fd_Validator_jailed = md_Validator.Fields().ByName("jailed")
-	fd_Validator_jail_count = md_Validator.Fields().ByName("jail_count")
+	md_CommissionRates = File_strangelove_ventures_poa_v1_validator_proto.Messages().ByName("CommissionRates")
+	fd_CommissionRates_rate = md_CommissionRates.Fields().ByName("rate")
+	fd_CommissionRates_max_rate = md_CommissionRates.Fields().ByName("max_rate")
+	fd_CommissionRates_max_change_rate = md_CommissionRates.Fields().ByName("max_change_rate")
 }
 
-var _ protoreflect.Message = (*fastReflection_Validator)(nil)
+var _ protoreflect.Message = (*fastReflection_CommissionRates)(nil)
 
-type fastReflection_Validator Validator
+type fastReflection_CommissionRates CommissionRates
 
-func (x *Validator) ProtoReflect() protoreflect.Message {
-	return (*fastReflection_Validator)(x)
+func (x *CommissionRates) ProtoReflect() protoreflect.Message {
+	return (*fastReflection_CommissionRates)(x)
 }
 
-func (x *Validator) slowProtoReflect() protoreflect.Message {
+func (x *CommissionRates) slowProtoReflect() protoreflect.Message {
 	mi := &file_strangelove_ventures_poa_v1_validator_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -735,43 +728,43 @@ func (x *Validator) slowProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-var _fastReflection_Validator_messageType fastReflection_Validator_messageType
-var _ protoreflect.MessageType = fastReflection_Validator_messageType{}
+var _fastReflection_CommissionRates_messageType fastReflection_CommissionRates_messageType
+var _ protoreflect.MessageType = fastReflection_CommissionRates_messageType{}
 
-type fastReflection_Validator_messageType struct{}
+type fastReflection_CommissionRates_messageType struct{}
 
-func (x fastReflection_Validator_messageType) Zero() protoreflect.Message {
-	return (*fastReflection_Validator)(nil)
+func (x fastReflection_CommissionRates_messageType) Zero() protoreflect.Message {
+	return (*fastReflection_CommissionRates)(nil)
 }
-func (x fastReflection_Validator_messageType) New() protoreflect.Message {
-	return new(fastReflection_Validator)
+func (x fastReflection_CommissionRates_messageType) New() protoreflect.Message {
+	return new(fastReflection_CommissionRates)
 }
-func (x fastReflection_Validator_messageType) Descriptor() protoreflect.MessageDescriptor {
-	return md_Validator
+func (x fastReflection_CommissionRates_messageType) Descriptor() protoreflect.MessageDescriptor {
+	return md_CommissionRates
 }
 
 // Descriptor returns message descriptor, which contains only the protobuf
 // type information for the message.
-func (x *fastReflection_Validator) Descriptor() protoreflect.MessageDescriptor {
-	return md_Validator
+func (x *fastReflection_CommissionRates) Descriptor() protoreflect.MessageDescriptor {
+	return md_CommissionRates
 }
 
 // Type returns the message type, which encapsulates both Go and protobuf
 // type information. If the Go type information is not needed,
 // it is recommended that the message descriptor be used instead.
-func (x *fastReflection_Validator) Type() protoreflect.MessageType {
-	return _fastReflection_Validator_messageType
+func (x *fastReflection_CommissionRates) Type() protoreflect.MessageType {
+	return _fastReflection_CommissionRates_messageType
 }
 
 // New returns a newly allocated and mutable empty message.
-func (x *fastReflection_Validator) New() protoreflect.Message {
-	return new(fastReflection_Validator)
+func (x *fastReflection_CommissionRates) New() protoreflect.Message {
+	return new(fastReflection_CommissionRates)
 }
 
 // Interface unwraps the message reflection interface and
 // returns the underlying ProtoMessage interface.
-func (x *fastReflection_Validator) Interface() protoreflect.ProtoMessage {
-	return (*Validator)(x)
+func (x *fastReflection_CommissionRates) Interface() protoreflect.ProtoMessage {
+	return (*CommissionRates)(x)
 }
 
 // Range iterates over every populated field in an undefined order,
@@ -779,46 +772,22 @@ func (x *fastReflection_Validator) Interface() protoreflect.ProtoMessage {
 // Range returns immediately if f returns false.
 // While iterating, mutating operations may only be performed
 // on the current field descriptor.
-func (x *fastReflection_Validator) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
-	if x.Description != nil {
-		value := protoreflect.ValueOfMessage(x.Description.ProtoReflect())
-		if !f(fd_Validator_description, value) {
+func (x *fastReflection_CommissionRates) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+	if x.Rate != "" {
+		value := protoreflect.ValueOfString(x.Rate)
+		if !f(fd_CommissionRates_rate, value) {
 			return
 		}
 	}
-	if len(x.Address) != 0 {
-		value := protoreflect.ValueOfBytes(x.Address)
-		if !f(fd_Validator_address, value) {
+	if x.MaxRate != "" {
+		value := protoreflect.ValueOfString(x.MaxRate)
+		if !f(fd_CommissionRates_max_rate, value) {
 			return
 		}
 	}
-	if x.Pubkey != nil {
-		value := protoreflect.ValueOfMessage(x.Pubkey.ProtoReflect())
-		if !f(fd_Validator_pubkey, value) {
-			return
-		}
-	}
-	if x.InSet != false {
-		value := protoreflect.ValueOfBool(x.InSet)
-		if !f(fd_Validator_in_set, value) {
-			return
-		}
-	}
-	if x.IsAccepted != false {
-		value := protoreflect.ValueOfBool(x.IsAccepted)
-		if !f(fd_Validator_is_accepted, value) {
-			return
-		}
-	}
-	if x.Jailed != false {
-		value := protoreflect.ValueOfBool(x.Jailed)
-		if !f(fd_Validator_jailed, value) {
-			return
-		}
-	}
-	if x.JailCount != uint64(0) {
-		value := protoreflect.ValueOfUint64(x.JailCount)
-		if !f(fd_Validator_jail_count, value) {
+	if x.MaxChangeRate != "" {
+		value := protoreflect.ValueOfString(x.MaxChangeRate)
+		if !f(fd_CommissionRates_max_change_rate, value) {
 			return
 		}
 	}
@@ -835,27 +804,19 @@ func (x *fastReflection_Validator) Range(f func(protoreflect.FieldDescriptor, pr
 // In other cases (aside from the nullable cases above),
 // a proto3 scalar field is populated if it contains a non-zero value, and
 // a repeated field is populated if it is non-empty.
-func (x *fastReflection_Validator) Has(fd protoreflect.FieldDescriptor) bool {
+func (x *fastReflection_CommissionRates) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
-	case "strangelove_ventures.poa.v1.Validator.description":
-		return x.Description != nil
-	case "strangelove_ventures.poa.v1.Validator.address":
-		return len(x.Address) != 0
-	case "strangelove_ventures.poa.v1.Validator.pubkey":
-		return x.Pubkey != nil
-	case "strangelove_ventures.poa.v1.Validator.in_set":
-		return x.InSet != false
-	case "strangelove_ventures.poa.v1.Validator.is_accepted":
-		return x.IsAccepted != false
-	case "strangelove_ventures.poa.v1.Validator.jailed":
-		return x.Jailed != false
-	case "strangelove_ventures.poa.v1.Validator.jail_count":
-		return x.JailCount != uint64(0)
+	case "strangelove_ventures.poa.v1.CommissionRates.rate":
+		return x.Rate != ""
+	case "strangelove_ventures.poa.v1.CommissionRates.max_rate":
+		return x.MaxRate != ""
+	case "strangelove_ventures.poa.v1.CommissionRates.max_change_rate":
+		return x.MaxChangeRate != ""
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.Validator"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.CommissionRates"))
 		}
-		panic(fmt.Errorf("message strangelove_ventures.poa.v1.Validator does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message strangelove_ventures.poa.v1.CommissionRates does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -865,27 +826,19 @@ func (x *fastReflection_Validator) Has(fd protoreflect.FieldDescriptor) bool {
 // associated with the given field number.
 //
 // Clear is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_Validator) Clear(fd protoreflect.FieldDescriptor) {
+func (x *fastReflection_CommissionRates) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
-	case "strangelove_ventures.poa.v1.Validator.description":
-		x.Description = nil
-	case "strangelove_ventures.poa.v1.Validator.address":
-		x.Address = nil
-	case "strangelove_ventures.poa.v1.Validator.pubkey":
-		x.Pubkey = nil
-	case "strangelove_ventures.poa.v1.Validator.in_set":
-		x.InSet = false
-	case "strangelove_ventures.poa.v1.Validator.is_accepted":
-		x.IsAccepted = false
-	case "strangelove_ventures.poa.v1.Validator.jailed":
-		x.Jailed = false
-	case "strangelove_ventures.poa.v1.Validator.jail_count":
-		x.JailCount = uint64(0)
+	case "strangelove_ventures.poa.v1.CommissionRates.rate":
+		x.Rate = ""
+	case "strangelove_ventures.poa.v1.CommissionRates.max_rate":
+		x.MaxRate = ""
+	case "strangelove_ventures.poa.v1.CommissionRates.max_change_rate":
+		x.MaxChangeRate = ""
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.Validator"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.CommissionRates"))
 		}
-		panic(fmt.Errorf("message strangelove_ventures.poa.v1.Validator does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message strangelove_ventures.poa.v1.CommissionRates does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -895,34 +848,22 @@ func (x *fastReflection_Validator) Clear(fd protoreflect.FieldDescriptor) {
 // the default value of a bytes scalar is guaranteed to be a copy.
 // For unpopulated composite types, it returns an empty, read-only view
 // of the value; to obtain a mutable reference, use Mutable.
-func (x *fastReflection_Validator) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_CommissionRates) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
-	case "strangelove_ventures.poa.v1.Validator.description":
-		value := x.Description
-		return protoreflect.ValueOfMessage(value.ProtoReflect())
-	case "strangelove_ventures.poa.v1.Validator.address":
-		value := x.Address
-		return protoreflect.ValueOfBytes(value)
-	case "strangelove_ventures.poa.v1.Validator.pubkey":
-		value := x.Pubkey
-		return protoreflect.ValueOfMessage(value.ProtoReflect())
-	case "strangelove_ventures.poa.v1.Validator.in_set":
-		value := x.InSet
-		return protoreflect.ValueOfBool(value)
-	case "strangelove_ventures.poa.v1.Validator.is_accepted":
-		value := x.IsAccepted
-		return protoreflect.ValueOfBool(value)
-	case "strangelove_ventures.poa.v1.Validator.jailed":
-		value := x.Jailed
-		return protoreflect.ValueOfBool(value)
-	case "strangelove_ventures.poa.v1.Validator.jail_count":
-		value := x.JailCount
-		return protoreflect.ValueOfUint64(value)
+	case "strangelove_ventures.poa.v1.CommissionRates.rate":
+		value := x.Rate
+		return protoreflect.ValueOfString(value)
+	case "strangelove_ventures.poa.v1.CommissionRates.max_rate":
+		value := x.MaxRate
+		return protoreflect.ValueOfString(value)
+	case "strangelove_ventures.poa.v1.CommissionRates.max_change_rate":
+		value := x.MaxChangeRate
+		return protoreflect.ValueOfString(value)
 	default:
 		if descriptor.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.Validator"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.CommissionRates"))
 		}
-		panic(fmt.Errorf("message strangelove_ventures.poa.v1.Validator does not contain field %s", descriptor.FullName()))
+		panic(fmt.Errorf("message strangelove_ventures.poa.v1.CommissionRates does not contain field %s", descriptor.FullName()))
 	}
 }
 
@@ -936,27 +877,19 @@ func (x *fastReflection_Validator) Get(descriptor protoreflect.FieldDescriptor) 
 // empty, read-only value, then it panics.
 //
 // Set is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_Validator) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
+func (x *fastReflection_CommissionRates) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
-	case "strangelove_ventures.poa.v1.Validator.description":
-		x.Description = value.Message().Interface().(*Description)
-	case "strangelove_ventures.poa.v1.Validator.address":
-		x.Address = value.Bytes()
-	case "strangelove_ventures.poa.v1.Validator.pubkey":
-		x.Pubkey = value.Message().Interface().(*anypb.Any)
-	case "strangelove_ventures.poa.v1.Validator.in_set":
-		x.InSet = value.Bool()
-	case "strangelove_ventures.poa.v1.Validator.is_accepted":
-		x.IsAccepted = value.Bool()
-	case "strangelove_ventures.poa.v1.Validator.jailed":
-		x.Jailed = value.Bool()
-	case "strangelove_ventures.poa.v1.Validator.jail_count":
-		x.JailCount = value.Uint()
+	case "strangelove_ventures.poa.v1.CommissionRates.rate":
+		x.Rate = value.Interface().(string)
+	case "strangelove_ventures.poa.v1.CommissionRates.max_rate":
+		x.MaxRate = value.Interface().(string)
+	case "strangelove_ventures.poa.v1.CommissionRates.max_change_rate":
+		x.MaxChangeRate = value.Interface().(string)
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.Validator"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.CommissionRates"))
 		}
-		panic(fmt.Errorf("message strangelove_ventures.poa.v1.Validator does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message strangelove_ventures.poa.v1.CommissionRates does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -970,72 +903,48 @@ func (x *fastReflection_Validator) Set(fd protoreflect.FieldDescriptor, value pr
 // It panics if the field does not contain a composite type.
 //
 // Mutable is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_Validator) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_CommissionRates) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "strangelove_ventures.poa.v1.Validator.description":
-		if x.Description == nil {
-			x.Description = new(Description)
-		}
-		return protoreflect.ValueOfMessage(x.Description.ProtoReflect())
-	case "strangelove_ventures.poa.v1.Validator.pubkey":
-		if x.Pubkey == nil {
-			x.Pubkey = new(anypb.Any)
-		}
-		return protoreflect.ValueOfMessage(x.Pubkey.ProtoReflect())
-	case "strangelove_ventures.poa.v1.Validator.address":
-		panic(fmt.Errorf("field address of message strangelove_ventures.poa.v1.Validator is not mutable"))
-	case "strangelove_ventures.poa.v1.Validator.in_set":
-		panic(fmt.Errorf("field in_set of message strangelove_ventures.poa.v1.Validator is not mutable"))
-	case "strangelove_ventures.poa.v1.Validator.is_accepted":
-		panic(fmt.Errorf("field is_accepted of message strangelove_ventures.poa.v1.Validator is not mutable"))
-	case "strangelove_ventures.poa.v1.Validator.jailed":
-		panic(fmt.Errorf("field jailed of message strangelove_ventures.poa.v1.Validator is not mutable"))
-	case "strangelove_ventures.poa.v1.Validator.jail_count":
-		panic(fmt.Errorf("field jail_count of message strangelove_ventures.poa.v1.Validator is not mutable"))
+	case "strangelove_ventures.poa.v1.CommissionRates.rate":
+		panic(fmt.Errorf("field rate of message strangelove_ventures.poa.v1.CommissionRates is not mutable"))
+	case "strangelove_ventures.poa.v1.CommissionRates.max_rate":
+		panic(fmt.Errorf("field max_rate of message strangelove_ventures.poa.v1.CommissionRates is not mutable"))
+	case "strangelove_ventures.poa.v1.CommissionRates.max_change_rate":
+		panic(fmt.Errorf("field max_change_rate of message strangelove_ventures.poa.v1.CommissionRates is not mutable"))
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.Validator"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.CommissionRates"))
 		}
-		panic(fmt.Errorf("message strangelove_ventures.poa.v1.Validator does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message strangelove_ventures.poa.v1.CommissionRates does not contain field %s", fd.FullName()))
 	}
 }
 
 // NewField returns a new value that is assignable to the field
 // for the given descriptor. For scalars, this returns the default value.
 // For lists, maps, and messages, this returns a new, empty, mutable value.
-func (x *fastReflection_Validator) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_CommissionRates) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "strangelove_ventures.poa.v1.Validator.description":
-		m := new(Description)
-		return protoreflect.ValueOfMessage(m.ProtoReflect())
-	case "strangelove_ventures.poa.v1.Validator.address":
-		return protoreflect.ValueOfBytes(nil)
-	case "strangelove_ventures.poa.v1.Validator.pubkey":
-		m := new(anypb.Any)
-		return protoreflect.ValueOfMessage(m.ProtoReflect())
-	case "strangelove_ventures.poa.v1.Validator.in_set":
-		return protoreflect.ValueOfBool(false)
-	case "strangelove_ventures.poa.v1.Validator.is_accepted":
-		return protoreflect.ValueOfBool(false)
-	case "strangelove_ventures.poa.v1.Validator.jailed":
-		return protoreflect.ValueOfBool(false)
-	case "strangelove_ventures.poa.v1.Validator.jail_count":
-		return protoreflect.ValueOfUint64(uint64(0))
+	case "strangelove_ventures.poa.v1.CommissionRates.rate":
+		return protoreflect.ValueOfString("")
+	case "strangelove_ventures.poa.v1.CommissionRates.max_rate":
+		return protoreflect.ValueOfString("")
+	case "strangelove_ventures.poa.v1.CommissionRates.max_change_rate":
+		return protoreflect.ValueOfString("")
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.Validator"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.CommissionRates"))
 		}
-		panic(fmt.Errorf("message strangelove_ventures.poa.v1.Validator does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message strangelove_ventures.poa.v1.CommissionRates does not contain field %s", fd.FullName()))
 	}
 }
 
 // WhichOneof reports which field within the oneof is populated,
 // returning nil if none are populated.
 // It panics if the oneof descriptor does not belong to this message.
-func (x *fastReflection_Validator) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+func (x *fastReflection_CommissionRates) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
 	switch d.FullName() {
 	default:
-		panic(fmt.Errorf("%s is not a oneof field in strangelove_ventures.poa.v1.Validator", d.FullName()))
+		panic(fmt.Errorf("%s is not a oneof field in strangelove_ventures.poa.v1.CommissionRates", d.FullName()))
 	}
 	panic("unreachable")
 }
@@ -1043,7 +952,7 @@ func (x *fastReflection_Validator) WhichOneof(d protoreflect.OneofDescriptor) pr
 // GetUnknown retrieves the entire list of unknown fields.
 // The caller may only mutate the contents of the RawFields
 // if the mutated bytes are stored back into the message with SetUnknown.
-func (x *fastReflection_Validator) GetUnknown() protoreflect.RawFields {
+func (x *fastReflection_CommissionRates) GetUnknown() protoreflect.RawFields {
 	return x.unknownFields
 }
 
@@ -1054,7 +963,7 @@ func (x *fastReflection_Validator) GetUnknown() protoreflect.RawFields {
 // An empty RawFields may be passed to clear the fields.
 //
 // SetUnknown is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_Validator) SetUnknown(fields protoreflect.RawFields) {
+func (x *fastReflection_CommissionRates) SetUnknown(fields protoreflect.RawFields) {
 	x.unknownFields = fields
 }
 
@@ -1066,7 +975,7 @@ func (x *fastReflection_Validator) SetUnknown(fields protoreflect.RawFields) {
 // message type, but the details are implementation dependent.
 // Validity is not part of the protobuf data model, and may not
 // be preserved in marshaling or other operations.
-func (x *fastReflection_Validator) IsValid() bool {
+func (x *fastReflection_CommissionRates) IsValid() bool {
 	return x != nil
 }
 
@@ -1076,9 +985,9 @@ func (x *fastReflection_Validator) IsValid() bool {
 // The returned methods type is identical to
 // "google.golang.org/protobuf/runtime/protoiface".Methods.
 // Consult the protoiface package documentation for details.
-func (x *fastReflection_Validator) ProtoMethods() *protoiface.Methods {
+func (x *fastReflection_CommissionRates) ProtoMethods() *protoiface.Methods {
 	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
-		x := input.Message.Interface().(*Validator)
+		x := input.Message.Interface().(*CommissionRates)
 		if x == nil {
 			return protoiface.SizeOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -1090,29 +999,17 @@ func (x *fastReflection_Validator) ProtoMethods() *protoiface.Methods {
 		var n int
 		var l int
 		_ = l
-		if x.Description != nil {
-			l = options.Size(x.Description)
-			n += 1 + l + runtime.Sov(uint64(l))
-		}
-		l = len(x.Address)
+		l = len(x.Rate)
 		if l > 0 {
 			n += 1 + l + runtime.Sov(uint64(l))
 		}
-		if x.Pubkey != nil {
-			l = options.Size(x.Pubkey)
+		l = len(x.MaxRate)
+		if l > 0 {
 			n += 1 + l + runtime.Sov(uint64(l))
 		}
-		if x.InSet {
-			n += 2
-		}
-		if x.IsAccepted {
-			n += 2
-		}
-		if x.Jailed {
-			n += 2
-		}
-		if x.JailCount != 0 {
-			n += 1 + runtime.Sov(uint64(x.JailCount))
+		l = len(x.MaxChangeRate)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
 		}
 		if x.unknownFields != nil {
 			n += len(x.unknownFields)
@@ -1124,7 +1021,7 @@ func (x *fastReflection_Validator) ProtoMethods() *protoiface.Methods {
 	}
 
 	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
-		x := input.Message.Interface().(*Validator)
+		x := input.Message.Interface().(*CommissionRates)
 		if x == nil {
 			return protoiface.MarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -1143,73 +1040,24 @@ func (x *fastReflection_Validator) ProtoMethods() *protoiface.Methods {
 			i -= len(x.unknownFields)
 			copy(dAtA[i:], x.unknownFields)
 		}
-		if x.JailCount != 0 {
-			i = runtime.EncodeVarint(dAtA, i, uint64(x.JailCount))
-			i--
-			dAtA[i] = 0x38
-		}
-		if x.Jailed {
-			i--
-			if x.Jailed {
-				dAtA[i] = 1
-			} else {
-				dAtA[i] = 0
-			}
-			i--
-			dAtA[i] = 0x30
-		}
-		if x.IsAccepted {
-			i--
-			if x.IsAccepted {
-				dAtA[i] = 1
-			} else {
-				dAtA[i] = 0
-			}
-			i--
-			dAtA[i] = 0x28
-		}
-		if x.InSet {
-			i--
-			if x.InSet {
-				dAtA[i] = 1
-			} else {
-				dAtA[i] = 0
-			}
-			i--
-			dAtA[i] = 0x20
-		}
-		if x.Pubkey != nil {
-			encoded, err := options.Marshal(x.Pubkey)
-			if err != nil {
-				return protoiface.MarshalOutput{
-					NoUnkeyedLiterals: input.NoUnkeyedLiterals,
-					Buf:               input.Buf,
-				}, err
-			}
-			i -= len(encoded)
-			copy(dAtA[i:], encoded)
-			i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
+		if len(x.MaxChangeRate) > 0 {
+			i -= len(x.MaxChangeRate)
+			copy(dAtA[i:], x.MaxChangeRate)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.MaxChangeRate)))
 			i--
 			dAtA[i] = 0x1a
 		}
-		if len(x.Address) > 0 {
-			i -= len(x.Address)
-			copy(dAtA[i:], x.Address)
-			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Address)))
+		if len(x.MaxRate) > 0 {
+			i -= len(x.MaxRate)
+			copy(dAtA[i:], x.MaxRate)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.MaxRate)))
 			i--
 			dAtA[i] = 0x12
 		}
-		if x.Description != nil {
-			encoded, err := options.Marshal(x.Description)
-			if err != nil {
-				return protoiface.MarshalOutput{
-					NoUnkeyedLiterals: input.NoUnkeyedLiterals,
-					Buf:               input.Buf,
-				}, err
-			}
-			i -= len(encoded)
-			copy(dAtA[i:], encoded)
-			i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
+		if len(x.Rate) > 0 {
+			i -= len(x.Rate)
+			copy(dAtA[i:], x.Rate)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Rate)))
 			i--
 			dAtA[i] = 0xa
 		}
@@ -1224,7 +1072,7 @@ func (x *fastReflection_Validator) ProtoMethods() *protoiface.Methods {
 		}, nil
 	}
 	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
-		x := input.Message.Interface().(*Validator)
+		x := input.Message.Interface().(*CommissionRates)
 		if x == nil {
 			return protoiface.UnmarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -1256,17 +1104,17 @@ func (x *fastReflection_Validator) ProtoMethods() *protoiface.Methods {
 			fieldNum := int32(wire >> 3)
 			wireType := int(wire & 0x7)
 			if wireType == 4 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: Validator: wiretype end group for non-group")
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: CommissionRates: wiretype end group for non-group")
 			}
 			if fieldNum <= 0 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: Validator: illegal tag %d (wire type %d)", fieldNum, wire)
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: CommissionRates: illegal tag %d (wire type %d)", fieldNum, wire)
 			}
 			switch fieldNum {
 			case 1:
 				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Description", wireType)
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Rate", wireType)
 				}
-				var msglen int
+				var stringLen uint64
 				for shift := uint(0); ; shift += 7 {
 					if shift >= 64 {
 						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
@@ -1276,33 +1124,29 @@ func (x *fastReflection_Validator) ProtoMethods() *protoiface.Methods {
 					}
 					b := dAtA[iNdEx]
 					iNdEx++
-					msglen |= int(b&0x7F) << shift
+					stringLen |= uint64(b&0x7F) << shift
 					if b < 0x80 {
 						break
 					}
 				}
-				if msglen < 0 {
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
 				}
-				postIndex := iNdEx + msglen
+				postIndex := iNdEx + intStringLen
 				if postIndex < 0 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
 				}
 				if postIndex > l {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
-				if x.Description == nil {
-					x.Description = &Description{}
-				}
-				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.Description); err != nil {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
-				}
+				x.Rate = string(dAtA[iNdEx:postIndex])
 				iNdEx = postIndex
 			case 2:
 				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Address", wireType)
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field MaxRate", wireType)
 				}
-				var byteLen int
+				var stringLen uint64
 				for shift := uint(0); ; shift += 7 {
 					if shift >= 64 {
 						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
@@ -1312,31 +1156,29 @@ func (x *fastReflection_Validator) ProtoMethods() *protoiface.Methods {
 					}
 					b := dAtA[iNdEx]
 					iNdEx++
-					byteLen |= int(b&0x7F) << shift
+					stringLen |= uint64(b&0x7F) << shift
 					if b < 0x80 {
 						break
 					}
 				}
-				if byteLen < 0 {
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
 				}
-				postIndex := iNdEx + byteLen
+				postIndex := iNdEx + intStringLen
 				if postIndex < 0 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
 				}
 				if postIndex > l {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
-				x.Address = append(x.Address[:0], dAtA[iNdEx:postIndex]...)
-				if x.Address == nil {
-					x.Address = []byte{}
-				}
+				x.MaxRate = string(dAtA[iNdEx:postIndex])
 				iNdEx = postIndex
 			case 3:
 				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Pubkey", wireType)
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field MaxChangeRate", wireType)
 				}
-				var msglen int
+				var stringLen uint64
 				for shift := uint(0); ; shift += 7 {
 					if shift >= 64 {
 						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
@@ -1346,107 +1188,24 @@ func (x *fastReflection_Validator) ProtoMethods() *protoiface.Methods {
 					}
 					b := dAtA[iNdEx]
 					iNdEx++
-					msglen |= int(b&0x7F) << shift
+					stringLen |= uint64(b&0x7F) << shift
 					if b < 0x80 {
 						break
 					}
 				}
-				if msglen < 0 {
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
 				}
-				postIndex := iNdEx + msglen
+				postIndex := iNdEx + intStringLen
 				if postIndex < 0 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
 				}
 				if postIndex > l {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
-				if x.Pubkey == nil {
-					x.Pubkey = &anypb.Any{}
-				}
-				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.Pubkey); err != nil {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
-				}
+				x.MaxChangeRate = string(dAtA[iNdEx:postIndex])
 				iNdEx = postIndex
-			case 4:
-				if wireType != 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field InSet", wireType)
-				}
-				var v int
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
-					}
-					if iNdEx >= l {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					v |= int(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				x.InSet = bool(v != 0)
-			case 5:
-				if wireType != 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field IsAccepted", wireType)
-				}
-				var v int
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
-					}
-					if iNdEx >= l {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					v |= int(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				x.IsAccepted = bool(v != 0)
-			case 6:
-				if wireType != 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Jailed", wireType)
-				}
-				var v int
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
-					}
-					if iNdEx >= l {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					v |= int(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				x.Jailed = bool(v != 0)
-			case 7:
-				if wireType != 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field JailCount", wireType)
-				}
-				x.JailCount = 0
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
-					}
-					if iNdEx >= l {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					x.JailCount |= uint64(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
 			default:
 				iNdEx = preIndex
 				skippy, err := runtime.Skip(dAtA[iNdEx:])
@@ -1568,23 +1327,23 @@ func (x *Description) GetDetails() string {
 	return ""
 }
 
-// Validator models a POA Validator
-type Validator struct {
+// CommissionRates defines the initial commission rates to be used for creating
+// a validator.
+type CommissionRates struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Description *Description `protobuf:"bytes,1,opt,name=description,proto3" json:"description,omitempty"`
-	Address     []byte       `protobuf:"bytes,2,opt,name=address,proto3" json:"address,omitempty"`
-	Pubkey      *anypb.Any   `protobuf:"bytes,3,opt,name=pubkey,proto3" json:"pubkey,omitempty"`
-	InSet       bool         `protobuf:"varint,4,opt,name=in_set,json=inSet,proto3" json:"in_set,omitempty"`
-	IsAccepted  bool         `protobuf:"varint,5,opt,name=is_accepted,json=isAccepted,proto3" json:"is_accepted,omitempty"`
-	Jailed      bool         `protobuf:"varint,6,opt,name=jailed,proto3" json:"jailed,omitempty"`
-	JailCount   uint64       `protobuf:"varint,7,opt,name=jail_count,json=jailCount,proto3" json:"jail_count,omitempty"`
+	// rate is the commission rate charged to delegators, as a fraction.
+	Rate string `protobuf:"bytes,1,opt,name=rate,proto3" json:"rate,omitempty"`
+	// max_rate defines the maximum commission rate which validator can ever charge, as a fraction.
+	MaxRate string `protobuf:"bytes,2,opt,name=max_rate,json=maxRate,proto3" json:"max_rate,omitempty"`
+	// max_change_rate defines the maximum daily increase of the validator commission, as a fraction.
+	MaxChangeRate string `protobuf:"bytes,3,opt,name=max_change_rate,json=maxChangeRate,proto3" json:"max_change_rate,omitempty"`
 }
 
-func (x *Validator) Reset() {
-	*x = Validator{}
+func (x *CommissionRates) Reset() {
+	*x = CommissionRates{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_strangelove_ventures_poa_v1_validator_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -1592,64 +1351,36 @@ func (x *Validator) Reset() {
 	}
 }
 
-func (x *Validator) String() string {
+func (x *CommissionRates) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Validator) ProtoMessage() {}
+func (*CommissionRates) ProtoMessage() {}
 
-// Deprecated: Use Validator.ProtoReflect.Descriptor instead.
-func (*Validator) Descriptor() ([]byte, []int) {
+// Deprecated: Use CommissionRates.ProtoReflect.Descriptor instead.
+func (*CommissionRates) Descriptor() ([]byte, []int) {
 	return file_strangelove_ventures_poa_v1_validator_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *Validator) GetDescription() *Description {
+func (x *CommissionRates) GetRate() string {
 	if x != nil {
-		return x.Description
+		return x.Rate
 	}
-	return nil
+	return ""
 }
 
-func (x *Validator) GetAddress() []byte {
+func (x *CommissionRates) GetMaxRate() string {
 	if x != nil {
-		return x.Address
+		return x.MaxRate
 	}
-	return nil
+	return ""
 }
 
-func (x *Validator) GetPubkey() *anypb.Any {
+func (x *CommissionRates) GetMaxChangeRate() string {
 	if x != nil {
-		return x.Pubkey
+		return x.MaxChangeRate
 	}
-	return nil
-}
-
-func (x *Validator) GetInSet() bool {
-	if x != nil {
-		return x.InSet
-	}
-	return false
-}
-
-func (x *Validator) GetIsAccepted() bool {
-	if x != nil {
-		return x.IsAccepted
-	}
-	return false
-}
-
-func (x *Validator) GetJailed() bool {
-	if x != nil {
-		return x.Jailed
-	}
-	return false
-}
-
-func (x *Validator) GetJailCount() uint64 {
-	if x != nil {
-		return x.JailCount
-	}
-	return 0
+	return ""
 }
 
 var File_strangelove_ventures_poa_v1_validator_proto protoreflect.FileDescriptor
@@ -1666,54 +1397,53 @@ var file_strangelove_ventures_poa_v1_validator_proto_rawDesc = []byte{
 	0x1a, 0x1f, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75,
 	0x66, 0x2f, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x2e, 0x70, 0x72, 0x6f, 0x74,
 	0x6f, 0x1a, 0x14, 0x67, 0x6f, 0x67, 0x6f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x67, 0x6f, 0x67,
-	0x6f, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0xa8, 0x01, 0x0a, 0x0b, 0x44, 0x65, 0x73, 0x63,
-	0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x18, 0x0a, 0x07, 0x6d, 0x6f, 0x6e, 0x69, 0x6b,
-	0x65, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x6d, 0x6f, 0x6e, 0x69, 0x6b, 0x65,
-	0x72, 0x12, 0x1a, 0x0a, 0x08, 0x69, 0x64, 0x65, 0x6e, 0x74, 0x69, 0x74, 0x79, 0x18, 0x02, 0x20,
-	0x01, 0x28, 0x09, 0x52, 0x08, 0x69, 0x64, 0x65, 0x6e, 0x74, 0x69, 0x74, 0x79, 0x12, 0x18, 0x0a,
-	0x07, 0x77, 0x65, 0x62, 0x73, 0x69, 0x74, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07,
-	0x77, 0x65, 0x62, 0x73, 0x69, 0x74, 0x65, 0x12, 0x29, 0x0a, 0x10, 0x73, 0x65, 0x63, 0x75, 0x72,
-	0x69, 0x74, 0x79, 0x5f, 0x63, 0x6f, 0x6e, 0x74, 0x61, 0x63, 0x74, 0x18, 0x04, 0x20, 0x01, 0x28,
-	0x09, 0x52, 0x0f, 0x73, 0x65, 0x63, 0x75, 0x72, 0x69, 0x74, 0x79, 0x43, 0x6f, 0x6e, 0x74, 0x61,
-	0x63, 0x74, 0x12, 0x18, 0x0a, 0x07, 0x64, 0x65, 0x74, 0x61, 0x69, 0x6c, 0x73, 0x18, 0x05, 0x20,
-	0x01, 0x28, 0x09, 0x52, 0x07, 0x64, 0x65, 0x74, 0x61, 0x69, 0x6c, 0x73, 0x3a, 0x04, 0xe8, 0xa0,
-	0x1f, 0x01, 0x22, 0xb4, 0x02, 0x0a, 0x09, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72,
-	0x12, 0x50, 0x0a, 0x0b, 0x64, 0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x18,
-	0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x28, 0x2e, 0x73, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c,
-	0x6f, 0x76, 0x65, 0x5f, 0x76, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65, 0x73, 0x2e, 0x70, 0x6f, 0x61,
-	0x2e, 0x76, 0x31, 0x2e, 0x44, 0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x42,
-	0x04, 0xc8, 0xde, 0x1f, 0x00, 0x52, 0x0b, 0x64, 0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69,
-	0x6f, 0x6e, 0x12, 0x18, 0x0a, 0x07, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x18, 0x02, 0x20,
-	0x01, 0x28, 0x0c, 0x52, 0x07, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x12, 0x46, 0x0a, 0x06,
-	0x70, 0x75, 0x62, 0x6b, 0x65, 0x79, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x14, 0x2e, 0x67,
-	0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x41,
-	0x6e, 0x79, 0x42, 0x18, 0xca, 0xb4, 0x2d, 0x14, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x63,
-	0x72, 0x79, 0x70, 0x74, 0x6f, 0x2e, 0x50, 0x75, 0x62, 0x4b, 0x65, 0x79, 0x52, 0x06, 0x70, 0x75,
-	0x62, 0x6b, 0x65, 0x79, 0x12, 0x15, 0x0a, 0x06, 0x69, 0x6e, 0x5f, 0x73, 0x65, 0x74, 0x18, 0x04,
-	0x20, 0x01, 0x28, 0x08, 0x52, 0x05, 0x69, 0x6e, 0x53, 0x65, 0x74, 0x12, 0x1f, 0x0a, 0x0b, 0x69,
-	0x73, 0x5f, 0x61, 0x63, 0x63, 0x65, 0x70, 0x74, 0x65, 0x64, 0x18, 0x05, 0x20, 0x01, 0x28, 0x08,
-	0x52, 0x0a, 0x69, 0x73, 0x41, 0x63, 0x63, 0x65, 0x70, 0x74, 0x65, 0x64, 0x12, 0x16, 0x0a, 0x06,
-	0x6a, 0x61, 0x69, 0x6c, 0x65, 0x64, 0x18, 0x06, 0x20, 0x01, 0x28, 0x08, 0x52, 0x06, 0x6a, 0x61,
-	0x69, 0x6c, 0x65, 0x64, 0x12, 0x1d, 0x0a, 0x0a, 0x6a, 0x61, 0x69, 0x6c, 0x5f, 0x63, 0x6f, 0x75,
-	0x6e, 0x74, 0x18, 0x07, 0x20, 0x01, 0x28, 0x04, 0x52, 0x09, 0x6a, 0x61, 0x69, 0x6c, 0x43, 0x6f,
-	0x75, 0x6e, 0x74, 0x3a, 0x04, 0xe8, 0xa0, 0x1f, 0x00, 0x42, 0x86, 0x02, 0x0a, 0x1f, 0x63, 0x6f,
-	0x6d, 0x2e, 0x73, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65, 0x5f, 0x76, 0x65,
-	0x6e, 0x74, 0x75, 0x72, 0x65, 0x73, 0x2e, 0x70, 0x6f, 0x61, 0x2e, 0x76, 0x31, 0x42, 0x0e, 0x56,
-	0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a,
-	0x49, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x73, 0x74, 0x72, 0x61,
-	0x6e, 0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65, 0x2d, 0x76, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65, 0x73,
-	0x2f, 0x70, 0x6f, 0x61, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x73, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65,
-	0x6c, 0x6f, 0x76, 0x65, 0x5f, 0x76, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65, 0x73, 0x2f, 0x70, 0x6f,
-	0x61, 0x2f, 0x76, 0x31, 0x3b, 0x70, 0x6f, 0x61, 0x76, 0x31, 0xa2, 0x02, 0x03, 0x53, 0x50, 0x58,
-	0xaa, 0x02, 0x1a, 0x53, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65, 0x56, 0x65,
-	0x6e, 0x74, 0x75, 0x72, 0x65, 0x73, 0x2e, 0x50, 0x6f, 0x61, 0x2e, 0x56, 0x31, 0xca, 0x02, 0x1a,
-	0x53, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65, 0x56, 0x65, 0x6e, 0x74, 0x75,
-	0x72, 0x65, 0x73, 0x5c, 0x50, 0x6f, 0x61, 0x5c, 0x56, 0x31, 0xe2, 0x02, 0x26, 0x53, 0x74, 0x72,
-	0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65, 0x56, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65, 0x73,
-	0x5c, 0x50, 0x6f, 0x61, 0x5c, 0x56, 0x31, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64,
-	0x61, 0x74, 0x61, 0xea, 0x02, 0x1c, 0x53, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f, 0x76,
-	0x65, 0x56, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65, 0x73, 0x3a, 0x3a, 0x50, 0x6f, 0x61, 0x3a, 0x3a,
-	0x56, 0x31, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x6f, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x11, 0x61, 0x6d, 0x69, 0x6e, 0x6f, 0x2f, 0x61,
+	0x6d, 0x69, 0x6e, 0x6f, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0xa8, 0x01, 0x0a, 0x0b, 0x44,
+	0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x18, 0x0a, 0x07, 0x6d, 0x6f,
+	0x6e, 0x69, 0x6b, 0x65, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x6d, 0x6f, 0x6e,
+	0x69, 0x6b, 0x65, 0x72, 0x12, 0x1a, 0x0a, 0x08, 0x69, 0x64, 0x65, 0x6e, 0x74, 0x69, 0x74, 0x79,
+	0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x69, 0x64, 0x65, 0x6e, 0x74, 0x69, 0x74, 0x79,
+	0x12, 0x18, 0x0a, 0x07, 0x77, 0x65, 0x62, 0x73, 0x69, 0x74, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x07, 0x77, 0x65, 0x62, 0x73, 0x69, 0x74, 0x65, 0x12, 0x29, 0x0a, 0x10, 0x73, 0x65,
+	0x63, 0x75, 0x72, 0x69, 0x74, 0x79, 0x5f, 0x63, 0x6f, 0x6e, 0x74, 0x61, 0x63, 0x74, 0x18, 0x04,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x0f, 0x73, 0x65, 0x63, 0x75, 0x72, 0x69, 0x74, 0x79, 0x43, 0x6f,
+	0x6e, 0x74, 0x61, 0x63, 0x74, 0x12, 0x18, 0x0a, 0x07, 0x64, 0x65, 0x74, 0x61, 0x69, 0x6c, 0x73,
+	0x18, 0x05, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x64, 0x65, 0x74, 0x61, 0x69, 0x6c, 0x73, 0x3a,
+	0x04, 0xe8, 0xa0, 0x1f, 0x01, 0x22, 0x96, 0x02, 0x0a, 0x0f, 0x43, 0x6f, 0x6d, 0x6d, 0x69, 0x73,
+	0x73, 0x69, 0x6f, 0x6e, 0x52, 0x61, 0x74, 0x65, 0x73, 0x12, 0x4a, 0x0a, 0x04, 0x72, 0x61, 0x74,
+	0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x42, 0x36, 0xc8, 0xde, 0x1f, 0x00, 0xda, 0xde, 0x1f,
+	0x1b, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x73, 0x64, 0x6b, 0x2e, 0x69, 0x6f, 0x2f, 0x6d, 0x61,
+	0x74, 0x68, 0x2e, 0x4c, 0x65, 0x67, 0x61, 0x63, 0x79, 0x44, 0x65, 0x63, 0xd2, 0xb4, 0x2d, 0x0a,
+	0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x44, 0x65, 0x63, 0xa8, 0xe7, 0xb0, 0x2a, 0x01, 0x52,
+	0x04, 0x72, 0x61, 0x74, 0x65, 0x12, 0x51, 0x0a, 0x08, 0x6d, 0x61, 0x78, 0x5f, 0x72, 0x61, 0x74,
+	0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x42, 0x36, 0xc8, 0xde, 0x1f, 0x00, 0xda, 0xde, 0x1f,
+	0x1b, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x73, 0x64, 0x6b, 0x2e, 0x69, 0x6f, 0x2f, 0x6d, 0x61,
+	0x74, 0x68, 0x2e, 0x4c, 0x65, 0x67, 0x61, 0x63, 0x79, 0x44, 0x65, 0x63, 0xd2, 0xb4, 0x2d, 0x0a,
+	0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x44, 0x65, 0x63, 0xa8, 0xe7, 0xb0, 0x2a, 0x01, 0x52,
+	0x07, 0x6d, 0x61, 0x78, 0x52, 0x61, 0x74, 0x65, 0x12, 0x5e, 0x0a, 0x0f, 0x6d, 0x61, 0x78, 0x5f,
+	0x63, 0x68, 0x61, 0x6e, 0x67, 0x65, 0x5f, 0x72, 0x61, 0x74, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28,
+	0x09, 0x42, 0x36, 0xc8, 0xde, 0x1f, 0x00, 0xda, 0xde, 0x1f, 0x1b, 0x63, 0x6f, 0x73, 0x6d, 0x6f,
+	0x73, 0x73, 0x64, 0x6b, 0x2e, 0x69, 0x6f, 0x2f, 0x6d, 0x61, 0x74, 0x68, 0x2e, 0x4c, 0x65, 0x67,
+	0x61, 0x63, 0x79, 0x44, 0x65, 0x63, 0xd2, 0xb4, 0x2d, 0x0a, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73,
+	0x2e, 0x44, 0x65, 0x63, 0xa8, 0xe7, 0xb0, 0x2a, 0x01, 0x52, 0x0d, 0x6d, 0x61, 0x78, 0x43, 0x68,
+	0x61, 0x6e, 0x67, 0x65, 0x52, 0x61, 0x74, 0x65, 0x3a, 0x04, 0xe8, 0xa0, 0x1f, 0x01, 0x42, 0x86,
+	0x02, 0x0a, 0x1f, 0x63, 0x6f, 0x6d, 0x2e, 0x73, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f,
+	0x76, 0x65, 0x5f, 0x76, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65, 0x73, 0x2e, 0x70, 0x6f, 0x61, 0x2e,
+	0x76, 0x31, 0x42, 0x0e, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x50, 0x72, 0x6f,
+	0x74, 0x6f, 0x50, 0x01, 0x5a, 0x49, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d,
+	0x2f, 0x73, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65, 0x2d, 0x76, 0x65, 0x6e,
+	0x74, 0x75, 0x72, 0x65, 0x73, 0x2f, 0x70, 0x6f, 0x61, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x73, 0x74,
+	0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65, 0x5f, 0x76, 0x65, 0x6e, 0x74, 0x75, 0x72,
+	0x65, 0x73, 0x2f, 0x70, 0x6f, 0x61, 0x2f, 0x76, 0x31, 0x3b, 0x70, 0x6f, 0x61, 0x76, 0x31, 0xa2,
+	0x02, 0x03, 0x53, 0x50, 0x58, 0xaa, 0x02, 0x1a, 0x53, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c,
+	0x6f, 0x76, 0x65, 0x56, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65, 0x73, 0x2e, 0x50, 0x6f, 0x61, 0x2e,
+	0x56, 0x31, 0xca, 0x02, 0x1a, 0x53, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65,
+	0x56, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65, 0x73, 0x5c, 0x50, 0x6f, 0x61, 0x5c, 0x56, 0x31, 0xe2,
+	0x02, 0x26, 0x53, 0x74, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65, 0x56, 0x65, 0x6e,
+	0x74, 0x75, 0x72, 0x65, 0x73, 0x5c, 0x50, 0x6f, 0x61, 0x5c, 0x56, 0x31, 0x5c, 0x47, 0x50, 0x42,
+	0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x1c, 0x53, 0x74, 0x72, 0x61, 0x6e,
+	0x67, 0x65, 0x6c, 0x6f, 0x76, 0x65, 0x56, 0x65, 0x6e, 0x74, 0x75, 0x72, 0x65, 0x73, 0x3a, 0x3a,
+	0x50, 0x6f, 0x61, 0x3a, 0x3a, 0x56, 0x31, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -1730,18 +1460,15 @@ func file_strangelove_ventures_poa_v1_validator_proto_rawDescGZIP() []byte {
 
 var file_strangelove_ventures_poa_v1_validator_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_strangelove_ventures_poa_v1_validator_proto_goTypes = []interface{}{
-	(*Description)(nil), // 0: strangelove_ventures.poa.v1.Description
-	(*Validator)(nil),   // 1: strangelove_ventures.poa.v1.Validator
-	(*anypb.Any)(nil),   // 2: google.protobuf.Any
+	(*Description)(nil),     // 0: strangelove_ventures.poa.v1.Description
+	(*CommissionRates)(nil), // 1: strangelove_ventures.poa.v1.CommissionRates
 }
 var file_strangelove_ventures_poa_v1_validator_proto_depIdxs = []int32{
-	0, // 0: strangelove_ventures.poa.v1.Validator.description:type_name -> strangelove_ventures.poa.v1.Description
-	2, // 1: strangelove_ventures.poa.v1.Validator.pubkey:type_name -> google.protobuf.Any
-	2, // [2:2] is the sub-list for method output_type
-	2, // [2:2] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	0, // [0:0] is the sub-list for method output_type
+	0, // [0:0] is the sub-list for method input_type
+	0, // [0:0] is the sub-list for extension type_name
+	0, // [0:0] is the sub-list for extension extendee
+	0, // [0:0] is the sub-list for field type_name
 }
 
 func init() { file_strangelove_ventures_poa_v1_validator_proto_init() }
@@ -1763,7 +1490,7 @@ func file_strangelove_ventures_poa_v1_validator_proto_init() {
 			}
 		}
 		file_strangelove_ventures_poa_v1_validator_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Validator); i {
+			switch v := v.(*CommissionRates); i {
 			case 0:
 				return &v.state
 			case 1:

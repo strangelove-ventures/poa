@@ -41,12 +41,13 @@ func (msfd MsgStakingFilterDecorator) hasInvalidStakingMsg(msgs []sdk.Msg) (bool
 			return true, nil
 		case *stakingtypes.MsgCancelUnbondingDelegation:
 			return true, nil
-		case *stakingtypes.MsgCreateValidator: // TODO:? wrap it to our own Message to allow & mint the needed token?
+		// we disable here, but have an identical poa Tx. We mint them 1stake so they can actually make it.
+		case *stakingtypes.MsgCreateValidator:
 			return true, nil
 		case *stakingtypes.MsgDelegate:
 			return true, nil
-		case *stakingtypes.MsgEditValidator: // TODO:?
-			return true, nil
+		// case *stakingtypes.MsgEditValidator: // TODO:?
+		// 	return true, nil
 		case *stakingtypes.MsgUndelegate:
 			return true, nil
 		case *stakingtypes.MsgUpdateParams: // TODO: ? allow or wrap with isAdmin?

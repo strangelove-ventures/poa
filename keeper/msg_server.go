@@ -4,8 +4,12 @@ import (
 	"context"
 	"fmt"
 
+	errorsmod "cosmossdk.io/errors"
 	"cosmossdk.io/math"
+	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/cosmos/cosmos-sdk/x/staking/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
 	"github.com/strangelove-ventures/poa"
@@ -89,6 +93,141 @@ func (ms msgServer) RemoveValidator(ctx context.Context, msg *poa.MsgRemoveValid
 	return &poa.MsgRemoveValidatorResponse{}, nil
 }
 
+// CreateValidator implements poa.MsgServer.
+func (ms msgServer) CreateValidator(ctx context.Context, msg *poa.MsgCreateValidator) (*poa.MsgCreateValidatorResponse, error) {
+	valAddr, err := ms.k.validatorAddressCodec.StringToBytes(msg.ValidatorAddress)
+	if err != nil {
+		return nil, sdkerrors.ErrInvalidAddress.Wrapf("invalid validator address: %s", err)
+	}
+
+	if err := msg.Validate(ms.k.validatorAddressCodec); err != nil {
+		return nil, err
+	}
+
+	minCommRate, err := ms.k.stakingKeeper.MinCommissionRate(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	if msg.Commission.Rate.LT(minCommRate) {
+		return nil, errorsmod.Wrapf(types.ErrCommissionLTMinRate, "cannot set validator commission to less than minimum rate of %s", minCommRate)
+	}
+
+	// check to see if the pubkey or sender has been registered before
+	if _, err := ms.k.stakingKeeper.GetValidator(ctx, valAddr); err == nil {
+		return nil, types.ErrValidatorOwnerExists
+	}
+
+	pk, ok := msg.Pubkey.GetCachedValue().(cryptotypes.PubKey)
+	if !ok {
+		return nil, errorsmod.Wrapf(sdkerrors.ErrInvalidType, "Expecting cryptotypes.PubKey, got %T", pk)
+	}
+
+	if _, err := ms.k.stakingKeeper.GetValidatorByConsAddr(ctx, sdk.GetConsAddress(pk)); err == nil {
+		return nil, types.ErrValidatorPubKeyExists
+	}
+
+	if _, err := msg.Description.EnsureLength(); err != nil {
+		return nil, err
+	}
+
+	sdkCtx := sdk.UnwrapSDKContext(ctx)
+	cp := sdkCtx.ConsensusParams()
+	if cp.Validator != nil {
+		pkType := pk.Type()
+		hasKeyType := false
+		for _, keyType := range cp.Validator.PubKeyTypes {
+			if pkType == keyType {
+				hasKeyType = true
+				break
+			}
+		}
+		if !hasKeyType {
+			return nil, errorsmod.Wrapf(
+				types.ErrValidatorPubKeyTypeNotSupported,
+				"got: %s, expected: %s", pk.Type(), cp.Validator.PubKeyTypes,
+			)
+		}
+	}
+
+	validator, err := types.NewValidator(msg.ValidatorAddress, pk, stakingtypes.Description{
+		Moniker:         msg.Description.Moniker,
+		Identity:        msg.Description.Identity,
+		Website:         msg.Description.Website,
+		SecurityContact: msg.Description.SecurityContact,
+		Details:         msg.Description.Details,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	commission := types.NewCommissionWithTime(
+		msg.Commission.Rate, msg.Commission.MaxRate,
+		msg.Commission.MaxChangeRate, sdkCtx.BlockHeader().Time,
+	)
+
+	validator, err = validator.SetInitialCommission(commission)
+	if err != nil {
+		return nil, err
+	}
+
+	validator.MinSelfDelegation = msg.MinSelfDelegation
+
+	err = ms.k.stakingKeeper.SetValidator(ctx, validator)
+	if err != nil {
+		return nil, err
+	}
+
+	err = ms.k.stakingKeeper.SetValidatorByConsAddr(ctx, validator)
+	if err != nil {
+		return nil, err
+	}
+
+	err = ms.k.stakingKeeper.SetNewValidatorByPowerIndex(ctx, validator)
+	if err != nil {
+		return nil, err
+	}
+
+	// call the after-creation hook
+	if err := ms.k.stakingKeeper.Hooks().AfterValidatorCreated(ctx, valAddr); err != nil {
+		return nil, err
+	}
+
+	// bondDenom, err := ms.k.stakingKeeper.BondDenom(ctx)
+	// if err != nil {
+	// 	return nil, err
+	// }
+
+	// move coins from the msg.Address account to a (self-delegation) delegator account
+	// the validator account and global shares are updated within here
+	// NOTE source will always be from a wallet which are unbonded
+	// TODO: Force set delegation instead?
+	_, err = ms.k.stakingKeeper.Delegate(ctx, sdk.AccAddress(valAddr), math.NewInt(1), types.Unbonded, validator, true)
+	if err != nil {
+		return nil, err
+	}
+
+	sdkCtx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			types.EventTypeCreateValidator,
+			sdk.NewAttribute(types.AttributeKeyValidator, msg.ValidatorAddress),
+			sdk.NewAttribute(sdk.AttributeKeyAmount, "1"),
+		),
+	})
+
+	return &poa.MsgCreateValidatorResponse{}, nil
+}
+
+func (ms msgServer) UpdateParams(ctx context.Context, msg *poa.MsgUpdateParams) (*poa.MsgUpdateParamsResponse, error) {
+	if ok, err := ms.isAdmin(ctx, msg.FromAddress); err != nil {
+		return nil, err
+	} else if !ok {
+		return nil, fmt.Errorf("not an authority")
+	}
+
+	return &poa.MsgUpdateParamsResponse{}, ms.k.SetParams(ctx, msg.Params)
+}
+
 func (ms msgServer) clearValidator(ctx context.Context, valAddr sdk.ValAddress) error {
 	val, err := ms.k.stakingKeeper.GetValidator(ctx, valAddr)
 	if err != nil {
@@ -120,16 +259,6 @@ func (ms msgServer) clearValidator(ctx context.Context, valAddr sdk.ValAddress) 
 	// }
 
 	return nil
-}
-
-func (ms msgServer) UpdateParams(ctx context.Context, msg *poa.MsgUpdateParams) (*poa.MsgUpdateParamsResponse, error) {
-	if ok, err := ms.isAdmin(ctx, msg.FromAddress); err != nil {
-		return nil, err
-	} else if !ok {
-		return nil, fmt.Errorf("not an authority")
-	}
-
-	return &poa.MsgUpdateParamsResponse{}, ms.k.SetParams(ctx, msg.Params)
 }
 
 func (ms msgServer) isAdmin(ctx context.Context, fromAddr string) (bool, error) {

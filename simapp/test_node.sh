@@ -10,9 +10,13 @@
 #
 # validate staking msg err
 # poad tx staking delegate $(poad q staking validators --output=json | jq .validators[0].operator_address -r) 1stake --home=$HOME_DIR --yes --from=acc1
+#
+# Create a validator
+# poad tx staking create-validator simapp/validator_file.json --from acc3 --home=$HOME_DIR # no genesis amount
 
-export KEY="acc1"
+export KEY="acc1" # validator
 export KEY2="acc2"
+export KEY2="acc3"
 
 export CHAIN_ID=${CHAIN_ID:-"local-1"}
 export MONIKER="moniker"
@@ -52,6 +56,8 @@ from_scratch () {
   echo "decorate bright ozone fork gallery riot bus exhaust worth way bone indoor calm squirrel merry zero scheme cotton until shop any excess stage laundry" | BINARY keys add $KEY --keyring-backend $KEYRING --algo $KEYALGO --recover
   # cosmos1efd63aw40lxf3n4mhf7dzhjkr453axur6cpk92
   echo "wealth flavor believe regret funny network recall kiss grape useless pepper cram hint member few certain unveil rather brick bargain curious require crowd raise" | BINARY keys add $KEY2 --keyring-backend $KEYRING --algo $KEYALGO --recover
+  # cosmos1evcfka7s3200ypj0k2449cujlq3u4xe850hc4w
+  echo "year action hospital impulse repeat town caught glue palace guilt diet about melt outdoor orbit field income left visit client route float wife media" | BINARY keys add $KEY3 --keyring-backend $KEYRING --algo $KEYALGO --recover
   
   # TODO: move from stake to another denom, this works for now though.
   BINARY init $MONIKER --chain-id $CHAIN_ID --default-denom stake
