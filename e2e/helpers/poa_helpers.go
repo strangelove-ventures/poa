@@ -2,6 +2,7 @@ package helpers
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"testing"
 
@@ -12,7 +13,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func POASetPower(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, user ibc.Wallet, valoper string, power int64) {
+func POASetPower(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, user ibc.Wallet, valoper string, power int64) TxResponse {
 	cmd := []string{chain.Config().Bin, "tx", "poa", "set-power", valoper, fmt.Sprintf("%d", power),
 		"--node", chain.GetRPCAddress(),
 		"--home", chain.HomeDir(),
@@ -21,19 +22,24 @@ func POASetPower(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, u
 		"--gas", "500000",
 		"--keyring-dir", chain.HomeDir(),
 		"--keyring-backend", keyring.BackendTest,
+		"--output=json",
 		"-y",
 	}
 	stdout, _, err := chain.Exec(ctx, cmd, nil)
 	require.NoError(t, err)
 
-	debugOutput(t, string(stdout))
-
 	if err := testutil.WaitForBlocks(ctx, 2, chain); err != nil {
 		t.Fatal(err)
 	}
+
+	var res TxResponse
+	if err := json.Unmarshal(stdout, &res); err != nil {
+		t.Fatal(err)
+	}
+	return res
 }
 
-func POARemove(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, user ibc.Wallet, valoper string) {
+func POARemove(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, user ibc.Wallet, valoper string) TxResponse {
 	cmd := []string{chain.Config().Bin, "tx", "poa", "remove", valoper,
 		"--node", chain.GetRPCAddress(),
 		"--home", chain.HomeDir(),
@@ -43,14 +49,19 @@ func POARemove(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, use
 		"--keyring-dir", chain.HomeDir(),
 		"--keyring-backend", keyring.BackendTest,
 		"--output", "json",
+		"--output=json",
 		"-y",
 	}
 	stdout, _, err := chain.Exec(ctx, cmd, nil)
 	require.NoError(t, err)
 
-	debugOutput(t, string(stdout))
-
 	if err := testutil.WaitForBlocks(ctx, 2, chain); err != nil {
 		t.Fatal(err)
 	}
+
+	var res TxResponse
+	if err := json.Unmarshal(stdout, &res); err != nil {
+		t.Fatal(err)
+	}
+	return res
 }

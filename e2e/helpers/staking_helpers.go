@@ -3,7 +3,6 @@ package helpers
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"testing"
 
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
@@ -13,14 +12,8 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func debugOutput(t *testing.T, stdout string) {
-	if true {
-		t.Log(stdout)
-	}
-}
-
 // move this upstream
-func StakeTokens(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, user ibc.Wallet, valoper, coinAmt string) {
+func StakeTokens(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, user ibc.Wallet, valoper, coinAmt string) TxResponse {
 	// amount is #utoken
 	cmd := []string{chain.Config().Bin, "tx", "staking", "delegate", valoper, coinAmt,
 		"--node", chain.GetRPCAddress(),
@@ -30,19 +23,24 @@ func StakeTokens(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, u
 		"--gas", "500000",
 		"--keyring-dir", chain.HomeDir(),
 		"--keyring-backend", keyring.BackendTest,
+		"--output=json",
 		"-y",
 	}
 	stdout, _, err := chain.Exec(ctx, cmd, nil)
 	require.NoError(t, err)
 
-	debugOutput(t, string(stdout))
-
 	if err := testutil.WaitForBlocks(ctx, 2, chain); err != nil {
 		t.Fatal(err)
 	}
+
+	var res TxResponse
+	if err := json.Unmarshal(stdout, &res); err != nil {
+		t.Fatal(err)
+	}
+	return res
 }
 
-func ClaimStakingRewards(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, user ibc.Wallet, valoper string) {
+func ClaimStakingRewards(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, user ibc.Wallet, valoper string) TxResponse {
 	cmd := []string{chain.Config().Bin, "tx", "distribution", "withdraw-rewards", valoper,
 		"--node", chain.GetRPCAddress(),
 		"--home", chain.HomeDir(),
@@ -51,33 +49,25 @@ func ClaimStakingRewards(t *testing.T, ctx context.Context, chain *cosmos.Cosmos
 		"--gas", "500000",
 		"--keyring-dir", chain.HomeDir(),
 		"--keyring-backend", keyring.BackendTest,
+		"--output=json",
 		"-y",
 	}
 	stdout, _, err := chain.Exec(ctx, cmd, nil)
 	require.NoError(t, err)
 
-	debugOutput(t, string(stdout))
-
 	if err := testutil.WaitForBlocks(ctx, 2, chain); err != nil {
 		t.Fatal(err)
 	}
+
+	var res TxResponse
+	if err := json.Unmarshal(stdout, &res); err != nil {
+		t.Fatal(err)
+	}
+	return res
 }
 
 func GetValidators(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain) Vals {
 	var res Vals
-
-	cmd := []string{chain.Config().Bin, "query", "staking", "validators",
-		"--node", chain.GetRPCAddress(),
-		"--output", "json",
-	}
-
-	stdout, _, err := chain.Exec(ctx, cmd, nil)
-	require.NoError(t, err)
-
-	fmt.Println(string(stdout))
-	if err := json.Unmarshal(stdout, &res); err != nil {
-		t.Fatal(err)
-	}
-
+	QueryBuilder(ctx, chain, []string{"query", "staking", "validators"}, &res)
 	return res
 }
