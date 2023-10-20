@@ -8,6 +8,7 @@ import (
 	flag "github.com/spf13/pflag"
 
 	"cosmossdk.io/core/address"
+	"cosmossdk.io/math"
 	"github.com/spf13/cobra"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -37,6 +38,7 @@ func NewTxCmd(ac address.Codec) *cobra.Command {
 	}
 
 	txCmd.AddCommand(
+		NewCreateValidatorCmd(ac),
 		NewSetPowerCmd(),
 		NewRemoveValidatorCmd(),
 	)
@@ -119,13 +121,13 @@ func NewCreateValidatorCmd(ac address.Codec) *cobra.Command {
 		Long:  `Create a new validator initialized with a self-delegation by submitting a JSON file with the new validator details.`,
 		Example: strings.TrimSpace(
 			fmt.Sprintf(`
-$ %s tx staking create-validator path/to/validator.json --from keyname
+$ %s tx poa create-validator path/to/validator.json --from keyname
 
 Where validator.json contains:
 
 {
 	"pubkey": {"@type":"/cosmos.crypto.ed25519.PubKey","key":"oWg2ISpLF405Jcm2vXV+2v4fnjodh6aafuIdeoW+rUw="},
-	"amount": "1000000stake",
+	"amount": "1stake",
 	"moniker": "myvalidator",
 	"identity": "optional identity signature (ex. UPort or Keybase)",
 	"website": "validator's (optional) website",
@@ -189,7 +191,7 @@ func newBuildCreateValidatorMsg(clientCtx client.Context, txf tx.Factory, fs *fl
 		return txf, nil, err
 	}
 	msg, err := types.NewMsgCreateValidator(
-		valStr, val.PubKey, val.Amount, description, val.CommissionRates, val.MinSelfDelegation,
+		valStr, val.PubKey, sdk.NewCoin(val.Amount.Denom, math.NewInt(1)), description, val.CommissionRates, val.MinSelfDelegation,
 	)
 	if err != nil {
 		return txf, nil, err

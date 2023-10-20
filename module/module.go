@@ -57,7 +57,7 @@ func (AppModule) RegisterGRPCGatewayRoutes(clientCtx client.Context, mux *gwrunt
 
 // GetTxCmd returns the root tx command for the bank module.
 func (am AppModule) GetTxCmd() *cobra.Command {
-	return cli.NewTxCmd(am.cdc.InterfaceRegistry().SigningContext().AddressCodec())
+	return cli.NewTxCmd(am.cdc.InterfaceRegistry().SigningContext().ValidatorAddressCodec())
 }
 
 // RegisterInterfaces registers interfaces and implementations of the circuit module.

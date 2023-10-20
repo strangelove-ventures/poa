@@ -2,7 +2,6 @@ package poa
 
 import (
 	"cosmossdk.io/core/address"
-	"cosmossdk.io/errors"
 	errorsmod "cosmossdk.io/errors"
 	"cosmossdk.io/math"
 
@@ -87,23 +86,23 @@ func (cr CommissionRates) Validate() error {
 // EnsureLength ensures the length of a validator's description.
 func (d Description) EnsureLength() (Description, error) {
 	if len(d.Moniker) > types.MaxMonikerLength {
-		return d, errors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid moniker length; got: %d, max: %d", len(d.Moniker), types.MaxMonikerLength)
+		return d, errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "invalid moniker length; got: %d, max: %d", len(d.Moniker), types.MaxMonikerLength)
 	}
 
 	if len(d.Identity) > types.MaxIdentityLength {
-		return d, errors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid identity length; got: %d, max: %d", len(d.Identity), types.MaxIdentityLength)
+		return d, errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "invalid identity length; got: %d, max: %d", len(d.Identity), types.MaxIdentityLength)
 	}
 
 	if len(d.Website) > types.MaxWebsiteLength {
-		return d, errors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid website length; got: %d, max: %d", len(d.Website), types.MaxWebsiteLength)
+		return d, errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "invalid website length; got: %d, max: %d", len(d.Website), types.MaxWebsiteLength)
 	}
 
 	if len(d.SecurityContact) > types.MaxSecurityContactLength {
-		return d, errors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid security contact length; got: %d, max: %d", len(d.SecurityContact), types.MaxSecurityContactLength)
+		return d, errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "invalid security contact length; got: %d, max: %d", len(d.SecurityContact), types.MaxSecurityContactLength)
 	}
 
 	if len(d.Details) > types.MaxDetailsLength {
-		return d, errors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid details length; got: %d, max: %d", len(d.Details), types.MaxDetailsLength)
+		return d, errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "invalid details length; got: %d, max: %d", len(d.Details), types.MaxDetailsLength)
 	}
 
 	return d, nil

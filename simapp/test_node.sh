@@ -12,7 +12,7 @@
 # poad tx staking delegate $(poad q staking validators --output=json | jq .validators[0].operator_address -r) 1stake --home=$HOME_DIR --yes --from=acc1
 #
 # Create a validator
-# poad tx staking create-validator simapp/validator_file.json --from acc3 --home=$HOME_DIR # no genesis amount
+# poad tx poa create-validator simapp/validator_file.json --from acc3 --home=$HOME_DIR # no genesis amount
 
 export KEY="acc1" # validator
 export KEY2="acc2"

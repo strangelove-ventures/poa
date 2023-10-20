@@ -41,12 +41,12 @@ func (msfd MsgStakingFilterDecorator) hasInvalidStakingMsg(msgs []sdk.Msg) (bool
 			return true, nil
 		case *stakingtypes.MsgCancelUnbondingDelegation:
 			return true, nil
-		// we disable here, but have an identical poa Tx. We mint them 1stake so they can actually make it.
-		case *stakingtypes.MsgCreateValidator:
-			return true, nil
+		// TODO: Since users will not have the POA token, we allow this and just wrap it with a `poa` Tx command.
+		// case *stakingtypes.MsgCreateValidator:
+		// 	return true, nil
 		case *stakingtypes.MsgDelegate:
 			return true, nil
-		// case *stakingtypes.MsgEditValidator: // TODO:?
+		// case *stakingtypes.MsgEditValidator: // TODO:? (wrap this or allow editing from main staking)
 		// 	return true, nil
 		case *stakingtypes.MsgUndelegate:
 			return true, nil

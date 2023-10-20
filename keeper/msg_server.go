@@ -193,15 +193,23 @@ func (ms msgServer) CreateValidator(ctx context.Context, msg *poa.MsgCreateValid
 		return nil, err
 	}
 
-	// bondDenom, err := ms.k.stakingKeeper.BondDenom(ctx)
-	// if err != nil {
-	// 	return nil, err
-	// }
+	// TODO: temp - REMOVE ME
+	bondDenom, err := ms.k.stakingKeeper.BondDenom(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if err := ms.k.bankKeeper.MintCoins(ctx, types.ModuleName, sdk.NewCoins(sdk.NewCoin(bondDenom, math.NewInt(1)))); err != nil {
+		return nil, err
+	}
+	if err := ms.k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, sdk.AccAddress(valAddr), sdk.NewCoins(sdk.NewCoin(bondDenom, math.NewInt(1)))); err != nil {
+		return nil, err
+	}
+	// TODO: end of /temp
 
 	// move coins from the msg.Address account to a (self-delegation) delegator account
 	// the validator account and global shares are updated within here
 	// NOTE source will always be from a wallet which are unbonded
-	// TODO: Force set delegation instead?
+	// TODO: Force set delegation instead? (do this later after AcceptValidator function is written)
 	_, err = ms.k.stakingKeeper.Delegate(ctx, sdk.AccAddress(valAddr), math.NewInt(1), types.Unbonded, validator, true)
 	if err != nil {
 		return nil, err
