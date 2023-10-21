@@ -7,8 +7,8 @@ import (
 	"cosmossdk.io/depinject"
 
 	"github.com/cosmos/cosmos-sdk/codec"
-	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 
+	slashingkeeper "github.com/cosmos/cosmos-sdk/x/slashing/keeper"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	modulev1 "github.com/strangelove-ventures/poa/api/module/v1"
 	"github.com/strangelove-ventures/poa/keeper"
@@ -36,8 +36,8 @@ type ModuleInputs struct {
 	StoreService store.KVStoreService
 	AddressCodec address.Codec
 
-	StakingKeeper stakingkeeper.Keeper
-	BankKeeper    bankkeeper.Keeper
+	StakingKeeper  stakingkeeper.Keeper
+	SlashingKeeper slashingkeeper.Keeper
 }
 
 type ModuleOutputs struct {
@@ -48,7 +48,7 @@ type ModuleOutputs struct {
 }
 
 func ProvideModule(in ModuleInputs) ModuleOutputs {
-	k := keeper.NewKeeper(in.Cdc, in.StoreService, &in.StakingKeeper, in.AddressCodec)
+	k := keeper.NewKeeper(in.Cdc, in.StoreService, &in.StakingKeeper, in.SlashingKeeper, in.AddressCodec)
 	m := NewAppModule(in.Cdc, k)
 
 	return ModuleOutputs{Module: m, Keeper: k, Out: depinject.Out{}}

@@ -317,6 +317,7 @@ func NewSimApp(
 		appCodec,
 		runtime.NewKVStoreService(keys[poatypes.StoreKey]),
 		app.StakingKeeper,
+		app.SlashingKeeper,
 		authcodec.NewBech32Codec(sdk.Bech32PrefixValAddr),
 	)
 	poaAppModule := poamodule.NewAppModule(appCodec, app.POAKeeper)

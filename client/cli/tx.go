@@ -37,13 +37,13 @@ func NewTxCmd(ac address.Codec) *cobra.Command {
 
 	txCmd.AddCommand(
 		NewCreateValidatorCmd(ac),
-		NewSetPowerCmd(),
+		NewSetPowerCmd(ac),
 		NewRemoveValidatorCmd(),
 	)
 	return txCmd
 }
 
-func NewSetPowerCmd() *cobra.Command {
+func NewSetPowerCmd(ac address.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:  "set-power [validator] [power]",
 		Args: cobra.ExactArgs(2),
@@ -68,6 +68,10 @@ func NewSetPowerCmd() *cobra.Command {
 				FromAddress:      clientCtx.GetFromAddress().String(),
 				ValidatorAddress: validator,
 				Power:            power,
+			}
+
+			if err := msg.Validate(ac); err != nil {
+				return fmt.Errorf("msg.Validate failed: %w", err)
 			}
 
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
@@ -125,7 +129,7 @@ Where validator.json contains:
 
 {
 	"pubkey": {"@type":"/cosmos.crypto.ed25519.PubKey","key":"oWg2ISpLF405Jcm2vXV+2v4fnjodh6aafuIdeoW+rUw="},
-	"amount": "1stake",
+	"amount": "1stake", # ignored
 	"moniker": "myvalidator",
 	"identity": "optional identity signature (ex. UPort or Keybase)",
 	"website": "validator's (optional) website",
@@ -134,7 +138,7 @@ Where validator.json contains:
 	"commission-rate": "0.1",
 	"commission-max-rate": "0.2",
 	"commission-max-change-rate": "0.01",
-	"min-self-delegation": "1"
+	"min-self-delegation": "1" # ignored
 }
 
 where we can get the pubkey using "%s tendermint show-validator"
@@ -194,7 +198,6 @@ func newBuildCreateValidatorMsg(clientCtx client.Context, txf tx.Factory, fs *fl
 		return txf, nil, err
 	}
 	msg, err := poa.NewMsgCreateValidator(
-		// TODO: force set min delegation at the params level?
 		valStr, val.PubKey, description, commissionRates, val.MinSelfDelegation,
 	)
 	if err != nil {
