@@ -52,8 +52,8 @@ func ConvertPOAToStaking(poa Validator) types.Validator {
 	}
 }
 
-func ConvertStakingToPOA(val types.Validator) *Validator {
-	return &Validator{
+func ConvertStakingToPOA(val types.Validator) Validator {
+	return Validator{
 		OperatorAddress: val.OperatorAddress,
 		ConsensusPubkey: val.ConsensusPubkey,
 		Jailed:          val.Jailed,

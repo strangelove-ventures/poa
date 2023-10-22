@@ -88,12 +88,9 @@ func (ms msgServer) SetPower(ctx context.Context, msg *poa.MsgSetPower) (*poa.Ms
 		Shares:           math.LegacyNewDec(int64(msg.Power)),
 	}
 
-	// TODO: Do not allow setting lower than 1_000_000 ?
-	// TODO: does this cause any invariance issues?
 	val.DelegatorShares = delegation.Shares
 	val.Tokens = math.NewIntFromUint64(msg.Power)
 	val.Status = stakingtypes.Bonded
-
 	if err := ms.k.stakingKeeper.SetDelegation(ctx, delegation); err != nil {
 		return nil, err
 	}
@@ -102,13 +99,8 @@ func (ms msgServer) SetPower(ctx context.Context, msg *poa.MsgSetPower) (*poa.Ms
 		return nil, err
 	}
 
-	delegations, err = ms.k.stakingKeeper.GetValidatorDelegations(ctx, valAddr)
-	if err != nil {
+	if err := ms.k.stakingKeeper.SetLastValidatorPower(ctx, valAddr, int64(msg.Power)); err != nil {
 		return nil, err
-	}
-
-	if len(delegations) != 1 {
-		return nil, fmt.Errorf("delegation error, expected 1, got %d", len(delegations))
 	}
 
 	return &poa.MsgSetPowerResponse{}, nil

@@ -111,8 +111,7 @@ func (d Description) EnsureLength() (Description, error) {
 }
 
 func (msg MsgSetPower) Validate(ac address.Codec) error {
-	_, err := ac.StringToBytes(msg.ValidatorAddress)
-	if err != nil {
+	if _, err := ac.StringToBytes(msg.ValidatorAddress); err != nil {
 		return sdkerrors.ErrInvalidAddress.Wrapf("invalid validator address: %s", err)
 	}
 
