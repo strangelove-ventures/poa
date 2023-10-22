@@ -45,7 +45,7 @@ func NewTxCmd(ac address.Codec) *cobra.Command {
 
 func NewSetPowerCmd(ac address.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:  "set-power [validator] [power]",
+		Use:  "set-power [validator] [power] [--unsafe]",
 		Args: cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -64,10 +64,16 @@ func NewSetPowerCmd(ac address.Codec) *cobra.Command {
 				return fmt.Errorf("strconv.ParseUint failed: %w", err)
 			}
 
+			unsafeAction, err := cmd.Flags().GetBool("unsafe")
+			if err != nil {
+				return fmt.Errorf("get unsafe flag failed: %w", err)
+			}
+
 			msg := &poa.MsgSetPower{
 				FromAddress:      clientCtx.GetFromAddress().String(),
 				ValidatorAddress: validator,
 				Power:            power,
+				Unsafe:           unsafeAction,
 			}
 
 			if err := msg.Validate(ac); err != nil {
@@ -79,6 +85,7 @@ func NewSetPowerCmd(ac address.Codec) *cobra.Command {
 	}
 
 	flags.AddTxFlagsToCmd(cmd)
+	cmd.Flags().Bool("unsafe", false, "set power without checking if validator is in the validator set")
 
 	return cmd
 }

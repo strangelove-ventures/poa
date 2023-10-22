@@ -9,6 +9,7 @@ import (
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
 	"github.com/strangelove-ventures/poa"
@@ -33,6 +34,10 @@ func (ms msgServer) SetPower(ctx context.Context, msg *poa.MsgSetPower) (*poa.Ms
 		return nil, fmt.Errorf("not an authority")
 	}
 
+	if err := msg.Validate(ms.k.validatorAddressCodec); err != nil {
+		return nil, err
+	}
+
 	isPending, err := ms.k.IsValidatorPending(ctx, msg.ValidatorAddress)
 	if err != nil {
 		return nil, err
@@ -42,7 +47,18 @@ func (ms msgServer) SetPower(ctx context.Context, msg *poa.MsgSetPower) (*poa.Ms
 		if err := ms.acceptNewValidator(ctx, msg.ValidatorAddress, msg.Power); err != nil {
 			return nil, err
 		}
+	}
 
+	// if msg.Unsafe is true, we don't check the total power and set it.
+	if !msg.Unsafe {
+		totalPower, err := ms.getTotalChainPower(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		if msg.Power > totalPower.Mul(math.NewInt(30)).Quo(math.NewInt(100)).Uint64() {
+			return nil, fmt.Errorf("unsafe: msg.Power is >30%% of total power, set unsafe=true to override")
+		}
 	}
 
 	valAddr, err := sdk.ValAddressFromBech32(msg.ValidatorAddress)
@@ -98,11 +114,34 @@ func (ms msgServer) SetPower(ctx context.Context, msg *poa.MsgSetPower) (*poa.Ms
 	return &poa.MsgSetPowerResponse{}, nil
 }
 
+func (ms msgServer) getTotalChainPower(ctx context.Context) (math.Int, error) {
+	delSum := math.ZeroInt()
+	allDelegations, err := ms.k.stakingKeeper.GetAllDelegations(ctx)
+	if err != nil {
+		return math.ZeroInt(), err
+	}
+
+	for _, del := range allDelegations {
+		delSum = delSum.Add(del.Shares.TruncateInt())
+	}
+
+	return delSum, nil
+}
+
 func (ms msgServer) RemoveValidator(ctx context.Context, msg *poa.MsgRemoveValidator) (*poa.MsgRemoveValidatorResponse, error) {
 	if ok, err := ms.isAdmin(ctx, msg.FromAddress); err != nil {
 		return nil, err
 	} else if !ok {
 		return nil, fmt.Errorf("not an authority")
+	}
+
+	// Ensure we do not remove the last validator in the set.
+	allValidators, err := ms.k.stakingKeeper.GetAllValidators(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("GetAllValidators failed: %w", err)
+	}
+	if len(allValidators) == 1 {
+		return nil, fmt.Errorf("cannot remove the last validator")
 	}
 
 	valAddr, err := sdk.ValAddressFromBech32(msg.ValidatorAddress)
@@ -195,7 +234,7 @@ func (ms msgServer) CreateValidator(ctx context.Context, msg *poa.MsgCreateValid
 		return nil, err
 	}
 
-	validator.MinSelfDelegation = msg.MinSelfDelegation
+	validator.MinSelfDelegation = math.NewInt(1)
 
 	// the validator is now pending approval to be let into the set.
 	// Until then, they are not apart of the set.
@@ -240,6 +279,23 @@ func (ms msgServer) acceptNewValidator(ctx context.Context, operatingAddress str
 		return err
 	}
 
+	cons, err := val.GetConsAddr()
+	if err != nil {
+		return err
+	}
+
+	err = ms.k.slashKeeper.SetValidatorSigningInfo(ctx, sdk.ConsAddress(cons), slashingtypes.ValidatorSigningInfo{
+		Address:             sdk.ConsAddress(cons).String(),
+		StartHeight:         sdkCtx.BlockHeight(),
+		IndexOffset:         0,
+		JailedUntil:         sdkCtx.BlockHeader().Time,
+		Tombstoned:          false,
+		MissedBlocksCounter: 0,
+	})
+	if err != nil {
+		return err
+	}
+
 	// call the after-creation hook
 	if err := ms.k.stakingKeeper.Hooks().AfterValidatorCreated(ctx, valAddr); err != nil {
 		return err
@@ -248,6 +304,8 @@ func (ms msgServer) acceptNewValidator(ctx context.Context, operatingAddress str
 	if err := ms.k.RemovePendingValidator(ctx, val.OperatorAddress); err != nil {
 		return err
 	}
+
+	// TODO: set validator signing info (slashing) - how does staking do it?
 
 	sdkCtx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
@@ -287,11 +345,28 @@ func (ms msgServer) clearValidator(ctx context.Context, valAddr sdk.ValAddress) 
 		}
 	}
 
-	val.Status = stakingtypes.Unbonded
+	// val.Status = stakingtypes.Unbonding // this removes the validator from singing BUT is not fully unbonded yet.
 	val.Tokens = math.ZeroInt()
 	val.DelegatorShares = math.LegacyNewDecFromInt(math.ZeroInt())
 	if err := ms.k.stakingKeeper.SetValidator(ctx, val); err != nil {
 		return fmt.Errorf("SetValidator failed: %w", err)
+	}
+
+	// Set their power to 0 they do no longer propose any blocks
+	if err := ms.k.stakingKeeper.SetLastValidatorPower(ctx, valAddr, 0); err != nil {
+		return fmt.Errorf("SetLastValidatorPower failed: %w", err)
+	}
+
+	// clear missed blocks
+	cons, err := val.GetConsAddr()
+	if err != nil {
+		return fmt.Errorf("GetConsAddr failed: %w", err)
+	}
+	if err := ms.k.slashKeeper.DeleteMissedBlockBitmap(ctx, sdk.ConsAddress(cons)); err != nil {
+		return err
+	}
+	if err := ms.k.slashKeeper.SetValidatorSigningInfo(ctx, sdk.ConsAddress(cons), slashingtypes.ValidatorSigningInfo{}); err != nil {
+		return err
 	}
 
 	// Do we handle? or does the sdk do this (may need to wait until the next block?)

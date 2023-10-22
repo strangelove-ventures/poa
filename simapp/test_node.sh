@@ -4,7 +4,7 @@
 # cd simapp
 # BINARY="poad" CHAIN_ID="poa-1" HOME_DIR="$HOME/.poad" TIMEOUT_COMMIT="500ms" CLEAN=true sh test_node.sh
 #
-# poad tx poa set-power $(poad q staking validators --output=json | jq .validators[0].operator_address -r) 1230000 --home=$HOME_DIR --yes --from=acc1
+# poad tx poa set-power $(poad q staking validators --output=json | jq .validators[0].operator_address -r) 12356789 --home=$HOME_DIR --yes --from=acc1 --unsafe
 # poad q staking validators
 # poad tx poa remove $(poad q staking validators --output=json | jq .validators[0].operator_address -r) --home=$HOME_DIR --yes --from=acc1
 #
@@ -14,7 +14,7 @@
 # Create a validator
 # poad tx poa create-validator simapp/validator_file.json --from acc3 --yes --home=$HOME_DIR # no genesis amount
 # poad q poa pending-validators --output json
-# poad tx poa set-power $(poad q poa pending-validators --output=json | jq .pending[0].operator_address -r) 123 --home=$HOME_DIR --yes --from=acc1
+# poad tx poa set-power $(poad q poa pending-validators --output=json | jq .pending[0].operator_address -r) 1000000 --home=$HOME_DIR --yes --from=acc1
 # poad tx poa remove $(poad q staking validators --output=json | jq .validators[1].operator_address -r) --home=$HOME_DIR --yes --from=acc1
 
 export KEY="acc1" # validator
