@@ -26,11 +26,8 @@ func NewMsgServerImpl(keeper Keeper) poa.MsgServer {
 	return &msgServer{k: keeper}
 }
 
-// ! IMPORTANT: if set to low the chain halts (delegations must be above 1_000_000stake atm)
 func (ms msgServer) SetPower(ctx context.Context, msg *poa.MsgSetPower) (*poa.MsgSetPowerResponse, error) {
-	if ok, err := ms.isAdmin(ctx, msg.FromAddress); err != nil {
-		return nil, err
-	} else if !ok {
+	if ok := ms.isAdmin(ctx, msg.FromAddress); !ok {
 		return nil, fmt.Errorf("not an authority")
 	}
 
@@ -38,117 +35,74 @@ func (ms msgServer) SetPower(ctx context.Context, msg *poa.MsgSetPower) (*poa.Ms
 		return nil, err
 	}
 
-	isPending, err := ms.k.IsValidatorPending(ctx, msg.ValidatorAddress)
-	if err != nil {
+	// accepts a validator into the active set if they are pending approval.
+	if isPending, err := ms.k.IsValidatorPending(ctx, msg.ValidatorAddress); err != nil {
 		return nil, err
-	}
-
-	if isPending {
+	} else if isPending {
 		if err := ms.acceptNewValidator(ctx, msg.ValidatorAddress, msg.Power); err != nil {
 			return nil, err
 		}
 	}
 
-	// if msg.Unsafe is true, we don't check the total power and set it.
 	if !msg.Unsafe {
-		totalPower, err := ms.getTotalChainPower(ctx)
+		totalPOAPower := math.ZeroInt()
+		allDelegations, err := ms.k.stakingKeeper.GetAllDelegations(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		if msg.Power > totalPower.Mul(math.NewInt(30)).Quo(math.NewInt(100)).Uint64() {
+		for _, del := range allDelegations {
+			totalPOAPower = totalPOAPower.Add(del.Shares.TruncateInt())
+		}
+
+		if msg.Power > totalPOAPower.Mul(math.NewInt(30)).Quo(math.NewInt(100)).Uint64() {
 			return nil, fmt.Errorf("unsafe: msg.Power is >30%% of total power, set unsafe=true to override")
 		}
 	}
 
-	valAddr, err := sdk.ValAddressFromBech32(msg.ValidatorAddress)
-	if err != nil {
-		return nil, fmt.Errorf("ValAddressFromBech32 failed: %w", err)
-	}
-
-	val, err := ms.k.stakingKeeper.GetValidator(ctx, valAddr)
-	if err != nil {
-		return nil, fmt.Errorf("GetValidator failed: %w", err)
-	}
-
-	// clean delegations up
-	delegations, err := ms.k.stakingKeeper.GetValidatorDelegations(ctx, valAddr)
-	if err != nil {
-		return nil, err
-	}
-	for _, del := range delegations {
-		if err := ms.k.stakingKeeper.RemoveDelegation(ctx, del); err != nil {
-			return nil, err
-		}
-	}
-
-	delegation := stakingtypes.Delegation{
-		DelegatorAddress: sdk.AccAddress(valAddr.Bytes()).String(),
-		ValidatorAddress: val.OperatorAddress,
-		Shares:           math.LegacyNewDec(int64(msg.Power)),
-	}
-
-	val.DelegatorShares = delegation.Shares
-	val.Tokens = math.NewIntFromUint64(msg.Power)
-	val.Status = stakingtypes.Bonded
-	if err := ms.k.stakingKeeper.SetDelegation(ctx, delegation); err != nil {
-		return nil, err
-	}
-
-	if err := ms.k.stakingKeeper.SetValidator(ctx, val); err != nil {
-		return nil, err
-	}
-
-	if err := ms.k.stakingKeeper.SetLastValidatorPower(ctx, valAddr, int64(msg.Power)); err != nil {
+	// sets the new POA power for the validator
+	if _, err := ms.updatePOAPower(ctx, msg.ValidatorAddress, int64(msg.Power)); err != nil {
 		return nil, err
 	}
 
 	return &poa.MsgSetPowerResponse{}, nil
 }
 
-func (ms msgServer) getTotalChainPower(ctx context.Context) (math.Int, error) {
-	delSum := math.ZeroInt()
-	allDelegations, err := ms.k.stakingKeeper.GetAllDelegations(ctx)
-	if err != nil {
-		return math.ZeroInt(), err
-	}
-
-	for _, del := range allDelegations {
-		delSum = delSum.Add(del.Shares.TruncateInt())
-	}
-
-	return delSum, nil
-}
-
 func (ms msgServer) RemoveValidator(ctx context.Context, msg *poa.MsgRemoveValidator) (*poa.MsgRemoveValidatorResponse, error) {
-	if ok, err := ms.isAdmin(ctx, msg.FromAddress); err != nil {
-		return nil, err
-	} else if !ok {
+	if ok := ms.isAdmin(ctx, msg.FromAddress); !ok {
 		return nil, fmt.Errorf("not an authority")
 	}
 
 	// Ensure we do not remove the last validator in the set.
 	allValidators, err := ms.k.stakingKeeper.GetAllValidators(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("GetAllValidators failed: %w", err)
+		return nil, err
 	}
 	if len(allValidators) == 1 {
 		return nil, fmt.Errorf("cannot remove the last validator")
 	}
 
-	valAddr, err := sdk.ValAddressFromBech32(msg.ValidatorAddress)
+	val, err := ms.updatePOAPower(ctx, msg.ValidatorAddress, 0)
 	if err != nil {
-		return nil, fmt.Errorf("ValAddressFromBech32 failed: %w", err)
+		return nil, err
 	}
 
-	if err := ms.clearValidator(ctx, valAddr); err != nil {
-		return nil, fmt.Errorf("clearValidator failed: %w", err)
+	// clear missed blocks (is this needed?)
+	cons, err := val.GetConsAddr()
+	if err != nil {
+		return nil, err
+	}
+	if err := ms.k.slashKeeper.DeleteMissedBlockBitmap(ctx, sdk.ConsAddress(cons)); err != nil {
+		return nil, err
+	}
+	if err := ms.k.slashKeeper.SetValidatorSigningInfo(ctx, sdk.ConsAddress(cons), slashingtypes.ValidatorSigningInfo{}); err != nil {
+		return nil, err
 	}
 
 	return &poa.MsgRemoveValidatorResponse{}, nil
 }
 
-// CreateValidator implements poa.MsgServer.
+// pulled from x/staking
 func (ms msgServer) CreateValidator(ctx context.Context, msg *poa.MsgCreateValidator) (*poa.MsgCreateValidatorResponse, error) {
 	valAddr, err := ms.k.validatorAddressCodec.StringToBytes(msg.ValidatorAddress)
 	if err != nil {
@@ -228,8 +182,7 @@ func (ms msgServer) CreateValidator(ctx context.Context, msg *poa.MsgCreateValid
 
 	validator.MinSelfDelegation = math.NewInt(1)
 
-	// the validator is now pending approval to be let into the set.
-	// Until then, they are not apart of the set.
+	// appends the validator to a queue to wait for approval from an admin.
 	if err := ms.k.AddPendingValidator(ctx, validator, pk); err != nil {
 		return nil, err
 	}
@@ -237,21 +190,27 @@ func (ms msgServer) CreateValidator(ctx context.Context, msg *poa.MsgCreateValid
 	return &poa.MsgCreateValidatorResponse{}, nil
 }
 
+func (ms msgServer) UpdateParams(ctx context.Context, msg *poa.MsgUpdateParams) (*poa.MsgUpdateParamsResponse, error) {
+	if ok := ms.isAdmin(ctx, msg.FromAddress); !ok {
+		return nil, fmt.Errorf("not an authority")
+	}
+
+	return &poa.MsgUpdateParamsResponse{}, ms.k.SetParams(ctx, msg.Params)
+}
+
 // takes in a validator address & sees if they are pending approval.
-// if so, we create them now.
-// TODO: use stakingtypes.Validator in GetPendingValidator?
 func (ms msgServer) acceptNewValidator(ctx context.Context, operatingAddress string, power uint64) error {
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
 
+	// Get the validator configuration from their CreateValidator message in the past.
 	poaVal, err := ms.k.GetPendingValidator(ctx, operatingAddress)
 	if err != nil {
 		return err
 	}
 
-	// ideally we just save the type
 	val := poa.ConvertPOAToStaking(poaVal)
 
-	valAddr, err := ms.k.validatorAddressCodec.StringToBytes(val.OperatorAddress) // this is the same as the ValidatorAddress yes?
+	valAddr, err := ms.k.validatorAddressCodec.StringToBytes(val.OperatorAddress)
 	if err != nil {
 		return sdkerrors.ErrInvalidAddress.Wrapf("invalid validator address: %s", err)
 	}
@@ -271,24 +230,22 @@ func (ms msgServer) acceptNewValidator(ctx context.Context, operatingAddress str
 		return err
 	}
 
+	// sets validator slashing defaults (useful for downtime jailing)
 	cons, err := val.GetConsAddr()
 	if err != nil {
 		return err
 	}
-
-	err = ms.k.slashKeeper.SetValidatorSigningInfo(ctx, sdk.ConsAddress(cons), slashingtypes.ValidatorSigningInfo{
+	if err := ms.k.slashKeeper.SetValidatorSigningInfo(ctx, sdk.ConsAddress(cons), slashingtypes.ValidatorSigningInfo{
 		Address:             sdk.ConsAddress(cons).String(),
 		StartHeight:         sdkCtx.BlockHeight(),
 		IndexOffset:         0,
 		JailedUntil:         sdkCtx.BlockHeader().Time,
 		Tombstoned:          false,
 		MissedBlocksCounter: 0,
-	})
-	if err != nil {
+	}); err != nil {
 		return err
 	}
 
-	// call the after-creation hook
 	if err := ms.k.stakingKeeper.Hooks().AfterValidatorCreated(ctx, valAddr); err != nil {
 		return err
 	}
@@ -297,8 +254,7 @@ func (ms msgServer) acceptNewValidator(ctx context.Context, operatingAddress str
 		return err
 	}
 
-	// TODO: set validator signing info (slashing) - how does staking do it?
-
+	// The validator is actually created now, so emit the necessary events
 	sdkCtx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			stakingtypes.EventTypeCreateValidator,
@@ -310,72 +266,62 @@ func (ms msgServer) acceptNewValidator(ctx context.Context, operatingAddress str
 	return nil
 }
 
-func (ms msgServer) UpdateParams(ctx context.Context, msg *poa.MsgUpdateParams) (*poa.MsgUpdateParamsResponse, error) {
-	if ok, err := ms.isAdmin(ctx, msg.FromAddress); err != nil {
-		return nil, err
-	} else if !ok {
-		return nil, fmt.Errorf("not an authority")
+// updatePOAPower removes all delegations, sets a single delegation for POA power, updates the validator with the new shares
+// and sets the last validator power to the new value.
+func (ms msgServer) updatePOAPower(ctx context.Context, valOpBech32 string, power int64) (stakingtypes.Validator, error) {
+	valAddr, err := sdk.ValAddressFromBech32(valOpBech32)
+	if err != nil {
+		return stakingtypes.Validator{}, err
 	}
 
-	return &poa.MsgUpdateParamsResponse{}, ms.k.SetParams(ctx, msg.Params)
-}
-
-func (ms msgServer) clearValidator(ctx context.Context, valAddr sdk.ValAddress) error {
 	val, err := ms.k.stakingKeeper.GetValidator(ctx, valAddr)
 	if err != nil {
-		return fmt.Errorf("GetValidator failed: %w", err)
+		return stakingtypes.Validator{}, err
 	}
 
+	// remove all delegations (for safety)
 	delegations, err := ms.k.stakingKeeper.GetValidatorDelegations(ctx, valAddr)
 	if err != nil {
-		return fmt.Errorf("GetValidatorDelegations failed: %w", err)
+		return stakingtypes.Validator{}, err
 	}
 
 	for _, del := range delegations {
 		if err := ms.k.stakingKeeper.RemoveDelegation(ctx, del); err != nil {
-			return fmt.Errorf("RemoveDelegation failed: %w", err)
+			return stakingtypes.Validator{}, err
 		}
 	}
 
-	// val.Status = stakingtypes.Unbonding // this removes the validator from singing BUT is not fully unbonded yet.
-	val.Tokens = math.ZeroInt()
-	val.DelegatorShares = math.LegacyNewDecFromInt(math.ZeroInt())
+	// set a single updated delegation of power
+	delegation := stakingtypes.Delegation{
+		DelegatorAddress: sdk.AccAddress(valAddr.Bytes()).String(),
+		ValidatorAddress: val.OperatorAddress,
+		Shares:           math.LegacyNewDec(power),
+	}
+
+	val.Tokens = math.NewIntFromUint64(uint64(power))
+	val.DelegatorShares = delegation.Shares
+	val.Status = stakingtypes.Bonded
 	if err := ms.k.stakingKeeper.SetValidator(ctx, val); err != nil {
-		return fmt.Errorf("SetValidator failed: %w", err)
+		return stakingtypes.Validator{}, err
 	}
 
-	// Set their power to 0 they do no longer propose any blocks
-	if err := ms.k.stakingKeeper.SetLastValidatorPower(ctx, valAddr, 0); err != nil {
-		return fmt.Errorf("SetLastValidatorPower failed: %w", err)
+	if err := ms.k.stakingKeeper.SetDelegation(ctx, delegation); err != nil {
+		return stakingtypes.Validator{}, err
 	}
 
-	// clear missed blocks
-	cons, err := val.GetConsAddr()
-	if err != nil {
-		return fmt.Errorf("GetConsAddr failed: %w", err)
-	}
-	if err := ms.k.slashKeeper.DeleteMissedBlockBitmap(ctx, sdk.ConsAddress(cons)); err != nil {
-		return err
-	}
-	if err := ms.k.slashKeeper.SetValidatorSigningInfo(ctx, sdk.ConsAddress(cons), slashingtypes.ValidatorSigningInfo{}); err != nil {
-		return err
+	if err := ms.k.stakingKeeper.SetLastValidatorPower(ctx, valAddr, power); err != nil {
+		return stakingtypes.Validator{}, err
 	}
 
-	// Do we handle? or does the sdk do this (may need to wait until the next block?)
-	// validator record not found for address: 67AE8730FE9C4A8E67FB699F61EEA7F90627B34F\n
-	// if err := ms.k.stakingKeeper.RemoveValidator(ctx, valAddr); err != nil {
-	// 	return fmt.Errorf("removevalidator failed: %w", err)
-	// }
-
-	return nil
+	return val, nil
 }
 
-func (ms msgServer) isAdmin(ctx context.Context, fromAddr string) (bool, error) {
+func (ms msgServer) isAdmin(ctx context.Context, fromAddr string) bool {
 	for _, auth := range ms.k.GetAdmins(ctx) {
 		if auth == fromAddr {
-			return true, nil
+			return true
 		}
 	}
 
-	return false, nil
+	return false
 }
