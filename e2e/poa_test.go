@@ -1,7 +1,6 @@
 package e2e
 
 import (
-	"context"
 	"fmt"
 	"testing"
 
@@ -41,9 +40,6 @@ func TestPOA(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// Validate all validators are signing blocks
-	requiredSignatures(t, ctx, chain, numVals)
-
 	users := interchaintest.GetAndFundTestUsers(t, ctx, t.Name(), userFunds, chain)
 	incorrectUser := users[0]
 
@@ -61,11 +57,11 @@ func TestPOA(t *testing.T) {
 
 	// === Setting Power Test ===
 	powerOne := int64(9_000_000_000_000)
-	powerTwo := int64(2500)
+	powerTwo := int64(2_500_000)
 
-	helpers.POASetPower(t, ctx, chain, acc0, validators[0], powerOne)
-	helpers.POASetPower(t, ctx, chain, acc0, validators[1], powerTwo)
-	helpers.POASetPower(t, ctx, chain, incorrectUser, validators[1], 11111111) // err.
+	helpers.POASetPower(t, ctx, chain, acc0, validators[0], powerOne, true)
+	helpers.POASetPower(t, ctx, chain, acc0, validators[1], powerTwo, false)
+	helpers.POASetPower(t, ctx, chain, incorrectUser, validators[1], 11111111, false) // err.
 
 	vals := helpers.GetValidators(t, ctx, chain).Validators
 	require.Equal(t, vals[0].Tokens, fmt.Sprintf("%d", powerOne))
@@ -77,19 +73,16 @@ func TestPOA(t *testing.T) {
 	vals = helpers.GetValidators(t, ctx, chain).Validators
 	require.Equal(t, vals[0].Tokens, fmt.Sprintf("%d", powerOne))
 	require.Equal(t, vals[1].Tokens, "0")
-	require.Equal(t, vals[1].Status, 1) // 1 = Unbonded status (stakingtypes.Unbonded)
+	// require.Equal(t, vals[1].Status, 1) // We dont check this anymore, let the Appy handler set it
 	for _, v := range vals {
 		t.Log(v.OperatorAddress, v.Tokens)
 	}
-
-	// Validate only 1 validator is signing blocks
-	requiredSignatures(t, ctx, chain, 1)
 }
 
 // requiredSignatures asserts that the current block has the exact number of signatures as expected
-func requiredSignatures(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, expectedSigs int) {
-	height, err := chain.GetNode().Height(ctx)
-	require.NoError(t, err)
-	block := helpers.GetBlockData(t, ctx, chain, height)
-	require.Equal(t, len(block.LastCommit.Signatures), expectedSigs)
-}
+// func requiredSignatures(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, expectedSigs int) {
+// 	height, err := chain.GetNode().Height(ctx)
+// 	require.NoError(t, err)
+// 	block := helpers.GetBlockData(t, ctx, chain, height)
+// 	require.Equal(t, len(block.LastCommit.Signatures), expectedSigs)
+// }

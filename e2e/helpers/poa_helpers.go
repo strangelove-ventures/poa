@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func POASetPower(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, user ibc.Wallet, valoper string, power int64) TxResponse {
+func POASetPower(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, user ibc.Wallet, valoper string, power int64, unsafe bool) TxResponse {
 	cmd := []string{chain.Config().Bin, "tx", "poa", "set-power", valoper, fmt.Sprintf("%d", power),
 		"--node", chain.GetRPCAddress(),
 		"--home", chain.HomeDir(),
@@ -25,6 +25,11 @@ func POASetPower(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, u
 		"--output=json",
 		"-y",
 	}
+
+	if unsafe {
+		cmd = append(cmd, "--unsafe")
+	}
+
 	stdout, _, err := chain.Exec(ctx, cmd, nil)
 	require.NoError(t, err)
 
