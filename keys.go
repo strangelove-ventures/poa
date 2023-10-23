@@ -5,7 +5,8 @@ import (
 )
 
 var (
-	ParamsKey = collections.NewPrefix(0)
+	ParamsKey            = collections.NewPrefix(0)
+	PendingValidatorsKey = collections.NewPrefix(1)
 )
 
 const (

@@ -4,14 +4,19 @@ package strangelove_ventures.poa.v1;
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "strangelove_ventures/poa/v1/params.proto";
+import "strangelove_ventures/poa/v1/validator.proto";
 
 option go_package = "github.com/strangelove-ventures/poa";
 
 // Query defines the gRPC querier service.
 service Query {
   // Params returns the current params of the module.
-  rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
+  rpc Params(QueryParamsRequest) returns (ParamsResponse) {
     option (google.api.http).get = "/poa/v1/params";
+  }
+  // PendingValidators
+  rpc PendingValidators(QueryPendingValidatorsRequest) returns (PendingValidatorsResponse) {
+    option (google.api.http).get = "/poa/v1/pending_validators";
   }
 }
 
@@ -19,7 +24,16 @@ service Query {
 message QueryParamsRequest {}
 
 // QueryParamsResponse is the response type for the Query/Params RPC method.
-message QueryParamsResponse {
+message ParamsResponse {
   // params is the returned parameter from the module
   Params params = 1 [ (gogoproto.nullable) = false ];
+}
+
+// QueryPendingValidatorsRequest
+message QueryPendingValidatorsRequest {}
+
+// QueryPendingValidatorResponse
+message PendingValidatorsResponse {
+  // pending 
+  repeated Validator pending = 1 [ (gogoproto.nullable) = false ];
 }

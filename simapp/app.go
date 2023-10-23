@@ -125,6 +125,7 @@ var (
 		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
 		govtypes.ModuleName:            {authtypes.Burner},
 		nft.ModuleName:                 nil,
+		poa.ModuleName:                 {authtypes.Minter},
 	}
 )
 
@@ -165,7 +166,7 @@ type SimApp struct {
 	NFTKeeper             nftkeeper.Keeper
 	ConsensusParamsKeeper consensusparamkeeper.Keeper
 	CircuitKeeper         circuitkeeper.Keeper
-	POAModule             poakeeper.Keeper
+	POAKeeper             poakeeper.Keeper
 
 	// the module manager
 	ModuleManager      *module.Manager
@@ -312,12 +313,14 @@ func NewSimApp(
 	app.FeeGrantKeeper = feegrantkeeper.NewKeeper(appCodec, runtime.NewKVStoreService(keys[feegrant.StoreKey]), app.AccountKeeper)
 
 	// POA Module
-	app.POAModule = poakeeper.NewKeeper(
+	app.POAKeeper = poakeeper.NewKeeper(
 		appCodec,
 		runtime.NewKVStoreService(keys[poatypes.StoreKey]),
 		app.StakingKeeper,
+		app.SlashingKeeper,
+		authcodec.NewBech32Codec(sdk.Bech32PrefixValAddr),
 	)
-	poaAppModule := poamodule.NewAppModule(appCodec, app.POAModule)
+	poaAppModule := poamodule.NewAppModule(appCodec, app.POAKeeper)
 
 	// register the staking hooks
 	// NOTE: stakingKeeper above is passed by reference, so that it will contain these hooks

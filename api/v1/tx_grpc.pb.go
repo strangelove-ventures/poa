@@ -19,6 +19,7 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
+	Msg_CreateValidator_FullMethodName = "/strangelove_ventures.poa.v1.Msg/CreateValidator"
 	Msg_SetPower_FullMethodName        = "/strangelove_ventures.poa.v1.Msg/SetPower"
 	Msg_RemoveValidator_FullMethodName = "/strangelove_ventures.poa.v1.Msg/RemoveValidator"
 	Msg_UpdateParams_FullMethodName    = "/strangelove_ventures.poa.v1.Msg/UpdateParams"
@@ -28,7 +29,10 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type MsgClient interface {
+	// x/staking wrappers (future)
+	CreateValidator(ctx context.Context, in *MsgCreateValidator, opts ...grpc.CallOption) (*MsgCreateValidatorResponse, error)
 	// SetPower sets the new power of a validator.
+	// This also doubles as a way to accept pending validators
 	SetPower(ctx context.Context, in *MsgSetPower, opts ...grpc.CallOption) (*MsgSetPowerResponse, error)
 	// RemoveValidator removes a validator from the active set and unbonds their delegations.
 	RemoveValidator(ctx context.Context, in *MsgRemoveValidator, opts ...grpc.CallOption) (*MsgRemoveValidatorResponse, error)
@@ -42,6 +46,15 @@ type msgClient struct {
 
 func NewMsgClient(cc grpc.ClientConnInterface) MsgClient {
 	return &msgClient{cc}
+}
+
+func (c *msgClient) CreateValidator(ctx context.Context, in *MsgCreateValidator, opts ...grpc.CallOption) (*MsgCreateValidatorResponse, error) {
+	out := new(MsgCreateValidatorResponse)
+	err := c.cc.Invoke(ctx, Msg_CreateValidator_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *msgClient) SetPower(ctx context.Context, in *MsgSetPower, opts ...grpc.CallOption) (*MsgSetPowerResponse, error) {
@@ -75,7 +88,10 @@ func (c *msgClient) UpdateParams(ctx context.Context, in *MsgUpdateParams, opts 
 // All implementations must embed UnimplementedMsgServer
 // for forward compatibility
 type MsgServer interface {
+	// x/staking wrappers (future)
+	CreateValidator(context.Context, *MsgCreateValidator) (*MsgCreateValidatorResponse, error)
 	// SetPower sets the new power of a validator.
+	// This also doubles as a way to accept pending validators
 	SetPower(context.Context, *MsgSetPower) (*MsgSetPowerResponse, error)
 	// RemoveValidator removes a validator from the active set and unbonds their delegations.
 	RemoveValidator(context.Context, *MsgRemoveValidator) (*MsgRemoveValidatorResponse, error)
@@ -88,6 +104,9 @@ type MsgServer interface {
 type UnimplementedMsgServer struct {
 }
 
+func (UnimplementedMsgServer) CreateValidator(context.Context, *MsgCreateValidator) (*MsgCreateValidatorResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateValidator not implemented")
+}
 func (UnimplementedMsgServer) SetPower(context.Context, *MsgSetPower) (*MsgSetPowerResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetPower not implemented")
 }
@@ -108,6 +127,24 @@ type UnsafeMsgServer interface {
 
 func RegisterMsgServer(s grpc.ServiceRegistrar, srv MsgServer) {
 	s.RegisterService(&Msg_ServiceDesc, srv)
+}
+
+func _Msg_CreateValidator_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgCreateValidator)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).CreateValidator(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Msg_CreateValidator_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).CreateValidator(ctx, req.(*MsgCreateValidator))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _Msg_SetPower_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -171,6 +208,10 @@ var Msg_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "strangelove_ventures.poa.v1.Msg",
 	HandlerType: (*MsgServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "CreateValidator",
+			Handler:    _Msg_CreateValidator_Handler,
+		},
 		{
 			MethodName: "SetPower",
 			Handler:    _Msg_SetPower_Handler,

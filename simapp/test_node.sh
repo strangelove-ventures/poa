@@ -4,15 +4,22 @@
 # cd simapp
 # BINARY="poad" CHAIN_ID="poa-1" HOME_DIR="$HOME/.poad" TIMEOUT_COMMIT="500ms" CLEAN=true sh test_node.sh
 #
-# poad tx poa set-power $(poad q staking validators --output=json | jq .validators[0].operator_address -r) 1230000 --home=$HOME_DIR --yes --from=acc1
+# poad tx poa set-power $(poad q staking validators --output=json | jq .validators[0].operator_address -r) 12356789 --home=$HOME_DIR --yes --from=acc1 --unsafe
 # poad q staking validators
 # poad tx poa remove $(poad q staking validators --output=json | jq .validators[0].operator_address -r) --home=$HOME_DIR --yes --from=acc1
 #
 # validate staking msg err
 # poad tx staking delegate $(poad q staking validators --output=json | jq .validators[0].operator_address -r) 1stake --home=$HOME_DIR --yes --from=acc1
+#
+# Create a validator
+# poad tx poa create-validator simapp/validator_file.json --from acc3 --yes --home=$HOME_DIR # no genesis amount
+# poad q poa pending-validators --output json
+# poad tx poa set-power $(poad q poa pending-validators --output=json | jq .pending[0].operator_address -r) 1000000 --home=$HOME_DIR --yes --from=acc1
+# poad tx poa remove $(poad q staking validators --output=json | jq .validators[1].operator_address -r) --home=$HOME_DIR --yes --from=acc1
 
-export KEY="acc1"
+export KEY="acc1" # validator
 export KEY2="acc2"
+export KEY2="acc3"
 
 export CHAIN_ID=${CHAIN_ID:-"local-1"}
 export MONIKER="moniker"
@@ -44,6 +51,12 @@ BINARY config set client chain-id $CHAIN_ID
 from_scratch () {
   # Fresh install on current branch
   go install ./...
+  status=$?
+  if [ $status -ne 0 ]; then
+    echo "Failed to install binary"
+    exit $status
+  fi
+
 
   # remove existing daemon.
   rm -rf $HOME_DIR && echo "Removed $HOME_DIR"  
@@ -52,6 +65,8 @@ from_scratch () {
   echo "decorate bright ozone fork gallery riot bus exhaust worth way bone indoor calm squirrel merry zero scheme cotton until shop any excess stage laundry" | BINARY keys add $KEY --keyring-backend $KEYRING --algo $KEYALGO --recover
   # cosmos1efd63aw40lxf3n4mhf7dzhjkr453axur6cpk92
   echo "wealth flavor believe regret funny network recall kiss grape useless pepper cram hint member few certain unveil rather brick bargain curious require crowd raise" | BINARY keys add $KEY2 --keyring-backend $KEYRING --algo $KEYALGO --recover
+  # cosmos1evcfka7s3200ypj0k2449cujlq3u4xe850hc4w
+  echo "year action hospital impulse repeat town caught glue palace guilt diet about melt outdoor orbit field income left visit client route float wife media" | BINARY keys add $KEY3 --keyring-backend $KEYRING --algo $KEYALGO --recover
   
   # TODO: move from stake to another denom, this works for now though.
   BINARY init $MONIKER --chain-id $CHAIN_ID --default-denom stake

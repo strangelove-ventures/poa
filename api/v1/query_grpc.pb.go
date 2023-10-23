@@ -19,7 +19,8 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Query_Params_FullMethodName = "/strangelove_ventures.poa.v1.Query/Params"
+	Query_Params_FullMethodName            = "/strangelove_ventures.poa.v1.Query/Params"
+	Query_PendingValidators_FullMethodName = "/strangelove_ventures.poa.v1.Query/PendingValidators"
 )
 
 // QueryClient is the client API for Query service.
@@ -27,7 +28,9 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type QueryClient interface {
 	// Params returns the current params of the module.
-	Params(ctx context.Context, in *QueryParamsRequest, opts ...grpc.CallOption) (*QueryParamsResponse, error)
+	Params(ctx context.Context, in *QueryParamsRequest, opts ...grpc.CallOption) (*ParamsResponse, error)
+	// PendingValidators
+	PendingValidators(ctx context.Context, in *QueryPendingValidatorsRequest, opts ...grpc.CallOption) (*PendingValidatorsResponse, error)
 }
 
 type queryClient struct {
@@ -38,9 +41,18 @@ func NewQueryClient(cc grpc.ClientConnInterface) QueryClient {
 	return &queryClient{cc}
 }
 
-func (c *queryClient) Params(ctx context.Context, in *QueryParamsRequest, opts ...grpc.CallOption) (*QueryParamsResponse, error) {
-	out := new(QueryParamsResponse)
+func (c *queryClient) Params(ctx context.Context, in *QueryParamsRequest, opts ...grpc.CallOption) (*ParamsResponse, error) {
+	out := new(ParamsResponse)
 	err := c.cc.Invoke(ctx, Query_Params_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *queryClient) PendingValidators(ctx context.Context, in *QueryPendingValidatorsRequest, opts ...grpc.CallOption) (*PendingValidatorsResponse, error) {
+	out := new(PendingValidatorsResponse)
+	err := c.cc.Invoke(ctx, Query_PendingValidators_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +64,9 @@ func (c *queryClient) Params(ctx context.Context, in *QueryParamsRequest, opts .
 // for forward compatibility
 type QueryServer interface {
 	// Params returns the current params of the module.
-	Params(context.Context, *QueryParamsRequest) (*QueryParamsResponse, error)
+	Params(context.Context, *QueryParamsRequest) (*ParamsResponse, error)
+	// PendingValidators
+	PendingValidators(context.Context, *QueryPendingValidatorsRequest) (*PendingValidatorsResponse, error)
 	mustEmbedUnimplementedQueryServer()
 }
 
@@ -60,8 +74,11 @@ type QueryServer interface {
 type UnimplementedQueryServer struct {
 }
 
-func (UnimplementedQueryServer) Params(context.Context, *QueryParamsRequest) (*QueryParamsResponse, error) {
+func (UnimplementedQueryServer) Params(context.Context, *QueryParamsRequest) (*ParamsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Params not implemented")
+}
+func (UnimplementedQueryServer) PendingValidators(context.Context, *QueryPendingValidatorsRequest) (*PendingValidatorsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PendingValidators not implemented")
 }
 func (UnimplementedQueryServer) mustEmbedUnimplementedQueryServer() {}
 
@@ -94,6 +111,24 @@ func _Query_Params_Handler(srv interface{}, ctx context.Context, dec func(interf
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Query_PendingValidators_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryPendingValidatorsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).PendingValidators(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Query_PendingValidators_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).PendingValidators(ctx, req.(*QueryPendingValidatorsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Query_ServiceDesc is the grpc.ServiceDesc for Query service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -104,6 +139,10 @@ var Query_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Params",
 			Handler:    _Query_Params_Handler,
+		},
+		{
+			MethodName: "PendingValidators",
+			Handler:    _Query_PendingValidators_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
