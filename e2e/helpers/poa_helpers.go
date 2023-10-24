@@ -38,8 +38,10 @@ func SubmitGovernanceProposalForValidatorChanges(t *testing.T, ctx context.Conte
 	title := fmt.Sprintf("Update" + validator + "Power")
 	desc := fmt.Sprintf("Updating power for validator %s to %d", validator, power)
 
-	proposal, err := chain.BuildProposal(powerMsg, title, desc, desc, fmt.Sprintf(`500000000%s`, chain.Config().Denom))
+	proposal, err := chain.BuildProposal(powerMsg, title, desc, desc, fmt.Sprintf(`500000000%s`, chain.Config().Denom), user.FormattedAddress(), false)
 	require.NoError(t, err, "error building proposal")
+
+	fmt.Println("proposal", proposal)
 
 	txProp, err := chain.SubmitProposal(ctx, user.KeyName(), proposal)
 	t.Log("txProp", txProp)

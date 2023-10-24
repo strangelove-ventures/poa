@@ -53,9 +53,7 @@ func TestPOA(t *testing.T) {
 	// disabled staking commands check
 	testStakingDisabled(t, ctx, chain, validators, acc0)
 	testPowerErrors(t, ctx, chain, validators, incorrectUser, acc0)
-
 	testRemoveValidator(t, ctx, chain, validators, acc0)
-
 	testPowerSwing(t, ctx, chain, validators, acc0)
 
 	// add a new node, create validator, add add them now at 50% with the validators[0]. This new validator is validator[2]
@@ -70,7 +68,7 @@ func TestPOA(t *testing.T) {
 	// Shut down 1 of those validators, ensure the network height halts.
 
 	// gov proposal to set a validator power
-	// testGovernance(t, ctx, chain, acc0, validators)
+	testGovernance(t, ctx, chain, acc0, validators)
 }
 
 func testRemoveValidator(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, validators []string, acc0 ibc.Wallet) {
