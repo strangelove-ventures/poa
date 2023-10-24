@@ -10,6 +10,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/strangelove-ventures/poa"
 
+	appmodule "cosmossdk.io/core/appmodule"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
@@ -18,6 +19,13 @@ import (
 
 	"github.com/strangelove-ventures/poa/client/cli"
 	"github.com/strangelove-ventures/poa/keeper"
+)
+
+var (
+	_ module.AppModule        = AppModule{}
+	_ module.AppModuleGenesis = AppModule{}
+
+	_ appmodule.HasBeginBlocker = AppModule{}
 )
 
 // ConsensusVersion defines the current module consensus version.
@@ -110,4 +118,9 @@ func (am AppModule) InitGenesis(ctx sdk.Context, cdc codec.JSONCodec, data json.
 func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONCodec) json.RawMessage {
 	gs := am.keeper.ExportGenesis(ctx)
 	return cdc.MustMarshalJSON(gs)
+}
+
+// BeginBlocker implements AppModule/BeginBlocker.
+func (am AppModule) BeginBlock(ctx context.Context) error {
+	return am.BeginBlocker(ctx)
 }
