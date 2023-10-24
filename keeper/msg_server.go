@@ -27,7 +27,7 @@ func NewMsgServerImpl(keeper Keeper) poa.MsgServer {
 }
 
 func (ms msgServer) SetPower(ctx context.Context, msg *poa.MsgSetPower) (*poa.MsgSetPowerResponse, error) {
-	if ok := ms.isAdmin(ctx, msg.FromAddress); !ok {
+	if ok := ms.isAdmin(ctx, msg.Sender); !ok {
 		return nil, poa.ErrNotAnAuthority
 	}
 
@@ -69,7 +69,7 @@ func (ms msgServer) SetPower(ctx context.Context, msg *poa.MsgSetPower) (*poa.Ms
 }
 
 func (ms msgServer) RemoveValidator(ctx context.Context, msg *poa.MsgRemoveValidator) (*poa.MsgRemoveValidatorResponse, error) {
-	if ok := ms.isAdmin(ctx, msg.FromAddress); !ok {
+	if ok := ms.isAdmin(ctx, msg.Sender); !ok {
 		return nil, poa.ErrNotAnAuthority
 	}
 
@@ -191,7 +191,7 @@ func (ms msgServer) CreateValidator(ctx context.Context, msg *poa.MsgCreateValid
 }
 
 func (ms msgServer) UpdateParams(ctx context.Context, msg *poa.MsgUpdateParams) (*poa.MsgUpdateParamsResponse, error) {
-	if ok := ms.isAdmin(ctx, msg.FromAddress); !ok {
+	if ok := ms.isAdmin(ctx, msg.Sender); !ok {
 		return nil, poa.ErrNotAnAuthority
 	}
 

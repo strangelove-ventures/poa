@@ -23,12 +23,11 @@ func POARemove(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, use
 }
 
 func SubmitGovernanceProposalForValidatorChanges(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, user ibc.Wallet, validator string, power uint64, unsafe bool) string {
-	moduleAddr, err := chain.GetModuleAddress(ctx, "gov")
-	require.NoError(t, err, "error getting module address")
+	govAddr := "cosmos10d07y265gmmuvt4z0w9aw880jnsr700j6zn9kn"
 
 	powerMsg := []cosmosproto.Message{
 		&poa.MsgSetPower{
-			FromAddress:      moduleAddr,
+			Sender:           govAddr,
 			ValidatorAddress: validator,
 			Power:            power,
 			Unsafe:           unsafe,
@@ -41,7 +40,7 @@ func SubmitGovernanceProposalForValidatorChanges(t *testing.T, ctx context.Conte
 	proposal, err := chain.BuildProposal(powerMsg, title, desc, desc, fmt.Sprintf(`500000000%s`, chain.Config().Denom), user.FormattedAddress(), false)
 	require.NoError(t, err, "error building proposal")
 
-	fmt.Println("proposal", proposal)
+	fmt.Printf("proposal: %+v\n", proposal)
 
 	txProp, err := chain.SubmitProposal(ctx, user.KeyName(), proposal)
 	t.Log("txProp", txProp)
