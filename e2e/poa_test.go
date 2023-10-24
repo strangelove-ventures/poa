@@ -50,8 +50,9 @@ func TestPOA(t *testing.T) {
 	require.Equal(t, len(validators), numVals)
 	assertSignatures(t, ctx, chain, len(validators))
 
-	// disabled staking commands check
+	// === Test Cases ===
 	testStakingDisabled(t, ctx, chain, validators, acc0)
+	testGovernance(t, ctx, chain, acc0, validators)
 	testPowerErrors(t, ctx, chain, validators, incorrectUser, acc0)
 	testRemoveValidator(t, ctx, chain, validators, acc0)
 	testPowerSwing(t, ctx, chain, validators, acc0)
@@ -67,11 +68,10 @@ func TestPOA(t *testing.T) {
 
 	// Shut down 1 of those validators, ensure the network height halts.
 
-	// gov proposal to set a validator power
-	testGovernance(t, ctx, chain, acc0, validators)
 }
 
 func testRemoveValidator(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, validators []string, acc0 ibc.Wallet) {
+	t.Log("===== TEST REMOVE VALIDATOR =====")
 	powerOne := int64(9_000_000_000_000)
 	powerTwo := int64(2_500_000)
 
@@ -100,6 +100,7 @@ func testRemoveValidator(t *testing.T, ctx context.Context, chain *cosmos.Cosmos
 }
 
 func testPowerSwing(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, validators []string, acc0 ibc.Wallet) {
+	t.Log("===== TEST POWER SWING =====")
 	helpers.POASetPower(t, ctx, chain, acc0, validators[0], 1_000_000_000_000_000, "--unsafe")
 	if err := testutil.WaitForBlocks(ctx, 2, chain); err != nil {
 		t.Fatal(err)
@@ -108,11 +109,13 @@ func testPowerSwing(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain
 }
 
 func testStakingDisabled(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, validators []string, acc0 ibc.Wallet) {
+	t.Log("===== TEST STAKING DISABLED =====")
 	txRes, _ := helpers.StakeTokens(t, ctx, chain, acc0, validators[0], "1stake")
 	require.Contains(t, txRes.RawLog, poa.ErrStakingActionNotAllowed.Error())
 }
 
 func testGovernance(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, acc0 ibc.Wallet, validators []string) {
+	t.Log("===== TEST GOVERNANCE =====")
 	// ibc.ChainConfig key: app_state.poa.params.admins must contain the governance address.
 	propID := helpers.SubmitGovernanceProposalForValidatorChanges(t, ctx, chain, acc0, validators[0], 1_234_567, true)
 	helpers.ValidatorVote(t, ctx, chain, propID, 25)
@@ -123,6 +126,7 @@ func testGovernance(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain
 }
 
 func testPowerErrors(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, validators []string, incorrectUser ibc.Wallet, admin ibc.Wallet) {
+	t.Log("===== TEST POWER ERRORS =====")
 	var res helpers.TxResponse
 	var err error
 
