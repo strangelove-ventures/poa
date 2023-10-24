@@ -2,7 +2,7 @@
 #
 # Example:
 # cd simapp
-# BINARY="poad" CHAIN_ID="poa-1" HOME_DIR="$HOME/.poad" TIMEOUT_COMMIT="500ms" CLEAN=true sh test_node.sh
+# BINARY="poad" CHAIN_ID="poa-1" HOME_DIR="$HOME/.poad" TIMEOUT_COMMIT="5500ms" CLEAN=true sh test_node.sh
 #
 # poad tx poa set-power $(poad q staking validators --output=json | jq .validators[0].operator_address -r) 12356789 --home=$HOME_DIR --yes --from=acc1 --unsafe
 # poad q staking validators
@@ -16,6 +16,10 @@
 # poad q poa pending-validators --output json
 # poad tx poa set-power $(poad q poa pending-validators --output=json | jq .pending[0].operator_address -r) 1000000 --home=$HOME_DIR --yes --from=acc1
 # poad tx poa remove $(poad q staking validators --output=json | jq .validators[1].operator_address -r) --home=$HOME_DIR --yes --from=acc1
+#
+# poad tx gov submit-proposal simapp/proposal.json --home=$HOME_DIR --from=acc1 --yes
+# poad tx gov vote 1 yes --home=$HOME_DIR --from=acc1 --yes
+#
 
 export KEY="acc1" # validator
 export KEY2="acc2"
@@ -95,7 +99,7 @@ from_scratch () {
 
   # Allocate genesis accounts 
   # stake should ONLY be as much as they gentx with. No more.
-  BINARY genesis add-genesis-account $KEY 1000000stake,1000utest --keyring-backend $KEYRING
+  BINARY genesis add-genesis-account $KEY 1000000000000stake,1000utest --keyring-backend $KEYRING
   BINARY genesis add-genesis-account $KEY2 1000000stake,1000utest --keyring-backend $KEYRING  
 
   # 1 power (these rates will be overwriten)

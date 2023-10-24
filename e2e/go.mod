@@ -11,9 +11,7 @@ replace (
 	github.com/btcsuite/btcd => github.com/btcsuite/btcd v0.22.2 //indirect
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 
-	// https://github.com/strangelove-ventures/interchaintest/pull/840
 	// github.com/strangelove-ventures/interchaintest/v8 => /home/reece/Desktop/Programming/Go/interchaintest
-	github.com/strangelove-ventures/interchaintest/v8 => github.com/strangelove-ventures/interchaintest/v8 v8.0.0-20231024184656-a592004de978
 	github.com/strangelove-ventures/poa => ../.
 
 	github.com/vedhavyas/go-subkey => github.com/strangelove-ventures/go-subkey v1.0.7
@@ -22,7 +20,8 @@ replace (
 require (
 	github.com/cosmos/cosmos-sdk v0.50.0-rc.1
 	github.com/cosmos/gogoproto v1.4.11
-	github.com/strangelove-ventures/interchaintest/v8 v8.0.0-20231018160911-cbabe40c85b1
+	// https://github.com/strangelove-ventures/interchaintest/pull/840
+	github.com/strangelove-ventures/interchaintest/v8 v8.0.0-20231024203546-8019accbfc66
 	github.com/strangelove-ventures/poa v0.0.0-00010101000000-000000000000
 	github.com/stretchr/testify v1.8.4
 	golang.org/x/sync v0.4.0

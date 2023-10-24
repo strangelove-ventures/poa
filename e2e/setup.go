@@ -8,6 +8,10 @@ import (
 )
 
 var (
+	VotingPeriod     = "15s"
+	MaxDepositPeriod = "10s"
+	Denom            = "stake"
+
 	POAImage = ibc.DockerImage{
 		Repository: "poa",
 		Version:    "local",
@@ -18,6 +22,7 @@ var (
 		Images: []ibc.DockerImage{
 			POAImage,
 		},
+		GasAdjustment: 1.3,
 		ModifyGenesis: cosmos.ModifyGenesis([]cosmos.GenesisKV{
 			{
 				Key: "app_state.poa.params.admins",
@@ -25,6 +30,18 @@ var (
 					"cosmos10d07y265gmmuvt4z0w9aw880jnsr700j6zn9kn", // gov
 					"cosmos1hj5fveer5cjtn4wd6wstzugjfdxzl0xpxvjjvr", // testing account
 				},
+			},
+			{
+				Key:   "app_state.gov.params.voting_period",
+				Value: VotingPeriod,
+			},
+			{
+				Key:   "app_state.gov.params.max_deposit_period",
+				Value: MaxDepositPeriod,
+			},
+			{
+				Key:   "app_state.gov.params.min_deposit.0.denom",
+				Value: Denom,
 			},
 		}),
 		// TODO: modify gentxs / genesis account amounts?
@@ -34,9 +51,9 @@ var (
 		ChainID:        "poa-1",
 		Bin:            "poad",
 		Bech32Prefix:   "cosmos",
-		Denom:          "stake", // maybe poa?
+		Denom:          Denom,
 		CoinType:       "118",
-		GasPrices:      "0stake,0utest",
+		GasPrices:      "0" + Denom + ",0utest",
 		TrustingPeriod: "330h",
 	}
 )
