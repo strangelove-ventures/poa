@@ -1,11 +1,13 @@
 package e2e
 
 import (
+	"context"
 	"fmt"
 	"testing"
 
 	"github.com/strangelove-ventures/interchaintest/v8"
 	"github.com/strangelove-ventures/interchaintest/v8/chain/cosmos"
+	"github.com/strangelove-ventures/interchaintest/v8/testutil"
 	"github.com/strangelove-ventures/poa"
 	"github.com/strangelove-ventures/poa/e2e/helpers"
 	"github.com/stretchr/testify/require"
@@ -51,6 +53,8 @@ func TestPOA(t *testing.T) {
 	t.Log(validators)
 	require.Equal(t, len(validators), numVals)
 
+	assertSignatures(t, ctx, chain, 2)
+
 	// === Staking Commands Disabled (ante) ===
 	txRes := helpers.StakeTokens(t, ctx, chain, acc0, validators[0], "1stake")
 	require.Contains(t, txRes.RawLog, poa.ErrStakingActionNotAllowed.Error())
@@ -70,19 +74,26 @@ func TestPOA(t *testing.T) {
 	// === Remove Validator Test ===
 	helpers.POARemove(t, ctx, chain, acc0, validators[1])
 
+	// allow the poa.BeginBlocker to update new status
+	if err := testutil.WaitForBlocks(ctx, 2, chain); err != nil {
+		t.Fatal(err)
+	}
+
 	vals = helpers.GetValidators(t, ctx, chain).Validators
 	require.Equal(t, vals[0].Tokens, fmt.Sprintf("%d", powerOne))
 	require.Equal(t, vals[1].Tokens, "0")
-	// require.Equal(t, vals[1].Status, 1) // We dont check this anymore, let the Appy handler set it
+	require.Equal(t, vals[1].Status, 1)
 	for _, v := range vals {
 		t.Log(v.OperatorAddress, v.Tokens)
 	}
+
+	assertSignatures(t, ctx, chain, 1)
 }
 
-// requiredSignatures asserts that the current block has the exact number of signatures as expected
-// func requiredSignatures(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, expectedSigs int) {
-// 	height, err := chain.GetNode().Height(ctx)
-// 	require.NoError(t, err)
-// 	block := helpers.GetBlockData(t, ctx, chain, height)
-// 	require.Equal(t, len(block.LastCommit.Signatures), expectedSigs)
-// }
+// assertSignatures asserts that the current block has the exact number of signatures as expected
+func assertSignatures(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, expectedSigs int) {
+	height, err := chain.GetNode().Height(ctx)
+	require.NoError(t, err)
+	block := helpers.GetBlockData(t, ctx, chain, height)
+	require.Equal(t, len(block.LastCommit.Signatures), expectedSigs)
+}
