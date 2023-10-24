@@ -70,7 +70,7 @@ func NewSetPowerCmd(ac address.Codec) *cobra.Command {
 			}
 
 			msg := &poa.MsgSetPower{
-				FromAddress:      clientCtx.GetFromAddress().String(),
+				Sender:           clientCtx.GetFromAddress().String(),
 				ValidatorAddress: validator,
 				Power:            power,
 				Unsafe:           unsafeAction,
@@ -107,7 +107,7 @@ func NewRemoveValidatorCmd() *cobra.Command {
 			}
 
 			msg := &poa.MsgRemoveValidator{
-				FromAddress:      clientCtx.GetFromAddress().String(),
+				Sender:           clientCtx.GetFromAddress().String(),
 				ValidatorAddress: validator,
 			}
 

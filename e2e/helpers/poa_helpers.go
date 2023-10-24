@@ -2,71 +2,49 @@ package helpers
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"testing"
 
-	"github.com/cosmos/cosmos-sdk/crypto/keyring"
+	cosmosproto "github.com/cosmos/gogoproto/proto"
 	"github.com/strangelove-ventures/interchaintest/v8/chain/cosmos"
 	"github.com/strangelove-ventures/interchaintest/v8/ibc"
-	"github.com/strangelove-ventures/interchaintest/v8/testutil"
+	"github.com/strangelove-ventures/poa"
 	"github.com/stretchr/testify/require"
 )
 
-func POASetPower(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, user ibc.Wallet, valoper string, power int64, unsafe bool) TxResponse {
-	cmd := []string{chain.Config().Bin, "tx", "poa", "set-power", valoper, fmt.Sprintf("%d", power),
-		"--node", chain.GetRPCAddress(),
-		"--home", chain.HomeDir(),
-		"--chain-id", chain.Config().ChainID,
-		"--from", user.KeyName(),
-		"--gas", "500000",
-		"--keyring-dir", chain.HomeDir(),
-		"--keyring-backend", keyring.BackendTest,
-		"--output=json",
-		"-y",
-	}
-
-	if unsafe {
-		cmd = append(cmd, "--unsafe")
-	}
-
-	stdout, _, err := chain.Exec(ctx, cmd, nil)
-	require.NoError(t, err)
-
-	if err := testutil.WaitForBlocks(ctx, 2, chain); err != nil {
-		t.Fatal(err)
-	}
-
-	var res TxResponse
-	if err := json.Unmarshal(stdout, &res); err != nil {
-		t.Fatal(err)
-	}
-	return res
+func POASetPower(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, user ibc.Wallet, valoper string, power int64, flags ...string) (TxResponse, error) {
+	cmd := TxCommandBuilder(ctx, chain, []string{"tx", "poa", "set-power", valoper, fmt.Sprintf("%d", power)}, user, flags...)
+	return ExecuteTransaction(ctx, chain, cmd)
 }
 
-func POARemove(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, user ibc.Wallet, valoper string) TxResponse {
-	cmd := []string{chain.Config().Bin, "tx", "poa", "remove", valoper,
-		"--node", chain.GetRPCAddress(),
-		"--home", chain.HomeDir(),
-		"--chain-id", chain.Config().ChainID,
-		"--from", user.KeyName(),
-		"--gas", "500000",
-		"--keyring-dir", chain.HomeDir(),
-		"--keyring-backend", keyring.BackendTest,
-		"--output", "json",
-		"--output=json",
-		"-y",
-	}
-	stdout, _, err := chain.Exec(ctx, cmd, nil)
-	require.NoError(t, err)
+func POARemove(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, user ibc.Wallet, valoper string) (TxResponse, error) {
+	cmd := TxCommandBuilder(ctx, chain, []string{"tx", "poa", "remove", valoper}, user)
+	return ExecuteTransaction(ctx, chain, cmd)
+}
 
-	if err := testutil.WaitForBlocks(ctx, 2, chain); err != nil {
-		t.Fatal(err)
+func SubmitGovernanceProposalForValidatorChanges(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, user ibc.Wallet, validator string, power uint64, unsafe bool) string {
+	govAddr := "cosmos10d07y265gmmuvt4z0w9aw880jnsr700j6zn9kn"
+
+	powerMsg := []cosmosproto.Message{
+		&poa.MsgSetPower{
+			Sender:           govAddr,
+			ValidatorAddress: validator,
+			Power:            power,
+			Unsafe:           unsafe,
+		},
 	}
 
-	var res TxResponse
-	if err := json.Unmarshal(stdout, &res); err != nil {
-		t.Fatal(err)
-	}
-	return res
+	title := fmt.Sprintf("Update" + validator + "Power")
+	desc := fmt.Sprintf("Updating power for validator %s to %d", validator, power)
+
+	proposal, err := chain.BuildProposal(powerMsg, title, desc, desc, fmt.Sprintf(`500000000%s`, chain.Config().Denom), user.FormattedAddress(), false)
+	require.NoError(t, err, "error building proposal")
+
+	fmt.Printf("proposal: %+v\n", proposal)
+
+	txProp, err := chain.SubmitProposal(ctx, user.KeyName(), proposal)
+	t.Log("txProp", txProp)
+	require.NoError(t, err, "error submitting proposal")
+
+	return txProp.ProposalID
 }
