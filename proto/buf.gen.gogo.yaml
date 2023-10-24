@@ -1,3 +1,4 @@
+# https://buf.build/cosmos/cosmos-sdk/file/main:cosmos/staking/v1beta1/tx.proto
 version: v1
 plugins:
   - name: gocosmos

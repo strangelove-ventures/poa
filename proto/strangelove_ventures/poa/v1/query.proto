@@ -1,6 +1,8 @@
 syntax = "proto3";
 package strangelove_ventures.poa.v1;
 
+import "cosmos-sdk/staking/v1beta1/staking.proto";
+// import "cosmos/staking/v1beta1/staking.proto";
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "strangelove_ventures/poa/v1/params.proto";

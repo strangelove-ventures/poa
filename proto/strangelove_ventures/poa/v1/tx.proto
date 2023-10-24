@@ -1,9 +1,9 @@
 syntax = "proto3";
 package strangelove_ventures.poa.v1;
 
-// import "cosmos/staking/v1beta1/staking.proto";
+import "cosmos/staking/v1beta1/staking.proto";
+
 import "cosmos/base/v1beta1/coin.proto";
-import "strangelove_ventures/poa/v1/validator.proto";
 import "strangelove_ventures/poa/v1/params.proto";
 import "cosmos_proto/cosmos.proto";
 import "google/protobuf/any.proto";
@@ -18,7 +18,7 @@ service Msg {
   option (cosmos.msg.v1.service) = true;  
 
   // x/staking wrappers (future)
-  rpc CreateValidator(MsgCreateValidator) returns (MsgCreateValidatorResponse);  
+  rpc CreatePOAValidator(MsgCreateValidator) returns (MsgCreateValidatorResponse);  
   
   // SetPower sets the new power of a validator.
   // This also doubles as a way to accept pending validators
@@ -48,7 +48,6 @@ message MsgSetPower {
 message MsgSetPowerResponse {}
 
 // MsgRemoveValidator removes an active validitor from the set
-// jail -> deleted
 message MsgRemoveValidator {
   option (cosmos.msg.v1.signer) = "from_address";
   option (amino.name)           = "poa/MsgRemoveValidator";
@@ -103,5 +102,5 @@ message MsgCreateValidator {
   google.protobuf.Any      pubkey            = 6 [(cosmos_proto.accepts_interface) = "cosmos.crypto.PubKey"];  
 }
 
-// MsgCreateValidatorResponse
+// // MsgCreateValidatorResponse
 message MsgCreateValidatorResponse {}

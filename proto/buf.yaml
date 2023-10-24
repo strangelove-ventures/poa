@@ -1,6 +1,7 @@
 version: v1
+name: buf.build/strangelove-ventures/poa
 deps:
-  - buf.build/cosmos/cosmos-sdk # pin the Cosmos SDK version
+  - buf.build/cosmos/cosmos-sdk:02b760776860a0b81ba367772da049c7e3ecbf5e
   - buf.build/cosmos/cosmos-proto
   - buf.build/cosmos/gogo-proto
   - buf.build/googleapis/googleapis
