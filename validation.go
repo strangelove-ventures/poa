@@ -116,7 +116,7 @@ func (msg MsgSetPower) Validate(ac address.Codec) error {
 	}
 
 	if msg.Power < 1_000_000 {
-		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "power must be above the 1_000_000 (1)")
+		return ErrPowerBelowMinimum
 	}
 
 	return nil

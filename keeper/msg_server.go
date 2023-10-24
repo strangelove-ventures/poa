@@ -28,7 +28,7 @@ func NewMsgServerImpl(keeper Keeper) poa.MsgServer {
 
 func (ms msgServer) SetPower(ctx context.Context, msg *poa.MsgSetPower) (*poa.MsgSetPowerResponse, error) {
 	if ok := ms.isAdmin(ctx, msg.FromAddress); !ok {
-		return nil, fmt.Errorf("not an authority")
+		return nil, poa.ErrNotAnAuthority
 	}
 
 	if err := msg.Validate(ms.k.validatorAddressCodec); err != nil {
@@ -56,7 +56,7 @@ func (ms msgServer) SetPower(ctx context.Context, msg *poa.MsgSetPower) (*poa.Ms
 		}
 
 		if msg.Power > totalPOAPower.Mul(math.NewInt(30)).Quo(math.NewInt(100)).Uint64() {
-			return nil, fmt.Errorf("unsafe: msg.Power is >30%% of total power, set unsafe=true to override")
+			return nil, poa.ErrUnsafePower
 		}
 	}
 
@@ -70,7 +70,7 @@ func (ms msgServer) SetPower(ctx context.Context, msg *poa.MsgSetPower) (*poa.Ms
 
 func (ms msgServer) RemoveValidator(ctx context.Context, msg *poa.MsgRemoveValidator) (*poa.MsgRemoveValidatorResponse, error) {
 	if ok := ms.isAdmin(ctx, msg.FromAddress); !ok {
-		return nil, fmt.Errorf("not an authority")
+		return nil, poa.ErrNotAnAuthority
 	}
 
 	// Ensure we do not remove the last validator in the set.
@@ -192,7 +192,7 @@ func (ms msgServer) CreateValidator(ctx context.Context, msg *poa.MsgCreateValid
 
 func (ms msgServer) UpdateParams(ctx context.Context, msg *poa.MsgUpdateParams) (*poa.MsgUpdateParamsResponse, error) {
 	if ok := ms.isAdmin(ctx, msg.FromAddress); !ok {
-		return nil, fmt.Errorf("not an authority")
+		return nil, poa.ErrNotAnAuthority
 	}
 
 	return &poa.MsgUpdateParamsResponse{}, ms.k.SetParams(ctx, msg.Params)
