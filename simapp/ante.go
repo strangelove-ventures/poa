@@ -3,6 +3,7 @@ package simapp
 import (
 	"errors"
 
+	"cosmossdk.io/math"
 	circuitante "cosmossdk.io/x/circuit/ante"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -33,6 +34,10 @@ func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 		return nil, errors.New("sign mode handler is required for ante builder")
 	}
 
+	doGenTxRateValidation := false
+	rateFloor := math.LegacyNewDec(0)
+	rateCeil := math.LegacyNewDecWithPrec(1, 1)
+
 	anteDecorators := []sdk.AnteDecorator{
 		ante.NewSetUpContextDecorator(), // outermost AnteDecorator. SetUpContext must be called first
 		circuitante.NewCircuitBreakerDecorator(options.CircuitKeeper),
@@ -48,6 +53,7 @@ func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 		ante.NewSigVerificationDecorator(options.AccountKeeper, options.SignModeHandler),
 		ante.NewIncrementSequenceDecorator(options.AccountKeeper),
 		poaante.NewPOAStakingFilterDecorator(),
+		poaante.NewMsgCommissionLimiterDecorator(doGenTxRateValidation, rateFloor, rateCeil),
 	}
 
 	return sdk.ChainAnteDecorators(anteDecorators...), nil
