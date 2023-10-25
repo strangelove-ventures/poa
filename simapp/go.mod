@@ -3,7 +3,6 @@ module github.com/strangelove-ventures/poa/simapp
 go 1.21
 
 replace (
-
 	// v50 fix
 	cosmossdk.io/core => cosmossdk.io/core v0.11.0
 	// use cosmos fork of keyring
@@ -194,7 +193,7 @@ require (
 	google.golang.org/genproto v0.0.0-20230803162519-f966b187b2e5 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20230726155614-23370e0ffb3e // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20230913181813-007df8e322eb // indirect
-	google.golang.org/grpc v1.58.1 // indirect
+	google.golang.org/grpc v1.58.3 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
