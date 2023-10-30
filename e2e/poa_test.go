@@ -105,7 +105,6 @@ func testUpdatePOAParams(t *testing.T, ctx context.Context, chain *cosmos.Cosmos
 		fmt.Printf("%+v", txRes)
 		require.Equal(t, txRes.Code, 0)
 
-		// validate the params is now properly set for staking
 		sp := helpers.GetStakingParams(t, ctx, chain)
 		fmt.Printf("%+v", sp)
 		require.EqualValues(t, sp.MaxValidators, 10)
@@ -209,20 +208,23 @@ func testPowerErrors(t *testing.T, ctx context.Context, chain *cosmos.CosmosChai
 	var res helpers.TxResponse
 	var err error
 
-	// unauthorized user
-	res, _ = helpers.POASetPower(t, ctx, chain, incorrectUser, validators[1], 1_000_000)
-	txRes := helpers.GetTxHash(t, ctx, chain, res.Txhash)
-	require.Contains(t, txRes.RawLog, poa.ErrNotAnAuthority.Error())
+	t.Run("fail: set-power message from a non authorized user", func(t *testing.T) {
+		res, _ = helpers.POASetPower(t, ctx, chain, incorrectUser, validators[1], 1_000_000)
+		txRes := helpers.GetTxHash(t, ctx, chain, res.Txhash)
+		require.Contains(t, txRes.RawLog, poa.ErrNotAnAuthority.Error())
+	})
 
-	// below minimum power requirement (self bond)
-	res, err = helpers.POASetPower(t, ctx, chain, admin, validators[0], 1)
-	require.Error(t, err) // cli validate error
-	require.Contains(t, err.Error(), poa.ErrPowerBelowMinimum.Error())
+	t.Run("fail: set-power message below minimum power requirement (self bond)", func(t *testing.T) {
+		res, err = helpers.POASetPower(t, ctx, chain, admin, validators[0], 1)
+		require.Error(t, err) // cli validate error
+		require.Contains(t, err.Error(), poa.ErrPowerBelowMinimum.Error())
+	})
 
-	// above 30% without unsafe
-	res, _ = helpers.POASetPower(t, ctx, chain, admin, validators[0], 9_000_000_000_000_000)
-	res = helpers.GetTxHash(t, ctx, chain, res.Txhash)
-	require.Contains(t, res.RawLog, poa.ErrUnsafePower.Error())
+	t.Run("fail: set-power message above 30%% without unsafe flag", func(t *testing.T) {
+		res, _ = helpers.POASetPower(t, ctx, chain, admin, validators[0], 9_000_000_000_000_000)
+		res = helpers.GetTxHash(t, ctx, chain, res.Txhash)
+		require.Contains(t, res.RawLog, poa.ErrUnsafePower.Error())
+	})
 }
 
 // assertSignatures asserts that the current block has the exact number of signatures as expected
