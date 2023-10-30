@@ -1,6 +1,7 @@
 package poaante
 
 import (
+	"fmt"
 	"testing"
 
 	"cosmossdk.io/math"
@@ -8,9 +9,18 @@ import (
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/strangelove-ventures/poa"
 	"github.com/stretchr/testify/require"
+	protov2 "google.golang.org/protobuf/proto"
 )
 
-func TestCommissionRanges(t *testing.T) {
+var (
+	EmptyAnte = func(ctx sdk.Context, tx sdk.Tx, simulate bool) (sdk.Context, error) {
+		return ctx, nil
+	}
+)
+
+func TestAnteCommissionRanges(t *testing.T) {
+	ctx := sdk.Context{}
+
 	testCases := []struct {
 		name       string
 		rateFloor  math.LegacyDec
@@ -76,27 +86,87 @@ func TestCommissionRanges(t *testing.T) {
 
 	for _, tc := range testCases {
 		tc := tc
-
-		m := NewMsgCommissionLimiterDecorator(true, tc.rateFloor, tc.rateCeil)
+		mcl := NewMsgCommissionLimiterDecorator(true, tc.rateFloor, tc.rateCeil)
 
 		// Creating a Validator
-		err := m.hasInvalidCommissionRange([]sdk.Msg{&poa.MsgCreateValidator{
+		mcv := &poa.MsgCreateValidator{
 			Commission: tc.commission,
-		}})
+		}
+		_, err := mcl.AnteHandle(ctx, NewMockTx(mcv), false, EmptyAnte)
 		if tc.expPass {
-			require.NoError(t, err)
+			require.NoError(t, err, tc.name)
 		} else {
-			require.Error(t, err)
+			require.Error(t, err, tc.name)
 		}
 
 		// Editing a Validator
-		err = m.hasInvalidCommissionRange([]sdk.Msg{&stakingtypes.MsgEditValidator{
+		mev := &stakingtypes.MsgEditValidator{
 			CommissionRate: &tc.commission.Rate,
-		}})
+		}
+		_, err = mcl.AnteHandle(ctx, NewMockTx(mev), false, EmptyAnte)
 		if tc.expPass {
 			require.NoError(t, err)
 		} else {
 			require.Error(t, err)
 		}
 	}
+}
+
+func TestAnteStakingFilter(t *testing.T) {
+	ctx := sdk.Context{}
+	sf := NewPOAStakingFilterDecorator()
+
+	blockedMsgs := map[string]sdk.Msg{
+		"BeginRedelegate":           &stakingtypes.MsgBeginRedelegate{},
+		"CancelUnbondingDelegation": &stakingtypes.MsgCancelUnbondingDelegation{},
+		"Delegate":                  &stakingtypes.MsgDelegate{},
+		"Undelegate":                &stakingtypes.MsgUndelegate{},
+		"UpdateParams":              &stakingtypes.MsgUpdateParams{},
+	}
+
+	for k, msg := range blockedMsgs {
+		tx := MockTx{
+			msgs: []sdk.Msg{
+				msg,
+			},
+		}
+
+		t.Run(fmt.Sprintf("allow GenTx to pass (%s)", k), func(t *testing.T) {
+			ctx = setBlockHeader(ctx, 1)
+			_, err := sf.AnteHandle(ctx, tx, false, EmptyAnte)
+			require.NoError(t, err)
+		})
+
+		t.Run(fmt.Sprintf("fail: staking action not allowed after gentx (%s)", k), func(t *testing.T) {
+			for h := uint64(2); h < 10; h++ {
+				ctx = setBlockHeader(ctx, h)
+				_, err := sf.AnteHandle(ctx, tx, false, EmptyAnte)
+				require.Error(t, err)
+			}
+		})
+	}
+}
+
+func setBlockHeader(ctx sdk.Context, height uint64) sdk.Context {
+	h := ctx.BlockHeader()
+	h.Height = int64(height)
+	return ctx.WithBlockHeader(h)
+}
+
+type MockTx struct {
+	msgs []sdk.Msg
+}
+
+func NewMockTx(msgs ...sdk.Msg) MockTx {
+	return MockTx{
+		msgs: msgs,
+	}
+}
+
+func (tx MockTx) GetMsgs() []sdk.Msg {
+	return tx.msgs
+}
+
+func (tx MockTx) GetMsgsV2() ([]protov2.Message, error) {
+	return nil, nil
 }
