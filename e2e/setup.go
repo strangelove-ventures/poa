@@ -44,7 +44,6 @@ var (
 				Value: Denom,
 			},
 		}),
-		// TODO: modify gentxs / genesis account amounts?
 		EncodingConfig: poaEncoding(),
 		Type:           "cosmos",
 		Name:           "poa",

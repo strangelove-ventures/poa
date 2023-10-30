@@ -3,15 +3,19 @@ package poaante
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/strangelove-ventures/poa"
+	poakeeper "github.com/strangelove-ventures/poa/keeper"
 
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 )
 
 type MsgStakingFilterDecorator struct {
+	poaKeeper poakeeper.Keeper
 }
 
-func NewPOAStakingFilterDecorator() MsgStakingFilterDecorator {
-	return MsgStakingFilterDecorator{}
+func NewPOAStakingFilterDecorator(poaKeeper poakeeper.Keeper) MsgStakingFilterDecorator {
+	return MsgStakingFilterDecorator{
+		poaKeeper: poaKeeper,
+	}
 }
 
 // AnteHandle performs an AnteHandler check that returns an error if the tx contains a message that is blocked.
@@ -41,7 +45,7 @@ func (msfd MsgStakingFilterDecorator) hasInvalidStakingMsg(msgs []sdk.Msg) (bool
 			return true, nil
 		case *stakingtypes.MsgCancelUnbondingDelegation:
 			return true, nil
-		case *stakingtypes.MsgCreateValidator: // POA wraps this command.
+		case *stakingtypes.MsgCreateValidator: // POA wraps this message.
 			return true, nil
 		case *stakingtypes.MsgDelegate:
 			return true, nil
@@ -49,8 +53,8 @@ func (msfd MsgStakingFilterDecorator) hasInvalidStakingMsg(msgs []sdk.Msg) (bool
 			// 	return true, nil
 		case *stakingtypes.MsgUndelegate:
 			return true, nil
-			// case *stakingtypes.MsgUpdateParams: // Allowed
-			// 	return true, nil
+		case *stakingtypes.MsgUpdateParams: // POA wraps this message.
+			return true, nil
 		}
 	}
 	return false, nil

@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/strangelove-ventures/interchaintest/v8/chain/cosmos"
 	"github.com/strangelove-ventures/interchaintest/v8/ibc"
 )
@@ -31,4 +32,10 @@ func GetValidatorsOperatingAddresses(t *testing.T, ctx context.Context, chain *c
 	}
 
 	return validators
+}
+
+func GetStakingParams(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain) stakingtypes.Params {
+	var res StakingParams
+	ExecuteQuery(ctx, chain, []string{"query", "staking", "params"}, &res)
+	return res.Params
 }

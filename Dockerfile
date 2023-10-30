@@ -13,6 +13,7 @@ RUN go mod download
 
 COPY . .
 
+RUN cd simapp && go mod download
 RUN cd simapp && make build
 
 FROM alpine:3.18

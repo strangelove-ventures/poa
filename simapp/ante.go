@@ -9,12 +9,14 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 
 	poaante "github.com/strangelove-ventures/poa/ante"
+	poakeeper "github.com/strangelove-ventures/poa/keeper"
 )
 
 // HandlerOptions are the options required for constructing a default SDK AnteHandler.
 type HandlerOptions struct {
 	ante.HandlerOptions
 	CircuitKeeper circuitante.CircuitBreaker
+	POAKeeper     poakeeper.Keeper
 }
 
 // NewAnteHandler returns an AnteHandler that checks and increments sequence
@@ -47,7 +49,7 @@ func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 		ante.NewSigGasConsumeDecorator(options.AccountKeeper, options.SigGasConsumer),
 		ante.NewSigVerificationDecorator(options.AccountKeeper, options.SignModeHandler),
 		ante.NewIncrementSequenceDecorator(options.AccountKeeper),
-		poaante.NewPOAStakingFilterDecorator(),
+		poaante.NewPOAStakingFilterDecorator(options.POAKeeper),
 	}
 
 	return sdk.ChainAnteDecorators(anteDecorators...), nil

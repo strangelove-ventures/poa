@@ -4,10 +4,12 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 
 	flag "github.com/spf13/pflag"
 
 	"cosmossdk.io/core/address"
+	"cosmossdk.io/math"
 	"github.com/spf13/cobra"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -39,6 +41,8 @@ func NewTxCmd(ac address.Codec) *cobra.Command {
 		NewCreateValidatorCmd(ac),
 		NewSetPowerCmd(ac),
 		NewRemoveValidatorCmd(),
+		NewUpdateParamsCmd(),
+		NewUpdateStakingParamsCmd(),
 	)
 	return txCmd
 }
@@ -120,14 +124,108 @@ func NewRemoveValidatorCmd() *cobra.Command {
 	return cmd
 }
 
+func NewUpdateParamsCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:  "update-params [admin1,admin2,admin3,...]",
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			admins := strings.Split(args[0], ",")
+			for _, admin := range admins {
+				_, err = sdk.AccAddressFromBech32(admin)
+				if err != nil {
+					return fmt.Errorf("AccAddressFromBech32 failed: %w", err)
+				}
+			}
+
+			msg := &poa.MsgUpdateParams{
+				Sender: clientCtx.GetFromAddress().String(),
+				Params: poa.Params{
+					Admins: admins,
+				},
+			}
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+
+	flags.AddTxFlagsToCmd(cmd)
+
+	return cmd
+}
+
+func NewUpdateStakingParamsCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:  "update-staking-params [unbondingTime] [maxVals] [maxEntries] [historicalEntries] [bondDenom] [minCommissionRate]",
+		Args: cobra.ExactArgs(6),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			unbondingTime, err := time.ParseDuration(args[0])
+			if err != nil {
+				return fmt.Errorf("unbondingTime time.ParseDuration failed: %w", err)
+			}
+
+			maxVals, err := strconv.ParseUint(args[1], 10, 32)
+			if err != nil {
+				return fmt.Errorf("maxVals strconv.ParseUint failed: %w", err)
+			}
+
+			maxEntries, err := strconv.ParseUint(args[2], 10, 32)
+			if err != nil {
+				return fmt.Errorf("maxEntries strconv.ParseUint failed: %w", err)
+			}
+
+			historicalEntries, err := strconv.ParseUint(args[3], 10, 32)
+			if err != nil {
+				return fmt.Errorf("historicalEntries strconv.ParseUint failed: %w", err)
+			}
+
+			bondDenom := args[4]
+			if bondDenom == "" {
+				return fmt.Errorf("bondDenom is empty")
+			}
+
+			minCommission, err := math.LegacyNewDecFromStr(args[5])
+			if err != nil {
+				return fmt.Errorf("minCommission math.LegacyNewDecFromStr failed: %w", err)
+			}
+
+			msg := &poa.MsgUpdateStakingParams{
+				Sender: clientCtx.GetFromAddress().String(),
+				Params: poa.StakingParams{
+					UnbondingTime:     unbondingTime,
+					MaxValidators:     uint32(maxVals),
+					MaxEntries:        uint32(maxEntries),
+					HistoricalEntries: uint32(historicalEntries),
+					BondDenom:         bondDenom,
+					MinCommissionRate: minCommission,
+				},
+			}
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+
+	flags.AddTxFlagsToCmd(cmd)
+
+	return cmd
+}
+
 // NewCreateValidatorCmd returns a CLI command handler for creating a MsgCreateValidator transaction.
-// TODO: remove amount or hardcode to 1stake, we will mint that to them when it is time in ante
 func NewCreateValidatorCmd(ac address.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create-validator [path/to/validator.json]",
-		Short: "create new validator initialized with a self-delegation to it",
+		Short: "create new validator for POA",
 		Args:  cobra.ExactArgs(1),
-		Long:  `Create a new validator initialized with a self-delegation by submitting a JSON file with the new validator details.`,
+		Long:  `Create a new validator creates the new validator for the POA module.`,
 		Example: strings.TrimSpace(
 			fmt.Sprintf(`
 $ %s tx poa create-validator path/to/validator.json --from keyname

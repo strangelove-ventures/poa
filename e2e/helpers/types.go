@@ -1,6 +1,11 @@
 package helpers
 
-import "time"
+import (
+	"time"
+
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+	"github.com/strangelove-ventures/poa"
+)
 
 // From stakingtypes.Validator
 type Vals struct {
@@ -142,4 +147,12 @@ type TxResponse struct {
 			Index bool   `json:"index"`
 		} `json:"attributes"`
 	} `json:"events"`
+}
+
+type POAParams struct {
+	Params poa.Params `json:"params"`
+}
+
+type StakingParams struct {
+	Params stakingtypes.Params `json:"params"`
 }

@@ -39,7 +39,16 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 						{ProtoField: "validator"},
 					},
 				},
-				// TODO: Params
+				{
+					RpcMethod: "CreateValidator",
+					Use:       "create-validator [validator]",
+					Short:     "Remove a pending validator for the set",
+				},
+				{
+					RpcMethod: "UpdateParams",
+					Use:       "update-params [admin1,admin2,admin3,...]",
+					Short:     "Update the params for the module",
+				},
 			},
 		},
 	}

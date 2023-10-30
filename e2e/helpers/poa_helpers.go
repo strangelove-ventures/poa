@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"testing"
 
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	cosmosproto "github.com/cosmos/gogoproto/proto"
 	"github.com/strangelove-ventures/interchaintest/v8/chain/cosmos"
 	"github.com/strangelove-ventures/interchaintest/v8/ibc"
@@ -47,4 +48,36 @@ func SubmitGovernanceProposalForValidatorChanges(t *testing.T, ctx context.Conte
 	require.NoError(t, err, "error submitting proposal")
 
 	return txProp.ProposalID
+}
+
+func GetPOAParams(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain) poa.Params {
+	var res POAParams
+	ExecuteQuery(ctx, chain, []string{"query", "poa", "params"}, &res)
+	return res.Params
+}
+
+func POAUpdateParams(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, user ibc.Wallet, admins []string) (TxResponse, error) {
+	// admin1,admin2,admin3
+	adminList := ""
+	for _, admin := range admins {
+		adminList += admin + ","
+	}
+	adminList = adminList[:len(adminList)-1]
+
+	cmd := TxCommandBuilder(ctx, chain, []string{"tx", "poa", "update-params", adminList}, user)
+	return ExecuteTransaction(ctx, chain, cmd)
+}
+
+func POAUpdateStakingParams(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, user ibc.Wallet, sp stakingtypes.Params) (TxResponse, error) {
+	command := []string{"tx", "poa", "update-staking-params",
+		sp.UnbondingTime.String(),
+		fmt.Sprintf("%d", sp.MaxValidators),
+		fmt.Sprintf("%d", sp.MaxEntries),
+		fmt.Sprintf("%d", sp.HistoricalEntries),
+		sp.BondDenom,
+		fmt.Sprintf("%d", sp.MinCommissionRate),
+	}
+
+	cmd := TxCommandBuilder(ctx, chain, command, user)
+	return ExecuteTransaction(ctx, chain, cmd)
 }
