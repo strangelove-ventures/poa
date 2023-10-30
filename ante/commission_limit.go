@@ -30,7 +30,6 @@ func NewMsgCommissionLimiterDecorator(doGenTxRateValidation bool, rateFloor, rat
 
 // AnteHandle performs an AnteHandler check that returns an error if the tx contains a message that is not within the commission limit.
 func (mcl MsgCommissionLimiterDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (sdk.Context, error) {
-	// TODO: validate this is correct
 	if !mcl.DoGenTxRateValidation && ctx.BlockHeight() <= 1 {
 		return next(ctx, tx, simulate)
 	}
@@ -52,9 +51,6 @@ func (mcl MsgCommissionLimiterDecorator) hasInvalidCommissionRange(msgs []sdk.Ms
 		// editing the validator through staking (no POA edit)
 		case *stakingtypes.MsgEditValidator:
 			return rateCheck(*msg.CommissionRate, mcl.RateFloor, mcl.RateCeil)
-		// this should already be disabled with `NewPOAStakingFilterDecorator`.
-		case *stakingtypes.MsgCreateValidator:
-			return rateCheck(msg.Commission.Rate, mcl.RateFloor, mcl.RateCeil)
 		}
 
 	}
