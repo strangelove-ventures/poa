@@ -117,6 +117,7 @@ func TestAnteStakingFilter(t *testing.T) {
 	sf := NewPOAStakingFilterDecorator()
 
 	blockedMsgs := map[string]sdk.Msg{
+		"CreateStakingValidator":    &stakingtypes.MsgCreateValidator{},
 		"BeginRedelegate":           &stakingtypes.MsgBeginRedelegate{},
 		"CancelUnbondingDelegation": &stakingtypes.MsgCancelUnbondingDelegation{},
 		"Delegate":                  &stakingtypes.MsgDelegate{},

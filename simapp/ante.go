@@ -38,7 +38,7 @@ func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 
 	doGenTxRateValidation := false
 
-	// higher than the default staking keeper rate
+	// example floor and ceiling for commission rate (poa.NewMsgCommissionLimiterDecorator)
 	rateFloor := math.LegacyMustNewDecFromStr("0.10")
 	rateCeil := math.LegacyMustNewDecFromStr("0.50")
 
