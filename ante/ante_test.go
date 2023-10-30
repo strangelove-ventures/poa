@@ -89,10 +89,9 @@ func TestAnteCommissionRanges(t *testing.T) {
 		mcl := NewMsgCommissionLimiterDecorator(true, tc.rateFloor, tc.rateCeil)
 
 		// Creating a Validator
-		mcv := &poa.MsgCreateValidator{
+		_, err := mcl.AnteHandle(ctx, NewMockTx(&poa.MsgCreateValidator{
 			Commission: tc.commission,
-		}
-		_, err := mcl.AnteHandle(ctx, NewMockTx(mcv), false, EmptyAnte)
+		}), false, EmptyAnte)
 		if tc.expPass {
 			require.NoError(t, err, tc.name)
 		} else {
@@ -100,14 +99,13 @@ func TestAnteCommissionRanges(t *testing.T) {
 		}
 
 		// Editing a Validator
-		mev := &stakingtypes.MsgEditValidator{
+		_, err = mcl.AnteHandle(ctx, NewMockTx(&stakingtypes.MsgEditValidator{
 			CommissionRate: &tc.commission.Rate,
-		}
-		_, err = mcl.AnteHandle(ctx, NewMockTx(mev), false, EmptyAnte)
+		}), false, EmptyAnte)
 		if tc.expPass {
-			require.NoError(t, err)
+			require.NoError(t, err, tc.name+" (edit)")
 		} else {
-			require.Error(t, err)
+			require.Error(t, err, tc.name+" (edit)")
 		}
 	}
 }
