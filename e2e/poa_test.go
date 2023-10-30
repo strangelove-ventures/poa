@@ -125,7 +125,7 @@ func testUpdatePOAParams(t *testing.T, ctx context.Context, chain *cosmos.Cosmos
 
 		p := helpers.GetPOAParams(t, ctx, chain)
 		for _, admin := range newAdmins {
-			require.Contains(t, p.Params.Admins, admin)
+			require.Contains(t, p.Admins, admin)
 		}
 	})
 

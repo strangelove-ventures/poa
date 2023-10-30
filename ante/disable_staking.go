@@ -1,8 +1,6 @@
 package poaante
 
 import (
-	"context"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/strangelove-ventures/poa"
 	poakeeper "github.com/strangelove-ventures/poa/keeper"
@@ -28,7 +26,7 @@ func (msfd MsgStakingFilterDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, sim
 		return next(ctx, tx, simulate)
 	}
 
-	invalid, err := msfd.hasInvalidStakingMsg(ctx, tx.GetMsgs())
+	invalid, err := msfd.hasInvalidStakingMsg(tx.GetMsgs())
 	if err != nil {
 		return ctx, err
 	}
@@ -40,7 +38,7 @@ func (msfd MsgStakingFilterDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, sim
 	return next(ctx, tx, simulate)
 }
 
-func (msfd MsgStakingFilterDecorator) hasInvalidStakingMsg(ctx context.Context, msgs []sdk.Msg) (bool, error) {
+func (msfd MsgStakingFilterDecorator) hasInvalidStakingMsg(msgs []sdk.Msg) (bool, error) {
 	for _, msg := range msgs {
 		switch msg.(type) {
 		case *stakingtypes.MsgBeginRedelegate:

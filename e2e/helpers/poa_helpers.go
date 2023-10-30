@@ -50,10 +50,10 @@ func SubmitGovernanceProposalForValidatorChanges(t *testing.T, ctx context.Conte
 	return txProp.ProposalID
 }
 
-func GetPOAParams(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain) POAParams {
+func GetPOAParams(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain) poa.Params {
 	var res POAParams
 	ExecuteQuery(ctx, chain, []string{"query", "poa", "params"}, &res)
-	return res
+	return res.Params
 }
 
 func POAUpdateParams(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, user ibc.Wallet, admins []string) (TxResponse, error) {

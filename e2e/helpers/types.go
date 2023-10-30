@@ -4,6 +4,7 @@ import (
 	"time"
 
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+	"github.com/strangelove-ventures/poa"
 )
 
 // From stakingtypes.Validator
@@ -149,9 +150,7 @@ type TxResponse struct {
 }
 
 type POAParams struct {
-	Params struct {
-		Admins []string `json:"admins"`
-	} `json:"params"`
+	Params poa.Params `json:"params"`
 }
 
 type StakingParams struct {
