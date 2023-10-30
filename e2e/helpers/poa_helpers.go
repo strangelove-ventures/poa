@@ -48,3 +48,21 @@ func SubmitGovernanceProposalForValidatorChanges(t *testing.T, ctx context.Conte
 
 	return txProp.ProposalID
 }
+
+func GetPOAParams(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain) POAParams {
+	var res POAParams
+	ExecuteQuery(ctx, chain, []string{"query", "poa", "params"}, &res)
+	return res
+}
+
+func POAUpdateParams(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, user ibc.Wallet, admins []string) (TxResponse, error) {
+	// admin1,admin2,admin3
+	adminList := ""
+	for _, admin := range admins {
+		adminList += admin + ","
+	}
+	adminList = adminList[:len(adminList)-1]
+
+	cmd := TxCommandBuilder(ctx, chain, []string{"tx", "poa", "update-params", adminList}, user)
+	return ExecuteTransaction(ctx, chain, cmd)
+}

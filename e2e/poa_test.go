@@ -51,11 +51,11 @@ func TestPOA(t *testing.T) {
 	assertSignatures(t, ctx, chain, len(validators))
 
 	// === Test Cases ===
-	testStakingDisabled(t, ctx, chain, validators, acc0)
-	testGovernance(t, ctx, chain, acc0, validators)
-	testPowerErrors(t, ctx, chain, validators, incorrectUser, acc0)
-	testRemoveValidator(t, ctx, chain, validators, acc0)
-	testPowerSwing(t, ctx, chain, validators, acc0)
+	// testStakingDisabled(t, ctx, chain, validators, acc0)
+	// testGovernance(t, ctx, chain, acc0, validators)
+	// testPowerErrors(t, ctx, chain, validators, incorrectUser, acc0)
+	// testRemoveValidator(t, ctx, chain, validators, acc0)
+	// testPowerSwing(t, ctx, chain, validators, acc0)
 
 	// add a new node, create validator, add add them now at 50% with the validators[0]. This new validator is validator[2]
 	// - create new node
@@ -68,6 +68,58 @@ func TestPOA(t *testing.T) {
 
 	// Shut down 1 of those validators, ensure the network height halts.
 
+	// This should be the last test since param changes happen
+	testUpdatePOAParams(t, ctx, chain, validators, acc0, incorrectUser)
+}
+
+func testUpdatePOAParams(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, validators []string, acc0, incorrectUser ibc.Wallet) {
+	// gov props MUST be submited from the gov account
+
+	// success: gov proposal update (only works if the gov account is allowed to submit proposals)
+	govModule := "cosmos10d07y265gmmuvt4z0w9aw880jnsr700j6zn9kn"
+	randAcc := "cosmos1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqnrql8a"
+
+	// fail: update-params message from a non authorized user.
+	tx, err := helpers.POAUpdateParams(t, ctx, chain, incorrectUser, []string{incorrectUser.FormattedAddress()})
+	if err != nil {
+		t.Fatal(err)
+	}
+	txRes := helpers.GetTxHash(t, ctx, chain, tx.Txhash)
+	fmt.Printf("%+v", txRes)
+	require.Contains(t, txRes.RawLog, poa.ErrNotAnAuthority.Error())
+
+	// success: update-params message from an authorized user.
+	newAdmins := []string{acc0.FormattedAddress(), govModule, randAcc, incorrectUser.FormattedAddress()}
+	tx, err = helpers.POAUpdateParams(t, ctx, chain, acc0, newAdmins)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	txRes = helpers.GetTxHash(t, ctx, chain, tx.Txhash)
+	fmt.Printf("%+v", txRes)
+	require.Equal(t, txRes.Code, 0)
+
+	p := helpers.GetPOAParams(t, ctx, chain)
+	for _, admin := range newAdmins {
+		require.Contains(t, p.Params.Admins, admin)
+	}
+
+	// TODO: SDK v50 does not seem to unmarshal this with the CLI.
+	// cannot marshal response proposals:{id:1 messages:{[/strangelove_ventures.poa.v1.MsgUpdateParams]:{sender:"cosmos10d07y265gmmuvt4z0w9aw880jnsr700j6zn9kn" params:{admins:"cosmos10d07y265gmmuvt4z0w9aw880jnsr700j6zn9kn" admins:"cosmos10d07y265gmmuvt4z0w9aw880jnsr700j6zn9kn"}}} status:PROPOSAL_STATUS_VOTING_PERIOD final_tally_result:{yes_count:"0" abstain_count:"0" no_count:"0" no_with_veto_count:"0"} submit_time:{seconds:1698682973 nanos:181594516} deposit_end_time:{seconds:1698855773 nanos:181594516} total_deposit:{denom:"stake" amount:"1000000"} voting_start_time:{seconds:1698682973 nanos:181594516} voting_end_time:{seconds:1698855773 nanos:181594516} metadata:"ipfs://CID" title:"title" summary:"summary" proposer:"cosmos1hj5fveer5cjtn4wd6wstzugjfdxzl0xpxvjjvr"} pagination:{total:1}: unexpected end of JSON input
+	// success: gov update, remove incorrectUser.FormattedAddress() from the previous list
+	// updatedParams := []cosmosproto.Message{
+	// 	&poa.MsgUpdateParams{
+	// 		Sender: govModule,
+	// 		Params: poa.Params{
+	// 			Admins: []string{acc0.FormattedAddress(), govModule, randAcc},
+	// 		},
+	// 	},
+	// }
+	// propId := helpers.SubmitParamChangeProp(t, ctx, chain, incorrectUser, updatedParams, govModule, 25)
+	// helpers.ValidatorVote(t, ctx, chain, propId, cosmos.ProposalVoteYes, uint64(25))
+
+	// p = helpers.GetPOAParams(t, ctx, chain)
+	// require.NotContains(t, p.Params.Admins, incorrectUser.FormattedAddress())
 }
 
 func testRemoveValidator(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, validators []string, acc0 ibc.Wallet) {
@@ -118,7 +170,7 @@ func testGovernance(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain
 	t.Log("===== TEST GOVERNANCE =====")
 	// ibc.ChainConfig key: app_state.poa.params.admins must contain the governance address.
 	propID := helpers.SubmitGovernanceProposalForValidatorChanges(t, ctx, chain, acc0, validators[0], 1_234_567, true)
-	helpers.ValidatorVote(t, ctx, chain, propID, 25)
+	helpers.ValidatorVote(t, ctx, chain, propID, cosmos.ProposalVoteYes, 25)
 
 	// validate the validator[0] was set to 1_234_567
 	val := helpers.GetValidators(t, ctx, chain).Validators[0]

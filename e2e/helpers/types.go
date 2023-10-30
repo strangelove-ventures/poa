@@ -143,3 +143,9 @@ type TxResponse struct {
 		} `json:"attributes"`
 	} `json:"events"`
 }
+
+type POAParams struct {
+	Params struct {
+		Admins []string `json:"admins"`
+	} `json:"params"`
+}

@@ -18,8 +18,11 @@
 # poad tx poa remove $(poad q staking validators --output=json | jq .validators[1].operator_address -r) --home=$HOME_DIR --yes --from=acc1
 #
 # poad tx gov submit-proposal simapp/proposal.json --home=$HOME_DIR --from=acc1 --yes
+# poad tx gov submit-proposal simapp/proposal-params.json --home=$HOME_DIR --from=acc1 --yes
 # poad tx gov vote 1 yes --home=$HOME_DIR --from=acc1 --yes
 #
+# poad q poa params
+# poad tx poa update-params cosmos1hj5fveer5cjtn4wd6wstzugjfdxzl0xpxvjjvr --home=$HOME_DIR --from=acc1 --yes
 
 export KEY="acc1" # validator
 export KEY2="acc2"
