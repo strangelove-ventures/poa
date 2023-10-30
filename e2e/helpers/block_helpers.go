@@ -12,7 +12,6 @@ func GetBlockData(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, 
 	var res BlockData
 	ExecuteQuery(ctx, chain, []string{"query", "block", "--type=height", fmt.Sprintf("%d", height)}, &res)
 	return res
-
 }
 
 // TODO: replace with `GetTransaction` https://github.com/strangelove-ventures/interchaintest/pull/836

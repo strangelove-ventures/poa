@@ -1,0 +1,19 @@
+{
+ "messages": [
+  {
+   "@type": "/strangelove_ventures.poa.v1.MsgUpdateParams",
+   "sender": "cosmos10d07y265gmmuvt4z0w9aw880jnsr700j6zn9kn",
+   "params": {
+    "admins": [
+        "cosmos10d07y265gmmuvt4z0w9aw880jnsr700j6zn9kn",
+        "cosmos10d07y265gmmuvt4z0w9aw880jnsr700j6zn9kn"
+    ]
+   }
+  }
+ ],
+ "metadata": "ipfs://CID",
+ "deposit": "1000000stake",
+ "title": "title",
+ "summary": "summary",
+ "expedited": false
+}

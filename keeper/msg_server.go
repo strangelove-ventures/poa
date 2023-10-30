@@ -198,6 +198,24 @@ func (ms msgServer) UpdateParams(ctx context.Context, msg *poa.MsgUpdateParams) 
 	return &poa.MsgUpdateParamsResponse{}, ms.k.SetParams(ctx, msg.Params)
 }
 
+// UpdateStakingParams implements poa.MsgServer.
+func (ms msgServer) UpdateStakingParams(ctx context.Context, msg *poa.MsgUpdateStakingParams) (*poa.MsgUpdateStakingParamsResponse, error) {
+	if ok := ms.isAdmin(ctx, msg.Sender); !ok {
+		return nil, poa.ErrNotAnAuthority
+	}
+
+	stakingParams := stakingtypes.Params{
+		UnbondingTime:     msg.Params.UnbondingTime,
+		MaxValidators:     msg.Params.MaxValidators,
+		MaxEntries:        msg.Params.MaxEntries,
+		HistoricalEntries: msg.Params.HistoricalEntries,
+		BondDenom:         msg.Params.BondDenom,
+		MinCommissionRate: msg.Params.MinCommissionRate,
+	}
+
+	return &poa.MsgUpdateStakingParamsResponse{}, ms.k.stakingKeeper.SetParams(ctx, stakingParams)
+}
+
 // takes in a validator address & sees if they are pending approval.
 func (ms msgServer) acceptNewValidator(ctx context.Context, operatingAddress string, power uint64) error {
 	sdkCtx := sdk.UnwrapSDKContext(ctx)

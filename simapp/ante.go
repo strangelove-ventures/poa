@@ -10,12 +10,14 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 
 	poaante "github.com/strangelove-ventures/poa/ante"
+	poakeeper "github.com/strangelove-ventures/poa/keeper"
 )
 
 // HandlerOptions are the options required for constructing a default SDK AnteHandler.
 type HandlerOptions struct {
 	ante.HandlerOptions
 	CircuitKeeper circuitante.CircuitBreaker
+	POAKeeper     poakeeper.Keeper
 }
 
 // NewAnteHandler returns an AnteHandler that checks and increments sequence
@@ -35,8 +37,10 @@ func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 	}
 
 	doGenTxRateValidation := false
-	rateFloor := math.LegacyNewDec(0)
-	rateCeil := math.LegacyNewDecWithPrec(1, 1)
+
+	// higher than the default staking keeper rate
+	rateFloor := math.LegacyMustNewDecFromStr("0.10")
+	rateCeil := math.LegacyMustNewDecFromStr("0.50")
 
 	anteDecorators := []sdk.AnteDecorator{
 		ante.NewSetUpContextDecorator(), // outermost AnteDecorator. SetUpContext must be called first
@@ -52,7 +56,7 @@ func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 		ante.NewSigGasConsumeDecorator(options.AccountKeeper, options.SigGasConsumer),
 		ante.NewSigVerificationDecorator(options.AccountKeeper, options.SignModeHandler),
 		ante.NewIncrementSequenceDecorator(options.AccountKeeper),
-		poaante.NewPOAStakingFilterDecorator(),
+		poaante.NewPOAStakingFilterDecorator(options.POAKeeper),
 		poaante.NewMsgCommissionLimiterDecorator(doGenTxRateValidation, rateFloor, rateCeil),
 	}
 
