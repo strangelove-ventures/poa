@@ -47,7 +47,7 @@ func (msfd MsgStakingFilterDecorator) hasInvalidStakingMsg(ctx context.Context, 
 			return true, nil
 		case *stakingtypes.MsgCancelUnbondingDelegation:
 			return true, nil
-		case *stakingtypes.MsgCreateValidator: // POA wraps this command.
+		case *stakingtypes.MsgCreateValidator: // POA wraps this message.
 			return true, nil
 		case *stakingtypes.MsgDelegate:
 			return true, nil
@@ -55,23 +55,7 @@ func (msfd MsgStakingFilterDecorator) hasInvalidStakingMsg(ctx context.Context, 
 			// 	return true, nil
 		case *stakingtypes.MsgUndelegate:
 			return true, nil
-		case *stakingtypes.MsgUpdateParams:
-			// this is only allowed for the admins
-			feeTx := msg.(sdk.FeeTx)
-			feePayer := feeTx.FeePayer()
-			feePayerAddr := sdk.AccAddress(feePayer)
-
-			for _, admin := range msfd.poaKeeper.GetAdmins(ctx) {
-				a, err := sdk.AccAddressFromBech32(admin)
-				if err != nil {
-					return false, err
-				}
-
-				if a.Equals(feePayerAddr) {
-					return false, nil
-				}
-			}
-
+		case *stakingtypes.MsgUpdateParams: // POA wraps this message.
 			return true, nil
 		}
 	}

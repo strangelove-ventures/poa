@@ -21,7 +21,7 @@ require (
 	github.com/cosmos/cosmos-sdk v0.50.0-rc.1
 	github.com/cosmos/gogoproto v1.4.11
 	// https://github.com/strangelove-ventures/interchaintest/pull/840
-	github.com/strangelove-ventures/interchaintest/v8 v8.0.0-20231027004256-e9bd6487842d
+	github.com/strangelove-ventures/interchaintest/v8 v8.0.0-20231030144423-5596f4cb2114
 	github.com/strangelove-ventures/poa v0.0.0-00010101000000-000000000000
 	github.com/stretchr/testify v1.8.4
 	golang.org/x/sync v0.4.0
