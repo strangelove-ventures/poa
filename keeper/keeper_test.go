@@ -10,6 +10,7 @@ import (
 	addresscodec "github.com/cosmos/cosmos-sdk/codec/address"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
+	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	"github.com/cosmos/cosmos-sdk/runtime"
 	"github.com/cosmos/cosmos-sdk/testutil"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -110,7 +111,7 @@ type valSetup struct {
 	valKey *ed25519.PrivKey
 }
 
-func genAcc() valSetup {
+func GenAcc() valSetup {
 	priv1 := secp256k1.GenPrivKey()
 	addr1 := sdk.AccAddress(priv1.PubKey().Address())
 	valKey1 := ed25519.GenPrivKey()
@@ -126,9 +127,9 @@ func (f *testFixture) createBaseStakingValidators(t *testing.T) {
 	bondCoin := sdk.NewCoin("stake", math.NewInt(1_000_000))
 
 	vals := []valSetup{
-		genAcc(),
-		genAcc(),
-		genAcc(),
+		GenAcc(),
+		GenAcc(),
+		GenAcc(),
 	}
 
 	for idx, val := range vals {
@@ -136,31 +137,12 @@ func (f *testFixture) createBaseStakingValidators(t *testing.T) {
 
 		pubKey := val.valKey.PubKey()
 
-		var pkAny *codectypes.Any
-		if pubKey != nil {
-			var err error
-			if pkAny, err = codectypes.NewAnyWithValue(pubKey); err != nil {
-				t.Fatal(err)
-			}
-		}
-
-		val := poa.ConvertPOAToStaking(poa.Validator{
-			OperatorAddress: valAddr,
-			ConsensusPubkey: pkAny,
-			Jailed:          false,
-			Status:          poa.Bonded,
-			Tokens:          bondCoin.Amount,
-			DelegatorShares: math.LegacyNewDecFromInt(bondCoin.Amount),
-			Description:     poa.NewDescription(fmt.Sprintf("foo-%d", idx), "", "", "", ""),
-			UnbondingHeight: 0,
-			UnbondingTime:   time.Time{},
-			Commission: poa.Commission{
-				CommissionRates: poa.NewCommissionRates(math.LegacyZeroDec(), math.LegacyZeroDec(), math.LegacyZeroDec()),
-			},
-			MinSelfDelegation:       math.OneInt(),
-			UnbondingOnHoldRefCount: 0,
-			UnbondingIds:            nil,
-		})
+		val := poa.ConvertPOAToStaking(CreateNewValidator(
+			fmt.Sprintf("val-%d", idx),
+			valAddr,
+			pubKey,
+			bondCoin.Amount.Int64(),
+		))
 
 		if err := f.k.AddPendingValidator(f.ctx, val, pubKey); err != nil {
 			panic(err)
@@ -191,5 +173,32 @@ func (f *testFixture) createBaseStakingValidators(t *testing.T) {
 		}
 
 	}
+}
 
+func CreateNewValidator(moniker string, opAddr string, pubKey cryptotypes.PubKey, amt int64) poa.Validator {
+	var pkAny *codectypes.Any
+	if pubKey != nil {
+		var err error
+		if pkAny, err = codectypes.NewAnyWithValue(pubKey); err != nil {
+			panic(err)
+		}
+	}
+
+	return poa.Validator{
+		OperatorAddress: opAddr,
+		ConsensusPubkey: pkAny,
+		Jailed:          false,
+		Status:          poa.Bonded,
+		Tokens:          math.NewInt(amt),
+		DelegatorShares: math.LegacyNewDecFromInt(math.NewInt(amt)),
+		Description:     poa.NewDescription(moniker, "", "", "", ""),
+		UnbondingHeight: 0,
+		UnbondingTime:   time.Time{},
+		Commission: poa.Commission{
+			CommissionRates: poa.NewCommissionRates(math.LegacyZeroDec(), math.LegacyZeroDec(), math.LegacyZeroDec()),
+		},
+		MinSelfDelegation:       math.OneInt(),
+		UnbondingOnHoldRefCount: 0,
+		UnbondingIds:            nil,
+	}
 }

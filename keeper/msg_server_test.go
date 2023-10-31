@@ -71,12 +71,11 @@ func TestSetPower(t *testing.T) {
 		totalBonded = totalBonded.Add(val.GetBondedTokens())
 	}
 
-	fmt.Println(totalBonded)
-
 	testCases := []struct {
-		name         string
-		request      *poa.MsgSetPower
-		expectErrMsg string
+		name               string
+		createNewValidator bool
+		request            *poa.MsgSetPower
+		expectErrMsg       string
 	}{
 		{
 			name: "set invalid authority (not an address)",
@@ -98,18 +97,69 @@ func TestSetPower(t *testing.T) {
 			},
 			expectErrMsg: poa.ErrUnsafePower.Error(),
 		},
-		// TODO: add more test
+		{
+			name:               "new validator",
+			createNewValidator: true,
+			request: &poa.MsgSetPower{
+				Sender: f.addrs[0].String(),
+				Power:  1_000_000,
+				Unsafe: true,
+			},
+			expectErrMsg: "",
+		},
 	}
 
 	for _, tc := range testCases {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
-			_, err := f.msgServer.SetPower(f.ctx, tc.request)
+
+			// add a new validator if the test case requires it
+			if tc.createNewValidator {
+				val := GenAcc()
+				valAddr := sdk.ValAddress(val.addr).String()
+
+				v := poa.ConvertPOAToStaking(CreateNewValidator(
+					fmt.Sprintf("val-%s", tc.name),
+					valAddr,
+					val.valKey.PubKey(),
+					int64(tc.request.Power),
+				))
+
+				if err := f.k.AddPendingValidator(f.ctx, v, val.valKey.PubKey()); err != nil {
+					panic(err)
+				}
+
+				f.increaseBlock(1)
+
+				// update the request to include the newly created valAddr
+				tc.request.ValidatorAddress = valAddr
+
+				// check the pending validators includes the new validator
+				pendingVals, err := f.k.GetPendingValidators(f.ctx)
+				require.NoError(err)
+				require.EqualValues(1, len(pendingVals.Validators))
+			}
+
+			preVals, err := f.stakingKeeper.GetValidators(f.ctx, 100)
+			require.NoError(err)
+
+			// sets the power
+			_, err = f.msgServer.SetPower(f.ctx, tc.request)
 			if tc.expectErrMsg != "" {
 				require.Error(err)
 				require.ErrorContains(err, tc.expectErrMsg)
 			} else {
 				require.NoError(err)
+			}
+
+			// check number of vals in the set
+			if tc.createNewValidator {
+				postVals, err := f.stakingKeeper.GetValidators(f.ctx, 100)
+				require.NoError(err)
+
+				require.EqualValues(len(preVals)+1, len(postVals))
+			} else {
+				require.EqualValues(len(vals), len(preVals))
 			}
 		})
 	}
