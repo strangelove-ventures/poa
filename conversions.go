@@ -23,7 +23,6 @@ func NewCommissionRates(rate, maxRate, maxChangeRate math.LegacyDec) CommissionR
 	}
 }
 
-// TODO: ideally we should remove this need?
 func ConvertPOAToStaking(poa Validator) types.Validator {
 	return types.Validator{
 		OperatorAddress: poa.OperatorAddress,
