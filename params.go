@@ -18,6 +18,22 @@ func DefaultParams() Params {
 	}
 }
 
+func NewParams(addresses []string) (Params, error) {
+	if len(addresses) == 0 {
+		return Params{}, nil
+	}
+
+	for _, address := range addresses {
+		if _, err := sdk.AccAddressFromBech32(address); err != nil {
+			return Params{}, err
+		}
+	}
+
+	return Params{
+		Admins: addresses,
+	}, nil
+}
+
 // add the stringer method for Params
 func (p Params) String() string {
 	bz, err := json.Marshal(p)
