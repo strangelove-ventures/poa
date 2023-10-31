@@ -83,10 +83,12 @@ func SetupTest(t *testing.T) *testFixture {
 	bankkeeper.NewMsgServerImpl(s.bankkeeper)
 
 	s.stakingKeeper = stakingkeeper.NewKeeper(encCfg.Codec, storeService, s.accountkeeper, s.bankkeeper, s.govModAddr, authcodec.NewBech32Codec(sdk.Bech32PrefixValAddr), authcodec.NewBech32Codec(sdk.Bech32PrefixConsAddr))
-	s.stakingKeeper.SetParams(s.ctx, stakingtypes.DefaultParams())
+	err := s.stakingKeeper.SetParams(s.ctx, stakingtypes.DefaultParams())
+	require.NoError(t, err)
 
 	s.slashingKeeper = slashingkeeper.NewKeeper(encCfg.Codec, encCfg.Amino, storeService, s.stakingKeeper, authtypes.NewModuleAddress(govtypes.ModuleName).String())
-	s.slashingKeeper.SetParams(s.ctx, slashingtypes.DefaultParams())
+	err = s.slashingKeeper.SetParams(s.ctx, slashingtypes.DefaultParams())
+	require.NoError(t, err)
 
 	s.k = keeper.NewKeeper(encCfg.Codec, storeService, s.stakingKeeper, s.slashingKeeper, addresscodec.NewBech32Codec("cosmosvaloper"))
 	s.msgServer = keeper.NewMsgServerImpl(s.k)
@@ -99,7 +101,8 @@ func SetupTest(t *testing.T) *testFixture {
 
 	genState := poa.NewGenesisState()
 	genState.Params.Admins = []string{s.addrs[0].String(), s.govModAddr}
-	s.k.InitGenesis(s.ctx, genState)
+	err = s.k.InitGenesis(s.ctx, genState)
+	require.NoError(t, err)
 
 	s.createBaseStakingValidators(t)
 	return s
@@ -149,16 +152,17 @@ func (f *testFixture) createBaseStakingValidators(t *testing.T) {
 		}
 
 		// set power
-		f.msgServer.SetPower(f.ctx, &poa.MsgSetPower{
+		_, err := f.msgServer.SetPower(f.ctx, &poa.MsgSetPower{
 			Sender:           f.addrs[0].String(),
 			ValidatorAddress: valAddr,
 			Power:            1_000_000,
 			Unsafe:           true,
 		})
+		require.NoError(t, err)
 
 		// increase the block so the new validator is in the validator set
 		f.ctx = f.ctx.WithBlockHeight(f.ctx.BlockHeight() + 1)
-		_, err := f.stakingKeeper.ApplyAndReturnValidatorSetUpdates(f.ctx)
+		_, err = f.stakingKeeper.ApplyAndReturnValidatorSetUpdates(f.ctx)
 		require.NoError(t, err)
 
 		valAddrBz, err := sdk.ValAddressFromBech32(val.GetOperator())

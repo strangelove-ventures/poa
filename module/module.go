@@ -109,7 +109,10 @@ func (am AppModule) InitGenesis(ctx sdk.Context, cdc codec.JSONCodec, data json.
 	var genesisState poa.GenesisState
 	cdc.MustUnmarshalJSON(data, &genesisState)
 
-	am.keeper.InitGenesis(ctx, &genesisState)
+	if err := am.keeper.InitGenesis(ctx, &genesisState); err != nil {
+		panic(err)
+	}
+
 	return nil
 }
 

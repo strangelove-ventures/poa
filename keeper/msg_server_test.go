@@ -129,7 +129,9 @@ func TestSetPower(t *testing.T) {
 					panic(err)
 				}
 
-				f.increaseBlock(1)
+				if _, err := f.increaseBlock(1); err != nil {
+					panic(err)
+				}
 
 				// update the request to include the newly created valAddr
 				tc.request.ValidatorAddress = valAddr
@@ -229,7 +231,9 @@ func TestRemoveValidator(t *testing.T) {
 
 				// TODO: move this to SetPower / RemoveValidator checks
 				// will require the bankKeeper again
-				f.mintTokensToBondedPool(t)
+				if err := f.mintTokensToBondedPool(t); err != nil {
+					panic(err)
+				}
 
 				u, err := f.increaseBlock(1)
 				require.NoError(err)
