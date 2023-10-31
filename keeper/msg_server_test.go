@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"cosmossdk.io/math"
-	abci "github.com/cometbft/cometbft/abci/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/strangelove-ventures/poa"
@@ -59,7 +58,55 @@ func TestUpdateParams(t *testing.T) {
 	}
 }
 
-func TestSetPower(t *testing.T) {
+func TestUpdateStakingParams(t *testing.T) {
+	f := SetupTest(t)
+	require := require.New(t)
+
+	testCases := []struct {
+		name         string
+		request      *poa.MsgUpdateStakingParams
+		expectErrMsg string
+	}{
+		{
+			name: "set invalid authority (not an address)",
+			request: &poa.MsgUpdateStakingParams{
+				Sender: "foo",
+			},
+			expectErrMsg: "not an authority",
+		},
+		{
+			name: "set invalid authority (not defined authority)",
+			request: &poa.MsgUpdateStakingParams{
+				Sender: f.addrs[1].String(),
+				Params: poa.DefaultStakingParams(),
+			},
+			expectErrMsg: "not an authority",
+		},
+		{
+			name: "set valid params",
+			request: &poa.MsgUpdateStakingParams{
+				Sender: f.govModAddr,
+				Params: poa.DefaultStakingParams(),
+			},
+			expectErrMsg: "",
+		},
+	}
+
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			_, err := f.msgServer.UpdateStakingParams(f.ctx, tc.request)
+			if tc.expectErrMsg != "" {
+				require.Error(err)
+				require.ErrorContains(err, tc.expectErrMsg)
+			} else {
+				require.NoError(err)
+			}
+		})
+	}
+}
+
+func TestSetPowerAndCreateValidator(t *testing.T) {
 	f := SetupTest(t)
 	require := require.New(t)
 
@@ -129,7 +176,7 @@ func TestSetPower(t *testing.T) {
 					panic(err)
 				}
 
-				if _, err := f.increaseBlock(1); err != nil {
+				if _, err := f.IncreaseBlock(1); err != nil {
 					panic(err)
 				}
 
@@ -235,12 +282,12 @@ func TestRemoveValidator(t *testing.T) {
 					panic(err)
 				}
 
-				u, err := f.increaseBlock(1)
+				u, err := f.IncreaseBlock(1)
 				require.NoError(err)
 				require.EqualValues(3, len(u))
 				fmt.Println(u, err)
 
-				u, err = f.increaseBlock(1)
+				u, err = f.IncreaseBlock(1)
 				require.NoError(err)
 				fmt.Println(u)
 				require.EqualValues(2, len(u))
@@ -278,10 +325,4 @@ func (f *testFixture) mintTokensToBondedPool(t *testing.T) error {
 	}
 
 	return nil
-}
-
-func (f *testFixture) increaseBlock(amt int64) ([]abci.ValidatorUpdate, error) {
-	f.ctx = f.ctx.WithBlockHeight(f.ctx.BlockHeight() + amt)
-	updates, err := f.stakingKeeper.ApplyAndReturnValidatorSetUpdates(f.ctx)
-	return updates, err
 }

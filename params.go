@@ -7,6 +7,7 @@ import (
 
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 )
 
 // DefaultParams returns default module parameters.
@@ -32,6 +33,20 @@ func NewParams(addresses []string) (Params, error) {
 	return Params{
 		Admins: addresses,
 	}, nil
+}
+
+// DefaultParams returns default x/staking parameters.
+func DefaultStakingParams() StakingParams {
+	sp := stakingtypes.DefaultParams()
+
+	return StakingParams{
+		UnbondingTime:     sp.UnbondingTime,
+		MaxValidators:     sp.MaxValidators,
+		MaxEntries:        sp.MaxEntries,
+		HistoricalEntries: sp.HistoricalEntries,
+		BondDenom:         sp.BondDenom,
+		MinCommissionRate: sp.MinCommissionRate,
+	}
 }
 
 // add the stringer method for Params

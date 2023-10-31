@@ -7,6 +7,7 @@ import (
 
 	"cosmossdk.io/math"
 	storetypes "cosmossdk.io/store/types"
+	abci "github.com/cometbft/cometbft/abci/types"
 	addresscodec "github.com/cosmos/cosmos-sdk/codec/address"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
@@ -205,4 +206,10 @@ func CreateNewValidator(moniker string, opAddr string, pubKey cryptotypes.PubKey
 		UnbondingOnHoldRefCount: 0,
 		UnbondingIds:            nil,
 	}
+}
+
+func (f *testFixture) IncreaseBlock(amt int64) ([]abci.ValidatorUpdate, error) {
+	f.ctx = f.ctx.WithBlockHeight(f.ctx.BlockHeight() + amt)
+	updates, err := f.stakingKeeper.ApplyAndReturnValidatorSetUpdates(f.ctx)
+	return updates, err
 }
