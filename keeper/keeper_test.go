@@ -3,6 +3,7 @@ package keeper_test
 import (
 	"fmt"
 	"testing"
+	"time"
 
 	"cosmossdk.io/math"
 	storetypes "cosmossdk.io/store/types"
@@ -30,6 +31,8 @@ import (
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+
+	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 )
 
 var (
@@ -53,7 +56,7 @@ type testFixture struct {
 	accountkeeper  authkeeper.AccountKeeper
 	stakingKeeper  *stakingkeeper.Keeper
 	slashingKeeper slashingkeeper.Keeper
-	bankkeeper     bankkeeper.Keeper
+	bankkeeper     bankkeeper.BaseKeeper
 
 	addrs      []sdk.AccAddress
 	govModAddr string
@@ -61,6 +64,9 @@ type testFixture struct {
 
 func SetupTest(t *testing.T) *testFixture {
 	s := new(testFixture)
+
+	logger := log.NewTestLogger(t)
+	s.govModAddr = authtypes.NewModuleAddress(govtypes.ModuleName).String()
 
 	encCfg := moduletestutil.MakeTestEncodingConfig()
 	key := storetypes.NewKVStoreKey(poa.ModuleName)
@@ -70,17 +76,10 @@ func SetupTest(t *testing.T) *testFixture {
 	storeService := runtime.NewKVStoreService(key)
 	s.addrs = simtestutil.CreateIncrementalAccounts(3)
 
-	// TODO: gomock initializations ?
-	// ctrl := gomock.NewController(s.T())
-	// s.stakingKeeper = slashingtestutil.NewMockStakingKeeper(ctrl)
-	// s.stakingKeeper.EXPECT().ValidatorAddressCodec().Return(address.NewBech32Codec("cosmosvaloper")).AnyTimes()
-	// s.stakingKeeper.EXPECT().ConsensusAddressCodec().Return(address.NewBech32Codec("cosmosvalcons")).AnyTimes()
-
-	logger := log.NewTestLogger(t)
-	s.govModAddr = authtypes.NewModuleAddress(govtypes.ModuleName).String()
-
 	s.accountkeeper = authkeeper.NewAccountKeeper(encCfg.Codec, storeService, authtypes.ProtoBaseAccount, maccPerms, authcodec.NewBech32Codec(sdk.Bech32MainPrefix), sdk.Bech32MainPrefix, s.govModAddr)
 	s.bankkeeper = bankkeeper.NewBaseKeeper(encCfg.Codec, storeService, s.accountkeeper, nil, s.govModAddr, logger)
+
+	bankkeeper.NewMsgServerImpl(s.bankkeeper)
 
 	s.stakingKeeper = stakingkeeper.NewKeeper(encCfg.Codec, storeService, s.accountkeeper, s.bankkeeper, s.govModAddr, authcodec.NewBech32Codec(sdk.Bech32PrefixValAddr), authcodec.NewBech32Codec(sdk.Bech32PrefixConsAddr))
 	s.stakingKeeper.SetParams(s.ctx, stakingtypes.DefaultParams())
@@ -101,7 +100,7 @@ func SetupTest(t *testing.T) *testFixture {
 	genState.Params.Admins = []string{s.addrs[0].String(), s.govModAddr}
 	s.k.InitGenesis(s.ctx, genState)
 
-	s.createBaseValidators(t)
+	s.createBaseStakingValidators(t)
 	return s
 }
 
@@ -123,8 +122,7 @@ func genAcc() valSetup {
 	}
 }
 
-func (f *testFixture) createBaseValidators(t *testing.T) {
-	stakingMsgServer := stakingkeeper.NewMsgServerImpl(f.stakingKeeper)
+func (f *testFixture) createBaseStakingValidators(t *testing.T) {
 	bondCoin := sdk.NewCoin("stake", math.NewInt(1_000_000))
 
 	vals := []valSetup{
@@ -134,29 +132,64 @@ func (f *testFixture) createBaseValidators(t *testing.T) {
 	}
 
 	for idx, val := range vals {
-		description := stakingtypes.NewDescription(fmt.Sprintf("foo-%d", idx), "", "", "", "")
-		commissionRates := stakingtypes.NewCommissionRates(math.LegacyZeroDec(), math.LegacyZeroDec(), math.LegacyZeroDec())
-
 		valAddr := sdk.ValAddress(val.addr).String()
 
-		// mint tokens to validator
-		f.bankkeeper.MintCoins(f.ctx, poa.ModuleName, sdk.NewCoins(bondCoin))
-		f.bankkeeper.SendCoinsFromModuleToAccount(f.ctx, poa.ModuleName, val.addr, sdk.NewCoins(bondCoin))
+		pubKey := val.valKey.PubKey()
 
-		// create validator
-		msg, err := stakingtypes.NewMsgCreateValidator(
-			valAddr, val.valKey.PubKey(), bondCoin, description, commissionRates, math.OneInt(),
-		)
-		require.NoError(t, err)
+		var pkAny *codectypes.Any
+		if pubKey != nil {
+			var err error
+			if pkAny, err = codectypes.NewAnyWithValue(pubKey); err != nil {
+				t.Fatal(err)
+			}
+		}
 
-		_, err = stakingMsgServer.CreateValidator(f.ctx, msg)
-		require.NoError(t, err)
+		val := poa.ConvertPOAToStaking(poa.Validator{
+			OperatorAddress: valAddr,
+			ConsensusPubkey: pkAny,
+			Jailed:          false,
+			Status:          poa.Bonded,
+			Tokens:          bondCoin.Amount,
+			DelegatorShares: math.LegacyNewDecFromInt(bondCoin.Amount),
+			Description:     poa.NewDescription(fmt.Sprintf("foo-%d", idx), "", "", "", ""),
+			UnbondingHeight: 0,
+			UnbondingTime:   time.Time{},
+			Commission: poa.Commission{
+				CommissionRates: poa.NewCommissionRates(math.LegacyZeroDec(), math.LegacyZeroDec(), math.LegacyZeroDec()),
+			},
+			MinSelfDelegation:       math.OneInt(),
+			UnbondingOnHoldRefCount: 0,
+			UnbondingIds:            nil,
+		})
+
+		if err := f.k.AddPendingValidator(f.ctx, val, pubKey); err != nil {
+			panic(err)
+		}
+
+		// set power
+		f.msgServer.SetPower(f.ctx, &poa.MsgSetPower{
+			Sender:           f.addrs[0].String(),
+			ValidatorAddress: valAddr,
+			Power:            1_000_000,
+			Unsafe:           true,
+		})
 
 		// increase the block so the new validator is in the validator set
 		f.ctx = f.ctx.WithBlockHeight(f.ctx.BlockHeight() + 1)
-
-		_, err = f.stakingKeeper.ApplyAndReturnValidatorSetUpdates(f.ctx)
+		_, err := f.stakingKeeper.ApplyAndReturnValidatorSetUpdates(f.ctx)
 		require.NoError(t, err)
+
+		valAddrBz, err := sdk.ValAddressFromBech32(val.GetOperator())
+		require.NoError(t, err)
+
+		validator, err := f.stakingKeeper.GetValidator(f.ctx, valAddrBz)
+		require.NoError(t, err)
+
+		validator.Status = stakingtypes.Bonded
+		if err := f.stakingKeeper.SetValidator(f.ctx, validator); err != nil {
+			panic(err)
+		}
+
 	}
 
 }
