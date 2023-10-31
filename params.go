@@ -2,6 +2,7 @@ package poa
 
 import (
 	"encoding/json"
+	fmt "fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -21,7 +22,7 @@ func DefaultParams() Params {
 
 func NewParams(addresses []string) (Params, error) {
 	if len(addresses) == 0 {
-		return Params{}, nil
+		return Params{}, fmt.Errorf("must provide at least one address")
 	}
 
 	for _, address := range addresses {

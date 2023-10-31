@@ -162,26 +162,8 @@ func TestSetPowerAndCreateValidator(t *testing.T) {
 
 			// add a new validator if the test case requires it
 			if tc.createNewValidator {
-				val := GenAcc()
-				valAddr := sdk.ValAddress(val.addr).String()
-
-				v := poa.ConvertPOAToStaking(CreateNewValidator(
-					fmt.Sprintf("val-%s", tc.name),
-					valAddr,
-					val.valKey.PubKey(),
-					int64(tc.request.Power),
-				))
-
-				if err := f.k.AddPendingValidator(f.ctx, v, val.valKey.PubKey()); err != nil {
-					panic(err)
-				}
-
-				if _, err := f.IncreaseBlock(1); err != nil {
-					panic(err)
-				}
-
-				// update the request to include the newly created valAddr
-				tc.request.ValidatorAddress = valAddr
+				valAddr := f.CreatePendingValidator(fmt.Sprintf("val-%s", tc.name), tc.request.Power)
+				tc.request.ValidatorAddress = valAddr.String()
 
 				// check the pending validators includes the new validator
 				pendingVals, err := f.k.GetPendingValidators(f.ctx)

@@ -208,6 +208,28 @@ func CreateNewValidator(moniker string, opAddr string, pubKey cryptotypes.PubKey
 	}
 }
 
+func (f *testFixture) CreatePendingValidator(name string, power uint64) sdk.ValAddress {
+	val := GenAcc()
+	valAddr := sdk.ValAddress(val.addr)
+
+	v := poa.ConvertPOAToStaking(CreateNewValidator(
+		name,
+		valAddr.String(),
+		val.valKey.PubKey(),
+		int64(power),
+	))
+
+	if err := f.k.AddPendingValidator(f.ctx, v, val.valKey.PubKey()); err != nil {
+		panic(err)
+	}
+
+	if _, err := f.IncreaseBlock(1); err != nil {
+		panic(err)
+	}
+
+	return valAddr
+}
+
 func (f *testFixture) IncreaseBlock(amt int64) ([]abci.ValidatorUpdate, error) {
 	f.ctx = f.ctx.WithBlockHeight(f.ctx.BlockHeight() + amt)
 	updates, err := f.stakingKeeper.ApplyAndReturnValidatorSetUpdates(f.ctx)
