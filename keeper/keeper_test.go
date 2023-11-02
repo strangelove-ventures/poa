@@ -152,7 +152,6 @@ func (f *testFixture) createBaseStakingValidators(t *testing.T) {
 			panic(err)
 		}
 
-		// set power
 		_, err := f.msgServer.SetPower(f.ctx, &poa.MsgSetPower{
 			Sender:           f.addrs[0].String(),
 			ValidatorAddress: valAddr,

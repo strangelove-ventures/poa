@@ -174,7 +174,6 @@ func TestSetPowerAndCreateValidator(t *testing.T) {
 			preVals, err := f.stakingKeeper.GetValidators(f.ctx, 100)
 			require.NoError(err)
 
-			// sets the power
 			_, err = f.msgServer.SetPower(f.ctx, tc.request)
 			if tc.expectErrMsg != "" {
 				require.Error(err)
@@ -183,7 +182,7 @@ func TestSetPowerAndCreateValidator(t *testing.T) {
 				require.NoError(err)
 			}
 
-			// check number of vals in the set
+			// check number of vals changed the expected amount
 			if tc.createNewValidator {
 				postVals, err := f.stakingKeeper.GetValidators(f.ctx, 100)
 				require.NoError(err)
@@ -258,8 +257,8 @@ func TestRemoveValidator(t *testing.T) {
 			} else {
 				require.NoError(err)
 
-				// TODO: move this to SetPower / RemoveValidator checks
-				// will require the bankKeeper again
+				// This is only required in testing as we do not have a 'real' validator set
+				// signing blocks.
 				if err := f.mintTokensToBondedPool(t); err != nil {
 					panic(err)
 				}
@@ -279,11 +278,12 @@ func TestRemoveValidator(t *testing.T) {
 	}
 }
 
-// TODO: move this to SetPower
+// mintTokensToBondedPool mints tokens to the bonded pool so the validator set
+// in testing can be removed.
+// In the future, this same logic would be run during the migration from POA->POS.
 func (f *testFixture) mintTokensToBondedPool(t *testing.T) error {
 	require := require.New(t)
 
-	// TODO: when RemoveValidator, mint tokens to the bonded pool? (seems we need to, so we can apply and return the set update early)
 	bondDenom, err := f.stakingKeeper.BondDenom(f.ctx)
 	require.NoError(err)
 
@@ -295,7 +295,6 @@ func (f *testFixture) mintTokensToBondedPool(t *testing.T) error {
 		amt += v.GetBondedTokens().Int64()
 	}
 
-	// simplify this to the diff between them
 	coins := sdk.NewCoins(sdk.NewCoin(bondDenom, math.NewInt(amt)))
 
 	if err := f.bankkeeper.MintCoins(f.ctx, poa.ModuleName, coins); err != nil {

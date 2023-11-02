@@ -9,6 +9,10 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
+const (
+	prefix = "/strangelove_ventures.poa.v1."
+)
+
 type CodecTestSuite struct {
 	suite.Suite
 }
@@ -23,8 +27,6 @@ func (suite *CodecTestSuite) TestRegisterInterfaces() {
 	RegisterInterfaces(registry)
 
 	impls := registry.ListImplementations(sdk.MsgInterfaceProtoName)
-
-	prefix := "/strangelove_ventures.poa.v1."
 
 	suite.Require().Equal(5, len(impls))
 	suite.Require().ElementsMatch([]string{
