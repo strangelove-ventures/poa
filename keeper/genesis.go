@@ -9,9 +9,9 @@ import (
 )
 
 // InitGenesis initializes the module's state from a genesis state.
-func (k *Keeper) InitGenesis(ctx context.Context, data *poa.GenesisState) {
+func (k *Keeper) InitGenesis(ctx context.Context, data *poa.GenesisState) error {
 	if err := k.SetParams(ctx, data.Params); err != nil {
-		panic(err)
+		return err
 	}
 
 	for _, val := range data.PendingValidators {
@@ -19,13 +19,15 @@ func (k *Keeper) InitGenesis(ctx context.Context, data *poa.GenesisState) {
 
 		pk, ok := stakingValidator.ConsensusPubkey.GetCachedValue().(cryptotypes.PubKey)
 		if !ok {
-			panic(fmt.Sprintf("Expecting cryptotypes.PubKey, got %T", pk))
+			return fmt.Errorf("expecting cryptotypes.PubKey, got %T", pk)
 		}
 
 		if err := k.AddPendingValidator(ctx, stakingValidator, pk); err != nil {
-			panic(err)
+			return err
 		}
 	}
+
+	return nil
 }
 
 // ExportGenesis exports the module's state to a genesis state.

@@ -7,6 +7,7 @@ import (
 
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 )
 
 // DefaultParams returns default module parameters.
@@ -15,6 +16,37 @@ func DefaultParams() Params {
 
 	return Params{
 		Admins: []string{govModuleAddress},
+	}
+}
+
+// NewParams returns a new POA Params.
+func NewParams(addresses []string) (Params, error) {
+	if len(addresses) == 0 {
+		return Params{}, ErrMustProvideAtLeastOneAddress
+	}
+
+	for _, address := range addresses {
+		if _, err := sdk.AccAddressFromBech32(address); err != nil {
+			return Params{}, err
+		}
+	}
+
+	return Params{
+		Admins: addresses,
+	}, nil
+}
+
+// DefaultParams returns default x/staking parameters.
+func DefaultStakingParams() StakingParams {
+	sp := stakingtypes.DefaultParams()
+
+	return StakingParams{
+		UnbondingTime:     sp.UnbondingTime,
+		MaxValidators:     sp.MaxValidators,
+		MaxEntries:        sp.MaxEntries,
+		HistoricalEntries: sp.HistoricalEntries,
+		BondDenom:         sp.BondDenom,
+		MinCommissionRate: sp.MinCommissionRate,
 	}
 }
 
