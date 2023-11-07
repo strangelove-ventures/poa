@@ -41,7 +41,7 @@ func ValidatorVote(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain,
 	height, err := chain.Height(ctx)
 	require.NoError(t, err, "failed to get height")
 
-	_, err = cosmos.PollForProposalStatus(ctx, chain, height, height+searchHeightDelta, proposalID, cosmos.ProposalStatusPassed)
+	_, err = cosmos.PollForProposalStatusV8(ctx, chain, height, height+searchHeightDelta, proposalID, cosmos.ProposalStatusPassedV8)
 	require.NoError(t, err, "proposal status did not change to passed in expected number of blocks")
 }
 
