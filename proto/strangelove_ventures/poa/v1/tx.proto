@@ -15,35 +15,38 @@ option go_package = "github.com/strangelove-ventures/poa";
 
 // Msg defines the Msg service.
 service Msg {
-  option (cosmos.msg.v1.service) = true;  
+  option (cosmos.msg.v1.service) = true;
 
   // x/staking wrappers (future)
-  rpc CreateValidator(MsgCreateValidator) returns (MsgCreateValidatorResponse);  
-  
+  rpc CreateValidator(MsgCreateValidator) returns (MsgCreateValidatorResponse);
+
   // SetPower sets the new power of a validator.
   // This also doubles as a way to accept pending validators
   rpc SetPower(MsgSetPower) returns (MsgSetPowerResponse);
 
-  // RemoveValidator removes a validator from the active set and unbonds their delegations.
+  // RemoveValidator removes a validator from the active set and unbonds their
+  // delegations.
   rpc RemoveValidator(MsgRemoveValidator) returns (MsgRemoveValidatorResponse);
 
   // UpdateParams updates the module parameters.
   rpc UpdateParams(MsgUpdateParams) returns (MsgUpdateParamsResponse);
 
   // UpdateStakingParams updates the module parameters.
-  rpc UpdateStakingParams(MsgUpdateStakingParams) returns (MsgUpdateStakingParamsResponse);
+  rpc UpdateStakingParams(MsgUpdateStakingParams)
+      returns (MsgUpdateStakingParamsResponse);
 }
 
 // SetPower sets the power of a validator
 message MsgSetPower {
   option (cosmos.msg.v1.signer) = "sender";
-  option (amino.name)           = "poa/MsgSetPower";
+  option (amino.name) = "poa/MsgSetPower";
 
-  option (gogoproto.equal)           = false;
+  option (gogoproto.equal) = false;
   option (gogoproto.goproto_getters) = false;
 
-  string sender = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
-  string validator_address = 2 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string sender = 1 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+  string validator_address = 2
+      [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
   uint64 power = 3;
   bool unsafe = 4;
 }
@@ -54,13 +57,14 @@ message MsgSetPowerResponse {}
 // jail -> deleted
 message MsgRemoveValidator {
   option (cosmos.msg.v1.signer) = "sender";
-  option (amino.name)           = "poa/MsgRemoveValidator";
+  option (amino.name) = "poa/MsgRemoveValidator";
 
-  option (gogoproto.equal)           = false;
+  option (gogoproto.equal) = false;
   option (gogoproto.goproto_getters) = false;
 
-  string sender = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
-  string validator_address = 2 [(cosmos_proto.scalar) = "cosmos.AddressString"];    
+  string sender = 1 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+  string validator_address = 2
+      [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
 }
 // MsgSetPowerResponse
 message MsgRemoveValidatorResponse {}
@@ -71,10 +75,10 @@ message MsgUpdateParams {
 
   // sender is the address of the admin account with permission to update.
   // ex: governance, multisig/DAO, or standard account found in Params.
-  string sender = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string sender = 1 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
 
-  // module parameters (all must be supplied). 
-  Params params = 2 [(gogoproto.nullable) = false];
+  // module parameters (all must be supplied).
+  Params params = 2 [ (gogoproto.nullable) = false ];
 }
 
 // MsgUpdateParamsResponse defines the response structure for executing a
@@ -87,10 +91,10 @@ message MsgUpdateStakingParams {
 
   // sender is the address of the admin account with permission to update.
   // ex: governance, multisig/DAO, or standard account found in Params.
-  string sender = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string sender = 1 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
 
-  //x/staking  module parameters (all must be supplied). 
-  StakingParams params = 2 [(gogoproto.nullable) = false];
+  // x/staking  module parameters (all must be supplied).
+  StakingParams params = 2 [ (gogoproto.nullable) = false ];
 }
 
 // MsgUpdateStakingParamsResponse defines the response structure for executing a
@@ -101,25 +105,30 @@ message MsgUpdateStakingParamsResponse {}
 // MsgCreateValidator defines a SDK message for creating a new validator.
 message MsgCreateValidator {
   option (cosmos.msg.v1.signer) = "validator_address";
-  option (amino.name)           = "poa/MsgCreateValidator";
+  option (amino.name) = "poa/MsgCreateValidator";
 
-  option (gogoproto.equal)           = false;
+  option (gogoproto.equal) = false;
   option (gogoproto.goproto_getters) = false;
 
-  Description     description         = 1 [(gogoproto.nullable) = false, (amino.dont_omitempty) = true];
-  CommissionRates commission          = 2 [(gogoproto.nullable) = false, (amino.dont_omitempty) = true];
-  string          min_self_delegation = 3 [
-    (cosmos_proto.scalar)  = "cosmos.Int",
+  Description description = 1
+      [ (gogoproto.nullable) = false, (amino.dont_omitempty) = true ];
+  CommissionRates commission = 2
+      [ (gogoproto.nullable) = false, (amino.dont_omitempty) = true ];
+  string min_self_delegation = 3 [
+    (cosmos_proto.scalar) = "cosmos.Int",
     (gogoproto.customtype) = "cosmossdk.io/math.Int",
-    (gogoproto.nullable)   = false,
+    (gogoproto.nullable) = false,
     (amino.dont_omitempty) = true
   ];
   // Deprecated: Use of Delegator Address in MsgCreateValidator is deprecated.
-  // The validator address bytes and delegator address bytes refer to the same account while creating validator (defer
-  // only in bech32 notation).
-  string                   delegator_address = 4 [(cosmos_proto.scalar) = "cosmos.AddressString", deprecated = true];
-  string                   validator_address = 5 [(cosmos_proto.scalar) = "cosmos.ValidatorAddressString"];
-  google.protobuf.Any      pubkey            = 6 [(cosmos_proto.accepts_interface) = "cosmos.crypto.PubKey"];  
+  // The validator address bytes and delegator address bytes refer to the same
+  // account while creating validator (defer only in bech32 notation).
+  string delegator_address = 4
+      [ (cosmos_proto.scalar) = "cosmos.AddressString", deprecated = true ];
+  string validator_address = 5
+      [ (cosmos_proto.scalar) = "cosmos.ValidatorAddressString" ];
+  google.protobuf.Any pubkey = 6
+      [ (cosmos_proto.accepts_interface) = "cosmos.crypto.PubKey" ];
 }
 
 // MsgCreateValidatorResponse
