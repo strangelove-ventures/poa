@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+
 	"github.com/strangelove-ventures/interchaintest/v8"
 	"github.com/strangelove-ventures/interchaintest/v8/chain/cosmos"
 	"github.com/strangelove-ventures/interchaintest/v8/ibc"
@@ -132,6 +133,9 @@ func testUpdatePOAParams(t *testing.T, ctx context.Context, chain *cosmos.Cosmos
 	// TODO: SDK v50 does not seem to unmarshal this with the CLI.
 	// cannot marshal response proposals:{id:1 messages:{[/strangelove_ventures.poa.v1.MsgUpdateParams]:{sender:"cosmos10d07y265gmmuvt4z0w9aw880jnsr700j6zn9kn" params:{admins:"cosmos10d07y265gmmuvt4z0w9aw880jnsr700j6zn9kn" admins:"cosmos10d07y265gmmuvt4z0w9aw880jnsr700j6zn9kn"}}} status:PROPOSAL_STATUS_VOTING_PERIOD final_tally_result:{yes_count:"0" abstain_count:"0" no_count:"0" no_with_veto_count:"0"} submit_time:{seconds:1698682973 nanos:181594516} deposit_end_time:{seconds:1698855773 nanos:181594516} total_deposit:{denom:"stake" amount:"1000000"} voting_start_time:{seconds:1698682973 nanos:181594516} voting_end_time:{seconds:1698855773 nanos:181594516} metadata:"ipfs://CID" title:"title" summary:"summary" proposer:"cosmos1hj5fveer5cjtn4wd6wstzugjfdxzl0xpxvjjvr"} pagination:{total:1}: unexpected end of JSON input
 	// t.Run("success: gov proposal update", func(t *testing.T) {
+	// 	govModule := "cosmos10d07y265gmmuvt4z0w9aw880jnsr700j6zn9kn"
+	// 	randAcc := "cosmos1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqnrql8a"
+
 	// 	updatedParams := []cosmosproto.Message{
 	// 		&poa.MsgUpdateParams{
 	// 			Sender: govModule,
@@ -142,14 +146,14 @@ func testUpdatePOAParams(t *testing.T, ctx context.Context, chain *cosmos.Cosmos
 	// 	}
 	// 	propId := helpers.SubmitParamChangeProp(t, ctx, chain, incorrectUser, updatedParams, govModule, 25)
 	// 	helpers.ValidatorVote(t, ctx, chain, propId, cosmos.ProposalVoteYes, uint64(25))
-	// 	p = helpers.GetPOAParams(t, ctx, chain)
-	// 	require.NotContains(t, p.Params.Admins, incorrectUser.FormattedAddress())
+	// 	p := helpers.GetPOAParams(t, ctx, chain)
+	// 	require.NotContains(t, p.Admins, incorrectUser.FormattedAddress())
 	// })
 
 }
 
 func testRemoveValidator(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, validators []string, acc0 ibc.Wallet) {
-	t.Log("===== TEST REMOVE VALIDATOR =====")
+	t.Log("\n===== TEST REMOVE VALIDATOR =====")
 	powerOne := int64(9_000_000_000_000)
 	powerTwo := int64(2_500_000)
 
@@ -178,7 +182,7 @@ func testRemoveValidator(t *testing.T, ctx context.Context, chain *cosmos.Cosmos
 }
 
 func testPowerSwing(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, validators []string, acc0 ibc.Wallet) {
-	t.Log("===== TEST POWER SWING =====")
+	t.Log("\n===== TEST POWER SWING =====")
 	helpers.POASetPower(t, ctx, chain, acc0, validators[0], 1_000_000_000_000_000, "--unsafe")
 	if err := testutil.WaitForBlocks(ctx, 2, chain); err != nil {
 		t.Fatal(err)
@@ -187,13 +191,13 @@ func testPowerSwing(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain
 }
 
 func testStakingDisabled(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, validators []string, acc0 ibc.Wallet) {
-	t.Log("===== TEST STAKING DISABLED =====")
+	t.Log("\n===== TEST STAKING DISABLED =====")
 	txRes, _ := helpers.StakeTokens(t, ctx, chain, acc0, validators[0], "1stake")
 	require.Contains(t, txRes.RawLog, poa.ErrStakingActionNotAllowed.Error())
 }
 
 func testGovernance(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, acc0 ibc.Wallet, validators []string) {
-	t.Log("===== TEST GOVERNANCE =====")
+	t.Log("\n===== TEST GOVERNANCE =====")
 	// ibc.ChainConfig key: app_state.poa.params.admins must contain the governance address.
 	propID := helpers.SubmitGovernanceProposalForValidatorChanges(t, ctx, chain, acc0, validators[0], 1_234_567, true)
 	helpers.ValidatorVote(t, ctx, chain, propID, cosmos.ProposalVoteYes, 25)
@@ -204,7 +208,7 @@ func testGovernance(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain
 }
 
 func testPowerErrors(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, validators []string, incorrectUser ibc.Wallet, admin ibc.Wallet) {
-	t.Log("===== TEST POWER ERRORS =====")
+	t.Log("\n===== TEST POWER ERRORS =====")
 	var res helpers.TxResponse
 	var err error
 

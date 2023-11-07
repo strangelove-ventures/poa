@@ -54,13 +54,7 @@ func SubmitParamChangeProp(t *testing.T, ctx context.Context, chain *cosmos.Cosm
 	t.Log("txProp", txProp)
 	require.NoError(t, err, "error submitting proposal")
 
-	height, _ := chain.Height(ctx)
-
-	err = chain.VoteOnProposalAllValidators(ctx, txProp.ProposalID, cosmos.ProposalVoteYes)
-	require.NoError(t, err, "failed to submit votes")
-
-	_, err = cosmos.PollForProposalStatus(ctx, chain, height, height+waitForBlocks, txProp.ProposalID, cosmos.ProposalStatusPassed)
-	require.NoError(t, err, "proposal status did not change to passed in expected number of blocks")
+	ValidatorVote(t, ctx, chain, txProp.ProposalID, cosmos.ProposalVoteYes, waitForBlocks)
 
 	return txProp.ProposalID
 }

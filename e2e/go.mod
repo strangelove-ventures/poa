@@ -18,13 +18,13 @@ replace (
 )
 
 require (
-	github.com/cosmos/cosmos-sdk v0.50.0-rc.1
+	github.com/cosmos/cosmos-sdk v0.50.0-rc.1.0.20231026141021-0469fc17e158
 	github.com/cosmos/gogoproto v1.4.11
 	// https://github.com/strangelove-ventures/interchaintest/pull/840
-	github.com/strangelove-ventures/interchaintest/v8 v8.0.0-20231030144423-5596f4cb2114
+	github.com/strangelove-ventures/interchaintest/v8 v8.0.0-20231107161816-e4b2b67ca400
 	github.com/strangelove-ventures/poa v0.0.0-00010101000000-000000000000
 	github.com/stretchr/testify v1.8.4
-	golang.org/x/sync v0.4.0
+	golang.org/x/sync v0.5.0
 )
 
 require (
@@ -40,7 +40,7 @@ require (
 	cosmossdk.io/errors v1.0.0 // indirect
 	cosmossdk.io/log v1.2.1 // indirect
 	cosmossdk.io/math v1.1.3-rc.1 // indirect
-	cosmossdk.io/store v1.0.0-rc.0 // indirect
+	cosmossdk.io/store v1.0.0 // indirect
 	cosmossdk.io/x/tx v0.11.0 // indirect
 	cosmossdk.io/x/upgrade v0.0.0-20230915171831-2196edacb99d // indirect
 	filippo.io/edwards25519 v1.0.0 // indirect
@@ -80,7 +80,7 @@ require (
 	github.com/cosmos/gogogateway v1.2.0 // indirect
 	github.com/cosmos/iavl v1.0.0 // indirect
 	github.com/cosmos/ibc-go/modules/capability v1.0.0-rc6 // indirect
-	github.com/cosmos/ibc-go/v8 v8.0.0-beta.1 // indirect
+	github.com/cosmos/ibc-go/v8 v8.0.0-rc.0 // indirect
 	github.com/cosmos/ics23/go v0.10.0 // indirect
 	github.com/cosmos/ledger-cosmos-go v0.13.3 // indirect
 	github.com/danieljoos/wincred v1.2.0 // indirect
@@ -211,7 +211,7 @@ require (
 	github.com/spaolacci/murmur3 v1.1.0 // indirect
 	github.com/spf13/afero v1.10.0 // indirect
 	github.com/spf13/cast v1.5.1 // indirect
-	github.com/spf13/cobra v1.7.0 // indirect
+	github.com/spf13/cobra v1.8.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/spf13/viper v1.17.0 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
@@ -256,7 +256,7 @@ require (
 	modernc.org/mathutil v1.6.0 // indirect
 	modernc.org/memory v1.7.2 // indirect
 	modernc.org/opt v0.1.3 // indirect
-	modernc.org/sqlite v1.26.0 // indirect
+	modernc.org/sqlite v1.27.0 // indirect
 	modernc.org/strutil v1.2.0 // indirect
 	modernc.org/token v1.1.0 // indirect
 	nhooyr.io/websocket v1.8.10 // indirect
