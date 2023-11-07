@@ -5,21 +5,21 @@ import "gogoproto/gogo.proto";
 import "strangelove_ventures/poa/v1/validator.proto";
 import "strangelove_ventures/poa/v1/params.proto";
 import "strangelove_ventures/poa/v1/tx.proto";
-import "cosmos/staking/v1beta1/staking.proto";
+// import "cosmos/staking/v1beta1/staking.proto";
 
 option go_package = "github.com/strangelove-ventures/poa";
 
 // GenesisState defines the poa module's genesis state.
 message GenesisState {
   // params
-  Params params = 1 [(gogoproto.nullable) = false];  
+  Params params = 1 [ (gogoproto.nullable) = false ];
   // pending_validators
-  repeated Validator pending_validators = 2 [(gogoproto.nullable) = false];
+  repeated Validator pending_validators = 2 [ (gogoproto.nullable) = false ];
 }
 
-
-//PendingValidators
+// PendingValidators
 message PendingValidators {
-  // validators stores pending validators waiting for SetPower approval (jailed until accepted)
-  repeated Validator validators = 1 [(gogoproto.nullable) = false];
+  // validators stores pending validators waiting for SetPower approval (jailed
+  // until accepted)
+  repeated Validator validators = 1 [ (gogoproto.nullable) = false ];
 }

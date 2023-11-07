@@ -15,7 +15,8 @@ service Query {
     option (google.api.http).get = "/poa/v1/params";
   }
   // PendingValidators
-  rpc PendingValidators(QueryPendingValidatorsRequest) returns (PendingValidatorsResponse) {
+  rpc PendingValidators(QueryPendingValidatorsRequest)
+      returns (PendingValidatorsResponse) {
     option (google.api.http).get = "/poa/v1/pending_validators";
   }
 }
@@ -34,6 +35,6 @@ message QueryPendingValidatorsRequest {}
 
 // QueryPendingValidatorResponse
 message PendingValidatorsResponse {
-  // pending 
+  // pending
   repeated Validator pending = 1 [ (gogoproto.nullable) = false ];
 }
