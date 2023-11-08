@@ -24,7 +24,7 @@ func ValidatorVote(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain,
 
 func SubmitParamChangeProp(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, user ibc.Wallet, updatedParams []cosmosproto.Message, sender string, waitForBlocks uint64) string {
 	expedited := false
-	proposal, err := chain.BuildProposal(updatedParams, "UpdateParams", "params", "ipfs://CID", fmt.Sprintf(`500000000%s`, chain.Config().Denom), sender, expedited)
+	proposal, err := chain.BuildProposal(updatedParams, "UpdateParams", "params", "ipfs://CID", fmt.Sprintf(`50%s`, chain.Config().Denom), sender, expedited)
 	require.NoError(t, err, "error building proposal")
 
 	txProp, err := chain.SubmitProposal(ctx, user.KeyName(), proposal)

@@ -43,6 +43,10 @@ var (
 				Key:   "app_state.gov.params.min_deposit.0.denom",
 				Value: Denom,
 			},
+			{
+				Key:   "app_state.gov.params.min_deposit.0.amount",
+				Value: "1",
+			},
 		}),
 		EncodingConfig: poaEncoding(),
 		Type:           "cosmos",
