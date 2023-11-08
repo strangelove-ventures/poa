@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	VotingPeriod     = "15s"
+	VotingPeriod     = "30s"
 	MaxDepositPeriod = "10s"
 	Denom            = "stake"
 
@@ -22,7 +22,7 @@ var (
 		Images: []ibc.DockerImage{
 			POAImage,
 		},
-		GasAdjustment: 1.3,
+		GasAdjustment: 1.5,
 		ModifyGenesis: cosmos.ModifyGenesis([]cosmos.GenesisKV{
 			{
 				Key: "app_state.poa.params.admins",
@@ -43,6 +43,10 @@ var (
 				Key:   "app_state.gov.params.min_deposit.0.denom",
 				Value: Denom,
 			},
+			{
+				Key:   "app_state.gov.params.min_deposit.0.amount",
+				Value: "1",
+			},
 		}),
 		EncodingConfig: poaEncoding(),
 		Type:           "cosmos",
@@ -52,7 +56,7 @@ var (
 		Bech32Prefix:   "cosmos",
 		Denom:          Denom,
 		CoinType:       "118",
-		GasPrices:      "0" + Denom + ",0utest",
+		GasPrices:      "0" + Denom,
 		TrustingPeriod: "330h",
 	}
 )
