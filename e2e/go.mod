@@ -20,8 +20,7 @@ replace (
 require (
 	github.com/cosmos/cosmos-sdk v0.50.1
 	github.com/cosmos/gogoproto v1.4.11
-	// https://github.com/strangelove-ventures/interchaintest/pull/840
-	github.com/strangelove-ventures/interchaintest/v8 v8.0.0-20231107161816-e4b2b67ca400
+	github.com/strangelove-ventures/interchaintest/v8 v8.0.0
 	github.com/strangelove-ventures/poa v0.0.0-00010101000000-000000000000
 	github.com/stretchr/testify v1.8.4
 	golang.org/x/sync v0.5.0

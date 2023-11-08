@@ -22,7 +22,7 @@ var (
 		Images: []ibc.DockerImage{
 			POAImage,
 		},
-		GasAdjustment: 1.3,
+		GasAdjustment: 1.5,
 		ModifyGenesis: cosmos.ModifyGenesis([]cosmos.GenesisKV{
 			{
 				Key: "app_state.poa.params.admins",
@@ -52,7 +52,7 @@ var (
 		Bech32Prefix:   "cosmos",
 		Denom:          Denom,
 		CoinType:       "118",
-		GasPrices:      "0" + Denom + ",0utest",
+		GasPrices:      "0" + Denom,
 		TrustingPeriod: "330h",
 	}
 )

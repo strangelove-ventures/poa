@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-
 	"github.com/strangelove-ventures/interchaintest/v8"
 	"github.com/strangelove-ventures/interchaintest/v8/chain/cosmos"
 	"github.com/strangelove-ventures/interchaintest/v8/ibc"
@@ -14,6 +13,8 @@ import (
 	"github.com/strangelove-ventures/poa"
 	"github.com/strangelove-ventures/poa/e2e/helpers"
 	"github.com/stretchr/testify/require"
+
+	cosmosproto "github.com/cosmos/gogoproto/proto"
 )
 
 const (
@@ -56,6 +57,7 @@ func TestPOA(t *testing.T) {
 	testPowerErrors(t, ctx, chain, validators, incorrectUser, acc0)
 	testRemoveValidator(t, ctx, chain, validators, acc0)
 	testPowerSwing(t, ctx, chain, validators, acc0)
+
 	// This should be the last test since param changes happen
 	testUpdatePOAParams(t, ctx, chain, validators, acc0, incorrectUser)
 }
@@ -130,25 +132,24 @@ func testUpdatePOAParams(t *testing.T, ctx context.Context, chain *cosmos.Cosmos
 		}
 	})
 
-	// TODO: SDK v50 does not seem to unmarshal this with the CLI.
-	// cannot marshal response proposals:{id:1 messages:{[/strangelove_ventures.poa.v1.MsgUpdateParams]:{sender:"cosmos10d07y265gmmuvt4z0w9aw880jnsr700j6zn9kn" params:{admins:"cosmos10d07y265gmmuvt4z0w9aw880jnsr700j6zn9kn" admins:"cosmos10d07y265gmmuvt4z0w9aw880jnsr700j6zn9kn"}}} status:PROPOSAL_STATUS_VOTING_PERIOD final_tally_result:{yes_count:"0" abstain_count:"0" no_count:"0" no_with_veto_count:"0"} submit_time:{seconds:1698682973 nanos:181594516} deposit_end_time:{seconds:1698855773 nanos:181594516} total_deposit:{denom:"stake" amount:"1000000"} voting_start_time:{seconds:1698682973 nanos:181594516} voting_end_time:{seconds:1698855773 nanos:181594516} metadata:"ipfs://CID" title:"title" summary:"summary" proposer:"cosmos1hj5fveer5cjtn4wd6wstzugjfdxzl0xpxvjjvr"} pagination:{total:1}: unexpected end of JSON input
-	// t.Run("success: gov proposal update", func(t *testing.T) {
-	// 	govModule := "cosmos10d07y265gmmuvt4z0w9aw880jnsr700j6zn9kn"
-	// 	randAcc := "cosmos1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqnrql8a"
+	t.Run("success: gov proposal update", func(t *testing.T) {
+		govModule := "cosmos10d07y265gmmuvt4z0w9aw880jnsr700j6zn9kn"
+		randAcc := "cosmos1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqnrql8a"
 
-	// 	updatedParams := []cosmosproto.Message{
-	// 		&poa.MsgUpdateParams{
-	// 			Sender: govModule,
-	// 			Params: poa.Params{
-	// 				Admins: []string{acc0.FormattedAddress(), govModule, randAcc},
-	// 			},
-	// 		},
-	// 	}
-	// 	propId := helpers.SubmitParamChangeProp(t, ctx, chain, incorrectUser, updatedParams, govModule, 25)
-	// 	helpers.ValidatorVote(t, ctx, chain, propId, cosmos.ProposalVoteYes, uint64(25))
-	// 	p := helpers.GetPOAParams(t, ctx, chain)
-	// 	require.NotContains(t, p.Admins, incorrectUser.FormattedAddress())
-	// })
+		updatedParams := []cosmosproto.Message{
+			&poa.MsgUpdateParams{
+				Sender: govModule,
+				Params: poa.Params{
+					Admins: []string{acc0.FormattedAddress(), govModule, randAcc},
+				},
+			},
+		}
+		propId := helpers.SubmitParamChangeProp(t, ctx, chain, incorrectUser, updatedParams, govModule, 25)
+		helpers.ValidatorVote(t, ctx, chain, propId, cosmos.ProposalVoteYes, uint64(25))
+		for _, admin := range helpers.GetPOAParams(t, ctx, chain).Admins {
+			require.NotEqual(t, admin, incorrectUser.FormattedAddress())
+		}
+	})
 
 }
 
