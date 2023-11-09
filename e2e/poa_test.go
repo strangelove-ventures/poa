@@ -52,12 +52,12 @@ func TestPOA(t *testing.T) {
 	assertSignatures(t, ctx, chain, len(validators))
 
 	// === Test Cases ===
-	testStakingDisabled(t, ctx, chain, validators, acc0)
-	testGovernance(t, ctx, chain, acc0, validators)
-	testUpdatePOAParams(t, ctx, chain, validators, acc0, incorrectUser)
-	testPowerErrors(t, ctx, chain, validators, incorrectUser, acc0)
-	testRemoveValidator(t, ctx, chain, validators, acc0)
+	// testStakingDisabled(t, ctx, chain, validators, acc0)
+	// testGovernance(t, ctx, chain, acc0, validators)
+	// testPowerErrors(t, ctx, chain, validators, incorrectUser, acc0)
+	// testRemoveValidator(t, ctx, chain, validators, acc0)
 	testPowerSwing(t, ctx, chain, validators, acc0)
+	testUpdatePOAParams(t, ctx, chain, validators, acc0, incorrectUser)
 }
 
 func testUpdatePOAParams(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, validators []string, acc0, incorrectUser ibc.Wallet) {

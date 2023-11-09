@@ -155,15 +155,15 @@ func (f *testFixture) createBaseStakingValidators(t *testing.T) {
 		_, err := f.msgServer.SetPower(f.ctx, &poa.MsgSetPower{
 			Sender:           f.addrs[0].String(),
 			ValidatorAddress: valAddr,
-			Power:            1_000_000,
+			Power:            bondCoin.Amount.Uint64(),
 			Unsafe:           true,
 		})
 		require.NoError(t, err)
 
 		// increase the block so the new validator is in the validator set
-		f.ctx = f.ctx.WithBlockHeight(f.ctx.BlockHeight() + 1)
-		_, err = f.stakingKeeper.ApplyAndReturnValidatorSetUpdates(f.ctx)
+		_, err = f.IncreaseBlock(1)
 		require.NoError(t, err)
+		// fmt.Printf("createBaseStakingValidators updates : %+v", updates)
 
 		valAddrBz, err := sdk.ValAddressFromBech32(val.GetOperator())
 		require.NoError(t, err)
@@ -175,7 +175,19 @@ func (f *testFixture) createBaseStakingValidators(t *testing.T) {
 		if err := f.stakingKeeper.SetValidator(f.ctx, validator); err != nil {
 			panic(err)
 		}
+	}
 
+	// update validator set power
+	allVals, err := f.stakingKeeper.GetValidators(f.ctx, 100)
+	require.NoError(t, err)
+
+	totalPower := math.ZeroInt()
+	for _, val := range allVals {
+		totalPower = totalPower.Add(val.Tokens)
+	}
+
+	if err := f.stakingKeeper.SetLastTotalPower(f.ctx, totalPower); err != nil {
+		panic(err)
 	}
 }
 

@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	VotingPeriod     = "30s"
+	VotingPeriod     = "15s"
 	MaxDepositPeriod = "10s"
 	Denom            = "stake"
 

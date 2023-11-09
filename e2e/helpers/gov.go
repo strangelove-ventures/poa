@@ -19,7 +19,7 @@ func ValidatorVote(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain,
 
 	resp, _ := cosmos.PollForProposalStatusV8(ctx, chain, height, height+searchHeightDelta, proposalID, cosmos.ProposalStatusPassedV8)
 	t.Log("PollForProposalStatusV8 resp", resp)
-	require.EqualValues(t, resp.Proposal.Status, cosmos.ProposalStatusPassedV8, "proposal status did not change to passed in expected number of blocks")
+	require.EqualValues(t, cosmos.ProposalStatusPassedV8, resp.Proposal.Status, "proposal status did not change to passed in expected number of blocks")
 }
 
 func SubmitParamChangeProp(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, user ibc.Wallet, updatedParams []cosmosproto.Message, sender string, waitForBlocks uint64) string {
