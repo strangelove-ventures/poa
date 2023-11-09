@@ -313,7 +313,9 @@ func TestGlobalPowerUpdates(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 
 			// increase block
-			f.IncreaseBlock(1)
+			if _, err := f.IncreaseBlock(1); err != nil {
+				panic(err)
+			}
 
 			// get total set power
 			total, err := f.stakingKeeper.GetLastTotalPower(f.ctx)
