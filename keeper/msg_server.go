@@ -99,6 +99,10 @@ func (ms msgServer) RemoveValidator(ctx context.Context, msg *poa.MsgRemoveValid
 		return nil, err
 	}
 
+	if _, err := ms.updatePOAPower(ctx, msg.ValidatorAddress, 0); err != nil {
+		return nil, err
+	}
+
 	return &poa.MsgRemoveValidatorResponse{}, nil
 }
 
@@ -352,12 +356,9 @@ func (ms msgServer) getValidatorSetTotalPower(ctx context.Context) (math.Int, er
 
 	totalPower := math.ZeroInt()
 	for _, val := range vals {
-
-		// if the validator is active
 		if val.Status != stakingtypes.Bonded {
 			continue
 		}
-
 		totalPower = totalPower.Add(val.Tokens)
 	}
 

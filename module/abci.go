@@ -14,10 +14,10 @@ func (am AppModule) BeginBlocker(ctx context.Context) error {
 		return err
 	}
 
-	// TODO: is this needed? / apply to the others?
-
 	if sdk.UnwrapSDKContext(ctx).BlockHeight() == 2 {
-		am.updateLastPower(ctx, vals)
+		if err := am.updateLastPower(ctx, vals); err != nil {
+			return err
+		}
 	}
 
 	for _, v := range vals {
@@ -38,7 +38,6 @@ func (am AppModule) BeginBlocker(ctx context.Context) error {
 			if err := am.keeper.GetStakingKeeper().DeleteLastValidatorPower(ctx, valAddr); err != nil {
 				return err
 			}
-			am.updateLastPower(ctx, vals)
 		}
 	}
 

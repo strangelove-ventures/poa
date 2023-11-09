@@ -1,8 +1,6 @@
 package helpers
 
 import (
-	"time"
-
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/strangelove-ventures/poa"
 )
@@ -21,14 +19,14 @@ type Vals struct {
 		Description     struct {
 			Moniker string `json:"moniker"`
 		} `json:"description"`
-		UnbondingTime time.Time `json:"unbonding_time"`
+		UnbondingTime string `json:"unbonding_time"`
 		Commission    struct {
 			CommissionRates struct {
 				Rate          string `json:"rate"`
 				MaxRate       string `json:"max_rate"`
 				MaxChangeRate string `json:"max_change_rate"`
 			} `json:"commission_rates"`
-			UpdateTime time.Time `json:"update_time"`
+			UpdateTime string `json:"update_time"`
 		} `json:"commission"`
 		MinSelfDelegation string `json:"min_self_delegation"`
 	} `json:"validators"`
@@ -44,9 +42,9 @@ type BlockData struct {
 			Block string `json:"block"`
 			App   string `json:"app"`
 		} `json:"version"`
-		ChainID     string    `json:"chain_id"`
-		Height      string    `json:"height"`
-		Time        time.Time `json:"time"`
+		ChainID     string `json:"chain_id"`
+		Height      string `json:"height"`
+		Time        string `json:"time"`
 		LastBlockID struct {
 			Hash          string `json:"hash"`
 			PartSetHeader struct {
@@ -81,10 +79,10 @@ type BlockData struct {
 			} `json:"part_set_header"`
 		} `json:"block_id"`
 		Signatures []struct {
-			BlockIDFlag      string    `json:"block_id_flag"`
-			ValidatorAddress string    `json:"validator_address"`
-			Timestamp        time.Time `json:"timestamp"`
-			Signature        string    `json:"signature"`
+			BlockIDFlag      string `json:"block_id_flag"`
+			ValidatorAddress string `json:"validator_address"`
+			Timestamp        string `json:"timestamp"`
+			Signature        string `json:"signature"`
 		} `json:"signatures"`
 	} `json:"last_commit"`
 }
