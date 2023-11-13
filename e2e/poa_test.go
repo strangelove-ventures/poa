@@ -54,10 +54,9 @@ func TestPOA(t *testing.T) {
 	// === Test Cases ===
 	testStakingDisabled(t, ctx, chain, validators, acc0)
 	testGovernance(t, ctx, chain, acc0, validators)
-	testUpdatePOAParams(t, ctx, chain, validators, acc0, incorrectUser)
 	testPowerErrors(t, ctx, chain, validators, incorrectUser, acc0)
 	testRemoveValidator(t, ctx, chain, validators, acc0)
-	testPowerSwing(t, ctx, chain, validators, acc0)
+	testUpdatePOAParams(t, ctx, chain, validators, acc0, incorrectUser)
 }
 
 func testUpdatePOAParams(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, validators []string, acc0, incorrectUser ibc.Wallet) {
@@ -178,15 +177,6 @@ func testRemoveValidator(t *testing.T, ctx context.Context, chain *cosmos.Cosmos
 
 	// only 1 validator is signing now
 	assertSignatures(t, ctx, chain, 1)
-}
-
-func testPowerSwing(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, validators []string, acc0 ibc.Wallet) {
-	t.Log("\n===== TEST POWER SWING =====")
-	helpers.POASetPower(t, ctx, chain, acc0, validators[0], 1_000_000_000_000_000, "--unsafe")
-	if err := testutil.WaitForBlocks(ctx, 2, chain); err != nil {
-		t.Fatal(err)
-	}
-	helpers.POASetPower(t, ctx, chain, acc0, validators[0], 1_000_000, "--unsafe")
 }
 
 func testStakingDisabled(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, validators []string, acc0 ibc.Wallet) {

@@ -99,6 +99,10 @@ func (ms msgServer) RemoveValidator(ctx context.Context, msg *poa.MsgRemoveValid
 		return nil, err
 	}
 
+	if _, err := ms.updatePOAPower(ctx, msg.ValidatorAddress, 0); err != nil {
+		return nil, err
+	}
+
 	return &poa.MsgRemoveValidatorResponse{}, nil
 }
 
@@ -331,7 +335,34 @@ func (ms msgServer) updatePOAPower(ctx context.Context, valOpBech32 string, powe
 		return stakingtypes.Validator{}, err
 	}
 
+	// Update the total power cache
+	totalSetPower, err := ms.getValidatorSetTotalPower(ctx)
+	if err != nil {
+		return stakingtypes.Validator{}, err
+	}
+
+	if err := ms.k.stakingKeeper.SetLastTotalPower(ctx, totalSetPower); err != nil {
+		return stakingtypes.Validator{}, err
+	}
+
 	return val, nil
+}
+
+func (ms msgServer) getValidatorSetTotalPower(ctx context.Context) (math.Int, error) {
+	vals, err := ms.k.stakingKeeper.GetAllValidators(ctx)
+	if err != nil {
+		return math.ZeroInt(), err
+	}
+
+	totalPower := math.ZeroInt()
+	for _, val := range vals {
+		if val.Status != stakingtypes.Bonded {
+			continue
+		}
+		totalPower = totalPower.Add(val.Tokens)
+	}
+
+	return totalPower, nil
 }
 
 func (ms msgServer) isAdmin(ctx context.Context, fromAddr string) bool {

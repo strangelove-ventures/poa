@@ -278,6 +278,77 @@ func TestRemoveValidator(t *testing.T) {
 	}
 }
 
+func TestGlobalPowerUpdates(t *testing.T) {
+	f := SetupTest(t)
+	require := require.New(t)
+
+	vals, err := f.stakingKeeper.GetValidators(f.ctx, 100)
+	require.NoError(err)
+
+	totalValTokens := math.ZeroInt()
+	for _, val := range vals {
+		totalValTokens = totalValTokens.Add(val.Tokens)
+	}
+
+	testCases := []struct {
+		name               string
+		createNewValidator bool
+		request            *poa.MsgSetPower
+		expectErrMsg       string
+	}{
+		{
+			name:               "new validator swing",
+			createNewValidator: true,
+			request: &poa.MsgSetPower{
+				Sender: f.addrs[0].String(),
+				Power:  2_000_000,
+				Unsafe: true,
+			},
+			expectErrMsg: "",
+		},
+	}
+
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+
+			// increase block
+			if _, err := f.IncreaseBlock(1); err != nil {
+				panic(err)
+			}
+
+			// get total set power
+			total, err := f.stakingKeeper.GetLastTotalPower(f.ctx)
+			require.NoError(err)
+			require.EqualValues(totalValTokens, total)
+
+			// add a new validator if the test case requires it
+			if tc.createNewValidator {
+				valAddr := f.CreatePendingValidator(fmt.Sprintf("val-%s", tc.name), tc.request.Power)
+				tc.request.ValidatorAddress = valAddr.String()
+
+				// check the pending validators includes the new validator
+				pendingVals, err := f.k.GetPendingValidators(f.ctx)
+				require.NoError(err)
+				require.EqualValues(1, len(pendingVals.Validators))
+			}
+
+			_, err = f.msgServer.SetPower(f.ctx, tc.request)
+			if tc.expectErrMsg != "" {
+				require.Error(err)
+				require.ErrorContains(err, tc.expectErrMsg)
+			} else {
+				require.NoError(err)
+			}
+
+			// verify that it goes up the Power request amount
+			total, err = f.stakingKeeper.GetLastTotalPower(f.ctx)
+			require.NoError(err)
+			require.EqualValues(totalValTokens.AddRaw(int64(tc.request.Power)), total)
+		})
+	}
+}
+
 // mintTokensToBondedPool mints tokens to the bonded pool so the validator set
 // in testing can be removed.
 // In the future, this same logic would be run during the migration from POA->POS.
