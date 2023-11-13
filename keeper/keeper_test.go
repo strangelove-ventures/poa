@@ -21,6 +21,7 @@ import (
 
 	"github.com/strangelove-ventures/poa"
 	"github.com/strangelove-ventures/poa/keeper"
+	poamodule "github.com/strangelove-ventures/poa/module"
 
 	"cosmossdk.io/log"
 	simtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
@@ -54,6 +55,7 @@ type testFixture struct {
 	k           keeper.Keeper
 	msgServer   poa.MsgServer
 	queryServer poa.QueryServer
+	appModule   poamodule.AppModule
 
 	accountkeeper  authkeeper.AccountKeeper
 	stakingKeeper  *stakingkeeper.Keeper
@@ -94,6 +96,7 @@ func SetupTest(t *testing.T) *testFixture {
 	s.k = keeper.NewKeeper(encCfg.Codec, storeService, s.stakingKeeper, s.slashingKeeper, addresscodec.NewBech32Codec("cosmosvaloper"))
 	s.msgServer = keeper.NewMsgServerImpl(s.k)
 	s.queryServer = keeper.NewQueryServerImpl(s.k)
+	s.appModule = poamodule.NewAppModule(encCfg.Codec, s.k)
 
 	// register interfaces
 	authtypes.RegisterInterfaces(encCfg.InterfaceRegistry)
@@ -177,16 +180,8 @@ func (f *testFixture) createBaseStakingValidators(t *testing.T) {
 		}
 	}
 
-	// update validator set power
-	allVals, err := f.stakingKeeper.GetValidators(f.ctx, 100)
-	require.NoError(t, err)
-
-	totalPower := math.ZeroInt()
-	for _, val := range allVals {
-		totalPower = totalPower.Add(val.Tokens)
-	}
-
-	if err := f.stakingKeeper.SetLastTotalPower(f.ctx, totalPower); err != nil {
+	total := bondCoin.Amount.MulRaw(int64(len(vals)))
+	if err := f.stakingKeeper.SetLastTotalPower(f.ctx, total); err != nil {
 		panic(err)
 	}
 }
@@ -241,8 +236,21 @@ func (f *testFixture) CreatePendingValidator(name string, power uint64) sdk.ValA
 	return valAddr
 }
 
-func (f *testFixture) IncreaseBlock(amt int64) ([]abci.ValidatorUpdate, error) {
+func (f *testFixture) IncreaseBlock(amt int64, debug ...bool) ([]abci.ValidatorUpdate, error) {
 	f.ctx = f.ctx.WithBlockHeight(f.ctx.BlockHeight() + amt)
-	updates, err := f.stakingKeeper.ApplyAndReturnValidatorSetUpdates(f.ctx)
+
+	if err := f.k.GetStakingKeeper().BeginBlocker(f.ctx); err != nil {
+		return nil, err
+	}
+
+	updates, err := f.k.GetStakingKeeper().EndBlocker(f.ctx)
+	if len(debug) > 0 && debug[0] {
+		fmt.Printf("\nIncreaseBlock(...) updates: %+v\n", updates)
+	}
+
+	if err := f.appModule.BeginBlock(f.ctx); err != nil {
+		return nil, err
+	}
+
 	return updates, err
 }
