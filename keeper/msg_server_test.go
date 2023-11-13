@@ -202,11 +202,8 @@ func TestRemoveValidator(t *testing.T) {
 	vals, err := f.stakingKeeper.GetValidators(f.ctx, 100)
 	require.NoError(err)
 
-	for idx, v := range vals {
-		power := 10_000_000
-		if idx == 0 {
-			power = 1_000_000
-		}
+	for _, v := range vals {
+		power := 1_000_000
 
 		_, err = f.msgServer.SetPower(f.ctx, &poa.MsgSetPower{
 			Sender:           f.addrs[0].String(),
@@ -217,16 +214,16 @@ func TestRemoveValidator(t *testing.T) {
 		require.NoError(err)
 	}
 
-	f.ctx = f.ctx.WithBlockHeight(f.ctx.BlockHeight() + 5)
-	updates, err := f.stakingKeeper.ApplyAndReturnValidatorSetUpdates(f.ctx)
+	updates, err := f.IncreaseBlock(1, true)
 	require.NoError(err)
 	fmt.Printf("%+v", updates)
 	require.EqualValues(3, len(updates))
 
 	testCases := []struct {
-		name         string
-		request      *poa.MsgRemoveValidator
-		expectErrMsg string
+		name             string
+		request          *poa.MsgRemoveValidator
+		expectErrMsg     string
+		expectValUpdates int
 	}{
 		{
 			name: "set invalid authority (not an address)",
@@ -237,10 +234,9 @@ func TestRemoveValidator(t *testing.T) {
 			expectErrMsg: "not an authority",
 		},
 		{
-			name: "removal",
+			name: "remove one validator",
 			request: &poa.MsgRemoveValidator{
-				Sender: f.addrs[0].String(),
-				// The validator with 1/10th the power
+				Sender:           f.addrs[0].String(),
 				ValidatorAddress: vals[0].OperatorAddress,
 			},
 			expectErrMsg: "",
@@ -251,6 +247,7 @@ func TestRemoveValidator(t *testing.T) {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			_, err := f.msgServer.RemoveValidator(f.ctx, tc.request)
+
 			if tc.expectErrMsg != "" {
 				require.Error(err)
 				require.ErrorContains(err, tc.expectErrMsg)
@@ -263,15 +260,13 @@ func TestRemoveValidator(t *testing.T) {
 					panic(err)
 				}
 
-				u, err := f.IncreaseBlock(1)
+				_, err := f.IncreaseBlock(5, true)
 				require.NoError(err)
-				require.EqualValues(3, len(u))
-				fmt.Println(u, err)
 
-				u, err = f.IncreaseBlock(1)
+				// no updates on the next increase
+				u, err := f.IncreaseBlock(1, true)
 				require.NoError(err)
-				fmt.Println(u)
-				require.EqualValues(2, len(u))
+				require.EqualValues(0, len(u))
 			}
 		})
 
