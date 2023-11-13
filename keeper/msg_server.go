@@ -45,14 +45,10 @@ func (ms msgServer) SetPower(ctx context.Context, msg *poa.MsgSetPower) (*poa.Ms
 	}
 
 	if !msg.Unsafe {
-		totalPOAPower := math.ZeroInt()
-		allDelegations, err := ms.k.stakingKeeper.GetAllDelegations(ctx)
+		// Gets the cached last total power of the validator set
+		totalPOAPower, err := ms.k.stakingKeeper.GetLastTotalPower(ctx)
 		if err != nil {
 			return nil, err
-		}
-
-		for _, del := range allDelegations {
-			totalPOAPower = totalPOAPower.Add(del.Shares.TruncateInt())
 		}
 
 		if msg.Power > totalPOAPower.Mul(math.NewInt(30)).Quo(math.NewInt(100)).Uint64() {
@@ -96,10 +92,6 @@ func (ms msgServer) RemoveValidator(ctx context.Context, msg *poa.MsgRemoveValid
 		return nil, err
 	}
 	if err := ms.k.slashKeeper.SetValidatorSigningInfo(ctx, sdk.ConsAddress(cons), slashingtypes.ValidatorSigningInfo{}); err != nil {
-		return nil, err
-	}
-
-	if _, err := ms.updatePOAPower(ctx, msg.ValidatorAddress, 0); err != nil {
 		return nil, err
 	}
 
@@ -301,68 +293,79 @@ func (ms msgServer) updatePOAPower(ctx context.Context, valOpBech32 string, powe
 		return stakingtypes.Validator{}, err
 	}
 
-	// remove all delegations (for safety)
-	delegations, err := ms.k.stakingKeeper.GetValidatorDelegations(ctx, valAddr)
-	if err != nil {
-		return stakingtypes.Validator{}, err
-	}
-
-	for _, del := range delegations {
-		if err := ms.k.stakingKeeper.RemoveDelegation(ctx, del); err != nil {
-			return stakingtypes.Validator{}, err
-		}
-	}
-
-	// set a single updated delegation of power
-	delegation := stakingtypes.Delegation{
-		DelegatorAddress: sdk.AccAddress(valAddr.Bytes()).String(),
-		ValidatorAddress: val.OperatorAddress,
-		Shares:           math.LegacyNewDec(power),
-	}
-
-	val.Tokens = math.NewIntFromUint64(uint64(power))
-	val.DelegatorShares = delegation.Shares
-	val.Status = stakingtypes.Bonded
-	if err := ms.k.stakingKeeper.SetValidator(ctx, val); err != nil {
-		return stakingtypes.Validator{}, err
-	}
-
-	if err := ms.k.stakingKeeper.SetDelegation(ctx, delegation); err != nil {
-		return stakingtypes.Validator{}, err
-	}
-
 	if err := ms.k.stakingKeeper.SetLastValidatorPower(ctx, valAddr, power); err != nil {
 		return stakingtypes.Validator{}, err
 	}
 
-	// Update the total power cache
-	totalSetPower, err := ms.getValidatorSetTotalPower(ctx)
-	if err != nil {
-		return stakingtypes.Validator{}, err
-	}
-
-	if err := ms.k.stakingKeeper.SetLastTotalPower(ctx, totalSetPower); err != nil {
+	if err := ms.updateValidatorSet(ctx, power, val, valAddr); err != nil {
 		return stakingtypes.Validator{}, err
 	}
 
 	return val, nil
 }
 
-func (ms msgServer) getValidatorSetTotalPower(ctx context.Context) (math.Int, error) {
-	vals, err := ms.k.stakingKeeper.GetAllValidators(ctx)
+func (ms msgServer) updateValidatorSet(ctx context.Context, power int64, val stakingtypes.Validator, valAddr sdk.ValAddress) error {
+	sdkContext := sdk.UnwrapSDKContext(ctx)
+
+	delegations, err := ms.k.stakingKeeper.GetValidatorDelegations(ctx, valAddr)
 	if err != nil {
-		return math.ZeroInt(), err
+		return err
 	}
 
-	totalPower := math.ZeroInt()
-	for _, val := range vals {
-		if val.Status != stakingtypes.Bonded {
-			continue
+	for _, del := range delegations {
+		if err := ms.k.stakingKeeper.RemoveDelegation(ctx, del); err != nil {
+			return err
 		}
-		totalPower = totalPower.Add(val.Tokens)
 	}
 
-	return totalPower, nil
+	delegation := stakingtypes.Delegation{
+		DelegatorAddress: sdk.AccAddress(valAddr.Bytes()).String(),
+		ValidatorAddress: val.OperatorAddress,
+		Shares:           math.LegacyNewDec(power),
+	}
+	if err := ms.k.stakingKeeper.SetDelegation(ctx, delegation); err != nil {
+		return err
+	}
+
+	if power == 0 && sdkContext.BlockHeight() > 1 {
+		currPower, err := ms.k.stakingKeeper.GetLastValidatorPower(ctx, valAddr)
+		if err != nil {
+			return err
+		}
+
+		val.MinSelfDelegation = math.NewIntFromUint64(uint64(currPower) + 1)
+	}
+
+	val.Tokens = math.NewIntFromUint64(uint64(power))
+	val.DelegatorShares = delegation.Shares
+	val.Status = stakingtypes.Bonded
+	if err := ms.k.stakingKeeper.SetValidator(ctx, val); err != nil {
+		return err
+	}
+
+	if err := ms.k.stakingKeeper.SetLastValidatorPower(ctx, valAddr, power); err != nil {
+		return err
+	}
+
+	return ms.updateTotalPower(ctx)
+}
+
+func (ms msgServer) updateTotalPower(ctx context.Context) error {
+	allVals, err := ms.k.stakingKeeper.GetAllValidators(ctx)
+	if err != nil {
+		return err
+	}
+
+	allTokens := math.ZeroInt()
+	for _, val := range allVals {
+		allTokens = allTokens.Add(val.Tokens)
+	}
+
+	if err := ms.k.stakingKeeper.SetLastTotalPower(ctx, allTokens); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (ms msgServer) isAdmin(ctx context.Context, fromAddr string) bool {
