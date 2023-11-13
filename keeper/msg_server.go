@@ -98,7 +98,6 @@ func (ms msgServer) RemoveValidator(ctx context.Context, msg *poa.MsgRemoveValid
 	return &poa.MsgRemoveValidatorResponse{}, nil
 }
 
-// TODO: require any new validator to only be 1_000_00utoken?
 // pulled from x/staking
 func (ms msgServer) CreateValidator(ctx context.Context, msg *poa.MsgCreateValidator) (*poa.MsgCreateValidatorResponse, error) {
 	valAddr, err := ms.k.validatorAddressCodec.StringToBytes(msg.ValidatorAddress)
