@@ -3,7 +3,6 @@ package module
 import (
 	"context"
 
-	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 )
@@ -12,12 +11,6 @@ func (am AppModule) BeginBlocker(ctx context.Context) error {
 	vals, err := am.keeper.GetStakingKeeper().GetAllValidators(ctx)
 	if err != nil {
 		return err
-	}
-
-	if sdk.UnwrapSDKContext(ctx).BlockHeight() == 2 {
-		if err := am.updateLastPower(ctx, vals); err != nil {
-			return err
-		}
 	}
 
 	for _, v := range vals {
@@ -39,28 +32,6 @@ func (am AppModule) BeginBlocker(ctx context.Context) error {
 				return err
 			}
 		}
-	}
-
-	return nil
-}
-
-func (am AppModule) updateLastPower(ctx context.Context, vals []stakingtypes.Validator) error {
-	totalPower := math.ZeroInt()
-	for _, v := range vals {
-		totalPower = totalPower.Add(v.Tokens)
-
-		valAddr, err := sdk.ValAddressFromBech32(v.OperatorAddress)
-		if err != nil {
-			return err
-		}
-
-		if err := am.keeper.GetStakingKeeper().SetLastValidatorPower(ctx, valAddr, v.Tokens.Int64()); err != nil {
-			return err
-		}
-	}
-
-	if err := am.keeper.GetStakingKeeper().SetLastTotalPower(ctx, totalPower); err != nil {
-		return err
 	}
 
 	return nil
