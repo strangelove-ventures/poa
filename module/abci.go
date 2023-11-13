@@ -8,6 +8,8 @@ import (
 )
 
 func (am AppModule) BeginBlocker(ctx context.Context) error {
+	sdkCtx := sdk.UnwrapSDKContext(ctx)
+
 	vals, err := am.keeper.GetStakingKeeper().GetAllValidators(ctx)
 	if err != nil {
 		return err
@@ -34,5 +36,59 @@ func (am AppModule) BeginBlocker(ctx context.Context) error {
 		}
 	}
 
+	currValPower, err := am.keeper.GetStakingKeeper().GetLastTotalPower(ctx)
+	if err != nil {
+		return err
+	}
+
+	if sdkCtx.BlockHeight() > 1 {
+		// if it is not a genTx, reset values to the expected
+		if err := am.resetCachedTotalPower(ctx, currValPower.Uint64()); err != nil {
+			return err
+		}
+
+		if err := am.resetAbsoluteBlockPower(ctx); err != nil {
+			return err
+		}
+	} else {
+		// it is a gentx, set the initial stores to the expected values
+		if err := am.keeper.SetCachedBlockPower(ctx, currValPower.Uint64()); err != nil {
+			return err
+		}
+
+		if err := am.keeper.SetAbsoluteChangedInBlockPower(ctx, 0); err != nil {
+			return err
+		}
+
+	}
+
 	return nil
+}
+
+// resetCachedTotalPower resets the cached total power to the new TotalPower index.
+func (am AppModule) resetCachedTotalPower(ctx context.Context, currValPower uint64) error {
+	prev, err := am.keeper.GetCachedBlockPower(ctx)
+	if err != nil {
+		return err
+	}
+
+	if currValPower != prev {
+		return am.keeper.SetAbsoluteChangedInBlockPower(ctx, currValPower-prev)
+	}
+
+	return nil
+}
+
+// resetAbsoluteBlockPower resets the absolute block power to 0.
+func (am AppModule) resetAbsoluteBlockPower(ctx context.Context) error {
+	var err error
+
+	val, err := am.keeper.GetAbsoluteChangedInBlockPower(ctx)
+	if err != nil {
+		return err
+	} else if val != 0 {
+		return am.keeper.SetAbsoluteChangedInBlockPower(ctx, 0)
+	}
+
+	return err
 }

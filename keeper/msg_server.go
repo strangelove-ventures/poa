@@ -3,9 +3,10 @@ package keeper
 import (
 	"context"
 	"fmt"
+	"math"
 
 	errorsmod "cosmossdk.io/errors"
-	"cosmossdk.io/math"
+	sdkmath "cosmossdk.io/math"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -27,6 +28,8 @@ func NewMsgServerImpl(keeper Keeper) poa.MsgServer {
 }
 
 func (ms msgServer) SetPower(ctx context.Context, msg *poa.MsgSetPower) (*poa.MsgSetPowerResponse, error) {
+	sdkCtx := sdk.UnwrapSDKContext(ctx)
+
 	if ok := ms.isAdmin(ctx, msg.Sender); !ok {
 		return nil, poa.ErrNotAnAuthority
 	}
@@ -44,21 +47,29 @@ func (ms msgServer) SetPower(ctx context.Context, msg *poa.MsgSetPower) (*poa.Ms
 		}
 	}
 
-	if !msg.Unsafe {
-		// Gets the cached last total power of the validator set
-		totalPOAPower, err := ms.k.stakingKeeper.GetLastTotalPower(ctx)
+	// sets the new POA power for the validator
+	if _, err := ms.updatePOAPower(ctx, msg.ValidatorAddress, int64(msg.Power)); err != nil {
+		return nil, err
+	}
+
+	// Check that the total power change of the block is not >=30% of the total power of the previous block
+	if !msg.Unsafe && sdkCtx.BlockHeight() > 1 {
+		// Get Cached GetLastTotalPower
+		cachedPower, err := ms.k.GetCachedBlockPower(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		if msg.Power > totalPOAPower.Mul(math.NewInt(30)).Quo(math.NewInt(100)).Uint64() {
+		totalChanged, err := ms.k.GetAbsoluteChangedInBlockPower(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		amt := (totalChanged * 100) / (cachedPower)
+		fmt.Printf("\ntotalChanged: %d, cachedPower: %d, amt: %d", totalChanged, cachedPower, amt)
+		if amt >= 30 {
 			return nil, poa.ErrUnsafePower
 		}
-	}
-
-	// sets the new POA power for the validator
-	if _, err := ms.updatePOAPower(ctx, msg.ValidatorAddress, int64(msg.Power)); err != nil {
-		return nil, err
 	}
 
 	return &poa.MsgSetPowerResponse{}, nil
@@ -176,7 +187,7 @@ func (ms msgServer) CreateValidator(ctx context.Context, msg *poa.MsgCreateValid
 		return nil, err
 	}
 
-	validator.MinSelfDelegation = math.NewInt(1)
+	validator.MinSelfDelegation = sdkmath.NewInt(1)
 
 	// appends the validator to a queue to wait for approval from an admin.
 	if err := ms.k.AddPendingValidator(ctx, validator, pk); err != nil {
@@ -293,7 +304,17 @@ func (ms msgServer) updatePOAPower(ctx context.Context, valOpBech32 string, powe
 		return stakingtypes.Validator{}, err
 	}
 
+	previousPower, err := ms.k.stakingKeeper.GetLastValidatorPower(ctx, valAddr)
+	if err != nil {
+		return stakingtypes.Validator{}, err
+	}
+
 	if err := ms.k.stakingKeeper.SetLastValidatorPower(ctx, valAddr, power); err != nil {
+		return stakingtypes.Validator{}, err
+	}
+
+	absPowerDiff := uint64(math.Abs(float64(power - previousPower)))
+	if err := ms.k.IncreaseAbsoluteChangedInBlockPower(ctx, absPowerDiff); err != nil {
 		return stakingtypes.Validator{}, err
 	}
 
@@ -321,7 +342,7 @@ func (ms msgServer) updateValidatorSet(ctx context.Context, power int64, val sta
 	delegation := stakingtypes.Delegation{
 		DelegatorAddress: sdk.AccAddress(valAddr.Bytes()).String(),
 		ValidatorAddress: val.OperatorAddress,
-		Shares:           math.LegacyNewDec(power),
+		Shares:           sdkmath.LegacyNewDec(power),
 	}
 	if err := ms.k.stakingKeeper.SetDelegation(ctx, delegation); err != nil {
 		return err
@@ -333,10 +354,10 @@ func (ms msgServer) updateValidatorSet(ctx context.Context, power int64, val sta
 			return err
 		}
 
-		val.MinSelfDelegation = math.NewIntFromUint64(uint64(currPower) + 1)
+		val.MinSelfDelegation = sdkmath.NewIntFromUint64(uint64(currPower) + 1)
 	}
 
-	val.Tokens = math.NewIntFromUint64(uint64(power))
+	val.Tokens = sdkmath.NewIntFromUint64(uint64(power))
 	val.DelegatorShares = delegation.Shares
 	val.Status = stakingtypes.Bonded
 	if err := ms.k.stakingKeeper.SetValidator(ctx, val); err != nil {
@@ -356,7 +377,7 @@ func (ms msgServer) updateTotalPower(ctx context.Context) error {
 		return err
 	}
 
-	allTokens := math.ZeroInt()
+	allTokens := sdkmath.ZeroInt()
 	for _, val := range allVals {
 		allTokens = allTokens.Add(val.Tokens)
 	}
