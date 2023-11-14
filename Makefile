@@ -8,16 +8,14 @@ export GO111MODULE = on
 ###   Testing   ####
 ####################
 
+include e2e/Makefile
+
 test:
 	@echo "--> Running tests"
 	go test -v ./...
 
-test-integration:
-	@echo "--> Running integration tests"
-	cd integration; go test -v ./...
-
 ictest-poa:
-	cd e2e && go clean -testcache && go test -race -v -run TestPOA .
+	$(MAKE) -C e2e/ ictest-poa
 
 ###############################################################################
 ###                                  Docker                                 ###
