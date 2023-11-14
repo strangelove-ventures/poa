@@ -166,7 +166,6 @@ func (f *testFixture) createBaseStakingValidators(t *testing.T) {
 		// increase the block so the new validator is in the validator set
 		_, err = f.IncreaseBlock(1)
 		require.NoError(t, err)
-		// fmt.Printf("createBaseStakingValidators updates : %+v", updates)
 
 		valAddrBz, err := sdk.ValAddressFromBech32(val.GetOperator())
 		require.NoError(t, err)
@@ -182,6 +181,10 @@ func (f *testFixture) createBaseStakingValidators(t *testing.T) {
 
 	total := bondCoin.Amount.MulRaw(int64(len(vals)))
 	if err := f.stakingKeeper.SetLastTotalPower(f.ctx, total); err != nil {
+		panic(err)
+	}
+
+	if err := f.k.InitCacheStores(f.ctx); err != nil {
 		panic(err)
 	}
 }

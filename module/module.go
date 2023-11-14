@@ -63,7 +63,7 @@ func (AppModule) RegisterGRPCGatewayRoutes(clientCtx client.Context, mux *gwrunt
 	}
 }
 
-// GetTxCmd returns the root tx command for the bank module.
+// GetTxCmd returns the root tx command for the poa module.
 func (am AppModule) GetTxCmd() *cobra.Command {
 	return cli.NewTxCmd(am.cdc.InterfaceRegistry().SigningContext().ValidatorAddressCodec())
 }
@@ -110,6 +110,10 @@ func (am AppModule) InitGenesis(ctx sdk.Context, cdc codec.JSONCodec, data json.
 	cdc.MustUnmarshalJSON(data, &genesisState)
 
 	if err := am.keeper.InitGenesis(ctx, &genesisState); err != nil {
+		panic(err)
+	}
+
+	if err := am.keeper.InitCacheStores(ctx); err != nil {
 		panic(err)
 	}
 

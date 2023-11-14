@@ -36,13 +36,13 @@ func (am AppModule) BeginBlocker(ctx context.Context) error {
 		}
 	}
 
-	currValPower, err := am.keeper.GetStakingKeeper().GetLastTotalPower(ctx)
-	if err != nil {
-		return err
-	}
-
+	// if it is not a genTx, reset values to the expected
 	if sdkCtx.BlockHeight() > 1 {
-		// if it is not a genTx, reset values to the expected
+		currValPower, err := am.keeper.GetStakingKeeper().GetLastTotalPower(ctx)
+		if err != nil {
+			return err
+		}
+
 		if err := am.resetCachedTotalPower(ctx, currValPower.Uint64()); err != nil {
 			return err
 		}
@@ -50,16 +50,6 @@ func (am AppModule) BeginBlocker(ctx context.Context) error {
 		if err := am.resetAbsoluteBlockPower(ctx); err != nil {
 			return err
 		}
-	} else {
-		// it is a gentx, set the initial stores to the expected values
-		if err := am.keeper.SetCachedBlockPower(ctx, currValPower.Uint64()); err != nil {
-			return err
-		}
-
-		if err := am.keeper.SetAbsoluteChangedInBlockPower(ctx, 0); err != nil {
-			return err
-		}
-
 	}
 
 	return nil
