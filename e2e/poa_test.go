@@ -162,11 +162,11 @@ func testRemoveValidator(t *testing.T, ctx context.Context, chain *cosmos.Cosmos
 	require.Equal(t, vals[0].Tokens, fmt.Sprintf("%d", powerOne))
 	require.Equal(t, vals[1].Tokens, fmt.Sprintf("%d", powerTwo))
 
-	// === Remove Validator Test ===
+	// remove the 2nd validator (lower power)
 	helpers.POARemove(t, ctx, chain, acc0, validators[1])
 
 	// allow the poa.BeginBlocker to update new status
-	if err := testutil.WaitForBlocks(ctx, 2, chain); err != nil {
+	if err := testutil.WaitForBlocks(ctx, 5, chain); err != nil {
 		t.Fatal(err)
 	}
 

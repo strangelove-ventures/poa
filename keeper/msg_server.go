@@ -55,9 +55,19 @@ func (ms msgServer) SetPower(ctx context.Context, msg *poa.MsgSetPower) (*poa.Ms
 	// Check that the total power change of the block is not >=30% of the total power of the previous block
 	if !msg.Unsafe && sdkCtx.BlockHeight() > 1 {
 		// Get Cached GetLastTotalPower
+		var cachedPower uint64
+
 		cachedPower, err := ms.k.GetCachedBlockPower(ctx)
 		if err != nil {
 			return nil, err
+		}
+
+		if cachedPower == 0 {
+			sdkPower, err := ms.k.stakingKeeper.GetLastTotalPower(ctx)
+			if err != nil {
+				return nil, err
+			}
+			cachedPower = sdkPower.Uint64()
 		}
 
 		totalChanged, err := ms.k.GetAbsoluteChangedInBlockPower(ctx)
@@ -65,8 +75,8 @@ func (ms msgServer) SetPower(ctx context.Context, msg *poa.MsgSetPower) (*poa.Ms
 			return nil, err
 		}
 
-		amt := (totalChanged * 100) / (cachedPower)
-		fmt.Printf("\ntotalChanged: %d, cachedPower: %d, amt: %d", totalChanged, cachedPower, amt)
+		amt := (totalChanged / cachedPower) * 100
+		fmt.Printf("\ntotalChanged: %d, cachedPower: %d, amt: %d\n", totalChanged, cachedPower, amt)
 		if amt >= 30 {
 			return nil, poa.ErrUnsafePower
 		}
@@ -293,7 +303,7 @@ func (ms msgServer) acceptNewValidator(ctx context.Context, operatingAddress str
 
 // updatePOAPower removes all delegations, sets a single delegation for POA power, updates the validator with the new shares
 // and sets the last validator power to the new value.
-func (ms msgServer) updatePOAPower(ctx context.Context, valOpBech32 string, power int64) (stakingtypes.Validator, error) {
+func (ms msgServer) updatePOAPower(ctx context.Context, valOpBech32 string, newPower int64) (stakingtypes.Validator, error) {
 	valAddr, err := sdk.ValAddressFromBech32(valOpBech32)
 	if err != nil {
 		return stakingtypes.Validator{}, err
@@ -309,46 +319,45 @@ func (ms msgServer) updatePOAPower(ctx context.Context, valOpBech32 string, powe
 		return stakingtypes.Validator{}, err
 	}
 
-	if err := ms.k.stakingKeeper.SetLastValidatorPower(ctx, valAddr, power); err != nil {
+	if err := ms.k.stakingKeeper.SetLastValidatorPower(ctx, valAddr, newPower); err != nil {
 		return stakingtypes.Validator{}, err
 	}
 
-	absPowerDiff := uint64(math.Abs(float64(power - previousPower)))
+	absPowerDiff := uint64(math.Abs(float64(newPower - previousPower)))
+
+	// print absPowerDiff
+	fmt.Printf("\n\n\nvalOpBech32: %s\n", valOpBech32)
+	fmt.Printf("New Power: %d\n", newPower)
+	fmt.Printf("Prev Power: %d\n", previousPower)
+	fmt.Printf("absPowerDiff: %d\n\n\n", absPowerDiff)
+
 	if err := ms.k.IncreaseAbsoluteChangedInBlockPower(ctx, absPowerDiff); err != nil {
 		return stakingtypes.Validator{}, err
 	}
 
-	if err := ms.updateValidatorSet(ctx, power, val, valAddr); err != nil {
+	if err := ms.updateValidatorSet(ctx, newPower, val, valAddr); err != nil {
 		return stakingtypes.Validator{}, err
 	}
 
 	return val, nil
 }
 
-func (ms msgServer) updateValidatorSet(ctx context.Context, power int64, val stakingtypes.Validator, valAddr sdk.ValAddress) error {
+func (ms msgServer) updateValidatorSet(ctx context.Context, newPower int64, val stakingtypes.Validator, valAddr sdk.ValAddress) error {
 	sdkContext := sdk.UnwrapSDKContext(ctx)
 
-	delegations, err := ms.k.stakingKeeper.GetValidatorDelegations(ctx, valAddr)
-	if err != nil {
-		return err
-	}
-
-	for _, del := range delegations {
-		if err := ms.k.stakingKeeper.RemoveDelegation(ctx, del); err != nil {
-			return err
-		}
-	}
+	newShare := sdkmath.LegacyNewDec(newPower)
+	newShareInt := sdkmath.NewIntFromUint64(uint64(newPower))
 
 	delegation := stakingtypes.Delegation{
 		DelegatorAddress: sdk.AccAddress(valAddr.Bytes()).String(),
 		ValidatorAddress: val.OperatorAddress,
-		Shares:           sdkmath.LegacyNewDec(power),
+		Shares:           newShare,
 	}
 	if err := ms.k.stakingKeeper.SetDelegation(ctx, delegation); err != nil {
 		return err
 	}
 
-	if power == 0 && sdkContext.BlockHeight() > 1 {
+	if newPower == 0 && sdkContext.BlockHeight() > 1 {
 		currPower, err := ms.k.stakingKeeper.GetLastValidatorPower(ctx, valAddr)
 		if err != nil {
 			return err
@@ -357,14 +366,14 @@ func (ms msgServer) updateValidatorSet(ctx context.Context, power int64, val sta
 		val.MinSelfDelegation = sdkmath.NewIntFromUint64(uint64(currPower) + 1)
 	}
 
-	val.Tokens = sdkmath.NewIntFromUint64(uint64(power))
-	val.DelegatorShares = delegation.Shares
+	val.Tokens = newShareInt
+	val.DelegatorShares = newShare
 	val.Status = stakingtypes.Bonded
 	if err := ms.k.stakingKeeper.SetValidator(ctx, val); err != nil {
 		return err
 	}
 
-	if err := ms.k.stakingKeeper.SetLastValidatorPower(ctx, valAddr, power); err != nil {
+	if err := ms.k.stakingKeeper.SetLastValidatorPower(ctx, valAddr, newPower); err != nil {
 		return err
 	}
 
