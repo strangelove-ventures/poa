@@ -216,7 +216,6 @@ func TestRemoveValidator(t *testing.T) {
 
 	updates, err := f.IncreaseBlock(1, true)
 	require.NoError(err)
-	fmt.Printf("%+v", updates)
 	require.EqualValues(3, len(updates))
 
 	testCases := []struct {

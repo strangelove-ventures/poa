@@ -309,7 +309,7 @@ func (ms msgServer) updatePOAPower(ctx context.Context, valOpBech32 string, newP
 		return stakingtypes.Validator{}, err
 	}
 
-	// TODO: For some reason GetLastValidatorPower only returns singkle diget powers on test setup.
+	// TODO: For some reason GetLastValidatorPower only returns single digit powers on test setup.
 	// I am unsure if this is due to a test mis-configure or an issue with POA logic (thus these lines would fix it)
 	// need to dive into the x/staking / cometBFT power requirements to see why a single digit number is used instead of udenom.
 	if previousPower < 1_000_000 {
@@ -322,11 +322,13 @@ func (ms msgServer) updatePOAPower(ctx context.Context, valOpBech32 string, newP
 
 	absPowerDiff := uint64(math.Abs(float64(newPower - previousPower)))
 
-	// print absPowerDiff
-	fmt.Printf("\nvalOpBech32: %s\n", valOpBech32)
-	fmt.Printf("New Power: %d\n", newPower)
-	fmt.Printf("Prev Power: %d\n", previousPower)
-	fmt.Printf("absPowerDiff: %d\n", absPowerDiff)
+	ms.k.Logger(ctx).Debug("POA updatePOAPower",
+		"valOpBech32", valOpBech32,
+		"New Power", newPower,
+		"Prev Power", previousPower,
+		"absPowerDiff", absPowerDiff,
+		"percent change", fmt.Sprintf("%v%%", (absPowerDiff*100)/uint64(previousPower)),
+	)
 
 	if err := ms.k.IncreaseAbsoluteChangedInBlockPower(ctx, absPowerDiff); err != nil {
 		return stakingtypes.Validator{}, err
