@@ -66,7 +66,7 @@ type testFixture struct {
 	govModAddr string
 }
 
-func SetupTest(t *testing.T) *testFixture {
+func SetupTest(t *testing.T, baseValShares int64) *testFixture {
 	s := new(testFixture)
 
 	logger := log.NewTestLogger(t)
@@ -108,7 +108,7 @@ func SetupTest(t *testing.T) *testFixture {
 	err = s.k.InitGenesis(s.ctx, genState)
 	require.NoError(t, err)
 
-	s.createBaseStakingValidators(t)
+	s.createBaseStakingValidators(t, baseValShares)
 	return s
 }
 
@@ -130,8 +130,8 @@ func GenAcc() valSetup {
 	}
 }
 
-func (f *testFixture) createBaseStakingValidators(t *testing.T) {
-	bondCoin := sdk.NewCoin("stake", math.NewInt(1_000_000))
+func (f *testFixture) createBaseStakingValidators(t *testing.T, baseValShares int64) {
+	bondCoin := sdk.NewCoin("stake", math.NewInt(baseValShares))
 
 	vals := []valSetup{
 		GenAcc(),
@@ -177,6 +177,10 @@ func (f *testFixture) createBaseStakingValidators(t *testing.T) {
 		if err := f.stakingKeeper.SetValidator(f.ctx, validator); err != nil {
 			panic(err)
 		}
+
+		if _, err := f.IncreaseBlock(1, true); err != nil {
+			panic(err)
+		}
 	}
 
 	total := bondCoin.Amount.MulRaw(int64(len(vals)))
@@ -185,6 +189,11 @@ func (f *testFixture) createBaseStakingValidators(t *testing.T) {
 	}
 
 	if err := f.k.InitCacheStores(f.ctx); err != nil {
+		panic(err)
+	}
+
+	// inc block
+	if _, err := f.IncreaseBlock(1, true); err != nil {
 		panic(err)
 	}
 }
@@ -242,18 +251,26 @@ func (f *testFixture) CreatePendingValidator(name string, power uint64) sdk.ValA
 func (f *testFixture) IncreaseBlock(amt int64, debug ...bool) ([]abci.ValidatorUpdate, error) {
 	f.ctx = f.ctx.WithBlockHeight(f.ctx.BlockHeight() + amt)
 
-	if err := f.k.GetStakingKeeper().BeginBlocker(f.ctx); err != nil {
-		return nil, err
+	allUpdates := make([]abci.ValidatorUpdate, 0)
+	for i := int64(0); i < amt; i++ {
+		if err := f.k.GetStakingKeeper().BeginBlocker(f.ctx); err != nil {
+			return nil, err
+		}
+
+		updates, err := f.k.GetStakingKeeper().EndBlocker(f.ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		allUpdates = append(allUpdates, updates...)
+		if len(debug) > 0 && debug[0] && len(updates) > 0 {
+			fmt.Printf("\nIncreaseBlock(...) updates: %+v\n", updates)
+		}
+
+		if err := f.appModule.BeginBlock(f.ctx); err != nil {
+			return nil, err
+		}
 	}
 
-	updates, err := f.k.GetStakingKeeper().EndBlocker(f.ctx)
-	if len(debug) > 0 && debug[0] {
-		fmt.Printf("\nIncreaseBlock(...) updates: %+v\n", updates)
-	}
-
-	if err := f.appModule.BeginBlock(f.ctx); err != nil {
-		return nil, err
-	}
-
-	return updates, err
+	return allUpdates, nil
 }

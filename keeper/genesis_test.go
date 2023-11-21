@@ -8,7 +8,7 @@ import (
 )
 
 func TestInitGenesis(t *testing.T) {
-	fixture := SetupTest(t)
+	fixture := SetupTest(t, 2_000_000)
 
 	t.Run("default params", func(t *testing.T) {
 		data := &poa.GenesisState{
