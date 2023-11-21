@@ -105,7 +105,7 @@ func testUpdatePOAParams(t *testing.T, ctx context.Context, chain *cosmos.Cosmos
 		txRes, err := chain.GetTransaction(tx.Txhash)
 		require.NoError(t, err)
 		fmt.Printf("%+v", txRes)
-		require.Equal(t, txRes.Code, 0)
+		require.EqualValues(t, txRes.Code, 0)
 
 		sp := helpers.GetStakingParams(t, ctx, chain)
 		fmt.Printf("%+v", sp)
@@ -124,7 +124,7 @@ func testUpdatePOAParams(t *testing.T, ctx context.Context, chain *cosmos.Cosmos
 		txRes, err := chain.GetTransaction(tx.Txhash)
 		require.NoError(t, err)
 		fmt.Printf("%+v", txRes)
-		require.Equal(t, txRes.Code, 0)
+		require.EqualValues(t, txRes.Code, 0)
 
 		p := helpers.GetPOAParams(t, ctx, chain)
 		for _, admin := range newAdmins {
