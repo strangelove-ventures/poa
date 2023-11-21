@@ -12,7 +12,7 @@ import (
 )
 
 func TestUpdateParams(t *testing.T) {
-	f := SetupTest(t)
+	f := SetupTest(t, 2_000_000)
 	require := require.New(t)
 
 	testCases := []struct {
@@ -59,7 +59,7 @@ func TestUpdateParams(t *testing.T) {
 }
 
 func TestUpdateStakingParams(t *testing.T) {
-	f := SetupTest(t)
+	f := SetupTest(t, 2_000_000)
 	require := require.New(t)
 
 	testCases := []struct {
@@ -107,7 +107,7 @@ func TestUpdateStakingParams(t *testing.T) {
 }
 
 func TestSetPowerAndCreateValidator(t *testing.T) {
-	f := SetupTest(t)
+	f := SetupTest(t, 2_000_000)
 	require := require.New(t)
 
 	vals, err := f.stakingKeeper.GetValidators(f.ctx, 100)
@@ -196,7 +196,7 @@ func TestSetPowerAndCreateValidator(t *testing.T) {
 }
 
 func TestRemoveValidator(t *testing.T) {
-	f := SetupTest(t)
+	f := SetupTest(t, 2_000_000)
 	require := require.New(t)
 
 	vals, err := f.stakingKeeper.GetValidators(f.ctx, 100)
@@ -216,7 +216,6 @@ func TestRemoveValidator(t *testing.T) {
 
 	updates, err := f.IncreaseBlock(1, true)
 	require.NoError(err)
-	fmt.Printf("%+v", updates)
 	require.EqualValues(3, len(updates))
 
 	testCases := []struct {
@@ -273,73 +272,77 @@ func TestRemoveValidator(t *testing.T) {
 	}
 }
 
-func TestGlobalPowerUpdates(t *testing.T) {
-	f := SetupTest(t)
+func TestMultipleUpdatesInASingleBlock(t *testing.T) {
+	f := SetupTest(t, 3_000_000)
 	require := require.New(t)
 
 	vals, err := f.stakingKeeper.GetValidators(f.ctx, 100)
 	require.NoError(err)
 
-	totalValTokens := math.ZeroInt()
-	for _, val := range vals {
-		totalValTokens = totalValTokens.Add(val.Tokens)
+	totalPower := 0
+	for _, v := range vals {
+		totalPower += int(v.GetBondedTokens().Int64())
+	}
+
+	if _, err := f.IncreaseBlock(5, true); err != nil {
+		panic(err)
 	}
 
 	testCases := []struct {
 		name               string
 		createNewValidator bool
-		request            *poa.MsgSetPower
+		request            []*poa.MsgSetPower
+		expectedErrIdx     int
 		expectErrMsg       string
 	}{
 		{
 			name:               "new validator swing",
 			createNewValidator: true,
-			request: &poa.MsgSetPower{
-				Sender: f.addrs[0].String(),
-				Power:  2_000_000,
-				Unsafe: true,
+			request: []*poa.MsgSetPower{
+				// 11.11%
+				{
+					Sender:           f.addrs[0].String(),
+					ValidatorAddress: vals[0].OperatorAddress,
+					Power:            4_000_000,
+					Unsafe:           false,
+				},
+				// 22.22%
+				{
+					Sender:           f.addrs[0].String(),
+					ValidatorAddress: vals[1].OperatorAddress,
+					Power:            4_000_000,
+					Unsafe:           false,
+				},
+				// 33.33% modified (>30)
+				{
+					Sender:           f.addrs[0].String(),
+					ValidatorAddress: vals[2].OperatorAddress,
+					Power:            4_000_000,
+					Unsafe:           false,
+				},
 			},
-			expectErrMsg: "",
+			expectedErrIdx: 2,
+			expectErrMsg:   "msg.Power is >30%% of total power, set unsafe=true to override",
 		},
 	}
 
 	for _, tc := range testCases {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
-
-			// increase block
 			if _, err := f.IncreaseBlock(1); err != nil {
 				panic(err)
 			}
 
-			// get total set power
-			total, err := f.stakingKeeper.GetLastTotalPower(f.ctx)
-			require.NoError(err)
-			require.EqualValues(totalValTokens, total)
+			for idx, req := range tc.request {
+				_, err = f.msgServer.SetPower(f.ctx, req)
 
-			// add a new validator if the test case requires it
-			if tc.createNewValidator {
-				valAddr := f.CreatePendingValidator(fmt.Sprintf("val-%s", tc.name), tc.request.Power)
-				tc.request.ValidatorAddress = valAddr.String()
-
-				// check the pending validators includes the new validator
-				pendingVals, err := f.k.GetPendingValidators(f.ctx)
-				require.NoError(err)
-				require.EqualValues(1, len(pendingVals.Validators))
+				if idx == tc.expectedErrIdx {
+					require.Error(err)
+					require.ErrorContains(err, tc.expectErrMsg)
+				} else {
+					require.NoError(err)
+				}
 			}
-
-			_, err = f.msgServer.SetPower(f.ctx, tc.request)
-			if tc.expectErrMsg != "" {
-				require.Error(err)
-				require.ErrorContains(err, tc.expectErrMsg)
-			} else {
-				require.NoError(err)
-			}
-
-			// verify that it goes up the Power request amount
-			total, err = f.stakingKeeper.GetLastTotalPower(f.ctx)
-			require.NoError(err)
-			require.EqualValues(totalValTokens.AddRaw(int64(tc.request.Power)), total)
 		})
 	}
 }

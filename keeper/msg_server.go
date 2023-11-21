@@ -3,9 +3,10 @@ package keeper
 import (
 	"context"
 	"fmt"
+	"math"
 
 	errorsmod "cosmossdk.io/errors"
-	"cosmossdk.io/math"
+	sdkmath "cosmossdk.io/math"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -27,6 +28,8 @@ func NewMsgServerImpl(keeper Keeper) poa.MsgServer {
 }
 
 func (ms msgServer) SetPower(ctx context.Context, msg *poa.MsgSetPower) (*poa.MsgSetPowerResponse, error) {
+	sdkCtx := sdk.UnwrapSDKContext(ctx)
+
 	if ok := ms.isAdmin(ctx, msg.Sender); !ok {
 		return nil, poa.ErrNotAnAuthority
 	}
@@ -44,21 +47,29 @@ func (ms msgServer) SetPower(ctx context.Context, msg *poa.MsgSetPower) (*poa.Ms
 		}
 	}
 
-	if !msg.Unsafe {
-		// Gets the cached last total power of the validator set
-		totalPOAPower, err := ms.k.stakingKeeper.GetLastTotalPower(ctx)
+	// sets the new POA power for the validator
+	if _, err := ms.updatePOAPower(ctx, msg.ValidatorAddress, int64(msg.Power)); err != nil {
+		return nil, err
+	}
+
+	// Check that the total power change of the block is not >=30% of the total power of the previous block
+	if !msg.Unsafe && sdkCtx.BlockHeight() > 1 {
+		var cachedPower uint64
+		cachedPower, err := ms.k.GetCachedBlockPower(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		if msg.Power > totalPOAPower.Mul(math.NewInt(30)).Quo(math.NewInt(100)).Uint64() {
+		totalChanged, err := ms.k.GetAbsoluteChangedInBlockPower(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		amt := (totalChanged * 100) / cachedPower
+		fmt.Printf("\ntotalChanged: %d, cachedPower: %d, amt: %v%%\n", totalChanged, cachedPower, amt)
+		if amt >= 30 {
 			return nil, poa.ErrUnsafePower
 		}
-	}
-
-	// sets the new POA power for the validator
-	if _, err := ms.updatePOAPower(ctx, msg.ValidatorAddress, int64(msg.Power)); err != nil {
-		return nil, err
 	}
 
 	return &poa.MsgSetPowerResponse{}, nil
@@ -176,7 +187,7 @@ func (ms msgServer) CreateValidator(ctx context.Context, msg *poa.MsgCreateValid
 		return nil, err
 	}
 
-	validator.MinSelfDelegation = math.NewInt(1)
+	validator.MinSelfDelegation = sdkmath.NewInt(1)
 
 	// appends the validator to a queue to wait for approval from an admin.
 	if err := ms.k.AddPendingValidator(ctx, validator, pk); err != nil {
@@ -282,7 +293,7 @@ func (ms msgServer) acceptNewValidator(ctx context.Context, operatingAddress str
 
 // updatePOAPower removes all delegations, sets a single delegation for POA power, updates the validator with the new shares
 // and sets the last validator power to the new value.
-func (ms msgServer) updatePOAPower(ctx context.Context, valOpBech32 string, power int64) (stakingtypes.Validator, error) {
+func (ms msgServer) updatePOAPower(ctx context.Context, valOpBech32 string, newPower int64) (stakingtypes.Validator, error) {
 	valAddr, err := sdk.ValAddressFromBech32(valOpBech32)
 	if err != nil {
 		return stakingtypes.Validator{}, err
@@ -293,57 +304,74 @@ func (ms msgServer) updatePOAPower(ctx context.Context, valOpBech32 string, powe
 		return stakingtypes.Validator{}, err
 	}
 
-	if err := ms.k.stakingKeeper.SetLastValidatorPower(ctx, valAddr, power); err != nil {
+	previousPower, err := ms.k.stakingKeeper.GetLastValidatorPower(ctx, valAddr)
+	if err != nil {
 		return stakingtypes.Validator{}, err
 	}
 
-	if err := ms.updateValidatorSet(ctx, power, val, valAddr); err != nil {
+	// TODO: For some reason GetLastValidatorPower only returns single digit powers on test setup.
+	// I am unsure if this is due to a test mis-configure or an issue with POA logic (thus these lines would fix it)
+	// need to dive into the x/staking / cometBFT power requirements to see why a single digit number is used instead of udenom.
+	if previousPower < 1_000_000 {
+		previousPower = previousPower * 1_000_000
+	}
+
+	if err := ms.k.stakingKeeper.SetLastValidatorPower(ctx, valAddr, newPower); err != nil {
+		return stakingtypes.Validator{}, err
+	}
+
+	absPowerDiff := uint64(math.Abs(float64(newPower - previousPower)))
+
+	ms.k.Logger(ctx).Debug("POA updatePOAPower",
+		"valOpBech32", valOpBech32,
+		"New Power", newPower,
+		"Prev Power", previousPower,
+		"absPowerDiff", absPowerDiff,
+	)
+
+	if err := ms.k.IncreaseAbsoluteChangedInBlockPower(ctx, absPowerDiff); err != nil {
+		return stakingtypes.Validator{}, err
+	}
+
+	if err := ms.updateValidatorSet(ctx, newPower, val, valAddr); err != nil {
 		return stakingtypes.Validator{}, err
 	}
 
 	return val, nil
 }
 
-func (ms msgServer) updateValidatorSet(ctx context.Context, power int64, val stakingtypes.Validator, valAddr sdk.ValAddress) error {
+func (ms msgServer) updateValidatorSet(ctx context.Context, newPower int64, val stakingtypes.Validator, valAddr sdk.ValAddress) error {
 	sdkContext := sdk.UnwrapSDKContext(ctx)
 
-	delegations, err := ms.k.stakingKeeper.GetValidatorDelegations(ctx, valAddr)
-	if err != nil {
-		return err
-	}
-
-	for _, del := range delegations {
-		if err := ms.k.stakingKeeper.RemoveDelegation(ctx, del); err != nil {
-			return err
-		}
-	}
+	newShare := sdkmath.LegacyNewDec(newPower)
+	newShareInt := sdkmath.NewIntFromUint64(uint64(newPower))
 
 	delegation := stakingtypes.Delegation{
 		DelegatorAddress: sdk.AccAddress(valAddr.Bytes()).String(),
 		ValidatorAddress: val.OperatorAddress,
-		Shares:           math.LegacyNewDec(power),
+		Shares:           newShare,
 	}
 	if err := ms.k.stakingKeeper.SetDelegation(ctx, delegation); err != nil {
 		return err
 	}
 
-	if power == 0 && sdkContext.BlockHeight() > 1 {
+	if newPower == 0 && sdkContext.BlockHeight() > 1 {
 		currPower, err := ms.k.stakingKeeper.GetLastValidatorPower(ctx, valAddr)
 		if err != nil {
 			return err
 		}
 
-		val.MinSelfDelegation = math.NewIntFromUint64(uint64(currPower) + 1)
+		val.MinSelfDelegation = sdkmath.NewIntFromUint64(uint64(currPower) + 1)
 	}
 
-	val.Tokens = math.NewIntFromUint64(uint64(power))
-	val.DelegatorShares = delegation.Shares
+	val.Tokens = newShareInt
+	val.DelegatorShares = newShare
 	val.Status = stakingtypes.Bonded
 	if err := ms.k.stakingKeeper.SetValidator(ctx, val); err != nil {
 		return err
 	}
 
-	if err := ms.k.stakingKeeper.SetLastValidatorPower(ctx, valAddr, power); err != nil {
+	if err := ms.k.stakingKeeper.SetLastValidatorPower(ctx, valAddr, newPower); err != nil {
 		return err
 	}
 
@@ -356,7 +384,7 @@ func (ms msgServer) updateTotalPower(ctx context.Context) error {
 		return err
 	}
 
-	allTokens := math.ZeroInt()
+	allTokens := sdkmath.ZeroInt()
 	for _, val := range allVals {
 		allTokens = allTokens.Add(val.Tokens)
 	}

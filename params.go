@@ -20,19 +20,19 @@ func DefaultParams() Params {
 }
 
 // NewParams returns a new POA Params.
-func NewParams(addresses []string) (Params, error) {
-	if len(addresses) == 0 {
+func NewParams(admins []string) (Params, error) {
+	if len(admins) == 0 {
 		return Params{}, ErrMustProvideAtLeastOneAddress
 	}
 
-	for _, address := range addresses {
+	for _, address := range admins {
 		if _, err := sdk.AccAddressFromBech32(address); err != nil {
 			return Params{}, err
 		}
 	}
 
 	return Params{
-		Admins: addresses,
+		Admins: admins,
 	}, nil
 }
 

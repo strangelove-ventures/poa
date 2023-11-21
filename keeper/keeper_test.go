@@ -66,8 +66,9 @@ type testFixture struct {
 	govModAddr string
 }
 
-func SetupTest(t *testing.T) *testFixture {
+func SetupTest(t *testing.T, baseValShares int64) *testFixture {
 	s := new(testFixture)
+	require := require.New(t)
 
 	logger := log.NewTestLogger(t)
 	s.govModAddr = authtypes.NewModuleAddress(govtypes.ModuleName).String()
@@ -87,11 +88,11 @@ func SetupTest(t *testing.T) *testFixture {
 
 	s.stakingKeeper = stakingkeeper.NewKeeper(encCfg.Codec, storeService, s.accountkeeper, s.bankkeeper, s.govModAddr, authcodec.NewBech32Codec(sdk.Bech32PrefixValAddr), authcodec.NewBech32Codec(sdk.Bech32PrefixConsAddr))
 	err := s.stakingKeeper.SetParams(s.ctx, stakingtypes.DefaultParams())
-	require.NoError(t, err)
+	require.NoError(err)
 
 	s.slashingKeeper = slashingkeeper.NewKeeper(encCfg.Codec, encCfg.Amino, storeService, s.stakingKeeper, authtypes.NewModuleAddress(govtypes.ModuleName).String())
 	err = s.slashingKeeper.SetParams(s.ctx, slashingtypes.DefaultParams())
-	require.NoError(t, err)
+	require.NoError(err)
 
 	s.k = keeper.NewKeeper(encCfg.Codec, storeService, s.stakingKeeper, s.slashingKeeper, addresscodec.NewBech32Codec("cosmosvaloper"))
 	s.msgServer = keeper.NewMsgServerImpl(s.k)
@@ -106,9 +107,9 @@ func SetupTest(t *testing.T) *testFixture {
 	genState := poa.NewGenesisState()
 	genState.Params.Admins = []string{s.addrs[0].String(), s.govModAddr}
 	err = s.k.InitGenesis(s.ctx, genState)
-	require.NoError(t, err)
+	require.NoError(err)
 
-	s.createBaseStakingValidators(t)
+	s.createBaseStakingValidators(t, baseValShares)
 	return s
 }
 
@@ -130,8 +131,9 @@ func GenAcc() valSetup {
 	}
 }
 
-func (f *testFixture) createBaseStakingValidators(t *testing.T) {
-	bondCoin := sdk.NewCoin("stake", math.NewInt(1_000_000))
+func (f *testFixture) createBaseStakingValidators(t *testing.T, baseValShares int64) {
+	require := require.New(t)
+	bondCoin := sdk.NewCoin("stake", math.NewInt(baseValShares))
 
 	vals := []valSetup{
 		GenAcc(),
@@ -161,27 +163,39 @@ func (f *testFixture) createBaseStakingValidators(t *testing.T) {
 			Power:            bondCoin.Amount.Uint64(),
 			Unsafe:           true,
 		})
-		require.NoError(t, err)
+		require.NoError(err)
 
 		// increase the block so the new validator is in the validator set
 		_, err = f.IncreaseBlock(1)
-		require.NoError(t, err)
-		// fmt.Printf("createBaseStakingValidators updates : %+v", updates)
+		require.NoError(err)
 
 		valAddrBz, err := sdk.ValAddressFromBech32(val.GetOperator())
-		require.NoError(t, err)
+		require.NoError(err)
 
 		validator, err := f.stakingKeeper.GetValidator(f.ctx, valAddrBz)
-		require.NoError(t, err)
+		require.NoError(err)
 
 		validator.Status = stakingtypes.Bonded
 		if err := f.stakingKeeper.SetValidator(f.ctx, validator); err != nil {
+			panic(err)
+		}
+
+		if _, err := f.IncreaseBlock(1, true); err != nil {
 			panic(err)
 		}
 	}
 
 	total := bondCoin.Amount.MulRaw(int64(len(vals)))
 	if err := f.stakingKeeper.SetLastTotalPower(f.ctx, total); err != nil {
+		panic(err)
+	}
+
+	if err := f.k.InitCacheStores(f.ctx); err != nil {
+		panic(err)
+	}
+
+	// inc block
+	if _, err := f.IncreaseBlock(1, true); err != nil {
 		panic(err)
 	}
 }
@@ -239,18 +253,26 @@ func (f *testFixture) CreatePendingValidator(name string, power uint64) sdk.ValA
 func (f *testFixture) IncreaseBlock(amt int64, debug ...bool) ([]abci.ValidatorUpdate, error) {
 	f.ctx = f.ctx.WithBlockHeight(f.ctx.BlockHeight() + amt)
 
-	if err := f.k.GetStakingKeeper().BeginBlocker(f.ctx); err != nil {
-		return nil, err
+	allUpdates := make([]abci.ValidatorUpdate, 0)
+	for i := int64(0); i < amt; i++ {
+		if err := f.k.GetStakingKeeper().BeginBlocker(f.ctx); err != nil {
+			return nil, err
+		}
+
+		updates, err := f.k.GetStakingKeeper().EndBlocker(f.ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		allUpdates = append(allUpdates, updates...)
+		if len(debug) > 0 && debug[0] && len(updates) > 0 {
+			fmt.Printf("\nIncreaseBlock(...) updates: %+v\n", updates)
+		}
+
+		if err := f.appModule.BeginBlock(f.ctx); err != nil {
+			return nil, err
+		}
 	}
 
-	updates, err := f.k.GetStakingKeeper().EndBlocker(f.ctx)
-	if len(debug) > 0 && debug[0] {
-		fmt.Printf("\nIncreaseBlock(...) updates: %+v\n", updates)
-	}
-
-	if err := f.appModule.BeginBlock(f.ctx); err != nil {
-		return nil, err
-	}
-
-	return updates, err
+	return allUpdates, nil
 }

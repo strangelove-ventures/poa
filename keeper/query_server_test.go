@@ -9,7 +9,7 @@ import (
 )
 
 func TestPendingValidatorsQuery(t *testing.T) {
-	f := SetupTest(t)
+	f := SetupTest(t, 1_000_000)
 	require := require.New(t)
 
 	// create many validators and query all
@@ -45,7 +45,7 @@ func TestPendingValidatorsQuery(t *testing.T) {
 }
 
 func TestParamsQuery(t *testing.T) {
-	f := SetupTest(t)
+	f := SetupTest(t, 1_000_000)
 	require := require.New(t)
 
 	testCases := []struct {

@@ -7,6 +7,13 @@ import (
 var (
 	ParamsKey            = collections.NewPrefix(0)
 	PendingValidatorsKey = collections.NewPrefix(1)
+
+	// CachedPreviousBlockPowerKey saves the previous blocks total delegated power amount.
+	CachedPreviousBlockPowerKey = collections.NewPrefix(2)
+
+	// AbsoluteChangedInBlockPowerKey tracks the current blocks total delegated power amount.
+	// If this becomes >30% of CachedPreviousBlockPowerKey, messages will fail to limit IBC issues.
+	AbsoluteChangedInBlockPowerKey = collections.NewPrefix(3)
 )
 
 const (
