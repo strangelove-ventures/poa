@@ -327,7 +327,6 @@ func (ms msgServer) updatePOAPower(ctx context.Context, valOpBech32 string, newP
 		"New Power", newPower,
 		"Prev Power", previousPower,
 		"absPowerDiff", absPowerDiff,
-		"percent change", fmt.Sprintf("%v%%", (absPowerDiff*100)/uint64(previousPower)),
 	)
 
 	if err := ms.k.IncreaseAbsoluteChangedInBlockPower(ctx, absPowerDiff); err != nil {
