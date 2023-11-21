@@ -38,12 +38,7 @@ func (am AppModule) BeginBlocker(ctx context.Context) error {
 
 	// if it is not a genTx, reset values to the expected
 	if sdkCtx.BlockHeight() > 1 {
-		currValPower, err := am.keeper.GetStakingKeeper().GetLastTotalPower(ctx)
-		if err != nil {
-			return err
-		}
-
-		if err := am.resetCachedTotalPower(ctx, currValPower.Uint64()); err != nil {
+		if err := am.resetCachedTotalPower(ctx); err != nil {
 			return err
 		}
 
@@ -56,14 +51,19 @@ func (am AppModule) BeginBlocker(ctx context.Context) error {
 }
 
 // resetCachedTotalPower resets the cached total power to the new TotalPower index.
-func (am AppModule) resetCachedTotalPower(ctx context.Context, currValPower uint64) error {
+func (am AppModule) resetCachedTotalPower(ctx context.Context) error {
+	currValPower, err := am.keeper.GetStakingKeeper().GetLastTotalPower(ctx)
+	if err != nil {
+		return err
+	}
+
 	prev, err := am.keeper.GetCachedBlockPower(ctx)
 	if err != nil {
 		return err
 	}
 
-	if currValPower != prev {
-		return am.keeper.SetAbsoluteChangedInBlockPower(ctx, currValPower-prev)
+	if currValPower.Uint64() != prev {
+		return am.keeper.SetAbsoluteChangedInBlockPower(ctx, currValPower.Uint64()-prev)
 	}
 
 	return nil

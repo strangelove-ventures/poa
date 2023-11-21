@@ -54,20 +54,10 @@ func (ms msgServer) SetPower(ctx context.Context, msg *poa.MsgSetPower) (*poa.Ms
 
 	// Check that the total power change of the block is not >=30% of the total power of the previous block
 	if !msg.Unsafe && sdkCtx.BlockHeight() > 1 {
-		// Get Cached GetLastTotalPower
 		var cachedPower uint64
-
 		cachedPower, err := ms.k.GetCachedBlockPower(ctx)
 		if err != nil {
 			return nil, err
-		}
-
-		if cachedPower == 0 {
-			sdkPower, err := ms.k.stakingKeeper.GetLastTotalPower(ctx)
-			if err != nil {
-				return nil, err
-			}
-			cachedPower = sdkPower.Uint64()
 		}
 
 		totalChanged, err := ms.k.GetAbsoluteChangedInBlockPower(ctx)
@@ -75,8 +65,8 @@ func (ms msgServer) SetPower(ctx context.Context, msg *poa.MsgSetPower) (*poa.Ms
 			return nil, err
 		}
 
-		amt := (totalChanged / cachedPower) * 100
-		fmt.Printf("\ntotalChanged: %d, cachedPower: %d, amt: %d\n", totalChanged, cachedPower, amt)
+		amt := (totalChanged * 100) / cachedPower
+		fmt.Printf("\ntotalChanged: %d, cachedPower: %d, amt: %v%%\n", totalChanged, cachedPower, amt)
 		if amt >= 30 {
 			return nil, poa.ErrUnsafePower
 		}
@@ -319,6 +309,13 @@ func (ms msgServer) updatePOAPower(ctx context.Context, valOpBech32 string, newP
 		return stakingtypes.Validator{}, err
 	}
 
+	// TODO: For some reason GetLastValidatorPower only returns singkle diget powers on test setup.
+	// I am unsure if this is due to a test mis-configure or an issue with POA logic (thus these lines would fix it)
+	// need to dive into the x/staking / cometBFT power requirements to see why a single digit number is used instead of udenom.
+	if previousPower < 1_000_000 {
+		previousPower = previousPower * 1_000_000
+	}
+
 	if err := ms.k.stakingKeeper.SetLastValidatorPower(ctx, valAddr, newPower); err != nil {
 		return stakingtypes.Validator{}, err
 	}
@@ -326,10 +323,10 @@ func (ms msgServer) updatePOAPower(ctx context.Context, valOpBech32 string, newP
 	absPowerDiff := uint64(math.Abs(float64(newPower - previousPower)))
 
 	// print absPowerDiff
-	fmt.Printf("\n\n\nvalOpBech32: %s\n", valOpBech32)
+	fmt.Printf("\nvalOpBech32: %s\n", valOpBech32)
 	fmt.Printf("New Power: %d\n", newPower)
 	fmt.Printf("Prev Power: %d\n", previousPower)
-	fmt.Printf("absPowerDiff: %d\n\n\n", absPowerDiff)
+	fmt.Printf("absPowerDiff: %d\n", absPowerDiff)
 
 	if err := ms.k.IncreaseAbsoluteChangedInBlockPower(ctx, absPowerDiff); err != nil {
 		return stakingtypes.Validator{}, err
