@@ -82,7 +82,7 @@ func testUpdatePOAParams(t *testing.T, ctx context.Context, chain *cosmos.Cosmos
 		txRes, err := chain.GetTransaction(tx.Txhash)
 		require.NoError(t, err)
 		fmt.Printf("%+v", txRes)
-		require.EqualValue(t, txRes.Code, 3)
+		require.EqualValues(t, txRes.Code, 3)
 
 		sp := helpers.GetStakingParams(t, ctx, chain)
 		fmt.Printf("%+v", sp)
