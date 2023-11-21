@@ -62,14 +62,14 @@ func TestPOA(t *testing.T) {
 func testUpdatePOAParams(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, validators []string, acc0, incorrectUser ibc.Wallet) {
 	var tx helpers.TxResponse
 	var err error
-	var txRes helpers.TxResponse
 
 	t.Run("fail: update-params message from a non authorized user", func(t *testing.T) {
 		tx, err = helpers.POAUpdateParams(t, ctx, chain, incorrectUser, []string{incorrectUser.FormattedAddress()})
 		if err != nil {
 			t.Fatal(err)
 		}
-		txRes = helpers.GetTxHash(t, ctx, chain, tx.Txhash)
+		txRes, err := chain.GetTransaction(tx.Txhash)
+		require.NoError(t, err)
 		fmt.Printf("%+v", txRes)
 		require.Contains(t, txRes.RawLog, poa.ErrNotAnAuthority.Error())
 	})
@@ -79,7 +79,8 @@ func testUpdatePOAParams(t *testing.T, ctx context.Context, chain *cosmos.Cosmos
 		if err != nil {
 			t.Fatal(err)
 		}
-		txRes = helpers.GetTxHash(t, ctx, chain, tx.Txhash)
+		txRes, err := chain.GetTransaction(tx.Txhash)
+		require.NoError(t, err)
 		fmt.Printf("%+v", txRes)
 		require.Equal(t, txRes.Code, 3)
 
@@ -101,7 +102,8 @@ func testUpdatePOAParams(t *testing.T, ctx context.Context, chain *cosmos.Cosmos
 			t.Fatal(err)
 		}
 
-		txRes = helpers.GetTxHash(t, ctx, chain, tx.Txhash)
+		txRes, err := chain.GetTransaction(tx.Txhash)
+		require.NoError(t, err)
 		fmt.Printf("%+v", txRes)
 		require.Equal(t, txRes.Code, 0)
 
@@ -119,7 +121,8 @@ func testUpdatePOAParams(t *testing.T, ctx context.Context, chain *cosmos.Cosmos
 		if err != nil {
 			t.Fatal(err)
 		}
-		txRes = helpers.GetTxHash(t, ctx, chain, tx.Txhash)
+		txRes, err := chain.GetTransaction(tx.Txhash)
+		require.NoError(t, err)
 		fmt.Printf("%+v", txRes)
 		require.Equal(t, txRes.Code, 0)
 
@@ -203,8 +206,9 @@ func testPowerErrors(t *testing.T, ctx context.Context, chain *cosmos.CosmosChai
 
 	t.Run("fail: set-power message from a non authorized user", func(t *testing.T) {
 		res, _ = helpers.POASetPower(t, ctx, chain, incorrectUser, validators[1], 1_000_000)
-		txRes := helpers.GetTxHash(t, ctx, chain, res.Txhash)
-		require.Contains(t, txRes.RawLog, poa.ErrNotAnAuthority.Error())
+		res, err := chain.GetTransaction(res.Txhash)
+		require.NoError(t, err)
+		require.Contains(t, res.RawLog, poa.ErrNotAnAuthority.Error())
 	})
 
 	t.Run("fail: set-power message below minimum power requirement (self bond)", func(t *testing.T) {
@@ -215,7 +219,8 @@ func testPowerErrors(t *testing.T, ctx context.Context, chain *cosmos.CosmosChai
 
 	t.Run("fail: set-power message above 30%% without unsafe flag", func(t *testing.T) {
 		res, _ = helpers.POASetPower(t, ctx, chain, admin, validators[0], 9_000_000_000_000_000)
-		res = helpers.GetTxHash(t, ctx, chain, res.Txhash)
+		res, err := chain.GetTransaction(res.Txhash)
+		require.NoError(t, err)
 		require.Contains(t, res.RawLog, poa.ErrUnsafePower.Error())
 	})
 }
