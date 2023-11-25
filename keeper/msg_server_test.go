@@ -38,12 +38,21 @@ func TestUpdateParams(t *testing.T) {
 			expectErrMsg: "not an authority",
 		},
 		{
-			name: "set valid params",
+			name: "set invalid admins",
 			request: &poa.MsgUpdateParams{
 				Sender: f.govModAddr,
 				Params: poa.Params{},
 			},
-			expectErrMsg: "",
+			expectErrMsg: poa.ErrMustProvideAtLeastOneAddress.Error(),
+		},
+		{
+			name: "set valid params",
+			request: &poa.MsgUpdateParams{
+				Sender: f.govModAddr,
+				Params: poa.Params{
+					Admins: []string{f.addrs[0].String()},
+				},
+			},
 		},
 	}
 

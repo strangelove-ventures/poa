@@ -150,6 +150,10 @@ func NewUpdateParamsCmd() *cobra.Command {
 				},
 			}
 
+			if err := msg.Params.Validate(); err != nil {
+				return fmt.Errorf("msg.Params.Validate failed: %w", err)
+			}
+
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}

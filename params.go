@@ -61,6 +61,10 @@ func (p Params) String() string {
 
 // Validate does the sanity check on the params.
 func (p Params) Validate() error {
+	if len(p.Admins) == 0 {
+		return ErrMustProvideAtLeastOneAddress
+	}
+
 	for _, auth := range p.Admins {
 		if _, err := sdk.AccAddressFromBech32(auth); err != nil {
 			return err
