@@ -5,6 +5,15 @@ DOCKER := $(shell which docker)
 export GO111MODULE = on
 
 ####################
+###   Building  ####
+####################
+
+include simapp/Makefile
+
+install:
+	$(MAKE) -C simapp/ install
+
+####################
 ###   Testing   ####
 ####################
 
