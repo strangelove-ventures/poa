@@ -35,7 +35,8 @@ type MsgClient interface {
 	// SetPower sets the new power of a validator.
 	// This also doubles as a way to accept pending validators
 	SetPower(ctx context.Context, in *MsgSetPower, opts ...grpc.CallOption) (*MsgSetPowerResponse, error)
-	// RemoveValidator removes a validator from the active set and unbonds their delegations.
+	// RemoveValidator removes a validator from the active set and unbonds their
+	// delegations.
 	RemoveValidator(ctx context.Context, in *MsgRemoveValidator, opts ...grpc.CallOption) (*MsgRemoveValidatorResponse, error)
 	// UpdateParams updates the module parameters.
 	UpdateParams(ctx context.Context, in *MsgUpdateParams, opts ...grpc.CallOption) (*MsgUpdateParamsResponse, error)
@@ -105,7 +106,8 @@ type MsgServer interface {
 	// SetPower sets the new power of a validator.
 	// This also doubles as a way to accept pending validators
 	SetPower(context.Context, *MsgSetPower) (*MsgSetPowerResponse, error)
-	// RemoveValidator removes a validator from the active set and unbonds their delegations.
+	// RemoveValidator removes a validator from the active set and unbonds their
+	// delegations.
 	RemoveValidator(context.Context, *MsgRemoveValidator) (*MsgRemoveValidatorResponse, error)
 	// UpdateParams updates the module parameters.
 	UpdateParams(context.Context, *MsgUpdateParams) (*MsgUpdateParamsResponse, error)

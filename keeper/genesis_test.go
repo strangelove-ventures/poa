@@ -18,8 +18,7 @@ func TestInitGenesis(t *testing.T) {
 
 	t.Run("default params", func(t *testing.T) {
 		data := &poa.GenesisState{
-			PendingValidators: []poa.Validator{},
-			Params:            poa.DefaultParams(),
+			Params: poa.DefaultParams(),
 		}
 		err := fixture.k.InitGenesis(fixture.ctx, data)
 		require.NoError(err)
@@ -35,8 +34,7 @@ func TestInitGenesis(t *testing.T) {
 		require.NoError(err)
 
 		data := &poa.GenesisState{
-			PendingValidators: []poa.Validator{},
-			Params:            p,
+			Params: p,
 		}
 		err = fixture.k.InitGenesis(fixture.ctx, data)
 		require.NoError(err)
@@ -59,17 +57,15 @@ func TestInitGenesis(t *testing.T) {
 		val.Tokens = sdkmath.NewInt(1_234_567)
 
 		err = fixture.k.InitGenesis(fixture.ctx, &poa.GenesisState{
-			PendingValidators: []poa.Validator{
-				poa.ConvertStakingToPOA(val),
-			},
 			Params: p,
 		})
 		require.NoError(err)
 
-		exported := fixture.k.ExportGenesis(fixture.ctx)
-		require.Equal(1, len(exported.PendingValidators))
-		require.Equal(valAddr.String(), exported.PendingValidators[0].OperatorAddress)
-		require.Equal(val.Tokens, exported.PendingValidators[0].Tokens)
+		// load params
+		params, err := fixture.k.GetParams(fixture.ctx)
+		require.NoError(err)
+
+		require.Equal(p, params)
 	})
 
 }

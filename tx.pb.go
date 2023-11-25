@@ -288,7 +288,7 @@ type MsgUpdateStakingParams struct {
 	// sender is the address of the admin account with permission to update.
 	// ex: governance, multisig/DAO, or standard account found in Params.
 	Sender string `protobuf:"bytes,1,opt,name=sender,proto3" json:"sender,omitempty"`
-	//x/staking  module parameters (all must be supplied).
+	// x/staking  module parameters (all must be supplied).
 	Params StakingParams `protobuf:"bytes,2,opt,name=params,proto3" json:"params"`
 }
 
@@ -384,8 +384,8 @@ type MsgCreateValidator struct {
 	Commission        CommissionRates       `protobuf:"bytes,2,opt,name=commission,proto3" json:"commission"`
 	MinSelfDelegation cosmossdk_io_math.Int `protobuf:"bytes,3,opt,name=min_self_delegation,json=minSelfDelegation,proto3,customtype=cosmossdk.io/math.Int" json:"min_self_delegation"`
 	// Deprecated: Use of Delegator Address in MsgCreateValidator is deprecated.
-	// The validator address bytes and delegator address bytes refer to the same account while creating validator (defer
-	// only in bech32 notation).
+	// The validator address bytes and delegator address bytes refer to the same
+	// account while creating validator (defer only in bech32 notation).
 	DelegatorAddress string     `protobuf:"bytes,4,opt,name=delegator_address,json=delegatorAddress,proto3" json:"delegator_address,omitempty"` // Deprecated: Do not use.
 	ValidatorAddress string     `protobuf:"bytes,5,opt,name=validator_address,json=validatorAddress,proto3" json:"validator_address,omitempty"`
 	Pubkey           *types.Any `protobuf:"bytes,6,opt,name=pubkey,proto3" json:"pubkey,omitempty"`
@@ -553,7 +553,8 @@ type MsgClient interface {
 	// SetPower sets the new power of a validator.
 	// This also doubles as a way to accept pending validators
 	SetPower(ctx context.Context, in *MsgSetPower, opts ...grpc.CallOption) (*MsgSetPowerResponse, error)
-	// RemoveValidator removes a validator from the active set and unbonds their delegations.
+	// RemoveValidator removes a validator from the active set and unbonds their
+	// delegations.
 	RemoveValidator(ctx context.Context, in *MsgRemoveValidator, opts ...grpc.CallOption) (*MsgRemoveValidatorResponse, error)
 	// UpdateParams updates the module parameters.
 	UpdateParams(ctx context.Context, in *MsgUpdateParams, opts ...grpc.CallOption) (*MsgUpdateParamsResponse, error)
@@ -621,7 +622,8 @@ type MsgServer interface {
 	// SetPower sets the new power of a validator.
 	// This also doubles as a way to accept pending validators
 	SetPower(context.Context, *MsgSetPower) (*MsgSetPowerResponse, error)
-	// RemoveValidator removes a validator from the active set and unbonds their delegations.
+	// RemoveValidator removes a validator from the active set and unbonds their
+	// delegations.
 	RemoveValidator(context.Context, *MsgRemoveValidator) (*MsgRemoveValidatorResponse, error)
 	// UpdateParams updates the module parameters.
 	UpdateParams(context.Context, *MsgUpdateParams) (*MsgUpdateParamsResponse, error)

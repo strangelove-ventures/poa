@@ -13,8 +13,6 @@ option go_package = "github.com/strangelove-ventures/poa";
 message GenesisState {
   // params
   Params params = 1 [ (gogoproto.nullable) = false ];
-  // pending_validators
-  repeated Validator pending_validators = 2 [ (gogoproto.nullable) = false ];
 }
 
 // PendingValidators
