@@ -11,17 +11,17 @@ func (k *Keeper) InitGenesis(ctx context.Context, data *poa.GenesisState) error 
 	return k.SetParams(ctx, data.Params)
 }
 
-// InitStores sets the base cached values from the genesis state in relation to the validator set.
+// InitStores sets the `AbsoluteChangedBlock` and `PreviousBlockPower` as a cache into the poa store.
 func (k *Keeper) InitCacheStores(ctx context.Context) error {
-	// currValPower will be 0 if height is 0 or 1 (gentx)
 	currValPower, err := k.GetStakingKeeper().GetLastTotalPower(ctx)
 	if err != nil {
 		return err
 	}
 
-	currValPower = currValPower.Quo(k.GetStakingKeeper().PowerReduction(ctx))
-
-	if err := k.SetCachedBlockPower(ctx, currValPower.Uint64()); err != nil {
+	// consPower converts the current validator power to a smaller number (divide by 10^6).
+	// This allows the power to match the expected consensus power (Int64 / 8) range.
+	consPower := currValPower.Quo(k.GetStakingKeeper().PowerReduction(ctx))
+	if err := k.SetCachedBlockPower(ctx, consPower.Uint64()); err != nil {
 		return err
 	}
 

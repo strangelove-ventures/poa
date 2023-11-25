@@ -74,7 +74,7 @@ func (ms msgServer) SetPower(ctx context.Context, msg *poa.MsgSetPower) (*poa.Ms
 		ms.k.Logger().Debug("POA SetPower",
 			"totalChanged", totalChanged,
 			"cachedPower", cachedPower,
-			"percent", percent,
+			"percent", fmt.Sprintf("%d%%", percent),
 		)
 		if percent >= 30 {
 			return nil, poa.ErrUnsafePower

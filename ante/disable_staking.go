@@ -11,7 +11,7 @@ import (
 type MsgStakingFilterDecorator struct {
 }
 
-func NewPOAStakingFilterDecorator() MsgStakingFilterDecorator {
+func NewPOADisableStakingDecorator() MsgStakingFilterDecorator {
 	return MsgStakingFilterDecorator{}
 }
 

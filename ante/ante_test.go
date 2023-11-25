@@ -115,7 +115,7 @@ func TestAnteCommissionRanges(t *testing.T) {
 
 func TestAnteStakingFilter(t *testing.T) {
 	ctx := sdk.Context{}
-	sf := NewPOAStakingFilterDecorator()
+	sf := NewPOADisableStakingDecorator()
 
 	blockedMsgs := map[string]sdk.Msg{
 		"CreateStakingValidator":    &stakingtypes.MsgCreateValidator{},

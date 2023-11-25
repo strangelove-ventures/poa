@@ -29,7 +29,6 @@ func TestInitGenesis(t *testing.T) {
 		require.Equal(poa.DefaultParams(), params)
 	})
 
-	// check custom
 	t.Run("custom params", func(t *testing.T) {
 		p, err := poa.NewParams([]string{fixture.addrs[0].String(), fixture.addrs[1].String()})
 		require.NoError(err)
@@ -43,6 +42,11 @@ func TestInitGenesis(t *testing.T) {
 		params, err := fixture.k.GetParams(fixture.ctx)
 		require.NoError(err)
 		require.Equal(p, params)
+	})
+
+	t.Run("bad params", func(t *testing.T) {
+		_, err := poa.NewParams(nil)
+		require.Error(err)
 	})
 
 	t.Run("pending validator export", func(t *testing.T) {
