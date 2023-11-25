@@ -300,7 +300,6 @@ func (ms msgServer) acceptNewValidator(ctx context.Context, operatingAddress str
 // updatePOAPower removes all delegations, sets a single delegation for POA power, updates the validator with the new shares
 // and sets the last validator power to the new value.
 func (ms msgServer) updatePOAPower(ctx context.Context, valOpBech32 string, newShares int64) (stakingtypes.Validator, error) {
-
 	powerReduction := ms.k.stakingKeeper.PowerReduction(ctx)
 	newConsensusPower := newShares / powerReduction.Int64()
 

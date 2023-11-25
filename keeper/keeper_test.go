@@ -8,7 +8,6 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 
-	sdkmath "cosmossdk.io/math"
 	abci "github.com/cometbft/cometbft/abci/types"
 
 	addresscodec "github.com/cosmos/cosmos-sdk/codec/address"
@@ -32,7 +31,7 @@ import (
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
 	"cosmossdk.io/log"
-	"cosmossdk.io/math"
+	sdkmath "cosmossdk.io/math"
 	storetypes "cosmossdk.io/store/types"
 
 	"github.com/strangelove-ventures/poa"
@@ -138,7 +137,7 @@ func GenAcc() valSetup {
 func (f *testFixture) createBaseStakingValidators(t *testing.T, baseValShares int64) {
 	t.Helper()
 	require := require.New(t)
-	bondCoin := sdk.NewCoin("stake", math.NewInt(baseValShares))
+	bondCoin := sdk.NewCoin("stake", sdkmath.NewInt(baseValShares))
 
 	vals := []valSetup{
 		GenAcc(),
@@ -225,15 +224,15 @@ func CreateNewValidator(moniker string, opAddr string, pubKey cryptotypes.PubKey
 		ConsensusPubkey: pkAny,
 		Jailed:          false,
 		Status:          poa.Bonded,
-		Tokens:          math.NewInt(amt),
-		DelegatorShares: math.LegacyNewDecFromInt(math.NewInt(amt)),
+		Tokens:          sdkmath.NewInt(amt),
+		DelegatorShares: sdkmath.LegacyNewDecFromInt(sdkmath.NewInt(amt)),
 		Description:     poa.NewDescription(moniker, "", "", "", ""),
 		UnbondingHeight: 0,
 		UnbondingTime:   time.Time{},
 		Commission: poa.Commission{
-			CommissionRates: poa.NewCommissionRates(math.LegacyZeroDec(), math.LegacyZeroDec(), math.LegacyZeroDec()),
+			CommissionRates: poa.NewCommissionRates(sdkmath.LegacyZeroDec(), sdkmath.LegacyZeroDec(), sdkmath.LegacyZeroDec()),
 		},
-		MinSelfDelegation:       math.OneInt(),
+		MinSelfDelegation:       sdkmath.OneInt(),
 		UnbondingOnHoldRefCount: 0,
 		UnbondingIds:            nil,
 	}
