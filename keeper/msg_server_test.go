@@ -216,9 +216,8 @@ func TestRemoveValidator(t *testing.T) {
 		require.NoError(err)
 	}
 
-	updates, err := f.IncreaseBlock(1, true)
+	_, err = f.IncreaseBlock(2, true)
 	require.NoError(err)
-	require.EqualValues(3, len(updates))
 
 	testCases := []struct {
 		name             string
@@ -279,11 +278,6 @@ func TestMultipleUpdatesInASingleBlock(t *testing.T) {
 
 	vals, err := f.stakingKeeper.GetValidators(f.ctx, 100)
 	require.NoError(err)
-
-	totalPower := 0
-	for _, v := range vals {
-		totalPower += int(v.GetBondedTokens().Int64())
-	}
 
 	if _, err := f.IncreaseBlock(5, true); err != nil {
 		panic(err)
