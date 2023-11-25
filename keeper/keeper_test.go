@@ -94,7 +94,7 @@ func SetupTest(t *testing.T, baseValShares int64) *testFixture {
 	err = s.slashingKeeper.SetParams(s.ctx, slashingtypes.DefaultParams())
 	require.NoError(err)
 
-	s.k = keeper.NewKeeper(encCfg.Codec, storeService, s.stakingKeeper, s.slashingKeeper, addresscodec.NewBech32Codec("cosmosvaloper"))
+	s.k = keeper.NewKeeper(encCfg.Codec, storeService, s.stakingKeeper, s.slashingKeeper, addresscodec.NewBech32Codec("cosmosvaloper"), logger)
 	s.msgServer = keeper.NewMsgServerImpl(s.k)
 	s.queryServer = keeper.NewQueryServerImpl(s.k)
 	s.appModule = poamodule.NewAppModule(encCfg.Codec, s.k)
@@ -266,7 +266,7 @@ func (f *testFixture) IncreaseBlock(amt int64, debug ...bool) ([]abci.ValidatorU
 
 		allUpdates = append(allUpdates, updates...)
 		if len(debug) > 0 && debug[0] && len(updates) > 0 {
-			fmt.Printf("\nIncreaseBlock(...) updates: %+v\n", updates)
+			f.k.Logger().Debug("IncreaseBlock(...) updates", "updates", updates)
 		}
 
 		if err := f.appModule.BeginBlock(f.ctx); err != nil {

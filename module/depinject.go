@@ -1,12 +1,16 @@
 package module
 
 import (
+	"os"
+
 	"cosmossdk.io/core/address"
 	"cosmossdk.io/core/appmodule"
 	"cosmossdk.io/core/store"
 	"cosmossdk.io/depinject"
 
 	"github.com/cosmos/cosmos-sdk/codec"
+
+	"cosmossdk.io/log"
 
 	slashingkeeper "github.com/cosmos/cosmos-sdk/x/slashing/keeper"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
@@ -48,7 +52,7 @@ type ModuleOutputs struct {
 }
 
 func ProvideModule(in ModuleInputs) ModuleOutputs {
-	k := keeper.NewKeeper(in.Cdc, in.StoreService, &in.StakingKeeper, in.SlashingKeeper, in.AddressCodec)
+	k := keeper.NewKeeper(in.Cdc, in.StoreService, &in.StakingKeeper, in.SlashingKeeper, in.AddressCodec, log.NewLogger(os.Stderr))
 	m := NewAppModule(in.Cdc, k)
 
 	return ModuleOutputs{Module: m, Keeper: k, Out: depinject.Out{}}

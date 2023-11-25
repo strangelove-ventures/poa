@@ -66,7 +66,12 @@ func (ms msgServer) SetPower(ctx context.Context, msg *poa.MsgSetPower) (*poa.Ms
 		}
 
 		amt := (totalChanged * 100) / cachedPower
-		fmt.Printf("\ntotalChanged: %d, cachedPower: %d, amt: %v%%\n", totalChanged, cachedPower, amt)
+		ms.k.Logger().Debug("POA SetPower",
+			"totalChanged", totalChanged,
+			"cachedPower", cachedPower,
+			"amt", amt,
+		)
+
 		if amt >= 30 {
 			return nil, poa.ErrUnsafePower
 		}
@@ -313,7 +318,7 @@ func (ms msgServer) updatePOAPower(ctx context.Context, valOpBech32 string, newP
 	// I am unsure if this is due to a test mis-configure or an issue with POA logic (thus these lines would fix it)
 	// need to dive into the x/staking / cometBFT power requirements to see why a single digit number is used instead of udenom.
 	if previousPower < 1_000_000 {
-		previousPower = previousPower * 1_000_000
+		previousPower *= 1_000_000
 	}
 
 	if err := ms.k.stakingKeeper.SetLastValidatorPower(ctx, valAddr, newPower); err != nil {
@@ -322,7 +327,7 @@ func (ms msgServer) updatePOAPower(ctx context.Context, valOpBech32 string, newP
 
 	absPowerDiff := uint64(math.Abs(float64(newPower - previousPower)))
 
-	ms.k.Logger(ctx).Debug("POA updatePOAPower",
+	ms.k.Logger().Debug("POA updatePOAPower",
 		"valOpBech32", valOpBech32,
 		"New Power", newPower,
 		"Prev Power", previousPower,
