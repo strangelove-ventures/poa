@@ -2,9 +2,7 @@ package keeper
 
 import (
 	"context"
-	"fmt"
 
-	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	"github.com/strangelove-ventures/poa"
 )
 
@@ -12,19 +10,6 @@ import (
 func (k *Keeper) InitGenesis(ctx context.Context, data *poa.GenesisState) error {
 	if err := k.SetParams(ctx, data.Params); err != nil {
 		return err
-	}
-
-	for _, val := range data.PendingValidators {
-		stakingValidator := poa.ConvertPOAToStaking(val)
-
-		pk, ok := stakingValidator.ConsensusPubkey.GetCachedValue().(cryptotypes.PubKey)
-		if !ok {
-			return fmt.Errorf("expecting cryptotypes.PubKey, got %T", pk)
-		}
-
-		if err := k.AddPendingValidator(ctx, stakingValidator, pk); err != nil {
-			return err
-		}
 	}
 
 	return nil
@@ -55,13 +40,7 @@ func (k *Keeper) ExportGenesis(ctx context.Context) *poa.GenesisState {
 		panic(err)
 	}
 
-	pendingVals, err := k.GetPendingValidators(ctx)
-	if err != nil {
-		panic(err)
-	}
-
 	return &poa.GenesisState{
-		Params:            params,
-		PendingValidators: pendingVals.Validators,
+		Params: params,
 	}
 }
