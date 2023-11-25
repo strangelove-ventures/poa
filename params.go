@@ -24,11 +24,7 @@ func NewParams(admins []string) (Params, error) {
 		Admins: admins,
 	}
 
-	if err := p.Validate(); err != nil {
-		return Params{}, err
-	}
-
-	return p, nil
+	return p, p.Validate()
 }
 
 // DefaultParams returns the default x/staking parameters.

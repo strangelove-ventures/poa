@@ -13,7 +13,6 @@ var (
 )
 
 // NewMsgCreateValidator creates a new MsgCreateValidator instance.
-// Delegator address and validator address are the same.
 func NewMsgCreateValidator(
 	valAddr string, pubKey cryptotypes.PubKey, description Description, commission CommissionRates, minSelfDelegation math.Int,
 ) (*MsgCreateValidator, error) {
