@@ -159,11 +159,22 @@ func testRemoveValidator(t *testing.T, ctx context.Context, chain *cosmos.Cosmos
 	powerTwo := int64(2_500_000)
 
 	helpers.POASetPower(t, ctx, chain, acc0, validators[0], powerOne, "--unsafe")
-	helpers.POASetPower(t, ctx, chain, acc0, validators[1], powerTwo)
+	res, err := helpers.POASetPower(t, ctx, chain, acc0, validators[1], powerTwo, "--unsafe")
+	require.NoError(t, err)
+	fmt.Printf("%+v", res)
+
+	// decode res.TxHash into a TxResponse
+	txRes, err := chain.GetTransaction(res.Txhash)
+	require.NoError(t, err)
+	fmt.Printf("%+v", txRes)
+
+	if err := testutil.WaitForBlocks(ctx, 2, chain); err != nil {
+		t.Fatal(err)
+	}
 
 	vals := helpers.GetValidators(t, ctx, chain).Validators
-	require.Equal(t, vals[0].Tokens, fmt.Sprintf("%d", powerOne))
-	require.Equal(t, vals[1].Tokens, fmt.Sprintf("%d", powerTwo))
+	require.Equal(t, fmt.Sprintf("%d", powerOne), vals[0].Tokens)
+	require.Equal(t, fmt.Sprintf("%d", powerTwo), vals[1].Tokens)
 
 	// remove the 2nd validator (lower power)
 	helpers.POARemove(t, ctx, chain, acc0, validators[1])
@@ -174,9 +185,9 @@ func testRemoveValidator(t *testing.T, ctx context.Context, chain *cosmos.Cosmos
 	}
 
 	vals = helpers.GetValidators(t, ctx, chain).Validators
-	require.Equal(t, vals[0].Tokens, fmt.Sprintf("%d", powerOne))
-	require.Equal(t, vals[1].Tokens, "0")
-	require.Equal(t, vals[1].Status, 1) // 1 = unbonded
+	require.Equal(t, fmt.Sprintf("%d", powerOne), vals[0].Tokens)
+	require.Equal(t, "0", vals[1].Tokens)
+	require.Equal(t, 1, vals[1].Status) // 1 = unbonded
 
 	// only 1 validator is signing now
 	assertSignatures(t, ctx, chain, 1)

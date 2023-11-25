@@ -65,9 +65,9 @@ func (ms msgServer) SetPower(ctx context.Context, msg *poa.MsgSetPower) (*poa.Ms
 			return nil, err
 		}
 
-		amt := (totalChanged * 100) / cachedPower
-		fmt.Printf("\ntotalChanged: %d, cachedPower: %d, amt: %v%%\n", totalChanged, cachedPower, amt)
-		if amt >= 30 {
+		percent := (totalChanged * 100) / cachedPower
+		fmt.Printf("\ntotalChanged: %d, cachedPower: %d, amt: %v%%\n", totalChanged, cachedPower, percent)
+		if percent >= 30 {
 			return nil, poa.ErrUnsafePower
 		}
 	}
@@ -331,14 +331,14 @@ func (ms msgServer) updatePOAPower(ctx context.Context, valOpBech32 string, newS
 		return stakingtypes.Validator{}, err
 	}
 
-	if err := ms.updateValidatorSet(ctx, newShares, val, valAddr); err != nil {
+	if err := ms.updateValidatorSet(ctx, newShares, newConsensusPower, val, valAddr); err != nil {
 		return stakingtypes.Validator{}, err
 	}
 
 	return val, nil
 }
 
-func (ms msgServer) updateValidatorSet(ctx context.Context, newShares int64, val stakingtypes.Validator, valAddr sdk.ValAddress) error {
+func (ms msgServer) updateValidatorSet(ctx context.Context, newShares, newConsensusPower int64, val stakingtypes.Validator, valAddr sdk.ValAddress) error {
 	sdkContext := sdk.UnwrapSDKContext(ctx)
 
 	newShare := sdkmath.LegacyNewDec(newShares)
@@ -369,8 +369,6 @@ func (ms msgServer) updateValidatorSet(ctx context.Context, newShares int64, val
 		return err
 	}
 
-	powerReduction := ms.k.stakingKeeper.PowerReduction(ctx)
-	newConsensusPower := newShares / powerReduction.Int64()
 	if err := ms.k.stakingKeeper.SetLastValidatorPower(ctx, valAddr, newConsensusPower); err != nil {
 		return err
 	}
