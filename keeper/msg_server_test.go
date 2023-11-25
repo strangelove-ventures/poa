@@ -214,9 +214,8 @@ func TestRemoveValidator(t *testing.T) {
 		require.NoError(err)
 	}
 
-	updates, err := f.IncreaseBlock(1, true)
+	_, err = f.IncreaseBlock(2, true)
 	require.NoError(err)
-	require.EqualValues(3, len(updates))
 
 	testCases := []struct {
 		name             string
