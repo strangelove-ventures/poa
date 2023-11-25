@@ -20,22 +20,18 @@ func DefaultParams() Params {
 
 // NewParams returns a new POA Params.
 func NewParams(admins []string) (Params, error) {
-	if len(admins) == 0 {
-		return Params{}, ErrMustProvideAtLeastOneAddress
-	}
-
-	for _, address := range admins {
-		if _, err := sdk.AccAddressFromBech32(address); err != nil {
-			return Params{}, err
-		}
-	}
-
-	return Params{
+	p := Params{
 		Admins: admins,
-	}, nil
+	}
+
+	if err := p.Validate(); err != nil {
+		return Params{}, err
+	}
+
+	return p, nil
 }
 
-// DefaultParams returns default x/staking parameters.
+// DefaultParams returns the default x/staking parameters.
 func DefaultStakingParams() StakingParams {
 	sp := stakingtypes.DefaultParams()
 
@@ -49,7 +45,7 @@ func DefaultStakingParams() StakingParams {
 	}
 }
 
-// add the stringer method for Params
+// Stringer method for Params.
 func (p Params) String() string {
 	bz, err := json.Marshal(p)
 	if err != nil {

@@ -11,7 +11,6 @@ import (
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
-	"cosmossdk.io/errors"
 	errorsmod "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
 
@@ -63,7 +62,7 @@ func (ms msgServer) SetPower(ctx context.Context, msg *poa.MsgSetPower) (*poa.Ms
 		}
 
 		if cachedPower == 0 {
-			return nil, errors.Wrapf(poa.ErrUnsafePower, "cached power is 0")
+			return nil, errorsmod.Wrapf(poa.ErrUnsafePower, "cached power is 0")
 		}
 
 		totalChanged, err := ms.k.GetAbsoluteChangedInBlockPower(ctx)
