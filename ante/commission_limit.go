@@ -5,6 +5,7 @@ import (
 
 	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/x/authz"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/strangelove-ventures/poa"
 )
@@ -44,11 +45,24 @@ func (mcl MsgCommissionLimiterDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, 
 
 func (mcl MsgCommissionLimiterDecorator) hasInvalidCommissionRange(msgs []sdk.Msg) error {
 	for _, msg := range msgs {
+		// authz nested message check (recursive)
+		if execMsg, ok := msg.(*authz.MsgExec); ok {
+			msgs, err := execMsg.GetMessages()
+			if err != nil {
+				return err
+			}
+
+			err = mcl.hasInvalidCommissionRange(msgs)
+			if err != nil {
+				return err
+			}
+		}
+
 		switch msg := msg.(type) {
 		// Create Validator POA wrapper
 		case *poa.MsgCreateValidator:
 			return rateCheck(msg.Commission.Rate, mcl.RateFloor, mcl.RateCeil)
-		// editing the validator through staking (no POA edit)
+		// Editing the validator through staking (no POA edit)
 		case *stakingtypes.MsgEditValidator:
 			return rateCheck(*msg.CommissionRate, mcl.RateFloor, mcl.RateCeil)
 		}
