@@ -10,6 +10,7 @@ import (
 
 	abci "github.com/cometbft/cometbft/abci/types"
 
+	"cosmossdk.io/core/store"
 	addresscodec "github.com/cosmos/cosmos-sdk/codec/address"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
@@ -39,15 +40,13 @@ import (
 	poamodule "github.com/strangelove-ventures/poa/module"
 )
 
-var (
-	maccPerms = map[string][]string{
-		authtypes.FeeCollectorName:     nil,
-		stakingtypes.BondedPoolName:    {authtypes.Burner, authtypes.Staking},
-		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
-		govtypes.ModuleName:            {authtypes.Burner},
-		poa.ModuleName:                 {authtypes.Minter},
-	}
-)
+var maccPerms = map[string][]string{
+	authtypes.FeeCollectorName:     nil,
+	stakingtypes.BondedPoolName:    {authtypes.Burner, authtypes.Staking},
+	stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
+	govtypes.ModuleName:            {authtypes.Burner},
+	poa.ModuleName:                 {authtypes.Minter},
+}
 
 type testFixture struct {
 	suite.Suite
@@ -69,51 +68,92 @@ type testFixture struct {
 
 func SetupTest(t *testing.T, baseValShares int64) *testFixture {
 	t.Helper()
-	s := new(testFixture)
+	f := new(testFixture)
 	require := require.New(t)
 
+	// Base setup
 	logger := log.NewTestLogger(t)
-	s.govModAddr = authtypes.NewModuleAddress(govtypes.ModuleName).String()
-
 	encCfg := moduletestutil.MakeTestEncodingConfig()
+
+	f.govModAddr = authtypes.NewModuleAddress(govtypes.ModuleName).String()
+	f.addrs = simtestutil.CreateIncrementalAccounts(3)
+
 	key := storetypes.NewKVStoreKey(poa.ModuleName)
-	testCtx := testutil.DefaultContextWithDB(t, key, storetypes.NewTransientStoreKey("transient_test"))
-	s.ctx = testCtx.Ctx
-
 	storeService := runtime.NewKVStoreService(key)
-	s.addrs = simtestutil.CreateIncrementalAccounts(3)
+	testCtx := testutil.DefaultContextWithDB(t, key, storetypes.NewTransientStoreKey("transient_test"))
 
-	s.accountkeeper = authkeeper.NewAccountKeeper(encCfg.Codec, storeService, authtypes.ProtoBaseAccount, maccPerms, authcodec.NewBech32Codec(sdk.Bech32MainPrefix), sdk.Bech32MainPrefix, s.govModAddr)
-	s.bankkeeper = bankkeeper.NewBaseKeeper(encCfg.Codec, storeService, s.accountkeeper, nil, s.govModAddr, logger)
+	f.ctx = testCtx.Ctx
 
-	bankkeeper.NewMsgServerImpl(s.bankkeeper)
+	// Register SDK modules.
+	registerBaseSDKModules(f, encCfg, storeService, logger, require)
 
-	s.stakingKeeper = stakingkeeper.NewKeeper(encCfg.Codec, storeService, s.accountkeeper, s.bankkeeper, s.govModAddr, authcodec.NewBech32Codec(sdk.Bech32PrefixValAddr), authcodec.NewBech32Codec(sdk.Bech32PrefixConsAddr))
-	err := s.stakingKeeper.SetParams(s.ctx, stakingtypes.DefaultParams())
-	require.NoError(err)
-
-	s.slashingKeeper = slashingkeeper.NewKeeper(encCfg.Codec, encCfg.Amino, storeService, s.stakingKeeper, authtypes.NewModuleAddress(govtypes.ModuleName).String())
-	err = s.slashingKeeper.SetParams(s.ctx, slashingtypes.DefaultParams())
-	require.NoError(err)
-
-	s.k = keeper.NewKeeper(encCfg.Codec, storeService, s.stakingKeeper, s.slashingKeeper, addresscodec.NewBech32Codec("cosmosvaloper"), logger)
-	s.msgServer = keeper.NewMsgServerImpl(s.k)
-	s.queryServer = keeper.NewQueryServerImpl(s.k)
-	s.appModule = poamodule.NewAppModule(encCfg.Codec, s.k)
+	// Setup POA Keeper.
+	f.k = keeper.NewKeeper(encCfg.Codec, storeService, f.stakingKeeper, f.slashingKeeper, addresscodec.NewBech32Codec(sdk.Bech32PrefixValAddr), logger)
+	f.msgServer = keeper.NewMsgServerImpl(f.k)
+	f.queryServer = keeper.NewQueryServerImpl(f.k)
+	f.appModule = poamodule.NewAppModule(encCfg.Codec, f.k)
 
 	// register interfaces
+	registerModuleInterfaces(encCfg)
+
+	// set POA genesis state
+	genState := poa.NewGenesisState()
+	genState.Params.Admins = []string{f.addrs[0].String(), f.govModAddr}
+	err := f.k.InitGenesis(f.ctx, genState)
+	require.NoError(err)
+
+	f.createBaseStakingValidators(t, baseValShares)
+	return f
+}
+
+func registerBaseSDKModules(
+	f *testFixture,
+	encCfg moduletestutil.TestEncodingConfig,
+	storeService store.KVStoreService,
+	logger log.Logger,
+	require *require.Assertions,
+) {
+	// Auth Keeper.
+	f.accountkeeper = authkeeper.NewAccountKeeper(
+		encCfg.Codec, storeService,
+		authtypes.ProtoBaseAccount,
+		maccPerms,
+		authcodec.NewBech32Codec(sdk.Bech32MainPrefix), sdk.Bech32MainPrefix,
+		f.govModAddr,
+	)
+
+	// Bank Keeper.
+	f.bankkeeper = bankkeeper.NewBaseKeeper(
+		encCfg.Codec, storeService,
+		f.accountkeeper,
+		nil,
+		f.govModAddr, logger,
+	)
+
+	// Staking Keeper.
+	f.stakingKeeper = stakingkeeper.NewKeeper(
+		encCfg.Codec, storeService,
+		f.accountkeeper, f.bankkeeper, f.govModAddr,
+		authcodec.NewBech32Codec(sdk.Bech32PrefixValAddr),
+		authcodec.NewBech32Codec(sdk.Bech32PrefixConsAddr),
+	)
+	err := f.stakingKeeper.SetParams(f.ctx, stakingtypes.DefaultParams())
+	require.NoError(err)
+
+	// Slashing Keeper.
+	f.slashingKeeper = slashingkeeper.NewKeeper(
+		encCfg.Codec, encCfg.Amino, storeService,
+		f.stakingKeeper,
+		f.govModAddr,
+	)
+	err = f.slashingKeeper.SetParams(f.ctx, slashingtypes.DefaultParams())
+	require.NoError(err)
+}
+
+func registerModuleInterfaces(encCfg moduletestutil.TestEncodingConfig) {
 	authtypes.RegisterInterfaces(encCfg.InterfaceRegistry)
 	stakingtypes.RegisterInterfaces(encCfg.InterfaceRegistry)
 	poa.RegisterInterfaces(encCfg.InterfaceRegistry)
-
-	genState := poa.NewGenesisState()
-	genState.Params.Admins = []string{s.addrs[0].String(), s.govModAddr}
-	err = s.k.InitGenesis(s.ctx, genState)
-	require.NoError(err)
-
-	s.createBaseStakingValidators(t, baseValShares)
-
-	return s
 }
 
 type valSetup struct {
@@ -123,14 +163,12 @@ type valSetup struct {
 }
 
 func GenAcc() valSetup {
-	priv1 := secp256k1.GenPrivKey()
-	addr1 := sdk.AccAddress(priv1.PubKey().Address())
-	valKey1 := ed25519.GenPrivKey()
+	priv := secp256k1.GenPrivKey()
 
 	return valSetup{
-		priv:   priv1,
-		addr:   addr1,
-		valKey: valKey1,
+		priv:   priv,
+		addr:   sdk.AccAddress(priv.PubKey().Address()),
+		valKey: ed25519.GenPrivKey(),
 	}
 }
 
