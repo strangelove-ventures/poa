@@ -10,7 +10,6 @@ import (
 
 	abci "github.com/cometbft/cometbft/abci/types"
 
-	"cosmossdk.io/core/store"
 	addresscodec "github.com/cosmos/cosmos-sdk/codec/address"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
@@ -31,6 +30,7 @@ import (
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
+	"cosmossdk.io/core/store"
 	"cosmossdk.io/log"
 	sdkmath "cosmossdk.io/math"
 	storetypes "cosmossdk.io/store/types"
@@ -103,6 +103,7 @@ func SetupTest(t *testing.T, baseValShares int64) *testFixture {
 	require.NoError(err)
 
 	f.createBaseStakingValidators(t, baseValShares)
+
 	return f
 }
 

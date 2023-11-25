@@ -16,8 +16,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 
-	// appmodule "cosmossdk.io/core/appmodule"
-
 	"github.com/strangelove-ventures/poa"
 	"github.com/strangelove-ventures/poa/client/cli"
 	"github.com/strangelove-ventures/poa/keeper"

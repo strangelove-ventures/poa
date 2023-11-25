@@ -81,6 +81,7 @@ func (k Keeper) RemovePendingValidator(ctx context.Context, valOpAddr string) er
 		if val.OperatorAddress == valOpAddr {
 			vals = append(vals[:i], vals[i+1:]...)
 			pending.Validators = vals
+
 			break
 		}
 	}
