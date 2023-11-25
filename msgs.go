@@ -1,10 +1,10 @@
 package poa
 
 import (
-	"cosmossdk.io/math"
-
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
+
+	"cosmossdk.io/math"
 )
 
 var (
@@ -24,6 +24,7 @@ func NewMsgCreateValidator(
 			return nil, err
 		}
 	}
+
 	return &MsgCreateValidator{
 		Description:       description,
 		ValidatorAddress:  valAddr,
@@ -36,11 +37,13 @@ func NewMsgCreateValidator(
 // UnpackInterfaces implements UnpackInterfacesMessage.UnpackInterfaces
 func (msg MsgCreateValidator) UnpackInterfaces(unpacker codectypes.AnyUnpacker) error {
 	var pubKey cryptotypes.PubKey
+
 	return unpacker.UnpackAny(msg.Pubkey, &pubKey)
 }
 
 // UnpackInterfaces implements UnpackInterfacesMessage.UnpackInterfaces
 func (v Validator) UnpackInterfaces(unpacker codectypes.AnyUnpacker) error {
 	var pk cryptotypes.PubKey
+
 	return unpacker.UnpackAny(v.ConsensusPubkey, &pk)
 }

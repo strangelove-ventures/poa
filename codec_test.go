@@ -28,7 +28,7 @@ func (suite *CodecTestSuite) TestRegisterInterfaces() {
 
 	impls := registry.ListImplementations(sdk.MsgInterfaceProtoName)
 
-	suite.Require().Equal(5, len(impls))
+	suite.Require().Len(impls, 5)
 	suite.Require().ElementsMatch([]string{
 		prefix + "MsgSetPower",
 		prefix + "MsgCreateValidator",

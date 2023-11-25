@@ -3,10 +3,12 @@ package poaante
 import (
 	"fmt"
 
-	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/authz"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+
+	"cosmossdk.io/math"
+
 	"github.com/strangelove-ventures/poa"
 )
 
@@ -66,8 +68,8 @@ func (mcl MsgCommissionLimiterDecorator) hasInvalidCommissionRange(msgs []sdk.Ms
 		case *stakingtypes.MsgEditValidator:
 			return rateCheck(*msg.CommissionRate, mcl.RateFloor, mcl.RateCeil)
 		}
-
 	}
+
 	return nil
 }
 

@@ -4,11 +4,14 @@ import (
 	"fmt"
 	"testing"
 
-	"cosmossdk.io/math"
+	"github.com/stretchr/testify/require"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/staking/types"
+
+	"cosmossdk.io/math"
+
 	"github.com/strangelove-ventures/poa"
-	"github.com/stretchr/testify/require"
 )
 
 func TestUpdateParams(t *testing.T) {
@@ -159,7 +162,6 @@ func TestSetPowerAndCreateValidator(t *testing.T) {
 	for _, tc := range testCases {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
-
 			// add a new validator if the test case requires it
 			if tc.createNewValidator {
 				valAddr := f.CreatePendingValidator(fmt.Sprintf("val-%s", tc.name), tc.request.Power)
@@ -268,7 +270,6 @@ func TestRemoveValidator(t *testing.T) {
 				require.EqualValues(0, len(u))
 			}
 		})
-
 	}
 }
 
@@ -351,6 +352,7 @@ func TestMultipleUpdatesInASingleBlock(t *testing.T) {
 // in testing can be removed.
 // In the future, this same logic would be run during the migration from POA->POS.
 func (f *testFixture) mintTokensToBondedPool(t *testing.T) error {
+	t.Helper()
 	require := require.New(t)
 
 	bondDenom, err := f.stakingKeeper.BondDenom(f.ctx)

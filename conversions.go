@@ -1,8 +1,9 @@
 package poa
 
 import (
-	"cosmossdk.io/math"
 	"github.com/cosmos/cosmos-sdk/x/staking/types"
+
+	"cosmossdk.io/math"
 )
 
 func NewDescription(moniker, identity, website, securityContact, details string) Description {

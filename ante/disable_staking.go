@@ -2,9 +2,9 @@ package poaante
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/strangelove-ventures/poa"
-
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+
+	"github.com/strangelove-ventures/poa"
 )
 
 type MsgStakingFilterDecorator struct {
@@ -48,5 +48,6 @@ func (msfd MsgStakingFilterDecorator) hasInvalidStakingMsg(msgs []sdk.Msg) bool 
 			return true
 		}
 	}
+
 	return false
 }

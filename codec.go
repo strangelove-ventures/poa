@@ -17,7 +17,6 @@ func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	legacy.RegisterAminoMsg(cdc, &MsgUpdateParams{}, "poa/MsgUpdateParams")
 	legacy.RegisterAminoMsg(cdc, &MsgRemoveValidator{}, "poa/MsgRemoveValidator")
 	legacy.RegisterAminoMsg(cdc, &MsgUpdateStakingParams{}, "poa/MsgUpdateStakingParams")
-
 }
 
 // RegisterInterfaces registers the interfaces types with the interface registry.

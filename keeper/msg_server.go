@@ -5,13 +5,14 @@ import (
 	"fmt"
 	"math"
 
-	errorsmod "cosmossdk.io/errors"
-	sdkmath "cosmossdk.io/math"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+
+	errorsmod "cosmossdk.io/errors"
+	sdkmath "cosmossdk.io/math"
 
 	"github.com/strangelove-ventures/poa"
 )
@@ -160,6 +161,7 @@ func (ms msgServer) CreateValidator(ctx context.Context, msg *poa.MsgCreateValid
 		for _, keyType := range cp.Validator.PubKeyTypes {
 			if pkType == keyType {
 				hasKeyType = true
+
 				break
 			}
 		}
@@ -314,7 +316,6 @@ func (ms msgServer) updatePOAPower(ctx context.Context, valOpBech32 string, newP
 		return stakingtypes.Validator{}, err
 	}
 
-	// TODO: For some reason GetLastValidatorPower only returns single digit powers on test setup.
 	// I am unsure if this is due to a test mis-configure or an issue with POA logic (thus these lines would fix it)
 	// need to dive into the x/staking / cometBFT power requirements to see why a single digit number is used instead of udenom.
 	if previousPower < 1_000_000 {

@@ -6,17 +6,17 @@ import (
 	"strings"
 	"time"
 
-	flag "github.com/spf13/pflag"
-
-	"cosmossdk.io/core/address"
-	"cosmossdk.io/math"
 	"github.com/spf13/cobra"
+	flag "github.com/spf13/pflag"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/version"
+
+	"cosmossdk.io/core/address"
+	"cosmossdk.io/math"
 
 	"github.com/strangelove-ventures/poa"
 )
@@ -44,6 +44,7 @@ func NewTxCmd(ac address.Codec) *cobra.Command {
 		NewUpdateParamsCmd(),
 		NewUpdateStakingParamsCmd(),
 	)
+
 	return txCmd
 }
 

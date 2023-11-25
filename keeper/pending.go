@@ -63,6 +63,7 @@ func (k Keeper) AddPendingValidator(ctx context.Context, newVal stakingtypes.Val
 	vals.Validators = append(vals.Validators, stdVal)
 
 	bz := k.cdc.MustMarshal(&vals)
+
 	return store.Set(poa.PendingValidatorsKey, bz)
 }
 
@@ -79,12 +80,14 @@ func (k Keeper) RemovePendingValidator(ctx context.Context, valOpAddr string) er
 	for i, val := range vals {
 		if val.OperatorAddress == valOpAddr {
 			vals = append(vals[:i], vals[i+1:]...)
+
 			break
 		}
 	}
 
 	pending.Validators = vals
 	bz := k.cdc.MustMarshal(&pending)
+
 	return store.Set(poa.PendingValidatorsKey, bz)
 }
 
@@ -99,6 +102,7 @@ func (k Keeper) GetPendingValidators(ctx context.Context) (poa.Validators, error
 
 	var pv poa.Validators
 	k.cdc.MustUnmarshal(bz, &pv)
+
 	return pv, nil
 }
 

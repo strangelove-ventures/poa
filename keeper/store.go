@@ -15,6 +15,7 @@ func (k Keeper) SetParams(ctx context.Context, p poa.Params) error {
 
 	store := k.storeService.OpenKVStore(ctx)
 	bz := k.cdc.MustMarshal(&p)
+
 	return store.Set(poa.ParamsKey, bz)
 }
 
@@ -29,6 +30,7 @@ func (k Keeper) GetParams(ctx context.Context) (poa.Params, error) {
 
 	var p poa.Params
 	k.cdc.MustUnmarshal(bz, &p)
+
 	return p, nil
 }
 

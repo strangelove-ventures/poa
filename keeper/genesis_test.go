@@ -3,13 +3,14 @@ package keeper_test
 import (
 	"testing"
 
-	"github.com/strangelove-ventures/poa"
 	"github.com/stretchr/testify/require"
-
-	sdkmath "cosmossdk.io/math"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+
+	sdkmath "cosmossdk.io/math"
+
+	"github.com/strangelove-ventures/poa"
 )
 
 func TestInitGenesis(t *testing.T) {
@@ -67,5 +68,4 @@ func TestInitGenesis(t *testing.T) {
 
 		require.Equal(p, params)
 	})
-
 }

@@ -17,7 +17,6 @@ func (am AppModule) BeginBlocker(ctx context.Context) error {
 
 	for _, v := range vals {
 		switch v.GetStatus() {
-
 		case stakingtypes.Unbonding:
 			v.Status = stakingtypes.Unbonded
 			if err := am.keeper.GetStakingKeeper().SetValidator(ctx, v); err != nil {
@@ -33,6 +32,9 @@ func (am AppModule) BeginBlocker(ctx context.Context) error {
 			if err := am.keeper.GetStakingKeeper().DeleteLastValidatorPower(ctx, valAddr); err != nil {
 				return err
 			}
+
+		case stakingtypes.Unspecified, stakingtypes.Bonded:
+			continue
 		}
 	}
 

@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/strangelove-ventures/poa"
 	"github.com/stretchr/testify/require"
+
+	"github.com/strangelove-ventures/poa"
 )
 
 func TestPendingValidatorsQuery(t *testing.T) {
@@ -99,5 +100,4 @@ func TestParamsQuery(t *testing.T) {
 			require.EqualValues(tc.expected, r.Params)
 		})
 	}
-
 }

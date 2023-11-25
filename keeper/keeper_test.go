@@ -5,26 +5,21 @@ import (
 	"testing"
 	"time"
 
-	"cosmossdk.io/math"
-	storetypes "cosmossdk.io/store/types"
+	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/suite"
+
 	abci "github.com/cometbft/cometbft/abci/types"
+
 	addresscodec "github.com/cosmos/cosmos-sdk/codec/address"
+	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	"github.com/cosmos/cosmos-sdk/runtime"
 	"github.com/cosmos/cosmos-sdk/testutil"
+	simtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	moduletestutil "github.com/cosmos/cosmos-sdk/types/module/testutil"
-	"github.com/stretchr/testify/require"
-	"github.com/stretchr/testify/suite"
-
-	"github.com/strangelove-ventures/poa"
-	"github.com/strangelove-ventures/poa/keeper"
-	poamodule "github.com/strangelove-ventures/poa/module"
-
-	"cosmossdk.io/log"
-	simtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
 	authcodec "github.com/cosmos/cosmos-sdk/x/auth/codec"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -35,7 +30,13 @@ import (
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
-	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
+	"cosmossdk.io/log"
+	"cosmossdk.io/math"
+	storetypes "cosmossdk.io/store/types"
+
+	"github.com/strangelove-ventures/poa"
+	"github.com/strangelove-ventures/poa/keeper"
+	poamodule "github.com/strangelove-ventures/poa/module"
 )
 
 var (
@@ -67,6 +68,7 @@ type testFixture struct {
 }
 
 func SetupTest(t *testing.T, baseValShares int64) *testFixture {
+	t.Helper()
 	s := new(testFixture)
 	require := require.New(t)
 
@@ -110,6 +112,7 @@ func SetupTest(t *testing.T, baseValShares int64) *testFixture {
 	require.NoError(err)
 
 	s.createBaseStakingValidators(t, baseValShares)
+
 	return s
 }
 
@@ -132,6 +135,7 @@ func GenAcc() valSetup {
 }
 
 func (f *testFixture) createBaseStakingValidators(t *testing.T, baseValShares int64) {
+	t.Helper()
 	require := require.New(t)
 	bondCoin := sdk.NewCoin("stake", math.NewInt(baseValShares))
 
