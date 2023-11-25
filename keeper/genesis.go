@@ -8,15 +8,12 @@ import (
 
 // InitGenesis initializes the module's state from a genesis state.
 func (k *Keeper) InitGenesis(ctx context.Context, data *poa.GenesisState) error {
-	if err := k.SetParams(ctx, data.Params); err != nil {
-		return err
-	}
-
-	return nil
+	return k.SetParams(ctx, data.Params)
 }
 
 // InitStores sets the base cached values from the genesis state in relation to the validator set.
 func (k *Keeper) InitCacheStores(ctx context.Context) error {
+	// currValPower will be 0 if height is 0 or 1 (gentx)
 	currValPower, err := k.GetStakingKeeper().GetLastTotalPower(ctx)
 	if err != nil {
 		return err
