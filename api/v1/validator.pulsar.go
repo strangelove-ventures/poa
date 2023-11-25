@@ -3625,7 +3625,7 @@ func (BondStatus) EnumDescriptor() ([]byte, []int) {
 	return file_strangelove_ventures_poa_v1_validator_proto_rawDescGZIP(), []int{0}
 }
 
-// Validators
+// Validators is a collection of Validators.
 type Validators struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

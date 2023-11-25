@@ -67,7 +67,7 @@ func (BondStatus) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_239839702462c302, []int{0}
 }
 
-// Validators
+// Validators is a collection of Validators.
 type Validators struct {
 	// A list of all the validators
 	Validators []Validator `protobuf:"bytes,1,rep,name=validators,proto3" json:"validators"`

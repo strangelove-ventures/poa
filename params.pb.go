@@ -32,7 +32,7 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 // Params defines the parameters for the module.
 type Params struct {
-	// array of accounts that can update the set. ex: governance, mulitisigs, etc.
+	// Array of addresses that are allowed to controll the chains validators power.
 	Admins []string `protobuf:"bytes,1,rep,name=admins,proto3" json:"admins,omitempty"`
 }
 
@@ -75,7 +75,7 @@ func (m *Params) GetAdmins() []string {
 	return nil
 }
 
-// Params defines the parameters for the x/staking module.
+// StakingParams defines the parameters for the x/staking module.
 type StakingParams struct {
 	// unbonding_time is the time duration of unbonding.
 	UnbondingTime time.Duration `protobuf:"bytes,1,opt,name=unbonding_time,json=unbondingTime,proto3,stdduration" json:"unbonding_time"`

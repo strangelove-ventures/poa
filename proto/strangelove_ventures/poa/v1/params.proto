@@ -13,11 +13,11 @@ message Params {
   option (gogoproto.equal) = true;
   option (gogoproto.goproto_stringer) = false;
 
-  // array of accounts that can update the set. ex: governance, mulitisigs, etc.
+  // Array of addresses that are allowed to controll the chains validators power.
   repeated string admins = 1;
 }
 
-// Params defines the parameters for the x/staking module.
+// StakingParams defines the parameters for the x/staking module.
 message StakingParams {
   option (amino.name) = "cosmos-sdk/x/staking/Params";
   option (gogoproto.equal) = true;

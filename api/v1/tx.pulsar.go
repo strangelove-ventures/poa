@@ -4664,7 +4664,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// SetPower sets the power of a validator
+// SetPower sets the new power of the validator and accepts new validators into the set.
 type MsgSetPower struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -4724,7 +4724,7 @@ func (x *MsgSetPower) GetUnsafe() bool {
 	return false
 }
 
-// MsgSetPowerResponse
+// MsgSetPowerResponse is the response type for the Msg/SetPower RPC method.
 type MsgSetPowerResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -4751,8 +4751,7 @@ func (*MsgSetPowerResponse) Descriptor() ([]byte, []int) {
 	return file_strangelove_ventures_poa_v1_tx_proto_rawDescGZIP(), []int{1}
 }
 
-// MsgRemoveValidator removes an active validitor from the set
-// jail -> deleted
+// MsgRemoveValidator removes an active validitor from the set and unbonds their delegations.
 type MsgRemoveValidator struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -4796,7 +4795,7 @@ func (x *MsgRemoveValidator) GetValidatorAddress() string {
 	return ""
 }
 
-// MsgSetPowerResponse
+// MsgSetPowerResponse is the response type for the Msg/RemoveValidator RPC method.
 type MsgRemoveValidatorResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -5056,7 +5055,7 @@ func (x *MsgCreateValidator) GetPubkey() *anypb.Any {
 	return nil
 }
 
-// MsgCreateValidatorResponse
+// MsgCreateValidatorResponse is the response type for the Msg/CreateValidator RPC method.
 type MsgCreateValidatorResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

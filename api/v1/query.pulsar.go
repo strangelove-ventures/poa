@@ -1732,7 +1732,7 @@ func (x *ParamsResponse) GetParams() *Params {
 	return nil
 }
 
-// QueryPendingValidatorsRequest
+// QueryPendingValidatorsRequest is the request type for the Query/PendingValidators RPC method.
 type QueryPendingValidatorsRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1759,13 +1759,13 @@ func (*QueryPendingValidatorsRequest) Descriptor() ([]byte, []int) {
 	return file_strangelove_ventures_poa_v1_query_proto_rawDescGZIP(), []int{2}
 }
 
-// QueryPendingValidatorResponse
+// QueryPendingValidatorResponse is the response type for the Query/PendingValidators RPC method.
 type PendingValidatorsResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// pending
+	// Pending is the returned pending validators from the module
 	Pending []*Validator `protobuf:"bytes,1,rep,name=pending,proto3" json:"pending,omitempty"`
 }
 

@@ -1,7 +1,6 @@
 syntax = "proto3";
 package strangelove_ventures.poa.v1;
 
-// import "cosmos/staking/v1beta1/staking.proto";
 import "cosmos_proto/cosmos.proto";
 import "google/protobuf/any.proto";
 import "google/protobuf/timestamp.proto";
@@ -10,7 +9,7 @@ import "amino/amino.proto";
 
 option go_package = "github.com/strangelove-ventures/poa";
 
-// Validators
+// Validators is a collection of Validators.
 message Validators {
   // A list of all the validators
   repeated Validator validators = 1 [ (gogoproto.nullable) = false ];

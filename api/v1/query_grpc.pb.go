@@ -29,7 +29,7 @@ const (
 type QueryClient interface {
 	// Params returns the current params of the module.
 	Params(ctx context.Context, in *QueryParamsRequest, opts ...grpc.CallOption) (*ParamsResponse, error)
-	// PendingValidators
+	// PendingValidators returns currently pending validators of the module.
 	PendingValidators(ctx context.Context, in *QueryPendingValidatorsRequest, opts ...grpc.CallOption) (*PendingValidatorsResponse, error)
 }
 
@@ -65,7 +65,7 @@ func (c *queryClient) PendingValidators(ctx context.Context, in *QueryPendingVal
 type QueryServer interface {
 	// Params returns the current params of the module.
 	Params(context.Context, *QueryParamsRequest) (*ParamsResponse, error)
-	// PendingValidators
+	// PendingValidators returns currently pending validators of the module.
 	PendingValidators(context.Context, *QueryPendingValidatorsRequest) (*PendingValidatorsResponse, error)
 	mustEmbedUnimplementedQueryServer()
 }

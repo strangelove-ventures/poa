@@ -14,7 +14,7 @@ service Query {
   rpc Params(QueryParamsRequest) returns (ParamsResponse) {
     option (google.api.http).get = "/poa/v1/params";
   }
-  // PendingValidators
+  // PendingValidators returns currently pending validators of the module.
   rpc PendingValidators(QueryPendingValidatorsRequest)
       returns (PendingValidatorsResponse) {
     option (google.api.http).get = "/poa/v1/pending_validators";
@@ -30,11 +30,11 @@ message ParamsResponse {
   Params params = 1 [ (gogoproto.nullable) = false ];
 }
 
-// QueryPendingValidatorsRequest
+// QueryPendingValidatorsRequest is the request type for the Query/PendingValidators RPC method.
 message QueryPendingValidatorsRequest {}
 
-// QueryPendingValidatorResponse
+// QueryPendingValidatorResponse is the response type for the Query/PendingValidators RPC method.
 message PendingValidatorsResponse {
-  // pending
+  // Pending is the returned pending validators from the module
   repeated Validator pending = 1 [ (gogoproto.nullable) = false ];
 }
