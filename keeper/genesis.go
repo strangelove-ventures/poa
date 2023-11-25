@@ -22,6 +22,8 @@ func (k *Keeper) InitCacheStores(ctx context.Context) error {
 		return err
 	}
 
+	currValPower = currValPower.Quo(k.GetStakingKeeper().PowerReduction(ctx))
+
 	if err := k.SetCachedBlockPower(ctx, currValPower.Uint64()); err != nil {
 		return err
 	}

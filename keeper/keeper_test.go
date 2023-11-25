@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"cosmossdk.io/math"
+	sdkmath "cosmossdk.io/math"
 	storetypes "cosmossdk.io/store/types"
 	abci "github.com/cometbft/cometbft/abci/types"
 	addresscodec "github.com/cosmos/cosmos-sdk/codec/address"
@@ -185,12 +186,18 @@ func (f *testFixture) createBaseStakingValidators(t *testing.T, baseValShares in
 		}
 	}
 
-	total := bondCoin.Amount.MulRaw(int64(len(vals)))
+	totalBondToken := bondCoin.Amount.MulRaw(int64(len(vals)))
+	total := sdkmath.NewInt(f.stakingKeeper.TokensToConsensusPower(f.ctx, totalBondToken))
 	if err := f.stakingKeeper.SetLastTotalPower(f.ctx, total); err != nil {
 		panic(err)
 	}
 
 	if err := f.k.InitCacheStores(f.ctx); err != nil {
+		panic(err)
+	}
+
+	// override proper consensus power for testing (from InitCacheStores)
+	if err := f.k.SetCachedBlockPower(f.ctx, total.Uint64()); err != nil {
 		panic(err)
 	}
 
