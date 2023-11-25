@@ -8,7 +8,8 @@ on:
 permissions:
   contents: read
 jobs:
-  lint:
+  lint-title:
+    name: Lint PR Title
     permissions:
       pull-requests: read
       statuses: write
