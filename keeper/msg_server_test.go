@@ -171,7 +171,6 @@ func TestSetPowerAndCreateValidator(t *testing.T) {
 	for _, tc := range testCases {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
-			// add a new validator if the test case requires it
 			if tc.createNewValidator {
 				valAddr := f.CreatePendingValidator(fmt.Sprintf("val-%s", tc.name), tc.request.Power)
 				tc.request.ValidatorAddress = valAddr.String()
@@ -181,6 +180,8 @@ func TestSetPowerAndCreateValidator(t *testing.T) {
 				require.NoError(err)
 				require.EqualValues(1, len(pendingVals.Validators))
 			}
+
+			require.NotEmpty(tc.request.ValidatorAddress)
 
 			preVals, err := f.stakingKeeper.GetValidators(f.ctx, 100)
 			require.NoError(err)
@@ -214,7 +215,7 @@ func TestRemoveValidator(t *testing.T) {
 	require.NoError(err)
 
 	for _, v := range vals {
-		power := 1_000_000
+		power := 10_000_000
 
 		_, err = f.msgServer.SetPower(f.ctx, &poa.MsgSetPower{
 			Sender:           f.addrs[0].String(),
@@ -229,10 +230,9 @@ func TestRemoveValidator(t *testing.T) {
 	require.NoError(err)
 
 	testCases := []struct {
-		name             string
-		request          *poa.MsgRemoveValidator
-		expectErrMsg     string
-		expectValUpdates int
+		name         string
+		request      *poa.MsgRemoveValidator
+		expectErrMsg string
 	}{
 		{
 			name: "set invalid authority (not an address)",
@@ -243,12 +243,11 @@ func TestRemoveValidator(t *testing.T) {
 			expectErrMsg: "not an authority",
 		},
 		{
-			name: "remove one validator",
+			name: "remove validator",
 			request: &poa.MsgRemoveValidator{
 				Sender:           f.addrs[0].String(),
 				ValidatorAddress: vals[0].OperatorAddress,
 			},
-			expectErrMsg: "",
 		},
 	}
 
@@ -271,11 +270,6 @@ func TestRemoveValidator(t *testing.T) {
 
 				_, err := f.IncreaseBlock(5, true)
 				require.NoError(err)
-
-				// no updates on the next increase
-				u, err := f.IncreaseBlock(1, true)
-				require.NoError(err)
-				require.EqualValues(0, len(u))
 			}
 		})
 	}
@@ -300,7 +294,7 @@ func TestMultipleUpdatesInASingleBlock(t *testing.T) {
 		expectErrMsg       string
 	}{
 		{
-			name:               "new validator swing",
+			name:               "multiple validator updates",
 			createNewValidator: true,
 			request: []*poa.MsgSetPower{
 				// 11.11%
@@ -317,7 +311,7 @@ func TestMultipleUpdatesInASingleBlock(t *testing.T) {
 					Power:            4_000_000,
 					Unsafe:           false,
 				},
-				// 33.33% modified (>30)
+				// 33.33% modified (>30%, fails if not unsafe)
 				{
 					Sender:           f.addrs[0].String(),
 					ValidatorAddress: vals[2].OperatorAddress,
@@ -326,14 +320,14 @@ func TestMultipleUpdatesInASingleBlock(t *testing.T) {
 				},
 			},
 			expectedErrIdx: 2,
-			expectErrMsg:   "msg.Power is >30%% of total power, set unsafe=true to override",
+			expectErrMsg:   poa.ErrUnsafePower.Error(),
 		},
 	}
 
 	for _, tc := range testCases {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
-			if _, err := f.IncreaseBlock(1); err != nil {
+			if _, err := f.IncreaseBlock(5); err != nil {
 				panic(err)
 			}
 

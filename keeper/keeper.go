@@ -25,7 +25,7 @@ type Keeper struct {
 	logger log.Logger
 }
 
-// NewKeeper creates a new Keeper instance
+// NewKeeper creates a new poa Keeper instance
 func NewKeeper(
 	cdc codec.BinaryCodec,
 	storeService storetypes.KVStoreService,
@@ -48,10 +48,12 @@ func NewKeeper(
 	return k
 }
 
+// GetStakingKeeper returns the staking keeper.
 func (k Keeper) GetStakingKeeper() *stakingkeeper.Keeper {
 	return k.stakingKeeper
 }
 
+// GetSlashingKeeper returns the slashing keeper.
 func (k Keeper) GetSlashingKeeper() slashingkeeper.Keeper {
 	return k.slashKeeper
 }
@@ -60,7 +62,6 @@ func (k Keeper) GetSlashingKeeper() slashingkeeper.Keeper {
 func (k Keeper) GetAdmins(ctx context.Context) []string {
 	p, err := k.GetParams(ctx)
 	if err != nil {
-		// panic(err) ?
 		return []string{}
 	}
 
