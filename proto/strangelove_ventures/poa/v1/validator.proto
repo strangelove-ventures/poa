@@ -10,7 +10,11 @@ import "amino/amino.proto";
 
 option go_package = "github.com/strangelove-ventures/poa";
 
-// cosmos-sdk/proto/cosmos/staking
+// Validators
+message Validators {
+  // A list of all the validators
+  repeated Validator validators = 1 [ (gogoproto.nullable) = false ];
+}
 
 // Description defines a validator description.
 message Description {

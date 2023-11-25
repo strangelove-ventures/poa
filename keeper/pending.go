@@ -11,8 +11,8 @@ import (
 )
 
 // DefaultPendingValidators
-func DefaultPendingValidators() poa.PendingValidators {
-	return poa.PendingValidators{
+func DefaultPendingValidators() poa.Validators {
+	return poa.Validators{
 		Validators: []poa.Validator{},
 	}
 }
@@ -89,7 +89,7 @@ func (k Keeper) RemovePendingValidator(ctx context.Context, valOpAddr string) er
 }
 
 // GetPendingValidators
-func (k Keeper) GetPendingValidators(ctx context.Context) (poa.PendingValidators, error) {
+func (k Keeper) GetPendingValidators(ctx context.Context) (poa.Validators, error) {
 	store := k.storeService.OpenKVStore(ctx)
 
 	bz, err := store.Get(poa.PendingValidatorsKey)
@@ -97,7 +97,7 @@ func (k Keeper) GetPendingValidators(ctx context.Context) (poa.PendingValidators
 		return DefaultPendingValidators(), err
 	}
 
-	var pv poa.PendingValidators
+	var pv poa.Validators
 	k.cdc.MustUnmarshal(bz, &pv)
 	return pv, nil
 }
