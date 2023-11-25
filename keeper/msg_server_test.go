@@ -278,11 +278,6 @@ func TestMultipleUpdatesInASingleBlock(t *testing.T) {
 	vals, err := f.stakingKeeper.GetValidators(f.ctx, 100)
 	require.NoError(err)
 
-	totalPower := 0
-	for _, v := range vals {
-		totalPower += int(v.GetBondedTokens().Int64())
-	}
-
 	if _, err := f.IncreaseBlock(5, true); err != nil {
 		panic(err)
 	}
