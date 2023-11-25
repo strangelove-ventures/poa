@@ -2,7 +2,6 @@ package poa
 
 import (
 	"github.com/cosmos/cosmos-sdk/codec"
-	// "github.com/cosmos/cosmos-sdk/codec/legacy"
 	"github.com/cosmos/cosmos-sdk/codec/legacy"
 	types "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"

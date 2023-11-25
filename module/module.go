@@ -16,7 +16,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 
-	appmodule "cosmossdk.io/core/appmodule"
+	// appmodule "cosmossdk.io/core/appmodule"
 
 	"github.com/strangelove-ventures/poa"
 	"github.com/strangelove-ventures/poa/client/cli"
@@ -27,7 +27,7 @@ var (
 	_ module.AppModule        = AppModule{}
 	_ module.AppModuleGenesis = AppModule{}
 
-	_ appmodule.HasBeginBlocker = AppModule{}
+	// _ appmodule.HasBeginBlocker = AppModule{}
 )
 
 // ConsensusVersion defines the current module consensus version.
@@ -130,7 +130,6 @@ func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONCodec) json.Raw
 	return cdc.MustMarshalJSON(gs)
 }
 
-// BeginBlocker implements AppModule/BeginBlocker.
-func (am AppModule) BeginBlock(ctx context.Context) error {
+func (am AppModule) BeginBlock(ctx sdk.Context) error {
 	return am.BeginBlocker(ctx)
 }

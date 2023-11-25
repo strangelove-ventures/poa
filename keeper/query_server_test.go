@@ -13,18 +13,20 @@ func TestPendingValidatorsQuery(t *testing.T) {
 	f := SetupTest(t, 1_000_000)
 	require := require.New(t)
 
-	// create many validators and query all
+	// Create many pending validators and query them.
 	numVals := 10
 	for i := 0; i < numVals; i++ {
 		f.CreatePendingValidator(fmt.Sprintf("val-%d", i), 1_000_000)
 	}
 
+	// Validate pending validators equals the number we created.
 	r, err := f.queryServer.PendingValidators(f.ctx, &poa.QueryPendingValidatorsRequest{})
 	require.NoError(err)
 	require.EqualValues(numVals, len(r.Pending))
 
-	// get validator 0, SetPower, increase, and query again. There should only be numVals-1 now
+	// Accept one of the validators from pending into the active set.
 	valAddr := r.Pending[0].OperatorAddress
+
 	_, err = f.msgServer.SetPower(f.ctx, &poa.MsgSetPower{
 		Sender:           f.addrs[0].String(),
 		ValidatorAddress: valAddr,
@@ -32,14 +34,17 @@ func TestPendingValidatorsQuery(t *testing.T) {
 		Unsafe:           true,
 	})
 	require.NoError(err)
-	if _, err := f.IncreaseBlock(1); err != nil {
+
+	if _, err := f.IncreaseBlock(2); err != nil {
 		panic(err)
 	}
 
+	// 1 less pending validator.
 	r, err = f.queryServer.PendingValidators(f.ctx, &poa.QueryPendingValidatorsRequest{})
 	require.NoError(err)
 	require.EqualValues(numVals-1, len(r.Pending))
 
+	// none of the pending validators should be the one we accepted.
 	for _, val := range r.Pending {
 		require.NotEqual(valAddr, val.OperatorAddress)
 	}

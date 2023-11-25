@@ -21,11 +21,6 @@ func DefaultPendingValidators() poa.Validators {
 func (k Keeper) AddPendingValidator(ctx context.Context, newVal stakingtypes.Validator, pubKey cryptotypes.PubKey) error {
 	store := k.storeService.OpenKVStore(ctx)
 
-	vals, err := k.GetPendingValidators(ctx)
-	if err != nil {
-		return err
-	}
-
 	pkAny, err := codectypes.NewAnyWithValue(pubKey)
 	if err != nil {
 		return err
@@ -60,6 +55,11 @@ func (k Keeper) AddPendingValidator(ctx context.Context, newVal stakingtypes.Val
 		UnbondingIds:            newVal.UnbondingIds,
 	}
 
+	vals, err := k.GetPendingValidators(ctx)
+	if err != nil {
+		return err
+	}
+
 	vals.Validators = append(vals.Validators, stdVal)
 
 	bz := k.cdc.MustMarshal(&vals)
@@ -80,12 +80,11 @@ func (k Keeper) RemovePendingValidator(ctx context.Context, valOpAddr string) er
 	for i, val := range vals {
 		if val.OperatorAddress == valOpAddr {
 			vals = append(vals[:i], vals[i+1:]...)
-
+			pending.Validators = vals
 			break
 		}
 	}
 
-	pending.Validators = vals
 	bz := k.cdc.MustMarshal(&pending)
 
 	return store.Set(poa.PendingValidatorsKey, bz)
