@@ -4,6 +4,7 @@ import (
 	"context"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
 	"github.com/strangelove-ventures/poa"
 )
 
@@ -36,7 +37,6 @@ func (qs queryServer) ConsensusPower(ctx context.Context, msg *poa.QueryConsensu
 	}
 
 	return &poa.QueryConsensusPowerResponse{ConsensusPower: lastPower}, nil
-
 }
 
 // PendingValidators returns the pending validators.
