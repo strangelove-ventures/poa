@@ -153,3 +153,14 @@ type POAConsensusPower struct {
 type StakingParams struct {
 	Params stakingtypes.Params `json:"params"`
 }
+
+type SingingInformation struct {
+	Info []struct {
+		Address     string `json:"address"`
+		IndexOffset string `json:"index_offset,omitempty"`
+		JailedUntil string `json:"jailed_until"`
+	} `json:"info"`
+	Pagination struct {
+		Total string `json:"total"`
+	} `json:"pagination"`
+}
