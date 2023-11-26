@@ -10,12 +10,12 @@ import (
 )
 
 func StakeTokens(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, user ibc.Wallet, valoper, coinAmt string) (TxResponse, error) {
-	cmd := TxCommandBuilder(ctx, chain, []string{"tx", "staking", "delegate", valoper, coinAmt}, user)
+	cmd := TxCommandBuilder(ctx, chain, []string{"tx", "staking", "delegate", valoper, coinAmt}, user.KeyName())
 	return ExecuteTransaction(ctx, chain, cmd)
 }
 
 func ClaimStakingRewards(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, user ibc.Wallet, valoper string) (TxResponse, error) {
-	cmd := TxCommandBuilder(ctx, chain, []string{"tx", "distribution", "withdraw-rewards", valoper}, user)
+	cmd := TxCommandBuilder(ctx, chain, []string{"tx", "distribution", "withdraw-rewards", valoper}, user.KeyName())
 	return ExecuteTransaction(ctx, chain, cmd)
 }
 
