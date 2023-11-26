@@ -18,36 +18,38 @@ var (
 		UidGid:     "1025:1025",
 	}
 
+	defaultGenesis = []cosmos.GenesisKV{
+		{
+			Key: "app_state.poa.params.admins",
+			Value: []string{
+				"cosmos10d07y265gmmuvt4z0w9aw880jnsr700j6zn9kn", // gov
+				"cosmos1hj5fveer5cjtn4wd6wstzugjfdxzl0xpxvjjvr", // testing account
+			},
+		},
+		{
+			Key:   "app_state.gov.params.voting_period",
+			Value: VotingPeriod,
+		},
+		{
+			Key:   "app_state.gov.params.max_deposit_period",
+			Value: MaxDepositPeriod,
+		},
+		{
+			Key:   "app_state.gov.params.min_deposit.0.denom",
+			Value: Denom,
+		},
+		{
+			Key:   "app_state.gov.params.min_deposit.0.amount",
+			Value: "1",
+		},
+	}
+
 	POACfg = ibc.ChainConfig{
 		Images: []ibc.DockerImage{
 			POAImage,
 		},
-		GasAdjustment: 1.5,
-		ModifyGenesis: cosmos.ModifyGenesis([]cosmos.GenesisKV{
-			{
-				Key: "app_state.poa.params.admins",
-				Value: []string{
-					"cosmos10d07y265gmmuvt4z0w9aw880jnsr700j6zn9kn", // gov
-					"cosmos1hj5fveer5cjtn4wd6wstzugjfdxzl0xpxvjjvr", // testing account
-				},
-			},
-			{
-				Key:   "app_state.gov.params.voting_period",
-				Value: VotingPeriod,
-			},
-			{
-				Key:   "app_state.gov.params.max_deposit_period",
-				Value: MaxDepositPeriod,
-			},
-			{
-				Key:   "app_state.gov.params.min_deposit.0.denom",
-				Value: Denom,
-			},
-			{
-				Key:   "app_state.gov.params.min_deposit.0.amount",
-				Value: "1",
-			},
-		}),
+		GasAdjustment:  1.5,
+		ModifyGenesis:  cosmos.ModifyGenesis(defaultGenesis),
 		EncodingConfig: poaEncoding(),
 		Type:           "cosmos",
 		Name:           "poa",
