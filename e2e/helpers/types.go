@@ -2,7 +2,6 @@ package helpers
 
 import (
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	"github.com/strangelove-ventures/poa"
 )
 
 // From stakingtypes.Validator
@@ -147,8 +146,8 @@ type TxResponse struct {
 	} `json:"events"`
 }
 
-type POAParams struct {
-	Params poa.Params `json:"params"`
+type POAConsensusPower struct {
+	Power string `json:"consensus_power"`
 }
 
 type StakingParams struct {

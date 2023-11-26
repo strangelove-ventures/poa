@@ -51,9 +51,22 @@ func SubmitGovernanceProposalForValidatorChanges(t *testing.T, ctx context.Conte
 }
 
 func GetPOAParams(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain) poa.Params {
-	var res POAParams
+	var res poa.ParamsResponse
 	ExecuteQuery(ctx, chain, []string{"query", "poa", "params"}, &res)
 	return res.Params
+}
+
+func GetPOAConsensusPower(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, valoperAddr string) int64 {
+	var res POAConsensusPower
+	ExecuteQuery(ctx, chain, []string{"query", "poa", "power", valoperAddr}, &res)
+
+	var power int64
+	_, err := fmt.Sscanf(res.Power, "%d", &power)
+	if err != nil {
+		return 0
+	}
+
+	return power
 }
 
 func POAUpdateParams(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, user ibc.Wallet, admins []string) (TxResponse, error) {
