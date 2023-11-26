@@ -19,10 +19,11 @@ import (
 
 const (
 	// cosmos1hj5fveer5cjtn4wd6wstzugjfdxzl0xpxvjjvr (test_node.sh)
-	accMnemonic = "decorate bright ozone fork gallery riot bus exhaust worth way bone indoor calm squirrel merry zero scheme cotton until shop any excess stage laundry"
-	userFunds   = 10_000_000_000
-	numVals     = 2
-	numNodes    = 0
+	accMnemonic  = "decorate bright ozone fork gallery riot bus exhaust worth way bone indoor calm squirrel merry zero scheme cotton until shop any excess stage laundry"
+	acc1Mnemonic = "wealth flavor believe regret funny network recall kiss grape useless pepper cram hint member few certain unveil rather brick bargain curious require crowd raise"
+	userFunds    = 10_000_000_000
+	numVals      = 2
+	numNodes     = 0
 )
 
 func TestPOA(t *testing.T) {
@@ -42,6 +43,10 @@ func TestPOA(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	acc1, err := interchaintest.GetAndFundTestUserWithMnemonic(ctx, "acc1", acc1Mnemonic, userFunds, chain)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	users := interchaintest.GetAndFundTestUsers(t, ctx, t.Name(), userFunds, chain)
 	incorrectUser := users[0]
@@ -52,7 +57,7 @@ func TestPOA(t *testing.T) {
 	assertSignatures(t, ctx, chain, len(validators))
 
 	// === Test Cases ===
-	testStakingDisabled(t, ctx, chain, validators, acc0)
+	testStakingDisabled(t, ctx, chain, validators, acc0, acc1)
 	testGovernance(t, ctx, chain, acc0, validators)
 	testPowerErrors(t, ctx, chain, validators, incorrectUser, acc0)
 	testRemoveValidator(t, ctx, chain, validators, acc0)
@@ -202,11 +207,28 @@ func testRemoveValidator(t *testing.T, ctx context.Context, chain *cosmos.Cosmos
 	assertSignatures(t, ctx, chain, 1)
 }
 
-func testStakingDisabled(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, validators []string, acc0 ibc.Wallet) {
-	// TODO: test nested authz exec as well
+func testStakingDisabled(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, validators []string, acc0, acc1 ibc.Wallet) {
 	t.Log("\n===== TEST STAKING DISABLED =====")
+	// Normal delegation execution fails
 	txRes, _ := helpers.StakeTokens(t, ctx, chain, acc0, validators[0], "1stake")
 	require.Contains(t, txRes.RawLog, poa.ErrStakingActionNotAllowed.Error())
+
+	granter := acc1
+	grantee := acc0
+
+	// Grant grantee (acc0) the ability to delegate from granter (acc1)
+	res, err := helpers.ExecuteAuthzGrantMsg(t, ctx, chain, granter, grantee, "/cosmos.staking.v1beta1.MsgDelegate")
+	require.NoError(t, err)
+	require.EqualValues(t, res.Code, 0)
+
+	// Generate nested message
+	nested := []string{"tx", "staking", "delegate", validators[0], "1stake"}
+	nestedCmd := helpers.TxCommandBuilder(ctx, chain, nested, granter.FormattedAddress())
+
+	// Execute nested message via a wrapped Exec
+	res, err = helpers.ExecuteAuthzExecMsg(t, ctx, chain, grantee, nestedCmd)
+	require.NoError(t, err)
+	require.Contains(t, res.RawLog, poa.ErrStakingActionNotAllowed.Error())
 }
 
 func testGovernance(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, acc0 ibc.Wallet, validators []string) {

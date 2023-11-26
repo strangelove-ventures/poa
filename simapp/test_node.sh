@@ -66,7 +66,7 @@ from_scratch () {
 
 
   # remove existing daemon.
-  rm -rf $HOME_DIR && echo "Removed $HOME_DIR"  
+  rm -rf $HOME_DIR && echo "Removed $HOME_DIR"
 
   # cosmos1hj5fveer5cjtn4wd6wstzugjfdxzl0xpxvjjvr
   echo "decorate bright ozone fork gallery riot bus exhaust worth way bone indoor calm squirrel merry zero scheme cotton until shop any excess stage laundry" | BINARY keys add $KEY --keyring-backend $KEYRING --algo $KEYALGO --recover
@@ -74,12 +74,12 @@ from_scratch () {
   echo "wealth flavor believe regret funny network recall kiss grape useless pepper cram hint member few certain unveil rather brick bargain curious require crowd raise" | BINARY keys add $KEY2 --keyring-backend $KEYRING --algo $KEYALGO --recover
   # cosmos1evcfka7s3200ypj0k2449cujlq3u4xe850hc4w
   echo "year action hospital impulse repeat town caught glue palace guilt diet about melt outdoor orbit field income left visit client route float wife media" | BINARY keys add $KEY3 --keyring-backend $KEYRING --algo $KEYALGO --recover
-  
+
   # TODO: move from stake to another denom, this works for now though.
   BINARY init $MONIKER --chain-id $CHAIN_ID --default-denom stake
 
   # Function updates the config based on a jq argument as a string
-  update_test_genesis () {    
+  update_test_genesis () {
     cat $HOME_DIR/config/genesis.json | jq "$1" > $HOME_DIR/config/tmp_genesis.json && mv $HOME_DIR/config/tmp_genesis.json $HOME_DIR/config/genesis.json
   }
 
@@ -89,21 +89,21 @@ from_scratch () {
   update_test_genesis '.app_state["gov"]["params"]["min_deposit"]=[{"denom": "stake","amount": "1000000"}]'
   update_test_genesis '.app_state["gov"]["voting_params"]["voting_period"]="15s"'
   # staking
-  update_test_genesis '.app_state["staking"]["params"]["bond_denom"]="stake"'  
-  update_test_genesis '.app_state["staking"]["params"]["min_commission_rate"]="0.050000000000000000"'  
+  update_test_genesis '.app_state["staking"]["params"]["bond_denom"]="stake"'
+  update_test_genesis '.app_state["staking"]["params"]["min_commission_rate"]="0.050000000000000000"'
   # mint
-  update_test_genesis '.app_state["mint"]["params"]["mint_denom"]="stake"'  
+  update_test_genesis '.app_state["mint"]["params"]["mint_denom"]="stake"'
   # crisis
-  update_test_genesis '.app_state["crisis"]["constant_fee"]={"denom": "stake","amount": "1000"}'  
+  update_test_genesis '.app_state["crisis"]["constant_fee"]={"denom": "stake","amount": "1000"}'
 
   # x/POA
   # allows gov & acc1 to perform actions on POA.
-  update_test_genesis '.app_state["poa"]["params"]["admins"]=["cosmos10d07y265gmmuvt4z0w9aw880jnsr700j6zn9kn","cosmos1hj5fveer5cjtn4wd6wstzugjfdxzl0xpxvjjvr"]'  
+  update_test_genesis '.app_state["poa"]["params"]["admins"]=["cosmos10d07y265gmmuvt4z0w9aw880jnsr700j6zn9kn","cosmos1hj5fveer5cjtn4wd6wstzugjfdxzl0xpxvjjvr"]'
 
-  # Allocate genesis accounts 
+  # Allocate genesis accounts
   # stake should ONLY be as much as they gentx with. No more.
   BINARY genesis add-genesis-account $KEY 1000000000000stake,1000utest --keyring-backend $KEYRING
-  BINARY genesis add-genesis-account $KEY2 1000000stake,1000utest --keyring-backend $KEYRING  
+  BINARY genesis add-genesis-account $KEY2 1000000stake,1000utest --keyring-backend $KEYRING
 
   # 1 power (these rates will be overwriten)
   BINARY genesis gentx $KEY 1000000stake --keyring-backend $KEYRING --chain-id $CHAIN_ID --commission-rate="0.05" --commission-max-rate="0.50"
