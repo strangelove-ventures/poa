@@ -68,6 +68,17 @@ func (k Keeper) GetAdmins(ctx context.Context) []string {
 	return p.Admins
 }
 
+// IsAdmin checks if the given address is an admin.
+func (k Keeper) IsAdmin(ctx context.Context, fromAddr string) bool {
+	for _, auth := range k.GetAdmins(ctx) {
+		if auth == fromAddr {
+			return true
+		}
+	}
+
+	return false
+}
+
 func (k Keeper) Logger() log.Logger {
 	return k.logger
 }
