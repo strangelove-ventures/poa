@@ -53,7 +53,8 @@ func (k Keeper) RemovePendingValidator(ctx context.Context, valOpAddr string) er
 
 	for i, val := range vals {
 		if val.OperatorAddress == valOpAddr {
-			pending.Validators = append(vals[:i], vals[i+1:]...)
+			vals = append(vals[:i], vals[i+1:]...)
+			pending.Validators = vals
 			break
 		}
 	}
@@ -73,7 +74,7 @@ func (k Keeper) GetPendingValidators(ctx context.Context) (poa.Validators, error
 	}
 
 	var pv poa.Validators
-	k.cdc.Unmarshal(bz, &pv)
+	k.cdc.MustUnmarshal(bz, &pv)
 
 	return pv, nil
 }
