@@ -7,7 +7,6 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	"github.com/strangelove-ventures/interchaintest/v8/chain/cosmos"
-	"github.com/strangelove-ventures/interchaintest/v8/ibc"
 	"github.com/strangelove-ventures/interchaintest/v8/testutil"
 )
 
@@ -66,17 +65,17 @@ func ExecuteTransactionNoError(ctx context.Context, chain *cosmos.CosmosChain, c
 	return res
 }
 
-func TxCommandBuilder(ctx context.Context, chain *cosmos.CosmosChain, cmd []string, fromUser ibc.Wallet, extraFlags ...string) []string {
+func TxCommandBuilder(ctx context.Context, chain *cosmos.CosmosChain, cmd []string, fromUser string, extraFlags ...string) []string {
 	return TxCommandBuilderNode(ctx, chain.GetNode(), cmd, fromUser, extraFlags...)
 }
 
-func TxCommandBuilderNode(ctx context.Context, node *cosmos.ChainNode, cmd []string, fromUser ibc.Wallet, extraFlags ...string) []string {
+func TxCommandBuilderNode(ctx context.Context, node *cosmos.ChainNode, cmd []string, fromUser string, extraFlags ...string) []string {
 	command := []string{node.Chain.Config().Bin}
 	command = append(command, cmd...)
 	command = append(command, "--node", node.Chain.GetRPCAddress())
 	command = append(command, "--home", node.HomeDir())
 	command = append(command, "--chain-id", node.Chain.Config().ChainID)
-	command = append(command, "--from", fromUser.KeyName())
+	command = append(command, "--from", fromUser)
 	command = append(command, "--keyring-backend", keyring.BackendTest)
 	command = append(command, "--output=json")
 	command = append(command, "--yes")

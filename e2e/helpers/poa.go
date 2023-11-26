@@ -14,12 +14,12 @@ import (
 )
 
 func POASetPower(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, user ibc.Wallet, valoper string, power int64, flags ...string) (TxResponse, error) {
-	cmd := TxCommandBuilder(ctx, chain, []string{"tx", "poa", "set-power", valoper, fmt.Sprintf("%d", power)}, user, flags...)
+	cmd := TxCommandBuilder(ctx, chain, []string{"tx", "poa", "set-power", valoper, fmt.Sprintf("%d", power)}, user.KeyName(), flags...)
 	return ExecuteTransaction(ctx, chain, cmd)
 }
 
 func POARemove(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, user ibc.Wallet, valoper string) (TxResponse, error) {
-	cmd := TxCommandBuilder(ctx, chain, []string{"tx", "poa", "remove", valoper}, user)
+	cmd := TxCommandBuilder(ctx, chain, []string{"tx", "poa", "remove", valoper}, user.KeyName())
 	return ExecuteTransaction(ctx, chain, cmd)
 }
 
@@ -77,7 +77,7 @@ func POAUpdateParams(t *testing.T, ctx context.Context, chain *cosmos.CosmosChai
 	}
 	adminList = adminList[:len(adminList)-1]
 
-	cmd := TxCommandBuilder(ctx, chain, []string{"tx", "poa", "update-params", adminList}, user)
+	cmd := TxCommandBuilder(ctx, chain, []string{"tx", "poa", "update-params", adminList}, user.KeyName())
 	return ExecuteTransaction(ctx, chain, cmd)
 }
 
@@ -91,6 +91,6 @@ func POAUpdateStakingParams(t *testing.T, ctx context.Context, chain *cosmos.Cos
 		fmt.Sprintf("%d", sp.MinCommissionRate),
 	}
 
-	cmd := TxCommandBuilder(ctx, chain, command, user)
+	cmd := TxCommandBuilder(ctx, chain, command, user.KeyName())
 	return ExecuteTransaction(ctx, chain, cmd)
 }
