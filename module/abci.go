@@ -69,7 +69,7 @@ func (am AppModule) resetCachedTotalPower(ctx context.Context) error {
 	}
 
 	if currValPower.Uint64() != prev {
-		return am.keeper.SetAbsoluteChangedInBlockPower(ctx, currValPower.Uint64()-prev)
+		return am.keeper.SetCachedBlockPower(ctx, currValPower.Uint64())
 	}
 
 	return nil
