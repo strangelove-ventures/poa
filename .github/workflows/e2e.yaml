@@ -47,6 +47,7 @@ jobs:
       matrix:
         test:
           - "ictest-poa"
+          - "ictest-jail"
       fail-fast: false
 
     steps:
