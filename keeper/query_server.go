@@ -3,6 +3,8 @@ package keeper
 import (
 	"context"
 
+	sdk "github.com/cosmos/cosmos-sdk/types"
+
 	"github.com/strangelove-ventures/poa"
 )
 
@@ -15,6 +17,26 @@ func NewQueryServerImpl(k Keeper) poa.QueryServer {
 
 type queryServer struct {
 	k Keeper
+}
+
+// ConsensusPower returns the consensus power of the given validator.
+func (qs queryServer) ConsensusPower(ctx context.Context, msg *poa.QueryConsensusPowerRequest) (*poa.QueryConsensusPowerResponse, error) {
+	valAddr, err := sdk.ValAddressFromBech32(msg.ValidatorAddress)
+	if err != nil {
+		return nil, err
+	}
+
+	// verify that the validator exists
+	if _, err := qs.k.stakingKeeper.GetValidator(ctx, valAddr); err != nil {
+		return nil, err
+	}
+
+	lastPower, err := qs.k.stakingKeeper.GetLastValidatorPower(ctx, valAddr)
+	if err != nil {
+		return nil, err
+	}
+
+	return &poa.QueryConsensusPowerResponse{ConsensusPower: lastPower}, nil
 }
 
 // PendingValidators returns the pending validators.

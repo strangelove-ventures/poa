@@ -176,6 +176,12 @@ func testRemoveValidator(t *testing.T, ctx context.Context, chain *cosmos.Cosmos
 	require.Equal(t, fmt.Sprintf("%d", powerOne), vals[0].Tokens)
 	require.Equal(t, fmt.Sprintf("%d", powerTwo), vals[1].Tokens)
 
+	// validate the validators both have a conesnsus-power of /1_000_000
+	p1 := helpers.GetPOAConsensusPower(t, ctx, chain, vals[0].OperatorAddress)
+	require.EqualValues(t, powerOne/1_000_000, p1) // = 9000000
+	p2 := helpers.GetPOAConsensusPower(t, ctx, chain, vals[1].OperatorAddress)
+	require.EqualValues(t, powerTwo/1_000_000, p2) // = 2
+
 	// remove the 2nd validator (lower power)
 	helpers.POARemove(t, ctx, chain, acc0, validators[1])
 
@@ -189,11 +195,15 @@ func testRemoveValidator(t *testing.T, ctx context.Context, chain *cosmos.Cosmos
 	require.Equal(t, "0", vals[1].Tokens)
 	require.Equal(t, 1, vals[1].Status) // 1 = unbonded
 
+	// validate the validator[1] has no consensus power
+	require.EqualValues(t, 0, helpers.GetPOAConsensusPower(t, ctx, chain, vals[1].OperatorAddress))
+
 	// only 1 validator is signing now
 	assertSignatures(t, ctx, chain, 1)
 }
 
 func testStakingDisabled(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, validators []string, acc0 ibc.Wallet) {
+	// TODO: test nested authz exec as well
 	t.Log("\n===== TEST STAKING DISABLED =====")
 	txRes, _ := helpers.StakeTokens(t, ctx, chain, acc0, validators[0], "1stake")
 	require.Contains(t, txRes.RawLog, poa.ErrStakingActionNotAllowed.Error())
@@ -208,6 +218,8 @@ func testGovernance(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain
 	// validate the validator[0] was set to 1_234_567
 	val := helpers.GetValidators(t, ctx, chain).Validators[0]
 	require.Equal(t, val.Tokens, "1234567")
+	p := helpers.GetPOAConsensusPower(t, ctx, chain, val.OperatorAddress)
+	require.EqualValues(t, 1_234_567/1_000_000, p)
 }
 
 func testPowerErrors(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, validators []string, incorrectUser ibc.Wallet, admin ibc.Wallet) {

@@ -10,13 +10,16 @@ import (
 func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 	return &autocliv1.ModuleOptions{
 		Query: &autocliv1.ServiceCommandDescriptor{
-			Service:           poav1.Query_ServiceDesc.ServiceName,
+			Service: poav1.Query_ServiceDesc.ServiceName,
 			RpcCommandOptions: []*autocliv1.RpcCommandOptions{
-				// {
-				// 	RpcMethod: "Params",
-				// 	Use:       "params",
-				// 	Short:     "Get the current module parameters",
-				// },
+				{
+					RpcMethod: "ConsensusPower",
+					Use:       "power [validator]",
+					Short:     "Get the current consensus power of a validator",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{
+						{ProtoField: "validator_address"},
+					},
+				},
 			},
 		},
 		Tx: &autocliv1.ServiceCommandDescriptor{

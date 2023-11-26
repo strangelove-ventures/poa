@@ -21,6 +21,7 @@ const _ = grpc.SupportPackageIsVersion7
 const (
 	Query_Params_FullMethodName            = "/strangelove_ventures.poa.v1.Query/Params"
 	Query_PendingValidators_FullMethodName = "/strangelove_ventures.poa.v1.Query/PendingValidators"
+	Query_ConsensusPower_FullMethodName    = "/strangelove_ventures.poa.v1.Query/ConsensusPower"
 )
 
 // QueryClient is the client API for Query service.
@@ -31,6 +32,8 @@ type QueryClient interface {
 	Params(ctx context.Context, in *QueryParamsRequest, opts ...grpc.CallOption) (*ParamsResponse, error)
 	// PendingValidators returns currently pending validators of the module.
 	PendingValidators(ctx context.Context, in *QueryPendingValidatorsRequest, opts ...grpc.CallOption) (*PendingValidatorsResponse, error)
+	// ConsensusPower returns the current consensus power of a validator.
+	ConsensusPower(ctx context.Context, in *QueryConsensusPowerRequest, opts ...grpc.CallOption) (*QueryConsensusPowerResponse, error)
 }
 
 type queryClient struct {
@@ -59,6 +62,15 @@ func (c *queryClient) PendingValidators(ctx context.Context, in *QueryPendingVal
 	return out, nil
 }
 
+func (c *queryClient) ConsensusPower(ctx context.Context, in *QueryConsensusPowerRequest, opts ...grpc.CallOption) (*QueryConsensusPowerResponse, error) {
+	out := new(QueryConsensusPowerResponse)
+	err := c.cc.Invoke(ctx, Query_ConsensusPower_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // QueryServer is the server API for Query service.
 // All implementations must embed UnimplementedQueryServer
 // for forward compatibility
@@ -67,6 +79,8 @@ type QueryServer interface {
 	Params(context.Context, *QueryParamsRequest) (*ParamsResponse, error)
 	// PendingValidators returns currently pending validators of the module.
 	PendingValidators(context.Context, *QueryPendingValidatorsRequest) (*PendingValidatorsResponse, error)
+	// ConsensusPower returns the current consensus power of a validator.
+	ConsensusPower(context.Context, *QueryConsensusPowerRequest) (*QueryConsensusPowerResponse, error)
 	mustEmbedUnimplementedQueryServer()
 }
 
@@ -79,6 +93,9 @@ func (UnimplementedQueryServer) Params(context.Context, *QueryParamsRequest) (*P
 }
 func (UnimplementedQueryServer) PendingValidators(context.Context, *QueryPendingValidatorsRequest) (*PendingValidatorsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PendingValidators not implemented")
+}
+func (UnimplementedQueryServer) ConsensusPower(context.Context, *QueryConsensusPowerRequest) (*QueryConsensusPowerResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ConsensusPower not implemented")
 }
 func (UnimplementedQueryServer) mustEmbedUnimplementedQueryServer() {}
 
@@ -129,6 +146,24 @@ func _Query_PendingValidators_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Query_ConsensusPower_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryConsensusPowerRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).ConsensusPower(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Query_ConsensusPower_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).ConsensusPower(ctx, req.(*QueryConsensusPowerRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Query_ServiceDesc is the grpc.ServiceDesc for Query service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -143,6 +178,10 @@ var Query_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "PendingValidators",
 			Handler:    _Query_PendingValidators_Handler,
+		},
+		{
+			MethodName: "ConsensusPower",
+			Handler:    _Query_ConsensusPower_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

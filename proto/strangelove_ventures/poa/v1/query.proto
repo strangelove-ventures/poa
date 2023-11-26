@@ -19,6 +19,11 @@ service Query {
       returns (PendingValidatorsResponse) {
     option (google.api.http).get = "/poa/v1/pending_validators";
   }
+  // ConsensusPower returns the current consensus power of a validator.
+  rpc ConsensusPower(QueryConsensusPowerRequest)
+      returns (QueryConsensusPowerResponse) {
+    option (google.api.http).get = "/poa/v1/consensus_power";
+  }
 }
 
 // QueryParamsRequest is the request type for the Query/Params RPC method.
@@ -37,4 +42,16 @@ message QueryPendingValidatorsRequest {}
 message PendingValidatorsResponse {
   // Pending is the returned pending validators from the module
   repeated Validator pending = 1 [ (gogoproto.nullable) = false ];
+}
+
+// QueryConsensusPowerRequest is the request type for the Query/ConsensusPower RPC method.
+message QueryConsensusPowerRequest {
+  // validator_address is the address of the validator
+  string validator_address = 1;
+}
+
+// QueryConsensusPowerResponse is the response type for the Query/ConsensusPowerRequest RPC method.
+message QueryConsensusPowerResponse {
+  // consensus_power is the returned consensus power from the BFT consensus mechanism
+  int64 consensus_power = 1;
 }
