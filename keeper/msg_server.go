@@ -103,7 +103,9 @@ func (ms msgServer) RemoveValidator(ctx context.Context, msg *poa.MsgRemoveValid
 	}
 
 	// Remove missed blocks for the validator.
-	ms.k.clearSlashingInfo(ctx, val)
+	if err := ms.k.clearSlashingInfo(ctx, val); err != nil {
+		return nil, err
+	}
 
 	return &poa.MsgRemoveValidatorResponse{}, nil
 }

@@ -8,9 +8,10 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	"github.com/strangelove-ventures/poa"
 
 	sdkmath "cosmossdk.io/math"
+
+	"github.com/strangelove-ventures/poa"
 )
 
 // UpdateValidatorSet updates a validator to their new share and consensus power, then updates the total power of the set.
@@ -126,7 +127,9 @@ func (k Keeper) AcceptNewValidator(ctx context.Context, operatingAddress string,
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
 
 	// set the slashing info for the validator
-	k.setSlashingInfo(sdkCtx, val)
+	if err := k.setSlashingInfo(sdkCtx, val); err != nil {
+		return err
+	}
 
 	// The validator is actually created now, so emit the necessary events
 	sdkCtx.EventManager().EmitEvents(sdk.Events{
