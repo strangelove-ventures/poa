@@ -1,7 +1,6 @@
 syntax = "proto3";
 package strangelove_ventures.poa.v1;
 
-// import "cosmos/staking/v1beta1/staking.proto";
 import "cosmos/base/v1beta1/coin.proto";
 import "strangelove_ventures/poa/v1/validator.proto";
 import "strangelove_ventures/poa/v1/params.proto";
@@ -17,26 +16,23 @@ option go_package = "github.com/strangelove-ventures/poa";
 service Msg {
   option (cosmos.msg.v1.service) = true;
 
-  // x/staking wrappers (future)
+  // CreateValidator is a wrapper method around the SDK's x/staking MsgCreateValidator.
   rpc CreateValidator(MsgCreateValidator) returns (MsgCreateValidatorResponse);
 
-  // SetPower sets the new power of a validator.
-  // This also doubles as a way to accept pending validators
+  // SetPower sets the new power of a validator and accepts new validators into the set.
   rpc SetPower(MsgSetPower) returns (MsgSetPowerResponse);
 
-  // RemoveValidator removes a validator from the active set and unbonds their
-  // delegations.
+  // RemoveValidator removes a validator from the active set and unbonds their delegations.
   rpc RemoveValidator(MsgRemoveValidator) returns (MsgRemoveValidatorResponse);
 
   // UpdateParams updates the module parameters.
   rpc UpdateParams(MsgUpdateParams) returns (MsgUpdateParamsResponse);
 
   // UpdateStakingParams updates the module parameters.
-  rpc UpdateStakingParams(MsgUpdateStakingParams)
-      returns (MsgUpdateStakingParamsResponse);
+  rpc UpdateStakingParams(MsgUpdateStakingParams) returns (MsgUpdateStakingParamsResponse);
 }
 
-// SetPower sets the power of a validator
+// SetPower sets the new power of the validator and accepts new validators into the set.
 message MsgSetPower {
   option (cosmos.msg.v1.signer) = "sender";
   option (amino.name) = "poa/MsgSetPower";
@@ -50,11 +46,11 @@ message MsgSetPower {
   uint64 power = 3;
   bool unsafe = 4;
 }
-// MsgSetPowerResponse
+
+// MsgSetPowerResponse is the response type for the Msg/SetPower RPC method.
 message MsgSetPowerResponse {}
 
-// MsgRemoveValidator removes an active validitor from the set
-// jail -> deleted
+// MsgRemoveValidator removes an active validitor from the set and unbonds their delegations.
 message MsgRemoveValidator {
   option (cosmos.msg.v1.signer) = "sender";
   option (amino.name) = "poa/MsgRemoveValidator";
@@ -66,7 +62,8 @@ message MsgRemoveValidator {
   string validator_address = 2
       [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
 }
-// MsgSetPowerResponse
+
+// MsgSetPowerResponse is the response type for the Msg/RemoveValidator RPC method.
 message MsgRemoveValidatorResponse {}
 
 // MsgUpdateParams is the Msg/UpdateParams request type.
@@ -131,5 +128,5 @@ message MsgCreateValidator {
       [ (cosmos_proto.accepts_interface) = "cosmos.crypto.PubKey" ];
 }
 
-// MsgCreateValidatorResponse
+// MsgCreateValidatorResponse is the response type for the Msg/CreateValidator RPC method.
 message MsgCreateValidatorResponse {}

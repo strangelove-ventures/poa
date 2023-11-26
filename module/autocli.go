@@ -2,6 +2,7 @@ package module
 
 import (
 	autocliv1 "cosmossdk.io/api/cosmos/autocli/v1"
+
 	poav1 "github.com/strangelove-ventures/poa/api/v1"
 )
 

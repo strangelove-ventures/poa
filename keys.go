@@ -5,7 +5,10 @@ import (
 )
 
 var (
-	ParamsKey            = collections.NewPrefix(0)
+	// ParamsKey saves the current module params.
+	ParamsKey = collections.NewPrefix(0)
+
+	// PendingValidatorsKey saves the current pending validators.
 	PendingValidatorsKey = collections.NewPrefix(1)
 
 	// CachedPreviousBlockPowerKey saves the previous blocks total delegated power amount.

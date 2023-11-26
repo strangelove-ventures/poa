@@ -34,7 +34,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// SetPower sets the power of a validator
+// SetPower sets the new power of the validator and accepts new validators into the set.
 type MsgSetPower struct {
 	Sender           string `protobuf:"bytes,1,opt,name=sender,proto3" json:"sender,omitempty"`
 	ValidatorAddress string `protobuf:"bytes,2,opt,name=validator_address,json=validatorAddress,proto3" json:"validator_address,omitempty"`
@@ -75,7 +75,7 @@ func (m *MsgSetPower) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgSetPower proto.InternalMessageInfo
 
-// MsgSetPowerResponse
+// MsgSetPowerResponse is the response type for the Msg/SetPower RPC method.
 type MsgSetPowerResponse struct {
 }
 
@@ -112,8 +112,7 @@ func (m *MsgSetPowerResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgSetPowerResponse proto.InternalMessageInfo
 
-// MsgRemoveValidator removes an active validitor from the set
-// jail -> deleted
+// MsgRemoveValidator removes an active validitor from the set and unbonds their delegations.
 type MsgRemoveValidator struct {
 	Sender           string `protobuf:"bytes,1,opt,name=sender,proto3" json:"sender,omitempty"`
 	ValidatorAddress string `protobuf:"bytes,2,opt,name=validator_address,json=validatorAddress,proto3" json:"validator_address,omitempty"`
@@ -152,7 +151,7 @@ func (m *MsgRemoveValidator) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgRemoveValidator proto.InternalMessageInfo
 
-// MsgSetPowerResponse
+// MsgSetPowerResponse is the response type for the Msg/RemoveValidator RPC method.
 type MsgRemoveValidatorResponse struct {
 }
 
@@ -424,7 +423,7 @@ func (m *MsgCreateValidator) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgCreateValidator proto.InternalMessageInfo
 
-// MsgCreateValidatorResponse
+// MsgCreateValidatorResponse is the response type for the Msg/CreateValidator RPC method.
 type MsgCreateValidatorResponse struct {
 }
 
@@ -548,13 +547,11 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type MsgClient interface {
-	// x/staking wrappers (future)
+	// CreateValidator is a wrapper method around the SDK's x/staking MsgCreateValidator.
 	CreateValidator(ctx context.Context, in *MsgCreateValidator, opts ...grpc.CallOption) (*MsgCreateValidatorResponse, error)
-	// SetPower sets the new power of a validator.
-	// This also doubles as a way to accept pending validators
+	// SetPower sets the new power of a validator and accepts new validators into the set.
 	SetPower(ctx context.Context, in *MsgSetPower, opts ...grpc.CallOption) (*MsgSetPowerResponse, error)
-	// RemoveValidator removes a validator from the active set and unbonds their
-	// delegations.
+	// RemoveValidator removes a validator from the active set and unbonds their delegations.
 	RemoveValidator(ctx context.Context, in *MsgRemoveValidator, opts ...grpc.CallOption) (*MsgRemoveValidatorResponse, error)
 	// UpdateParams updates the module parameters.
 	UpdateParams(ctx context.Context, in *MsgUpdateParams, opts ...grpc.CallOption) (*MsgUpdateParamsResponse, error)
@@ -617,13 +614,11 @@ func (c *msgClient) UpdateStakingParams(ctx context.Context, in *MsgUpdateStakin
 
 // MsgServer is the server API for Msg service.
 type MsgServer interface {
-	// x/staking wrappers (future)
+	// CreateValidator is a wrapper method around the SDK's x/staking MsgCreateValidator.
 	CreateValidator(context.Context, *MsgCreateValidator) (*MsgCreateValidatorResponse, error)
-	// SetPower sets the new power of a validator.
-	// This also doubles as a way to accept pending validators
+	// SetPower sets the new power of a validator and accepts new validators into the set.
 	SetPower(context.Context, *MsgSetPower) (*MsgSetPowerResponse, error)
-	// RemoveValidator removes a validator from the active set and unbonds their
-	// delegations.
+	// RemoveValidator removes a validator from the active set and unbonds their delegations.
 	RemoveValidator(context.Context, *MsgRemoveValidator) (*MsgRemoveValidatorResponse, error)
 	// UpdateParams updates the module parameters.
 	UpdateParams(context.Context, *MsgUpdateParams) (*MsgUpdateParamsResponse, error)

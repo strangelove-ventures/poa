@@ -4,12 +4,15 @@ import (
 	"fmt"
 	"testing"
 
-	"cosmossdk.io/math"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	"github.com/strangelove-ventures/poa"
 	"github.com/stretchr/testify/require"
 	protov2 "google.golang.org/protobuf/proto"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+
+	"cosmossdk.io/math"
+
+	"github.com/strangelove-ventures/poa"
 )
 
 var (
@@ -112,7 +115,7 @@ func TestAnteCommissionRanges(t *testing.T) {
 
 func TestAnteStakingFilter(t *testing.T) {
 	ctx := sdk.Context{}
-	sf := NewPOAStakingFilterDecorator()
+	sf := NewPOADisableStakingDecorator()
 
 	blockedMsgs := map[string]sdk.Msg{
 		"CreateStakingValidator":    &stakingtypes.MsgCreateValidator{},
@@ -149,6 +152,7 @@ func TestAnteStakingFilter(t *testing.T) {
 func setBlockHeader(ctx sdk.Context, height uint64) sdk.Context {
 	h := ctx.BlockHeader()
 	h.Height = int64(height)
+
 	return ctx.WithBlockHeader(h)
 }
 

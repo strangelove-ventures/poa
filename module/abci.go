@@ -7,6 +7,8 @@ import (
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 )
 
+// BeginBlocker updates the validator set without applying updates.
+// Since this module depends on staking, that module will `ApplyAndReturnValidatorSetUpdates` from x/staking.
 func (am AppModule) BeginBlocker(ctx context.Context) error {
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
 
@@ -17,14 +19,15 @@ func (am AppModule) BeginBlocker(ctx context.Context) error {
 
 	for _, v := range vals {
 		switch v.GetStatus() {
-
 		case stakingtypes.Unbonding:
+			// if the validator is unbonding, force it to be unbonded. (H+1)
 			v.Status = stakingtypes.Unbonded
 			if err := am.keeper.GetStakingKeeper().SetValidator(ctx, v); err != nil {
 				return err
 			}
 
 		case stakingtypes.Unbonded:
+			// if the validator is unbonded (above case), delete the last validator power. (H+2)
 			valAddr, err := sdk.ValAddressFromBech32(v.OperatorAddress)
 			if err != nil {
 				return err
@@ -33,11 +36,14 @@ func (am AppModule) BeginBlocker(ctx context.Context) error {
 			if err := am.keeper.GetStakingKeeper().DeleteLastValidatorPower(ctx, valAddr); err != nil {
 				return err
 			}
+
+		case stakingtypes.Unspecified, stakingtypes.Bonded:
+			continue
 		}
 	}
 
-	// if it is not a genTx, reset values to the expected
 	if sdkCtx.BlockHeight() > 1 {
+		// non gentx messages reset the cached block powers for IBC validations.
 		if err := am.resetCachedTotalPower(ctx); err != nil {
 			return err
 		}
@@ -50,7 +56,7 @@ func (am AppModule) BeginBlocker(ctx context.Context) error {
 	return nil
 }
 
-// resetCachedTotalPower resets the cached total power to the new TotalPower index.
+// resetCachedTotalPower resets the block power index to the current total power.
 func (am AppModule) resetCachedTotalPower(ctx context.Context) error {
 	currValPower, err := am.keeper.GetStakingKeeper().GetLastTotalPower(ctx)
 	if err != nil {
@@ -69,7 +75,7 @@ func (am AppModule) resetCachedTotalPower(ctx context.Context) error {
 	return nil
 }
 
-// resetAbsoluteBlockPower resets the absolute block power to 0.
+// resetAbsoluteBlockPower resets the absolute block power to 0 since updates per block have been executed upon.
 func (am AppModule) resetAbsoluteBlockPower(ctx context.Context) error {
 	var err error
 

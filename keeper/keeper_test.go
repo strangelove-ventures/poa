@@ -5,27 +5,21 @@ import (
 	"testing"
 	"time"
 
-	"cosmossdk.io/math"
-	sdkmath "cosmossdk.io/math"
-	storetypes "cosmossdk.io/store/types"
+	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/suite"
+
 	abci "github.com/cometbft/cometbft/abci/types"
+
 	addresscodec "github.com/cosmos/cosmos-sdk/codec/address"
+	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	"github.com/cosmos/cosmos-sdk/runtime"
 	"github.com/cosmos/cosmos-sdk/testutil"
+	simtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	moduletestutil "github.com/cosmos/cosmos-sdk/types/module/testutil"
-	"github.com/stretchr/testify/require"
-	"github.com/stretchr/testify/suite"
-
-	"github.com/strangelove-ventures/poa"
-	"github.com/strangelove-ventures/poa/keeper"
-	poamodule "github.com/strangelove-ventures/poa/module"
-
-	"cosmossdk.io/log"
-	simtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
 	authcodec "github.com/cosmos/cosmos-sdk/x/auth/codec"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -36,18 +30,23 @@ import (
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
-	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
+	"cosmossdk.io/core/store"
+	"cosmossdk.io/log"
+	sdkmath "cosmossdk.io/math"
+	storetypes "cosmossdk.io/store/types"
+
+	"github.com/strangelove-ventures/poa"
+	"github.com/strangelove-ventures/poa/keeper"
+	poamodule "github.com/strangelove-ventures/poa/module"
 )
 
-var (
-	maccPerms = map[string][]string{
-		authtypes.FeeCollectorName:     nil,
-		stakingtypes.BondedPoolName:    {authtypes.Burner, authtypes.Staking},
-		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
-		govtypes.ModuleName:            {authtypes.Burner},
-		poa.ModuleName:                 {authtypes.Minter},
-	}
-)
+var maccPerms = map[string][]string{
+	authtypes.FeeCollectorName:     nil,
+	stakingtypes.BondedPoolName:    {authtypes.Burner, authtypes.Staking},
+	stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
+	govtypes.ModuleName:            {authtypes.Burner},
+	poa.ModuleName:                 {authtypes.Minter},
+}
 
 type testFixture struct {
 	suite.Suite
@@ -68,50 +67,94 @@ type testFixture struct {
 }
 
 func SetupTest(t *testing.T, baseValShares int64) *testFixture {
-	s := new(testFixture)
+	t.Helper()
+	f := new(testFixture)
 	require := require.New(t)
 
+	// Base setup
 	logger := log.NewTestLogger(t)
-	s.govModAddr = authtypes.NewModuleAddress(govtypes.ModuleName).String()
-
 	encCfg := moduletestutil.MakeTestEncodingConfig()
+
+	f.govModAddr = authtypes.NewModuleAddress(govtypes.ModuleName).String()
+	f.addrs = simtestutil.CreateIncrementalAccounts(3)
+
 	key := storetypes.NewKVStoreKey(poa.ModuleName)
-	testCtx := testutil.DefaultContextWithDB(t, key, storetypes.NewTransientStoreKey("transient_test"))
-	s.ctx = testCtx.Ctx
-
 	storeService := runtime.NewKVStoreService(key)
-	s.addrs = simtestutil.CreateIncrementalAccounts(3)
+	testCtx := testutil.DefaultContextWithDB(t, key, storetypes.NewTransientStoreKey("transient_test"))
 
-	s.accountkeeper = authkeeper.NewAccountKeeper(encCfg.Codec, storeService, authtypes.ProtoBaseAccount, maccPerms, authcodec.NewBech32Codec(sdk.Bech32MainPrefix), sdk.Bech32MainPrefix, s.govModAddr)
-	s.bankkeeper = bankkeeper.NewBaseKeeper(encCfg.Codec, storeService, s.accountkeeper, nil, s.govModAddr, logger)
+	f.ctx = testCtx.Ctx
 
-	bankkeeper.NewMsgServerImpl(s.bankkeeper)
+	// Register SDK modules.
+	registerBaseSDKModules(f, encCfg, storeService, logger, require)
 
-	s.stakingKeeper = stakingkeeper.NewKeeper(encCfg.Codec, storeService, s.accountkeeper, s.bankkeeper, s.govModAddr, authcodec.NewBech32Codec(sdk.Bech32PrefixValAddr), authcodec.NewBech32Codec(sdk.Bech32PrefixConsAddr))
-	err := s.stakingKeeper.SetParams(s.ctx, stakingtypes.DefaultParams())
-	require.NoError(err)
-
-	s.slashingKeeper = slashingkeeper.NewKeeper(encCfg.Codec, encCfg.Amino, storeService, s.stakingKeeper, authtypes.NewModuleAddress(govtypes.ModuleName).String())
-	err = s.slashingKeeper.SetParams(s.ctx, slashingtypes.DefaultParams())
-	require.NoError(err)
-
-	s.k = keeper.NewKeeper(encCfg.Codec, storeService, s.stakingKeeper, s.slashingKeeper, addresscodec.NewBech32Codec("cosmosvaloper"))
-	s.msgServer = keeper.NewMsgServerImpl(s.k)
-	s.queryServer = keeper.NewQueryServerImpl(s.k)
-	s.appModule = poamodule.NewAppModule(encCfg.Codec, s.k)
+	// Setup POA Keeper.
+	f.k = keeper.NewKeeper(encCfg.Codec, storeService, f.stakingKeeper, f.slashingKeeper, addresscodec.NewBech32Codec(sdk.Bech32PrefixValAddr), logger)
+	f.msgServer = keeper.NewMsgServerImpl(f.k)
+	f.queryServer = keeper.NewQueryServerImpl(f.k)
+	f.appModule = poamodule.NewAppModule(encCfg.Codec, f.k)
 
 	// register interfaces
+	registerModuleInterfaces(encCfg)
+
+	// set POA genesis state
+	genState := poa.NewGenesisState()
+	genState.Params.Admins = []string{f.addrs[0].String(), f.govModAddr}
+	err := f.k.InitGenesis(f.ctx, genState)
+	require.NoError(err)
+
+	f.createBaseStakingValidators(t, baseValShares)
+
+	return f
+}
+
+func registerBaseSDKModules(
+	f *testFixture,
+	encCfg moduletestutil.TestEncodingConfig,
+	storeService store.KVStoreService,
+	logger log.Logger,
+	require *require.Assertions,
+) {
+	// Auth Keeper.
+	f.accountkeeper = authkeeper.NewAccountKeeper(
+		encCfg.Codec, storeService,
+		authtypes.ProtoBaseAccount,
+		maccPerms,
+		authcodec.NewBech32Codec(sdk.Bech32MainPrefix), sdk.Bech32MainPrefix,
+		f.govModAddr,
+	)
+
+	// Bank Keeper.
+	f.bankkeeper = bankkeeper.NewBaseKeeper(
+		encCfg.Codec, storeService,
+		f.accountkeeper,
+		nil,
+		f.govModAddr, logger,
+	)
+
+	// Staking Keeper.
+	f.stakingKeeper = stakingkeeper.NewKeeper(
+		encCfg.Codec, storeService,
+		f.accountkeeper, f.bankkeeper, f.govModAddr,
+		authcodec.NewBech32Codec(sdk.Bech32PrefixValAddr),
+		authcodec.NewBech32Codec(sdk.Bech32PrefixConsAddr),
+	)
+	err := f.stakingKeeper.SetParams(f.ctx, stakingtypes.DefaultParams())
+	require.NoError(err)
+
+	// Slashing Keeper.
+	f.slashingKeeper = slashingkeeper.NewKeeper(
+		encCfg.Codec, encCfg.Amino, storeService,
+		f.stakingKeeper,
+		f.govModAddr,
+	)
+	err = f.slashingKeeper.SetParams(f.ctx, slashingtypes.DefaultParams())
+	require.NoError(err)
+}
+
+func registerModuleInterfaces(encCfg moduletestutil.TestEncodingConfig) {
 	authtypes.RegisterInterfaces(encCfg.InterfaceRegistry)
 	stakingtypes.RegisterInterfaces(encCfg.InterfaceRegistry)
 	poa.RegisterInterfaces(encCfg.InterfaceRegistry)
-
-	genState := poa.NewGenesisState()
-	genState.Params.Admins = []string{s.addrs[0].String(), s.govModAddr}
-	err = s.k.InitGenesis(s.ctx, genState)
-	require.NoError(err)
-
-	s.createBaseStakingValidators(t, baseValShares)
-	return s
 }
 
 type valSetup struct {
@@ -121,20 +164,19 @@ type valSetup struct {
 }
 
 func GenAcc() valSetup {
-	priv1 := secp256k1.GenPrivKey()
-	addr1 := sdk.AccAddress(priv1.PubKey().Address())
-	valKey1 := ed25519.GenPrivKey()
+	priv := secp256k1.GenPrivKey()
 
 	return valSetup{
-		priv:   priv1,
-		addr:   addr1,
-		valKey: valKey1,
+		priv:   priv,
+		addr:   sdk.AccAddress(priv.PubKey().Address()),
+		valKey: ed25519.GenPrivKey(),
 	}
 }
 
 func (f *testFixture) createBaseStakingValidators(t *testing.T, baseValShares int64) {
+	t.Helper()
 	require := require.New(t)
-	bondCoin := sdk.NewCoin("stake", math.NewInt(baseValShares))
+	bondCoin := sdk.NewCoin("stake", sdkmath.NewInt(baseValShares))
 
 	vals := []valSetup{
 		GenAcc(),
@@ -221,15 +263,15 @@ func CreateNewValidator(moniker string, opAddr string, pubKey cryptotypes.PubKey
 		ConsensusPubkey: pkAny,
 		Jailed:          false,
 		Status:          poa.Bonded,
-		Tokens:          math.NewInt(amt),
-		DelegatorShares: math.LegacyNewDecFromInt(math.NewInt(amt)),
+		Tokens:          sdkmath.NewInt(amt),
+		DelegatorShares: sdkmath.LegacyNewDecFromInt(sdkmath.NewInt(amt)),
 		Description:     poa.NewDescription(moniker, "", "", "", ""),
 		UnbondingHeight: 0,
 		UnbondingTime:   time.Time{},
 		Commission: poa.Commission{
-			CommissionRates: poa.NewCommissionRates(math.LegacyZeroDec(), math.LegacyZeroDec(), math.LegacyZeroDec()),
+			CommissionRates: poa.NewCommissionRates(sdkmath.LegacyZeroDec(), sdkmath.LegacyZeroDec(), sdkmath.LegacyZeroDec()),
 		},
-		MinSelfDelegation:       math.OneInt(),
+		MinSelfDelegation:       sdkmath.OneInt(),
 		UnbondingOnHoldRefCount: 0,
 		UnbondingIds:            nil,
 	}
@@ -273,7 +315,7 @@ func (f *testFixture) IncreaseBlock(amt int64, debug ...bool) ([]abci.ValidatorU
 
 		allUpdates = append(allUpdates, updates...)
 		if len(debug) > 0 && debug[0] && len(updates) > 0 {
-			fmt.Printf("\nIncreaseBlock(...) updates: %+v\n", updates)
+			f.k.Logger().Debug("IncreaseBlock(...) updates", "updates", updates)
 		}
 
 		if err := f.appModule.BeginBlock(f.ctx); err != nil {

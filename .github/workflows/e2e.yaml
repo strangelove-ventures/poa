@@ -1,5 +1,5 @@
 name: e2e
-on: 
+on:
   push:
     branches:
     - main
@@ -8,7 +8,7 @@ on:
 env:
   LINT_VERSION: v1.52
   GO_VERSION: 1.21.0
-  
+
   TAR_PATH: /tmp/poa.tar
   IMAGE_NAME: poa
   DOCKER_TAG: poa:local
@@ -23,14 +23,14 @@ jobs:
       - name: Setup Go ${{ env.GO_VERSION }}
         uses: actions/setup-go@v4
         with:
-          go-version: ${{ env.GO_VERSION }}          
+          go-version: ${{ env.GO_VERSION }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-                     
+
       - name: Build and export
         uses: docker/build-push-action@v5
-        with:          
+        with:
           tags: ${{ env.DOCKER_TAG }}
           outputs: type=docker,dest=${{ env.TAR_PATH }}
 
@@ -44,16 +44,16 @@ jobs:
     needs: build-docker
     runs-on: ubuntu-latest
     strategy:
-      matrix:          
+      matrix:
         test:
-          - "ictest-poa"          
+          - "ictest-poa"
       fail-fast: false
 
     steps:
       - name: Set up Go ${{ env.GO_VERSION }}
         uses: actions/setup-go@v4
         with:
-          go-version: ${{ env.GO_VERSION }}          
+          go-version: ${{ env.GO_VERSION }}
 
       - name: checkout chain
         uses: actions/checkout@v4
@@ -66,7 +66,7 @@ jobs:
 
       - name: Load Docker Image
         run: |
-          docker image load -i ${{ env.TAR_PATH }}          
+          docker image load -i ${{ env.TAR_PATH }}
           docker image ls -a
 
       - name: Run Test

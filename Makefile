@@ -5,6 +5,15 @@ DOCKER := $(shell which docker)
 export GO111MODULE = on
 
 ####################
+###   Building  ####
+####################
+
+include simapp/Makefile
+
+install:
+	$(MAKE) -C simapp/ install
+
+####################
 ###   Testing   ####
 ####################
 
@@ -52,7 +61,7 @@ proto-lint:
 ##################
 
 golangci_lint_cmd=golangci-lint
-golangci_version=v1.51.2
+golangci_version=v1.55.2
 
 lint:
 	@echo "--> Running linter"

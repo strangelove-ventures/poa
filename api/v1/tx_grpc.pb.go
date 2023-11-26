@@ -30,13 +30,11 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type MsgClient interface {
-	// x/staking wrappers (future)
+	// CreateValidator is a wrapper method around the SDK's x/staking MsgCreateValidator.
 	CreateValidator(ctx context.Context, in *MsgCreateValidator, opts ...grpc.CallOption) (*MsgCreateValidatorResponse, error)
-	// SetPower sets the new power of a validator.
-	// This also doubles as a way to accept pending validators
+	// SetPower sets the new power of a validator and accepts new validators into the set.
 	SetPower(ctx context.Context, in *MsgSetPower, opts ...grpc.CallOption) (*MsgSetPowerResponse, error)
-	// RemoveValidator removes a validator from the active set and unbonds their
-	// delegations.
+	// RemoveValidator removes a validator from the active set and unbonds their delegations.
 	RemoveValidator(ctx context.Context, in *MsgRemoveValidator, opts ...grpc.CallOption) (*MsgRemoveValidatorResponse, error)
 	// UpdateParams updates the module parameters.
 	UpdateParams(ctx context.Context, in *MsgUpdateParams, opts ...grpc.CallOption) (*MsgUpdateParamsResponse, error)
@@ -101,13 +99,11 @@ func (c *msgClient) UpdateStakingParams(ctx context.Context, in *MsgUpdateStakin
 // All implementations must embed UnimplementedMsgServer
 // for forward compatibility
 type MsgServer interface {
-	// x/staking wrappers (future)
+	// CreateValidator is a wrapper method around the SDK's x/staking MsgCreateValidator.
 	CreateValidator(context.Context, *MsgCreateValidator) (*MsgCreateValidatorResponse, error)
-	// SetPower sets the new power of a validator.
-	// This also doubles as a way to accept pending validators
+	// SetPower sets the new power of a validator and accepts new validators into the set.
 	SetPower(context.Context, *MsgSetPower) (*MsgSetPowerResponse, error)
-	// RemoveValidator removes a validator from the active set and unbonds their
-	// delegations.
+	// RemoveValidator removes a validator from the active set and unbonds their delegations.
 	RemoveValidator(context.Context, *MsgRemoveValidator) (*MsgRemoveValidatorResponse, error)
 	// UpdateParams updates the module parameters.
 	UpdateParams(context.Context, *MsgUpdateParams) (*MsgUpdateParamsResponse, error)

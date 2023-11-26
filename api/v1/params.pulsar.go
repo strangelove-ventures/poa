@@ -1222,7 +1222,7 @@ type Params struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// array of accounts that can update the set. ex: governance, mulitisigs, etc.
+	// Array of addresses that are allowed to controll the chains validators power.
 	Admins []string `protobuf:"bytes,1,rep,name=admins,proto3" json:"admins,omitempty"`
 }
 
@@ -1253,7 +1253,7 @@ func (x *Params) GetAdmins() []string {
 	return nil
 }
 
-// Params defines the parameters for the x/staking module.
+// StakingParams defines the parameters for the x/staking module.
 type StakingParams struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

@@ -4,10 +4,13 @@ import (
 	"testing"
 	time "time"
 
-	"cosmossdk.io/math"
-	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	"github.com/strangelove-ventures/poa"
 	"github.com/stretchr/testify/suite"
+
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+
+	"cosmossdk.io/math"
+
+	"github.com/strangelove-ventures/poa"
 )
 
 type ConversionTestSuite struct {

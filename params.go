@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
@@ -21,22 +20,14 @@ func DefaultParams() Params {
 
 // NewParams returns a new POA Params.
 func NewParams(admins []string) (Params, error) {
-	if len(admins) == 0 {
-		return Params{}, ErrMustProvideAtLeastOneAddress
-	}
-
-	for _, address := range admins {
-		if _, err := sdk.AccAddressFromBech32(address); err != nil {
-			return Params{}, err
-		}
-	}
-
-	return Params{
+	p := Params{
 		Admins: admins,
-	}, nil
+	}
+
+	return p, p.Validate()
 }
 
-// DefaultParams returns default x/staking parameters.
+// DefaultParams returns the default x/staking parameters.
 func DefaultStakingParams() StakingParams {
 	sp := stakingtypes.DefaultParams()
 
@@ -50,7 +41,7 @@ func DefaultStakingParams() StakingParams {
 	}
 }
 
-// add the stringer method for Params
+// Stringer method for Params.
 func (p Params) String() string {
 	bz, err := json.Marshal(p)
 	if err != nil {
@@ -62,6 +53,10 @@ func (p Params) String() string {
 
 // Validate does the sanity check on the params.
 func (p Params) Validate() error {
+	if len(p.Admins) == 0 {
+		return ErrMustProvideAtLeastOneAddress
+	}
+
 	for _, auth := range p.Admins {
 		if _, err := sdk.AccAddressFromBech32(auth); err != nil {
 			return err

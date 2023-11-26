@@ -2,7 +2,6 @@ package poa
 
 import (
 	"github.com/cosmos/cosmos-sdk/codec"
-	// "github.com/cosmos/cosmos-sdk/codec/legacy"
 	"github.com/cosmos/cosmos-sdk/codec/legacy"
 	types "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -17,7 +16,6 @@ func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	legacy.RegisterAminoMsg(cdc, &MsgUpdateParams{}, "poa/MsgUpdateParams")
 	legacy.RegisterAminoMsg(cdc, &MsgRemoveValidator{}, "poa/MsgRemoveValidator")
 	legacy.RegisterAminoMsg(cdc, &MsgUpdateStakingParams{}, "poa/MsgUpdateStakingParams")
-
 }
 
 // RegisterInterfaces registers the interfaces types with the interface registry.

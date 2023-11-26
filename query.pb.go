@@ -112,7 +112,7 @@ func (m *ParamsResponse) GetParams() Params {
 	return Params{}
 }
 
-// QueryPendingValidatorsRequest
+// QueryPendingValidatorsRequest is the request type for the Query/PendingValidators RPC method.
 type QueryPendingValidatorsRequest struct {
 }
 
@@ -149,9 +149,9 @@ func (m *QueryPendingValidatorsRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_QueryPendingValidatorsRequest proto.InternalMessageInfo
 
-// QueryPendingValidatorResponse
+// QueryPendingValidatorResponse is the response type for the Query/PendingValidators RPC method.
 type PendingValidatorsResponse struct {
-	// pending
+	// Pending is the returned pending validators from the module
 	Pending []Validator `protobuf:"bytes,1,rep,name=pending,proto3" json:"pending"`
 }
 
@@ -248,7 +248,7 @@ const _ = grpc.SupportPackageIsVersion4
 type QueryClient interface {
 	// Params returns the current params of the module.
 	Params(ctx context.Context, in *QueryParamsRequest, opts ...grpc.CallOption) (*ParamsResponse, error)
-	// PendingValidators
+	// PendingValidators returns currently pending validators of the module.
 	PendingValidators(ctx context.Context, in *QueryPendingValidatorsRequest, opts ...grpc.CallOption) (*PendingValidatorsResponse, error)
 }
 
@@ -282,7 +282,7 @@ func (c *queryClient) PendingValidators(ctx context.Context, in *QueryPendingVal
 type QueryServer interface {
 	// Params returns the current params of the module.
 	Params(context.Context, *QueryParamsRequest) (*ParamsResponse, error)
-	// PendingValidators
+	// PendingValidators returns currently pending validators of the module.
 	PendingValidators(context.Context, *QueryPendingValidatorsRequest) (*PendingValidatorsResponse, error)
 }
 

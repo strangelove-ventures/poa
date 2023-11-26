@@ -5,26 +5,27 @@ import (
 	"encoding/json"
 	"fmt"
 
-	abci "github.com/cometbft/cometbft/abci/types"
 	gwruntime "github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/spf13/cobra"
-	"github.com/strangelove-ventures/poa"
 
-	appmodule "cosmossdk.io/core/appmodule"
+	abci "github.com/cometbft/cometbft/abci/types"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 
+	"cosmossdk.io/core/appmodule"
+
+	"github.com/strangelove-ventures/poa"
 	"github.com/strangelove-ventures/poa/client/cli"
 	"github.com/strangelove-ventures/poa/keeper"
 )
 
 var (
-	_ module.AppModule        = AppModule{}
-	_ module.AppModuleGenesis = AppModule{}
-
+	_ module.AppModule          = AppModule{}
+	_ module.AppModuleGenesis   = AppModule{}
 	_ appmodule.HasBeginBlocker = AppModule{}
 )
 
@@ -124,10 +125,10 @@ func (am AppModule) InitGenesis(ctx sdk.Context, cdc codec.JSONCodec, data json.
 // module.
 func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONCodec) json.RawMessage {
 	gs := am.keeper.ExportGenesis(ctx)
+
 	return cdc.MustMarshalJSON(gs)
 }
 
-// BeginBlocker implements AppModule/BeginBlocker.
 func (am AppModule) BeginBlock(ctx context.Context) error {
 	return am.BeginBlocker(ctx)
 }

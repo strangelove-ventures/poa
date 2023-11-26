@@ -1,10 +1,12 @@
 package poa
 
 import (
-	"cosmossdk.io/math"
 	"github.com/cosmos/cosmos-sdk/x/staking/types"
+
+	"cosmossdk.io/math"
 )
 
+// NewDescription creates a new POA Description instance.
 func NewDescription(moniker, identity, website, securityContact, details string) Description {
 	return Description{
 		Moniker:         moniker,
@@ -15,6 +17,7 @@ func NewDescription(moniker, identity, website, securityContact, details string)
 	}
 }
 
+// NewCommissionRates creates a new POA CommissionRates instance.
 func NewCommissionRates(rate, maxRate, maxChangeRate math.LegacyDec) CommissionRates {
 	return CommissionRates{
 		Rate:          rate,
@@ -23,6 +26,7 @@ func NewCommissionRates(rate, maxRate, maxChangeRate math.LegacyDec) CommissionR
 	}
 }
 
+// ConvertPOAToStaking converts a POA Validator to a Staking Validator.
 func ConvertPOAToStaking(poa Validator) types.Validator {
 	return types.Validator{
 		OperatorAddress: poa.OperatorAddress,
@@ -51,6 +55,7 @@ func ConvertPOAToStaking(poa Validator) types.Validator {
 	}
 }
 
+// ConvertStakingToPOA converts a Staking Validator to a POA Validator.
 func ConvertStakingToPOA(val types.Validator) Validator {
 	return Validator{
 		OperatorAddress: val.OperatorAddress,

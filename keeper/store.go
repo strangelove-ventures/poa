@@ -7,32 +7,7 @@ import (
 	"github.com/strangelove-ventures/poa"
 )
 
-// SetParams sets the module parameters.
-func (k Keeper) SetParams(ctx context.Context, p poa.Params) error {
-	if err := p.Validate(); err != nil {
-		return err
-	}
-
-	store := k.storeService.OpenKVStore(ctx)
-	bz := k.cdc.MustMarshal(&p)
-	return store.Set(poa.ParamsKey, bz)
-}
-
-// GetParams returns the current module parameters.
-func (k Keeper) GetParams(ctx context.Context) (poa.Params, error) {
-	store := k.storeService.OpenKVStore(ctx)
-
-	bz, err := store.Get(poa.ParamsKey)
-	if err != nil || bz == nil {
-		return poa.DefaultParams(), err
-	}
-
-	var p poa.Params
-	k.cdc.MustUnmarshal(bz, &p)
-	return p, nil
-}
-
-// SetCachedBlockPower sets the cached block power.
+// SetCachedBlockPower sets the cached consensus power for the current block.
 func (k Keeper) SetCachedBlockPower(ctx context.Context, power uint64) error {
 	store := k.storeService.OpenKVStore(ctx)
 
@@ -43,7 +18,7 @@ func (k Keeper) SetCachedBlockPower(ctx context.Context, power uint64) error {
 	return store.Set(poa.CachedPreviousBlockPowerKey, bz)
 }
 
-// GetCachedBlockPower gets the cached block power.
+// GetCachedBlockPower gets the cached previous block consensus power.
 func (k Keeper) GetCachedBlockPower(ctx context.Context) (uint64, error) {
 	store := k.storeService.OpenKVStore(ctx)
 
@@ -55,7 +30,7 @@ func (k Keeper) GetCachedBlockPower(ctx context.Context) (uint64, error) {
 	return binary.LittleEndian.Uint64(bz), nil
 }
 
-// SetAbsoluteChangedInBlockPower sets the absolute changed in block power.
+// SetAbsoluteChangedInBlockPower sets the absolute power changed in the current block (relative to last).
 func (k Keeper) SetAbsoluteChangedInBlockPower(ctx context.Context, power uint64) error {
 	store := k.storeService.OpenKVStore(ctx)
 
@@ -66,7 +41,7 @@ func (k Keeper) SetAbsoluteChangedInBlockPower(ctx context.Context, power uint64
 	return store.Set(poa.AbsoluteChangedInBlockPowerKey, bz)
 }
 
-// GetAbsoluteChangedInBlockPower gets the absolute changed in block power.
+// GetAbsoluteChangedInBlockPower gets the absolute power changed in the block.
 func (k Keeper) GetAbsoluteChangedInBlockPower(ctx context.Context) (uint64, error) {
 	store := k.storeService.OpenKVStore(ctx)
 

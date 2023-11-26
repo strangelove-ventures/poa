@@ -2,15 +2,16 @@ package poaante
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/strangelove-ventures/poa"
-
+	"github.com/cosmos/cosmos-sdk/x/authz"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+
+	"github.com/strangelove-ventures/poa"
 )
 
 type MsgStakingFilterDecorator struct {
 }
 
-func NewPOAStakingFilterDecorator() MsgStakingFilterDecorator {
+func NewPOADisableStakingDecorator() MsgStakingFilterDecorator {
 	return MsgStakingFilterDecorator{}
 }
 
@@ -31,22 +32,33 @@ func (msfd MsgStakingFilterDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, sim
 
 func (msfd MsgStakingFilterDecorator) hasInvalidStakingMsg(msgs []sdk.Msg) bool {
 	for _, msg := range msgs {
+		// authz nested message check (recursive)
+		if execMsg, ok := msg.(*authz.MsgExec); ok {
+			msgs, err := execMsg.GetMessages()
+			if err != nil {
+				return true
+			}
+
+			if msfd.hasInvalidStakingMsg(msgs) {
+				return true
+			}
+		}
+
 		switch msg.(type) {
-		case *stakingtypes.MsgBeginRedelegate:
+		// POA wrapped messages
+		case *stakingtypes.MsgCreateValidator, *stakingtypes.MsgUpdateParams:
 			return true
-		case *stakingtypes.MsgCancelUnbondingDelegation:
-			return true
-		case *stakingtypes.MsgCreateValidator: // POA wraps this message.
-			return true
-		case *stakingtypes.MsgDelegate:
-			return true
-		// case *stakingtypes.MsgEditValidator: // Allowed
-		// 	return true
-		case *stakingtypes.MsgUndelegate:
-			return true
-		case *stakingtypes.MsgUpdateParams: // POA wraps this message.
+
+		// Blocked entirely when POA is enabled
+		case *stakingtypes.MsgBeginRedelegate,
+			*stakingtypes.MsgCancelUnbondingDelegation,
+			*stakingtypes.MsgDelegate,
+			*stakingtypes.MsgUndelegate:
 			return true
 		}
+
+		// stakingtypes.MsgEditValidator is the only allowed message. We do not need to check for it.
 	}
+
 	return false
 }

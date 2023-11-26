@@ -321,6 +321,7 @@ func NewSimApp(
 		app.StakingKeeper,
 		app.SlashingKeeper,
 		authcodec.NewBech32Codec(sdk.Bech32PrefixValAddr),
+		logger,
 	)
 	poaAppModule := poamodule.NewAppModule(appCodec, app.POAKeeper)
 
