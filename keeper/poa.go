@@ -15,7 +15,6 @@ import (
 )
 
 // UpdateValidatorSet updates a validator to their new share and consensus power, then updates the total power of the set.
-// -
 func (k Keeper) UpdateValidatorSet(ctx context.Context, newShares, newConsensusPower int64, val stakingtypes.Validator, valAddr sdk.ValAddress) error {
 	sdkContext := sdk.UnwrapSDKContext(ctx)
 
@@ -73,6 +72,7 @@ func (k Keeper) SetPOAPower(ctx context.Context, valOpBech32 string, newShares i
 		return stakingtypes.Validator{}, err
 	}
 
+	// Get the validators current power before we update it
 	currentPower, err := k.stakingKeeper.GetLastValidatorPower(ctx, valAddr)
 	if err != nil {
 		return stakingtypes.Validator{}, err
