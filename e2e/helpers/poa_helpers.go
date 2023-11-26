@@ -13,6 +13,8 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+// POASetPower sets the power of a validator. The power value should be a single digit, not a micro value (ex: use 1 not 1000000).
+// Floating point values are not supported in the BFT Consensus Engine.
 func POASetPower(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, user ibc.Wallet, valoper string, power int64, flags ...string) (TxResponse, error) {
 	cmd := TxCommandBuilder(ctx, chain, []string{"tx", "poa", "set-power", valoper, fmt.Sprintf("%d", power)}, user, flags...)
 	return ExecuteTransaction(ctx, chain, cmd)

@@ -14,7 +14,7 @@ import (
 )
 
 func TestInitGenesis(t *testing.T) {
-	fixture := SetupTest(t, 2_000_000)
+	fixture := SetupTest(t, 2)
 	require := require.New(t)
 
 	t.Run("default params", func(t *testing.T) {
@@ -59,7 +59,7 @@ func TestInitGenesis(t *testing.T) {
 		val, err := stakingtypes.NewValidator(valAddr.String(), acc.valKey.PubKey(), stakingtypes.Description{})
 		require.NoError(err)
 
-		val.Tokens = sdkmath.NewInt(1_234_567)
+		val.Tokens = sdkmath.NewInt(10_000_000)
 
 		err = fixture.k.InitGenesis(fixture.ctx, &poa.GenesisState{
 			Params: p,

@@ -71,6 +71,10 @@ func SetupTest(t *testing.T, baseValShares int64) *testFixture {
 	f := new(testFixture)
 	require := require.New(t)
 
+	if baseValShares > 1_000_000 {
+		panic("baseValShares must be less than 1_000_000 since it uses single digets now")
+	}
+
 	// Base setup
 	logger := log.NewTestLogger(t)
 	encCfg := moduletestutil.MakeTestEncodingConfig()
@@ -173,10 +177,13 @@ func GenAcc() valSetup {
 	}
 }
 
-func (f *testFixture) createBaseStakingValidators(t *testing.T, baseValShares int64) {
+func (f *testFixture) createBaseStakingValidators(t *testing.T, baseValConsensusPower int64) {
 	t.Helper()
 	require := require.New(t)
-	bondCoin := sdk.NewCoin("stake", sdkmath.NewInt(baseValShares))
+	bondCoin := sdk.NewCoin("stake", sdkmath.NewInt(baseValConsensusPower).MulRaw(1_000_000))
+
+	// print bondCoin
+	fmt.Printf("bondCoin: %+v\n", bondCoin)
 
 	vals := []valSetup{
 		GenAcc(),
@@ -228,18 +235,25 @@ func (f *testFixture) createBaseStakingValidators(t *testing.T, baseValShares in
 		}
 	}
 
-	totalBondToken := bondCoin.Amount.MulRaw(int64(len(vals)))
-	total := sdkmath.NewInt(f.stakingKeeper.TokensToConsensusPower(f.ctx, totalBondToken))
-	if err := f.stakingKeeper.SetLastTotalPower(f.ctx, total); err != nil {
+	// totalBondToken := bondCoin.Amount.MulRaw(int64(len(vals)))
+	// total := sdkmath.NewInt(f.stakingKeeper.TokensToConsensusPower(f.ctx, totalBondToken))
+	// totalBondToken := bondCoin.Amount.MulRaw(int64(len(vals)))
+
+	totalConsensus := sdkmath.NewInt(baseValConsensusPower).MulRaw(int64(len(vals)))
+
+	// print totalConsensus
+	fmt.Printf("totalConsensus: %+v\n", totalConsensus)
+
+	if err := f.stakingKeeper.SetLastTotalPower(f.ctx, totalConsensus); err != nil {
 		panic(err)
 	}
 
-	if err := f.k.InitCacheStores(f.ctx); err != nil {
-		panic(err)
-	}
+	// if err := f.k.InitCacheStores(f.ctx); err != nil {
+	// 	panic(err)
+	// }
 
 	// override proper consensus power for testing (from InitCacheStores)
-	if err := f.k.SetCachedBlockPower(f.ctx, total.Uint64()); err != nil {
+	if err := f.k.SetCachedBlockPower(f.ctx, totalConsensus.Uint64()); err != nil {
 		panic(err)
 	}
 

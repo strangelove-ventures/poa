@@ -10,13 +10,13 @@ import (
 )
 
 func TestPendingValidatorsQuery(t *testing.T) {
-	f := SetupTest(t, 1_000_000)
+	f := SetupTest(t, 1)
 	require := require.New(t)
 
 	// Create many pending validators and query them.
 	numVals := 10
 	for i := 0; i < numVals; i++ {
-		f.CreatePendingValidator(fmt.Sprintf("val-%d", i), 1_000_000)
+		f.CreatePendingValidator(fmt.Sprintf("val-%d", i), 1)
 	}
 
 	// Validate pending validators equals the number we created.
@@ -30,7 +30,7 @@ func TestPendingValidatorsQuery(t *testing.T) {
 	_, err = f.msgServer.SetPower(f.ctx, &poa.MsgSetPower{
 		Sender:           f.addrs[0].String(),
 		ValidatorAddress: valAddr,
-		Power:            1_000_000,
+		Power:            2,
 		Unsafe:           true,
 	})
 	require.NoError(err)
@@ -51,7 +51,7 @@ func TestPendingValidatorsQuery(t *testing.T) {
 }
 
 func TestParamsQuery(t *testing.T) {
-	f := SetupTest(t, 1_000_000)
+	f := SetupTest(t, 1)
 	require := require.New(t)
 
 	testCases := []struct {

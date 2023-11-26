@@ -59,8 +59,9 @@ func (k Keeper) UpdateValidatorSet(ctx context.Context, newShares, newConsensusP
 // - updates the validator with the new shares, single delegation
 // - sets the last validator power to the new value.
 func (k Keeper) SetPOAPower(ctx context.Context, valOpBech32 string, newShares int64) (stakingtypes.Validator, error) {
-	powerReduction := k.stakingKeeper.PowerReduction(ctx)
-	newConsensusPower := newShares / powerReduction.Int64()
+	// set consensus power to the lower value (ex: 1) while new shares is increased to 1 * 1_000_000 for UIs and query purposes
+	newConsensusPower := newShares
+	newShares = k.stakingKeeper.PowerReduction(ctx).Int64() * newShares
 
 	valAddr, err := sdk.ValAddressFromBech32(valOpBech32)
 	if err != nil {
@@ -83,6 +84,7 @@ func (k Keeper) SetPOAPower(ctx context.Context, valOpBech32 string, newShares i
 		return stakingtypes.Validator{}, err
 	}
 
+	// TODO: This logic is off now due to reduced token amount things
 	absPowerDiff := uint64(math.Abs(float64(newConsensusPower - currentPower)))
 
 	k.Logger().Debug("POA updatePOAPower",
@@ -136,7 +138,7 @@ func (k Keeper) AcceptNewValidator(ctx context.Context, operatingAddress string,
 		sdk.NewEvent(
 			stakingtypes.EventTypeCreateValidator,
 			sdk.NewAttribute(stakingtypes.AttributeKeyValidator, val.OperatorAddress),
-			sdk.NewAttribute(sdk.AttributeKeyAmount, fmt.Sprintf("%d", power)),
+			sdk.NewAttribute(sdk.AttributeKeyAmount, fmt.Sprintf("%d", power*k.stakingKeeper.PowerReduction(ctx).Uint64())),
 		),
 	})
 

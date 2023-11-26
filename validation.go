@@ -116,9 +116,5 @@ func (msg MsgSetPower) Validate(ac address.Codec) error {
 		return sdkerrors.ErrInvalidAddress.Wrapf("invalid validator address: %s", err)
 	}
 
-	if msg.Power < 1_000_000 {
-		return ErrPowerBelowMinimum
-	}
-
 	return nil
 }
