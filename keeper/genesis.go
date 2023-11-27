@@ -18,7 +18,7 @@ func (k *Keeper) InitCacheStores(ctx context.Context) error {
 		return err
 	}
 
-	// Set the current block (last power) as a H+1 cache.
+	// Set the current block (last power) as a H-1 cache.
 	if err := k.SetCachedBlockPower(ctx, currValPower.Uint64()); err != nil {
 		return err
 	}

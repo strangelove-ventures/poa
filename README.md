@@ -14,7 +14,7 @@ Since this module depends on x/staking, carefully read through the [Integration 
 
 After integrating the PoA module into your chain, read the [network considerations](./INTEGRATION.md#network-considerations) before launching the network.
 
-This includes: useful parameters, full module control, migrating from PoA->PoS, and other useful information.
+This includes: parameters, full module control, migrating from PoA->PoS, and other useful information.
 
 ## Concepts
 

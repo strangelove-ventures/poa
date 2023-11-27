@@ -4,16 +4,16 @@
 * [Introduction](#introduction)
 * [Example integration of the PoA Module](#example-integration-of-the-poa-module)
     * [Ante Handler Setup](#ante-handler-integration)
-* [Genesis Considerations](#genesis-considerations)
+* [Network Considerations](#network-considerations)
 
 # Introduction
 
-This document provides the instructions on integration and configuring the Proof-of-Authority (PoA) module within your Cosmos SDK chain implementation. This document makes the assumption that you have some existing codebase for your chain. If you do not, you can grab a template simapp from the [Cosmos SDK repo](https://github.com/cosmos/cosmos-sdk/tree/main/simapp). Validate your simapp version is on the same tagged version as this module is (eg. use v0.50.1 simapp for the v0.50.1 POA module).
+This document provides the instructions on integration and configuring the Proof-of-Authority (PoA) module within your Cosmos SDK chain implementation. This document makes the assumption that you have some existing codebase for your chain. If you do not, you can grab a template simapp from the [Cosmos SDK repo](https://github.com/cosmos/cosmos-sdk/tree/main/simapp). Validate your app version is on the same tagged version as this module (eg. use v0.50.1 simapp for the v0.50.1 PoA module).
 
-As of the time of writing (Nov 2023) migrating a PoS (Proof of Stake) chains to PoA is not supported. This is possible, but the upgrade code has not yet been written to support this. If you are interested, please [create a PR](https://github.com/strangelove-ventures/poa/pulls).
+As of the time of writing (Nov 2023) migrating a PoS (Proof of Stake) chains to PoA is not yet supported. This is possible, but the upgrade code has not yet been written yet. If you are interested, please [create a PR](https://github.com/strangelove-ventures/poa/pulls).
 
 The integration steps include the following:
-1. Importing POA, setting the Module + Keeper, initialize the store keys + module params, and initialize the Begin/End Block logic and InitGenesis order.
+1. Importing POA, setting the Module + Keeper, initialize the store keys, and initialize the Begin/End Block logic and InitGenesis order.
 2. Setup the Ante handler(s) to enforce the POA logic and give more control.
 
 
@@ -162,7 +162,7 @@ func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 
 ## Network Considerations
 
-### Genesis Slashing Params
+### Slashing - Genesis Params
 
 When setting up your network genesis, it is important to consider setting slash infractions to 0%.
 
@@ -186,6 +186,36 @@ app_state.slashing.params.min_signed_per_window
 app_state.slashing.params.downtime_jail_duration
 600s
 ```
+
+## PoA - Genesis params
+
+The PoA module can be configured to pre-define the admin controls. One admin must be set for a valid network. If you do not yet have an admin, set the chain's governance address. (CLI: `appd q auth module-account gov`)
+
+```json
+// base + module accounts, DAOs, and multisigs are supported.
+app_state.poa.params.admins
+["admin1...", "admin2..."]
+```
+
+## Staking - Genesis Params
+
+You must modify the genesis staking parameters for some other PoA configuration options.
+
+```json
+// The maximum size of the active set.
+app_state.staking.params.max_validators
+100
+
+// Any unique token can be used here.
+app_state.staking.params.bond_denom
+"upoa"
+
+// 0 is recommended here if you use the `CommissionLimitDecorator` ante.
+app_state.staking.params.min_commission_rate
+0.000000000000000000
+```
+
+The bond_denom is discussed in the next section.
 
 ### Tokens
 
