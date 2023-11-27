@@ -89,6 +89,10 @@ The `AbsoluteChangedPower` of +1 to each validator is 3, which is 33% of the pre
 ```
 
 ### SetPower (admin only)
+
+- `power` is a micro unit of power (1,000,000 = 1 power) to derive a validators consensus power.
+- `unsafe` allows an admin to bypass the 30% of consensus power per block limitation.
+
 ```json
 {
   "@type": "/strangelove_ventures.poa.v1.MsgSetPower",
@@ -118,6 +122,10 @@ The `AbsoluteChangedPower` of +1 to each validator is 3, which is 33% of the pre
 ```
 
 ### UpdateParams (admin only)
+
+- `admins` is a list of bech32 addresses that control the validator set and parameters of the chain.
+- `allow_graceful_exit` allows validators to force remove themselves from the active set at any time.
+
 ```json
 {
   "@type": "/strangelove_ventures.poa.v1.MsgUpdateParams",
@@ -127,7 +135,8 @@ The `AbsoluteChangedPower` of +1 to each validator is 3, which is 33% of the pre
       "cosmos1addr",
       "cosmos1addr1",
       "cosmos1addr2",
-    ]
+    ],
+    "allow_graceful_exit": true
   }
 }
 ```
@@ -143,7 +152,7 @@ The `AbsoluteChangedPower` of +1 to each validator is 3, which is 33% of the pre
     "max_entries": 7,
     "historical_entries": 7,
     "bond_denom": "stake",
-    "min_commission_rate": "0.050000000000000000"
+    "min_commission_rate": "0.000000000000000000"
   }
 }
 ```
@@ -209,11 +218,12 @@ poad tx poa remove [validator]
 # - --unsafe flag allows for bypassing the 30% max change per block
 poad tx poa set-power [validator] [amount] [--unsafe]
 
-# (admin) Update the module params (admins list)
+# (admin) Update the PoA module params
 # - admins is a comma separated list of bech32 addresses
 # - any admin can modify the list at any time
 # - there must be at least one admin in the list at all times
-poad tx poa update-params admin1,admin2,admin3,...
+# - allow-graceful-exit is a bool to allow validators to force remove themselves from the set.
+poad tx poa update-params admin1,admin2,admin3,... allow-graceful-exit
 
 # (admin) Update the staking module params
 # - unbondingTime is the time that a validator must wait to unbond (ex: 336h)

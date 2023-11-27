@@ -63,14 +63,16 @@ func (x *_Params_1_list) IsValid() bool {
 }
 
 var (
-	md_Params        protoreflect.MessageDescriptor
-	fd_Params_admins protoreflect.FieldDescriptor
+	md_Params                     protoreflect.MessageDescriptor
+	fd_Params_admins              protoreflect.FieldDescriptor
+	fd_Params_allow_graceful_exit protoreflect.FieldDescriptor
 )
 
 func init() {
 	file_strangelove_ventures_poa_v1_params_proto_init()
 	md_Params = File_strangelove_ventures_poa_v1_params_proto.Messages().ByName("Params")
 	fd_Params_admins = md_Params.Fields().ByName("admins")
+	fd_Params_allow_graceful_exit = md_Params.Fields().ByName("allow_graceful_exit")
 }
 
 var _ protoreflect.Message = (*fastReflection_Params)(nil)
@@ -144,6 +146,12 @@ func (x *fastReflection_Params) Range(f func(protoreflect.FieldDescriptor, proto
 			return
 		}
 	}
+	if x.AllowGracefulExit != false {
+		value := protoreflect.ValueOfBool(x.AllowGracefulExit)
+		if !f(fd_Params_allow_graceful_exit, value) {
+			return
+		}
+	}
 }
 
 // Has reports whether a field is populated.
@@ -161,6 +169,8 @@ func (x *fastReflection_Params) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
 	case "strangelove_ventures.poa.v1.Params.admins":
 		return len(x.Admins) != 0
+	case "strangelove_ventures.poa.v1.Params.allow_graceful_exit":
+		return x.AllowGracefulExit != false
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.Params"))
@@ -179,6 +189,8 @@ func (x *fastReflection_Params) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
 	case "strangelove_ventures.poa.v1.Params.admins":
 		x.Admins = nil
+	case "strangelove_ventures.poa.v1.Params.allow_graceful_exit":
+		x.AllowGracefulExit = false
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.Params"))
@@ -201,6 +213,9 @@ func (x *fastReflection_Params) Get(descriptor protoreflect.FieldDescriptor) pro
 		}
 		listValue := &_Params_1_list{list: &x.Admins}
 		return protoreflect.ValueOfList(listValue)
+	case "strangelove_ventures.poa.v1.Params.allow_graceful_exit":
+		value := x.AllowGracefulExit
+		return protoreflect.ValueOfBool(value)
 	default:
 		if descriptor.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.Params"))
@@ -225,6 +240,8 @@ func (x *fastReflection_Params) Set(fd protoreflect.FieldDescriptor, value proto
 		lv := value.List()
 		clv := lv.(*_Params_1_list)
 		x.Admins = *clv.list
+	case "strangelove_ventures.poa.v1.Params.allow_graceful_exit":
+		x.AllowGracefulExit = value.Bool()
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.Params"))
@@ -251,6 +268,8 @@ func (x *fastReflection_Params) Mutable(fd protoreflect.FieldDescriptor) protore
 		}
 		value := &_Params_1_list{list: &x.Admins}
 		return protoreflect.ValueOfList(value)
+	case "strangelove_ventures.poa.v1.Params.allow_graceful_exit":
+		panic(fmt.Errorf("field allow_graceful_exit of message strangelove_ventures.poa.v1.Params is not mutable"))
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.Params"))
@@ -267,6 +286,8 @@ func (x *fastReflection_Params) NewField(fd protoreflect.FieldDescriptor) protor
 	case "strangelove_ventures.poa.v1.Params.admins":
 		list := []string{}
 		return protoreflect.ValueOfList(&_Params_1_list{list: &list})
+	case "strangelove_ventures.poa.v1.Params.allow_graceful_exit":
+		return protoreflect.ValueOfBool(false)
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: strangelove_ventures.poa.v1.Params"))
@@ -342,6 +363,9 @@ func (x *fastReflection_Params) ProtoMethods() *protoiface.Methods {
 				n += 1 + l + runtime.Sov(uint64(l))
 			}
 		}
+		if x.AllowGracefulExit {
+			n += 2
+		}
 		if x.unknownFields != nil {
 			n += len(x.unknownFields)
 		}
@@ -370,6 +394,16 @@ func (x *fastReflection_Params) ProtoMethods() *protoiface.Methods {
 		if x.unknownFields != nil {
 			i -= len(x.unknownFields)
 			copy(dAtA[i:], x.unknownFields)
+		}
+		if x.AllowGracefulExit {
+			i--
+			if x.AllowGracefulExit {
+				dAtA[i] = 1
+			} else {
+				dAtA[i] = 0
+			}
+			i--
+			dAtA[i] = 0x10
 		}
 		if len(x.Admins) > 0 {
 			for iNdEx := len(x.Admins) - 1; iNdEx >= 0; iNdEx-- {
@@ -461,6 +495,26 @@ func (x *fastReflection_Params) ProtoMethods() *protoiface.Methods {
 				}
 				x.Admins = append(x.Admins, string(dAtA[iNdEx:postIndex]))
 				iNdEx = postIndex
+			case 2:
+				if wireType != 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field AllowGracefulExit", wireType)
+				}
+				var v int
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					v |= int(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				x.AllowGracefulExit = bool(v != 0)
 			default:
 				iNdEx = preIndex
 				skippy, err := runtime.Skip(dAtA[iNdEx:])
@@ -1224,6 +1278,8 @@ type Params struct {
 
 	// Array of addresses that are allowed to controll the chains validators power.
 	Admins []string `protobuf:"bytes,1,rep,name=admins,proto3" json:"admins,omitempty"`
+	// allow_graceful_exit allows for a valdiator to remove themselves from the validator set.
+	AllowGracefulExit bool `protobuf:"varint,2,opt,name=allow_graceful_exit,json=allowGracefulExit,proto3" json:"allow_graceful_exit,omitempty"`
 }
 
 func (x *Params) Reset() {
@@ -1251,6 +1307,13 @@ func (x *Params) GetAdmins() []string {
 		return x.Admins
 	}
 	return nil
+}
+
+func (x *Params) GetAllowGracefulExit() bool {
+	if x != nil {
+		return x.AllowGracefulExit
+	}
+	return false
 }
 
 // StakingParams defines the parameters for the x/staking module.
@@ -1350,9 +1413,12 @@ var file_strangelove_ventures_poa_v1_params_proto_rawDesc = []byte{
 	0x1a, 0x1e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75,
 	0x66, 0x2f, 0x64, 0x75, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f,
 	0x1a, 0x19, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x5f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x63,
-	0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x2a, 0x0a, 0x06, 0x50,
+	0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x5a, 0x0a, 0x06, 0x50,
 	0x61, 0x72, 0x61, 0x6d, 0x73, 0x12, 0x16, 0x0a, 0x06, 0x61, 0x64, 0x6d, 0x69, 0x6e, 0x73, 0x18,
-	0x01, 0x20, 0x03, 0x28, 0x09, 0x52, 0x06, 0x61, 0x64, 0x6d, 0x69, 0x6e, 0x73, 0x3a, 0x08, 0x98,
+	0x01, 0x20, 0x03, 0x28, 0x09, 0x52, 0x06, 0x61, 0x64, 0x6d, 0x69, 0x6e, 0x73, 0x12, 0x2e, 0x0a,
+	0x13, 0x61, 0x6c, 0x6c, 0x6f, 0x77, 0x5f, 0x67, 0x72, 0x61, 0x63, 0x65, 0x66, 0x75, 0x6c, 0x5f,
+	0x65, 0x78, 0x69, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x08, 0x52, 0x11, 0x61, 0x6c, 0x6c, 0x6f,
+	0x77, 0x47, 0x72, 0x61, 0x63, 0x65, 0x66, 0x75, 0x6c, 0x45, 0x78, 0x69, 0x74, 0x3a, 0x08, 0x98,
 	0xa0, 0x1f, 0x00, 0xe8, 0xa0, 0x1f, 0x01, 0x22, 0xa3, 0x03, 0x0a, 0x0d, 0x53, 0x74, 0x61, 0x6b,
 	0x69, 0x6e, 0x67, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x12, 0x4f, 0x0a, 0x0e, 0x75, 0x6e, 0x62,
 	0x6f, 0x6e, 0x64, 0x69, 0x6e, 0x67, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28,
