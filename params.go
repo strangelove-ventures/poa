@@ -20,10 +20,10 @@ func DefaultParams() Params {
 }
 
 // NewParams returns a new POA Params.
-func NewParams(admins []string, allowGracefulExit bool) (Params, error) {
+func NewParams(admins []string, allowValSelfExit bool) (Params, error) {
 	p := Params{
-		Admins:            admins,
-		AllowGracefulExit: allowGracefulExit,
+		Admins:                 admins,
+		AllowValidatorSelfExit: allowValSelfExit,
 	}
 
 	return p, p.Validate()

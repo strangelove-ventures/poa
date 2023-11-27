@@ -109,7 +109,7 @@ func GetPOAPending(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain)
 	return res
 }
 
-func POAUpdateParams(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, user ibc.Wallet, admins []string) (TxResponse, error) {
+func POAUpdateParams(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, user ibc.Wallet, admins []string, gracefulExit bool) (TxResponse, error) {
 	// admin1,admin2,admin3
 	adminList := ""
 	for _, admin := range admins {
@@ -117,7 +117,12 @@ func POAUpdateParams(t *testing.T, ctx context.Context, chain *cosmos.CosmosChai
 	}
 	adminList = adminList[:len(adminList)-1]
 
-	cmd := TxCommandBuilder(ctx, chain, []string{"tx", "poa", "update-params", adminList}, user.KeyName())
+	gracefulParam := "true"
+	if !gracefulExit {
+		gracefulParam = "false"
+	}
+
+	cmd := TxCommandBuilder(ctx, chain, []string{"tx", "poa", "update-params", adminList, gracefulParam}, user.KeyName())
 	return ExecuteTransaction(ctx, chain, cmd)
 }
 

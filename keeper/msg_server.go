@@ -88,17 +88,24 @@ func (ms msgServer) RemoveValidator(ctx context.Context, msg *poa.MsgRemoveValid
 	// Sender is not an admin. Check if the sender is the validator and that validator exist.
 	if !ms.k.IsAdmin(ctx, msg.Sender) {
 
-		// check if the sender is the validator being removed.
-		isVal, err := ms.k.IsSenderValidator(ctx, msg.Sender, msg.ValidatorAddress)
+		params, err := ms.k.GetParams(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		if !isVal {
+		// check if the sender is the validator being removed.
+		hasPermission, err := ms.k.IsSenderValidator(ctx, msg.Sender, msg.ValidatorAddress)
+		if err != nil {
+			return nil, err
+		}
+
+		if !hasPermission {
 			return nil, poa.ErrNotAnAuthority
 		}
 
-		// the sender is the validator and does exist, continue.
+		if !params.AllowValidatorSelfExit {
+			return nil, poa.ErrValidatorSelfRemoval
+		}
 	}
 
 	vals, err := ms.k.stakingKeeper.GetAllValidators(ctx)

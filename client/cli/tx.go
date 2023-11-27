@@ -161,7 +161,7 @@ func NewRemovePendingCmd() *cobra.Command {
 
 func NewUpdateParamsCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "update-params [admin1,admin2,admin3,...] [allow-graceful-exit-bool]",
+		Use:   "update-params [admin1,admin2,admin3,...] [allow-validator-self-exit-bool]",
 		Short: "update the PoA module params",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {

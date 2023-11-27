@@ -16,8 +16,8 @@ message Params {
   // Array of addresses that are allowed to controll the chains validators power.
   repeated string admins = 1;
 
-  // allow_graceful_exit allows for a valdiator to remove themselves from the validator set.
-  bool allow_graceful_exit = 2;
+  // allow_validator_self_exit allows for a valdiator to remove themselves from the validator set.
+  bool allow_validator_self_exit = 2;
 }
 
 // StakingParams defines the parameters for the x/staking module.
