@@ -8,7 +8,7 @@
 
 # Introduction
 
-This document provides the instructions on integration and configuring the Proof-of-Authority (poa) module within your Cosmos SDK chain implementation. This document makes the assumption that you have some existing codebase for your chain. If you do not, you can grab a template simapp from the [Cosmos SDK repo](https://github.com/cosmos/cosmos-sdk/tree/main/simapp). Validate your simapp version is on the same tagged version as this module is (eg. use v0.50.1 simapp for the v0.50.1 POA module).
+This document provides the instructions on integration and configuring the Proof-of-Authority (PoA) module within your Cosmos SDK chain implementation. This document makes the assumption that you have some existing codebase for your chain. If you do not, you can grab a template simapp from the [Cosmos SDK repo](https://github.com/cosmos/cosmos-sdk/tree/main/simapp). Validate your simapp version is on the same tagged version as this module is (eg. use v0.50.1 simapp for the v0.50.1 POA module).
 
 As of the time of writing (Nov 2023) migrating a PoS (Proof of Stake) chains to PoA is not supported. This is possible, but the upgrade code has not yet been written to support this. If you are interested, please [create a PR](https://github.com/strangelove-ventures/poa/pulls).
 
@@ -22,13 +22,13 @@ The integration steps include the following:
 ```go
 // app.go
 
-// Import the poa module
+// Import the PoA module
 import (
     ...
     "github.com/strangelove-ventures/poa"
 	poatypes "github.com/strangelove-ventures/poa"
 	poakeeper "github.com/strangelove-ventures/poa/keeper"
-	poamodule "github.com/strangelove-ventures/poa/module"
+    poamodule "github.com/strangelove-ventures/poa/module"
 )
 
 ...
@@ -40,6 +40,13 @@ type App struct {
 	...
 }
 
+...
+
+// Create POA store key
+keys := storetypes.NewKVStoreKeys(
+    ...
+    poa.StoreKey,
+)
 
 ...
 
@@ -55,29 +62,17 @@ app.POAKeeper = poakeeper.NewKeeper(
 
 ...
 
-// Create POA store key
-keys := sdk.NewKVStoreKeys(
-    ...
-    poa.StoreKey,
-    ...
-)
-
-// See the section below for configuring an application stack with the PoA
-
-...
-
 // Register PoA AppModule
-app.moduleManager = module.NewManager(
+app.ModuleManager = module.NewManager(
     ...
-    packetforward.NewAppModule(app.PacketForwardKeeper),
-    ...
+    poamodule.NewAppModule(appCodec, app.POAKeeper),
 )
 
 ...
 
-// Add PoA to begin blocker logic
+// Add PoA to BeginBlock logic
 // NOTE: This must be before the staking module begin blocker
-app.moduleManager.SetOrderBeginBlockers(
+app.ModuleManager.SetOrderBeginBlockers(
     ...
     poa.ModuleName,
     stakingtypes.ModuleName,
@@ -85,7 +80,7 @@ app.moduleManager.SetOrderBeginBlockers(
 )
 
 // Add PoA to end blocker logic
-app.moduleManager.SetOrderEndBlockers(
+app.ModuleManager.SetOrderEndBlockers(
     ...
     poa.ModuleName,
     stakingtypes.ModuleName,
@@ -94,12 +89,15 @@ app.moduleManager.SetOrderEndBlockers(
 
 // Add PoA to init genesis logic
 // NOTE: This must be after the staking module init genesis
-app.moduleManager.SetOrderInitGenesis(
+app.ModuleManager.SetOrderInitGenesis(
     ...
     stakingtypes.ModuleName,
     poa.ModuleName,
     ...
 )
+
+// go get github.com/strangelove-ventures/poa
+
 ```
 
 ## Ante Handler Integration
@@ -140,6 +138,7 @@ if both rateFloor and rateCiel are set to the same value, then the commission ra
 ```go
 import (
     ...
+    sdkmath "cosmossdk.io/math"
     poaante "github.com/strangelove-ventures/poa/ante"
 )
 
@@ -149,12 +148,12 @@ func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
     ...
 
     doGenTxRateValidation := false
-    rateFloor := math.LegacyMustNewDecFromStr("0.10")
-	rateCeil := math.LegacyMustNewDecFromStr("0.50")
+    rateFloor := sdkmath.LegacyMustNewDecFromStr("0.10")
+	rateCeil := sdkmath.LegacyMustNewDecFromStr("0.50")
 
     anteDecorators := []sdk.AnteDecorator{
         ...
-        poaante.NewMsgCommissionLimiterDecorator(doGenTxRateValidation, rateFloor, rateCeil),
+        poaante.CommissionLimitDecorator(doGenTxRateValidation, rateFloor, rateCeil),
         ...
     }
     ...
