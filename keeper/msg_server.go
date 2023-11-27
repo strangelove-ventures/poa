@@ -84,8 +84,21 @@ func (ms msgServer) SetPower(ctx context.Context, msg *poa.MsgSetPower) (*poa.Ms
 }
 
 func (ms msgServer) RemoveValidator(ctx context.Context, msg *poa.MsgRemoveValidator) (*poa.MsgRemoveValidatorResponse, error) {
-	if ok := ms.k.IsAdmin(ctx, msg.Sender); !ok {
-		return nil, poa.ErrNotAnAuthority
+
+	// Sender is not an admin. Check if the sender is the validator and that validator exist.
+	if !ms.k.IsAdmin(ctx, msg.Sender) {
+
+		// check if the sender is the validator being removed.
+		isVal, err := ms.k.IsSenderValidator(ctx, msg.Sender, msg.ValidatorAddress)
+		if err != nil {
+			return nil, err
+		}
+
+		if !isVal {
+			return nil, poa.ErrNotAnAuthority
+		}
+
+		// the sender is the validator and does exist, continue.
 	}
 
 	vals, err := ms.k.stakingKeeper.GetAllValidators(ctx)
@@ -97,6 +110,24 @@ func (ms msgServer) RemoveValidator(ctx context.Context, msg *poa.MsgRemoveValid
 		return nil, fmt.Errorf("cannot remove the last validator in the set")
 	}
 
+	// Ensure the validator exists and is bonded.
+	found := false
+	for _, val := range vals {
+		if val.OperatorAddress == msg.ValidatorAddress {
+			if !val.IsBonded() {
+				return nil, errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "validator %s is not bonded", msg.ValidatorAddress)
+			}
+
+			found = true
+			break
+		}
+	}
+
+	if !found {
+		return nil, errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "validator %s does not exist", msg.ValidatorAddress)
+	}
+
+	// Remove the validator from the active set with 0 consensus power.
 	val, err := ms.k.SetPOAPower(ctx, msg.ValidatorAddress, 0)
 	if err != nil {
 		return nil, err

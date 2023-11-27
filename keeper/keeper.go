@@ -4,6 +4,8 @@ import (
 	"context"
 
 	"github.com/cosmos/cosmos-sdk/codec"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	slashingkeeper "github.com/cosmos/cosmos-sdk/x/slashing/keeper"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 
@@ -77,6 +79,21 @@ func (k Keeper) IsAdmin(ctx context.Context, fromAddr string) bool {
 	}
 
 	return false
+}
+
+// IsSenderValidator checks if the given sender address is the same address as the validator by bytes.
+func (k Keeper) IsSenderValidator(ctx context.Context, sender string, expectedValidator string) (bool, error) {
+	from, err := sdk.AccAddressFromBech32(sender)
+	if err != nil {
+		return false, sdkerrors.ErrInvalidAddress.Wrapf("invalid sender address: %s", err)
+	}
+
+	expectedVal, err := sdk.ValAddressFromBech32(expectedValidator)
+	if err != nil {
+		return false, sdkerrors.ErrInvalidAddress.Wrapf("invalid validator address: %s", err)
+	}
+
+	return from.Equals(expectedVal), nil
 }
 
 func (k Keeper) Logger() log.Logger {
