@@ -245,7 +245,6 @@ func testPending(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, a
 
 	txRes, err := helpers.POARemovePending(t, ctx, chain, acc0, pv.Pending[0].OperatorAddress)
 	require.NoError(t, err)
-	fmt.Printf("%+v", txRes)
 
 	// validate it was removed
 	pv = helpers.GetPOAPending(t, ctx, chain)
