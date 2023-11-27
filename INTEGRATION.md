@@ -4,7 +4,7 @@
 * [Introduction](#introduction)
 * [Example integration of the PoA Module](#example-integration-of-the-poa-module)
     * [Ante Handler Setup](#ante-handler-integration)
-* [Design Details](#design-details)
+* [Genesis Considerations](#genesis-considerations)
 
 # Introduction
 
@@ -160,16 +160,51 @@ func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 }
 ```
 
+## Network Considerations
 
-----
+### Genesis Slashing Params
 
+When setting up your network genesis, it is important to consider setting slash infractions to 0%.
 
-## Design Details
-- Wraps x/staking for XYZ
-- delegation is forced from the validators account.
-- validators can not unbond or redelegate. Can only go down 3 ways: (x/slashing module): downtime, doubleslash or (x/poa) admin removal.
+```json
+app_state.slashing.params.slash_fraction_double_sign
+0.000000000000000000
 
-- Ante: All staking commands except `MsgUpdateValidator`
-- Ante: Commission limits (forced range, or specific value)
+app_state.slashing.params.slash_fraction_downtime
+0.000000000000000000
+```
 
-- If you want a module's control not to be based on governance, update your `app.go` authorities to use your set account instead of the gov account by default. This could be useful for the Upgrade module to not require governance but still allow the chain to get upgrades.
+It is up to you on setting the slashing window requirements. An Example:
+
+```json
+app_state.slashing.params.signed_blocks_window
+10000
+
+app_state.slashing.params.min_signed_per_window
+0.100000000000000000
+
+app_state.slashing.params.downtime_jail_duration
+600s
+```
+
+### Tokens
+
+Because all network staking is disabled, it grants you the ability to use any token as the power token. This also includes using the PoA power token as a standard user token in the network. *(e.g. validator power can be `token` while the network mints and uses `token` also to distribute to user).*
+
+For best practice, use a dedicated power token (e.g. upoa) for validators and another token(s) for the day to day network and gas fee operations.
+
+### Validator Commission Rates
+
+Force your validator set commission rate range with the [Forced Commission Rate Ante Handler](./INTEGRATION.md#ante-handler-integration).
+
+### Full Module Control
+
+If you want a module's control not to be based on governance (e.g. x/upgrade for software upgrades), update that module's app.go authority string to use your own account instead of the gov address `authtypes.NewModuleAddress(govtypes.ModuleName).String()`. This can be one of the accounts in the PoA admin set, or any other valid account on chain (e.g. a multisig, DAO, Base or Module account).
+
+## Migrating to PoS from PoA
+
+A future optional upgrade will grant PoA networks the ability to migrate to PoS (Proof-of-Stake).
+
+Reasons this may be desired:
+- The chain product has been successful and the network is ready to be decentralized.
+- There is a new token use case that requires a PoS network for user delegations (ex: sharing platform rewards with stakers).

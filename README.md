@@ -2,7 +2,19 @@
 
 The Proof of Authority (PoA) module allows for permissioned networks to be controlled by a predefined set of validators to verify transactions. This implementation extends the Cosmos-SDK's x/staking module to a a set of administrators over the chain. These administrators gate keep the chain by whitelisting validators, updating cosnensus power, and removing validators from the network.
 
-Since this module depends on x/staking, carefully read through the [Integration Guide](./INTEGRATION.md) for a full understanding of how the two modules interact. This design choice was made to allow for the PoA module backwards compatible with website UIs, bots, and validator experience. It also has the added security benefit of a tested core module in Cosmos.
+## Integration
+
+Since this module depends on x/staking, carefully read through the [Integration Guide](./INTEGRATION.md) to add it to your network. This design choice was made to allow for the PoA module to have backwards compatibility with:
+- Website UIs
+- Uptime bots
+- Validator scripts
+- in-process multi-validator testnets
+
+## Configuration
+
+After integrating the PoA module into your chain, read the [network considerations](./INTEGRATION.md#network-considerations) before launching the network.
+
+This includes: useful parameters, full module control, migrating from PoA->PoS, and other useful information.
 
 ## Concepts
 
@@ -11,6 +23,15 @@ The PoA flow is divided into a few key steps:
 - **Start**: The chain controller merges these genesis transactions into the genesis file and starts the chain
 - **Updates**: The chain admin(s) can update the validator set by adding validators or modifying their consensus power.
 - **Removal**: The chain admin(s) can remove validators from the network.
+
+All delegation actions are disabled with the [disabled-staking ante](./INTEGRATION.md#ante-handler-integration). While the validator is the set delegator of its own account, only the admin(s) can modify this delegation of power via x/poa. Validators can only go down the following ways:
+
+| Module	    | Action 	      |
+|---	        |---	          |
+| x/slashing  | downtime 	    |
+| x/slashing  | double sign   |
+| x/poa       | admin removal |
+| x/poa       | self removal  |
 
 ## State
 
