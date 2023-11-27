@@ -55,7 +55,7 @@ func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 		ante.NewSigVerificationDecorator(options.AccountKeeper, options.SignModeHandler),
 		ante.NewIncrementSequenceDecorator(options.AccountKeeper),
 		poaante.NewPOADisableStakingDecorator(),
-		poaante.NewMsgCommissionLimiterDecorator(doGenTxRateValidation, rateFloor, rateCeil),
+		poaante.NewCommissionLimitDecorator(doGenTxRateValidation, rateFloor, rateCeil),
 	}
 
 	return sdk.ChainAnteDecorators(anteDecorators...), nil
