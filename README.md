@@ -124,7 +124,7 @@ The `AbsoluteChangedPower` of +1 to each validator is 3, which is 33% of the pre
 ### UpdateParams (admin only)
 
 - `admins` is a list of bech32 addresses that control the validator set and parameters of the chain.
-- `allow_graceful_exit` allows validators to force remove themselves from the active set at any time.
+- `allow_validator_self_exit` allows validators to force remove themselves from the active set at any time.
 
 ```json
 {
@@ -136,7 +136,7 @@ The `AbsoluteChangedPower` of +1 to each validator is 3, which is 33% of the pre
       "cosmos1addr1",
       "cosmos1addr2",
     ],
-    "allow_graceful_exit": true
+    "allow_validator_self_exit": true
   }
 }
 ```
