@@ -125,7 +125,6 @@ var (
 		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
 		govtypes.ModuleName:            {authtypes.Burner},
 		nft.ModuleName:                 nil,
-		poa.ModuleName:                 {authtypes.Minter},
 	}
 
 	govModAddress = authtypes.NewModuleAddress(govtypes.ModuleName).String()

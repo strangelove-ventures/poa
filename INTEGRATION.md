@@ -25,23 +25,11 @@ The integration steps include the following:
 // Import the poa module
 import (
     ...
-
-	"github.com/strangelove-ventures/poa"
+    "github.com/strangelove-ventures/poa"
 	poatypes "github.com/strangelove-ventures/poa"
 	poakeeper "github.com/strangelove-ventures/poa/keeper"
 	poamodule "github.com/strangelove-ventures/poa/module"
 )
-
-...
-
-// Set the PoA module Account permissions
-var (
-    maccPerms = map[string][]string{
-		...
-		poa.ModuleName:                 {authtypes.Minter},
-	}
-)
-
 
 ...
 
@@ -67,7 +55,7 @@ app.POAKeeper = poakeeper.NewKeeper(
 
 ...
 
-// Create store keys
+// Create POA store key
 keys := sdk.NewKVStoreKeys(
     ...
     poa.StoreKey,
@@ -82,6 +70,7 @@ keys := sdk.NewKVStoreKeys(
 app.moduleManager = module.NewManager(
     ...
     packetforward.NewAppModule(app.PacketForwardKeeper),
+    ...
 )
 
 ...
