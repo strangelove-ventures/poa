@@ -10,14 +10,12 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 
 	poaante "github.com/strangelove-ventures/poa/ante"
-	poakeeper "github.com/strangelove-ventures/poa/keeper"
 )
 
 // HandlerOptions are the options required for constructing a default SDK AnteHandler.
 type HandlerOptions struct {
 	ante.HandlerOptions
 	CircuitKeeper circuitante.CircuitBreaker
-	POAKeeper     poakeeper.Keeper
 }
 
 // NewAnteHandler returns an AnteHandler that checks and increments sequence
