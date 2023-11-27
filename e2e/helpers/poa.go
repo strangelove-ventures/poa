@@ -92,7 +92,7 @@ func GetPOAParams(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain) 
 
 func GetPOAConsensusPower(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, valoperAddr string) int64 {
 	var res POAConsensusPower
-	ExecuteQuery(ctx, chain, []string{"query", "poa", "power", valoperAddr}, &res)
+	ExecuteQuery(ctx, chain, []string{"query", "poa", "consensus-power", valoperAddr}, &res)
 
 	var power int64
 	_, err := fmt.Sscanf(res.Power, "%d", &power)
