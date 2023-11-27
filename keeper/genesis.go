@@ -18,10 +18,8 @@ func (k *Keeper) InitCacheStores(ctx context.Context) error {
 		return err
 	}
 
-	// consPower converts the current validator power to a smaller number (divide by 10^6).
-	// This allows the power to match the expected consensus power (Int64 / 8) range.
-	consPower := currValPower.Quo(k.GetStakingKeeper().PowerReduction(ctx))
-	if err := k.SetCachedBlockPower(ctx, consPower.Uint64()); err != nil {
+	// Set the current block (last power) as a H-1 cache.
+	if err := k.SetCachedBlockPower(ctx, currValPower.Uint64()); err != nil {
 		return err
 	}
 

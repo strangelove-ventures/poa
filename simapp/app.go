@@ -125,7 +125,6 @@ var (
 		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
 		govtypes.ModuleName:            {authtypes.Burner},
 		nft.ModuleName:                 nil,
-		poa.ModuleName:                 {authtypes.Minter},
 	}
 
 	govModAddress = authtypes.NewModuleAddress(govtypes.ModuleName).String()
@@ -323,7 +322,6 @@ func NewSimApp(
 		authcodec.NewBech32Codec(sdk.Bech32PrefixValAddr),
 		logger,
 	)
-	poaAppModule := poamodule.NewAppModule(appCodec, app.POAKeeper)
 
 	// register the staking hooks
 	// NOTE: stakingKeeper above is passed by reference, so that it will contain these hooks
@@ -418,7 +416,7 @@ func NewSimApp(
 		nftmodule.NewAppModule(appCodec, app.NFTKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
 		consensus.NewAppModule(appCodec, app.ConsensusParamsKeeper),
 		circuit.NewAppModule(appCodec, app.CircuitKeeper),
-		poaAppModule,
+		poamodule.NewAppModule(appCodec, app.POAKeeper),
 	)
 
 	// BasicModuleManager defines the module BasicManager is in charge of setting up basic,
@@ -429,13 +427,13 @@ func NewSimApp(
 		app.ModuleManager,
 		map[string]module.AppModuleBasic{
 			genutiltypes.ModuleName: genutil.NewAppModuleBasic(genutiltypes.DefaultMessageValidator),
-			poa.ModuleName:          poamodule.NewAppModuleBasic(poaAppModule),
 			govtypes.ModuleName: gov.NewAppModuleBasic(
 				[]govclient.ProposalHandler{
 					paramsclient.ProposalHandler,
 				},
 			),
-		})
+		},
+	)
 	app.BasicModuleManager.RegisterLegacyAminoCodec(legacyAmino)
 	app.BasicModuleManager.RegisterInterfaces(interfaceRegistry)
 
@@ -452,19 +450,19 @@ func NewSimApp(
 		distrtypes.ModuleName,
 		slashingtypes.ModuleName,
 		evidencetypes.ModuleName,
+		poa.ModuleName,
 		stakingtypes.ModuleName,
 		genutiltypes.ModuleName,
 		authz.ModuleName,
-		poa.ModuleName,
 	)
 	app.ModuleManager.SetOrderEndBlockers(
 		crisistypes.ModuleName,
 		govtypes.ModuleName,
+		poa.ModuleName,
 		stakingtypes.ModuleName,
 		genutiltypes.ModuleName,
 		feegrant.ModuleName,
 		group.ModuleName,
-		poa.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -575,7 +573,6 @@ func (app *SimApp) setAnteHandler(txConfig client.TxConfig) {
 				SigGasConsumer:  ante.DefaultSigVerificationGasConsumer,
 			},
 			&app.CircuitKeeper,
-			app.POAKeeper,
 		},
 	)
 	if err != nil {

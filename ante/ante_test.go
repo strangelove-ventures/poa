@@ -89,7 +89,7 @@ func TestAnteCommissionRanges(t *testing.T) {
 
 	for _, tc := range testCases {
 		tc := tc
-		mcl := NewMsgCommissionLimiterDecorator(true, tc.rateFloor, tc.rateCeil)
+		mcl := NewCommissionLimitDecorator(true, tc.rateFloor, tc.rateCeil)
 
 		// Creating a Validator
 		_, err := mcl.AnteHandle(ctx, NewMockTx(&poa.MsgCreateValidator{

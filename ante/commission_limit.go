@@ -12,9 +12,9 @@ import (
 	"github.com/strangelove-ventures/poa"
 )
 
-// MsgCommissionLimiterDecorator limits commission rates for validators between 2 ranges.
+// CommissionLimitDecorator limits commission rates for validators between 2 ranges.
 // if both ranges are the same, the rate change must only be the value both.
-type MsgCommissionLimiterDecorator struct {
+type CommissionLimitDecorator struct {
 	// if true, gentxs are also required to be within the commission limit on network start.
 	DoGenTxRateValidation bool
 
@@ -23,8 +23,8 @@ type MsgCommissionLimiterDecorator struct {
 	RateCeil  math.LegacyDec
 }
 
-func NewMsgCommissionLimiterDecorator(doGenTxRateValidation bool, rateFloor, rateCiel math.LegacyDec) MsgCommissionLimiterDecorator {
-	return MsgCommissionLimiterDecorator{
+func NewCommissionLimitDecorator(doGenTxRateValidation bool, rateFloor, rateCiel math.LegacyDec) CommissionLimitDecorator {
+	return CommissionLimitDecorator{
 		DoGenTxRateValidation: doGenTxRateValidation,
 		RateFloor:             rateFloor,
 		RateCeil:              rateCiel,
@@ -32,7 +32,7 @@ func NewMsgCommissionLimiterDecorator(doGenTxRateValidation bool, rateFloor, rat
 }
 
 // AnteHandle performs an AnteHandler check that returns an error if the tx contains a message that is not within the commission limit.
-func (mcl MsgCommissionLimiterDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (sdk.Context, error) {
+func (mcl CommissionLimitDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (sdk.Context, error) {
 	if !mcl.DoGenTxRateValidation && ctx.BlockHeight() <= 1 {
 		return next(ctx, tx, simulate)
 	}
@@ -45,7 +45,7 @@ func (mcl MsgCommissionLimiterDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, 
 	return next(ctx, tx, simulate)
 }
 
-func (mcl MsgCommissionLimiterDecorator) hasInvalidCommissionRange(msgs []sdk.Msg) error {
+func (mcl CommissionLimitDecorator) hasInvalidCommissionRange(msgs []sdk.Msg) error {
 	for _, msg := range msgs {
 		// authz nested message check (recursive)
 		if execMsg, ok := msg.(*authz.MsgExec); ok {

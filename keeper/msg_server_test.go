@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	"github.com/cosmos/cosmos-sdk/x/staking/types"
 
 	"cosmossdk.io/math"
@@ -365,11 +366,11 @@ func (f *testFixture) mintTokensToBondedPool(t *testing.T) error {
 
 	coins := sdk.NewCoins(sdk.NewCoin(bondDenom, math.NewInt(amt)))
 
-	if err := f.bankkeeper.MintCoins(f.ctx, poa.ModuleName, coins); err != nil {
+	if err := f.bankkeeper.MintCoins(f.ctx, minttypes.ModuleName, coins); err != nil {
 		return err
 	}
 
-	if err := f.bankkeeper.SendCoinsFromModuleToModule(f.ctx, poa.ModuleName, types.BondedPoolName, coins); err != nil {
+	if err := f.bankkeeper.SendCoinsFromModuleToModule(f.ctx, minttypes.ModuleName, types.BondedPoolName, coins); err != nil {
 		return err
 	}
 

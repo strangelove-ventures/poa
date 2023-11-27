@@ -11,10 +11,10 @@ var (
 	// PendingValidatorsKey saves the current pending validators.
 	PendingValidatorsKey = collections.NewPrefix(1)
 
-	// CachedPreviousBlockPowerKey saves the previous blocks total delegated power amount.
+	// CachedPreviousBlockPowerKey saves the previous blocks total power amount.
 	CachedPreviousBlockPowerKey = collections.NewPrefix(2)
 
-	// AbsoluteChangedInBlockPowerKey tracks the current blocks total delegated power amount.
+	// AbsoluteChangedInBlockPowerKey tracks the current blocks total power amount.
 	// If this becomes >30% of CachedPreviousBlockPowerKey, messages will fail to limit IBC issues.
 	AbsoluteChangedInBlockPowerKey = collections.NewPrefix(3)
 )
