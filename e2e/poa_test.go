@@ -70,7 +70,7 @@ func testUpdatePOAParams(t *testing.T, ctx context.Context, chain *cosmos.Cosmos
 	var err error
 
 	t.Run("fail: update-params message from a non authorized user", func(t *testing.T) {
-		tx, err = helpers.POAUpdateParams(t, ctx, chain, incorrectUser, []string{incorrectUser.FormattedAddress()})
+		tx, err = helpers.POAUpdateParams(t, ctx, chain, incorrectUser, []string{incorrectUser.FormattedAddress()}, true)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -123,7 +123,7 @@ func testUpdatePOAParams(t *testing.T, ctx context.Context, chain *cosmos.Cosmos
 		randAcc := "cosmos1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqnrql8a"
 
 		newAdmins := []string{acc0.FormattedAddress(), govModule, randAcc, incorrectUser.FormattedAddress()}
-		tx, err = helpers.POAUpdateParams(t, ctx, chain, acc0, newAdmins)
+		tx, err = helpers.POAUpdateParams(t, ctx, chain, acc0, newAdmins, true)
 		if err != nil {
 			t.Fatal(err)
 		}

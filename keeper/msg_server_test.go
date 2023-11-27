@@ -357,7 +357,6 @@ func TestRemoveValidator(t *testing.T) {
 	for _, tc := range testCases {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
-
 			// Update the params for self approval
 			currParams, _ := f.k.GetParams(f.ctx)
 			currParams.AllowValidatorSelfExit = tc.isSelfRemovalAllowed

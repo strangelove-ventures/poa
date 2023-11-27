@@ -222,7 +222,7 @@ poad tx poa set-power [validator] [amount] [--unsafe]
 # - admins is a comma separated list of bech32 addresses
 # - any admin can modify the list at any time
 # - there must be at least one admin in the list at all times
-# - allow-graceful-exit is a bool to allow validators to force remove themselves from the set.
+# - allow_validator_self_exit is a bool to allow validators to force remove themselves from the set.
 poad tx poa update-params [admin1,admin2,admin3,...] [allow_validator_self_exit]
 
 # (admin) Update the staking module params

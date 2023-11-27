@@ -84,10 +84,8 @@ func (ms msgServer) SetPower(ctx context.Context, msg *poa.MsgSetPower) (*poa.Ms
 }
 
 func (ms msgServer) RemoveValidator(ctx context.Context, msg *poa.MsgRemoveValidator) (*poa.MsgRemoveValidatorResponse, error) {
-
 	// Sender is not an admin. Check if the sender is the validator and that validator exist.
 	if !ms.k.IsAdmin(ctx, msg.Sender) {
-
 		params, err := ms.k.GetParams(ctx)
 		if err != nil {
 			return nil, err
