@@ -23,6 +23,37 @@ func POARemove(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, use
 	return ExecuteTransaction(ctx, chain, cmd)
 }
 
+func POARemovePending(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, user ibc.Wallet, valoper string) (TxResponse, error) {
+	cmd := TxCommandBuilder(ctx, chain, []string{"tx", "poa", "remove-pending", valoper}, user.KeyName())
+	return ExecuteTransaction(ctx, chain, cmd)
+}
+
+func POACreatePendingValidator(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, user ibc.Wallet) (TxResponse, error) {
+	file := "validator_file.json"
+
+	// TODO: allow modifying the values
+	content := fmt.Sprintf(`{
+		"pubkey": {"@type":"/cosmos.crypto.ed25519.PubKey","key":"pl3Q8OQwtC7G2dSqRqsUrO5VZul7l40I+MKUcejqRsg="},
+		"amount": "0stake",
+		"moniker": "%s",
+		"identity": "",
+		"website": "https://website.com",
+		"security": "security@cosmos.xyz",
+		"details": "description",
+		"commission-rate": "%s",
+		"commission-max-rate": "%s",
+		"commission-max-change-rate": "%s",
+		"min-self-delegation": "1"
+	}`, "testval", "0.10", "0.25", "0.05")
+
+	err := chain.GetNode().WriteFile(ctx, []byte(content), file)
+	require.NoError(t, err)
+
+	filePath := fmt.Sprintf("%s/%s", chain.GetNode().HomeDir(), file)
+	cmd := TxCommandBuilder(ctx, chain, []string{"tx", "poa", "create-validator", filePath}, user.KeyName())
+	return ExecuteTransaction(ctx, chain, cmd)
+}
+
 func SubmitGovernanceProposalForValidatorChanges(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, user ibc.Wallet, validator string, power uint64, unsafe bool) string {
 	govAddr := "cosmos10d07y265gmmuvt4z0w9aw880jnsr700j6zn9kn"
 
@@ -67,6 +98,12 @@ func GetPOAConsensusPower(t *testing.T, ctx context.Context, chain *cosmos.Cosmo
 	}
 
 	return power
+}
+
+func GetPOAPending(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain) POAPending {
+	var res POAPending
+	ExecuteQuery(ctx, chain, []string{"query", "poa", "pending-validators"}, &res)
+	return res
 }
 
 func POAUpdateParams(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, user ibc.Wallet, admins []string) (TxResponse, error) {

@@ -60,6 +60,7 @@ func TestPOA(t *testing.T) {
 	testStakingDisabled(t, ctx, chain, validators, acc0, acc1)
 	testGovernance(t, ctx, chain, acc0, validators)
 	testPowerErrors(t, ctx, chain, validators, incorrectUser, acc0)
+	testPending(t, ctx, chain, acc0)
 	testRemoveValidator(t, ctx, chain, validators, acc0)
 	testUpdatePOAParams(t, ctx, chain, validators, acc0, incorrectUser)
 }
@@ -229,6 +230,30 @@ func testStakingDisabled(t *testing.T, ctx context.Context, chain *cosmos.Cosmos
 	res, err = helpers.ExecuteAuthzExecMsg(t, ctx, chain, grantee, nestedCmd)
 	require.NoError(t, err)
 	require.Contains(t, res.RawLog, poa.ErrStakingActionNotAllowed.Error())
+}
+
+func testPending(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, acc0 ibc.Wallet) {
+	t.Log("\n===== TEST PENDING =====")
+	// create a validator
+	_, err := helpers.POACreatePendingValidator(t, ctx, chain, acc0)
+	require.NoError(t, err)
+
+	// query pending validators
+	pv := helpers.GetPOAPending(t, ctx, chain)
+	fmt.Printf("pendingVal: %+v", pv)
+	require.Equal(t, 1, len(pv.Pending))
+	require.Equal(t, "0", pv.Pending[0].Tokens)
+	require.Equal(t, "1", pv.Pending[0].MinSelfDelegation)
+
+	// remove the pending validator
+	txRes, err := helpers.POARemovePending(t, ctx, chain, acc0, pv.Pending[0].OperatorAddress)
+	require.NoError(t, err)
+	fmt.Printf("%+v", txRes)
+
+	// validate it was removed (len of 0)
+	pv = helpers.GetPOAPending(t, ctx, chain)
+	fmt.Printf("pendingVal: %+v", pv)
+	require.Equal(t, 0, len(pv.Pending))
 }
 
 func testGovernance(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, acc0 ibc.Wallet, validators []string) {
