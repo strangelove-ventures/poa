@@ -260,6 +260,11 @@ func TestRemovePending(t *testing.T) {
 	}
 }
 
+func MustValAddressFromBech32(address string) sdk.ValAddress {
+	bz, _ := sdk.ValAddressFromBech32(address)
+	return bz
+}
+
 func TestRemoveValidator(t *testing.T) {
 	f := SetupTest(t, 2_000_000)
 	require := require.New(t)
@@ -282,32 +287,84 @@ func TestRemoveValidator(t *testing.T) {
 	_, err = f.IncreaseBlock(2, true)
 	require.NoError(err)
 
+	firstVal := vals[0].OperatorAddress
+
 	testCases := []struct {
-		name         string
-		request      *poa.MsgRemoveValidator
-		expectErrMsg string
+		name                 string
+		request              *poa.MsgRemoveValidator
+		isSelfRemovalAllowed bool
+		expectErrMsg         string
 	}{
 		{
-			name: "set invalid authority (not an address)",
+			name: "fail; set invalid authority (not an address)",
 			request: &poa.MsgRemoveValidator{
 				Sender:           "foo",
-				ValidatorAddress: vals[0].OperatorAddress,
+				ValidatorAddress: firstVal,
 			},
-			expectErrMsg: "not an authority",
+			expectErrMsg: "invalid address",
 		},
 		{
-			name: "remove validator",
+			name: "fail; not from admin or validator",
+			request: &poa.MsgRemoveValidator{
+				Sender:           f.addrs[1].String(),
+				ValidatorAddress: vals[1].OperatorAddress,
+			},
+			expectErrMsg: poa.ErrNotAnAuthority.Error(),
+		},
+		{
+			name: "success; remove validator as admin",
 			request: &poa.MsgRemoveValidator{
 				Sender:           f.addrs[0].String(),
-				ValidatorAddress: vals[0].OperatorAddress,
+				ValidatorAddress: firstVal,
 			},
+		},
+		{
+			name: "fail; re-remove same validator as admin",
+			request: &poa.MsgRemoveValidator{
+				Sender:           f.addrs[0].String(),
+				ValidatorAddress: firstVal,
+			},
+			expectErrMsg: "is not bonded",
+		},
+		{
+			name: "fail; try to remove validator as itself with self removal disabled",
+			request: &poa.MsgRemoveValidator{
+				Sender:           sdk.AccAddress(MustValAddressFromBech32(vals[1].OperatorAddress)).String(),
+				ValidatorAddress: vals[1].OperatorAddress,
+			},
+			expectErrMsg:         poa.ErrValidatorSelfRemoval.Error(),
+			isSelfRemovalAllowed: false,
+		},
+		{
+			name: "remove validator as itself",
+			request: &poa.MsgRemoveValidator{
+				Sender:           sdk.AccAddress(MustValAddressFromBech32(vals[1].OperatorAddress)).String(),
+				ValidatorAddress: vals[1].OperatorAddress,
+			},
+			isSelfRemovalAllowed: true,
+		},
+		{
+			name: "fail; try again (no longer exist)",
+			request: &poa.MsgRemoveValidator{
+				Sender:           sdk.AccAddress(MustValAddressFromBech32(vals[1].OperatorAddress)).String(),
+				ValidatorAddress: vals[1].OperatorAddress,
+			},
+			expectErrMsg:         "is not bonded",
+			isSelfRemovalAllowed: true,
 		},
 	}
 
 	for _, tc := range testCases {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
-			_, err := f.msgServer.RemoveValidator(f.ctx, tc.request)
+			// Update the params for self approval
+			currParams, _ := f.k.GetParams(f.ctx)
+			currParams.AllowValidatorSelfExit = tc.isSelfRemovalAllowed
+
+			err := f.k.SetParams(f.ctx, currParams)
+			require.NoError(err)
+
+			_, err = f.msgServer.RemoveValidator(f.ctx, tc.request)
 
 			if tc.expectErrMsg != "" {
 				require.Error(err)

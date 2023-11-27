@@ -161,9 +161,9 @@ func NewRemovePendingCmd() *cobra.Command {
 
 func NewUpdateParamsCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "update-params [admin1,admin2,admin3,...]",
+		Use:   "update-params [admin1,admin2,admin3,...] [allow-validator-self-exit-bool]",
 		Short: "update the PoA module params",
-		Args:  cobra.ExactArgs(1),
+		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -178,11 +178,19 @@ func NewUpdateParamsCmd() *cobra.Command {
 				}
 			}
 
+			allowGracefulExit, err := strconv.ParseBool(args[1])
+			if err != nil {
+				return fmt.Errorf("strconv.ParseBool failed: %w", err)
+			}
+
+			p, err := poa.NewParams(admins, allowGracefulExit)
+			if err != nil {
+				return fmt.Errorf("NewParams failed: %w", err)
+			}
+
 			msg := &poa.MsgUpdateParams{
 				Sender: clientCtx.GetFromAddress().String(),
-				Params: poa.Params{
-					Admins: admins,
-				},
+				Params: p,
 			}
 
 			if err := msg.Params.Validate(); err != nil {

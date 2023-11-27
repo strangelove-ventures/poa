@@ -2,6 +2,7 @@ package poa
 
 import (
 	"encoding/json"
+	fmt "fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -19,9 +20,10 @@ func DefaultParams() Params {
 }
 
 // NewParams returns a new POA Params.
-func NewParams(admins []string) (Params, error) {
+func NewParams(admins []string, allowValSelfExit bool) (Params, error) {
 	p := Params{
-		Admins: admins,
+		Admins:                 admins,
+		AllowValidatorSelfExit: allowValSelfExit,
 	}
 
 	return p, p.Validate()
@@ -53,11 +55,20 @@ func (p Params) String() string {
 
 // Validate does the sanity check on the params.
 func (p Params) Validate() error {
-	if len(p.Admins) == 0 {
+	return validateAdmins(p.Admins)
+}
+
+func validateAdmins(i interface{}) error {
+	admins, ok := i.([]string)
+	if !ok {
+		return fmt.Errorf("invalid parameter type: %T", i)
+	}
+
+	if len(admins) == 0 {
 		return ErrMustProvideAtLeastOneAddress
 	}
 
-	for _, auth := range p.Admins {
+	for _, auth := range admins {
 		if _, err := sdk.AccAddressFromBech32(auth); err != nil {
 			return err
 		}
