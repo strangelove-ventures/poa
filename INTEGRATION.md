@@ -3,7 +3,7 @@
 ## Table of Contents
 * [Introduction](#introduction)
 * [Example integration of the PoA Module](#example-integration-of-the-poa-module)
-    * [Ante Handler Setup](#ante-handlers)
+    * [Ante Handler Setup](#ante-handler-integration)
 * [Design Details](#design-details)
 
 # Introduction
@@ -102,9 +102,64 @@ app.moduleManager.SetOrderInitGenesis(
 )
 ```
 
-## Ante Handlers
-- TODO:
+## Ante Handler Integration
 
+### [Disable Staking](./ante/disable_staking.go)
+A core feature of the POA module is to disable staking to all wallets. Make sure to add this decorator to your ante handler. An example can be found in the [simapp mock ante](./simapp/ante.go).
+
+This blocks the following staking commands: Redelegate, Cancel Unbonding, Delegate, and Undelegate. MsgCreateValidator and UpdateParams are also blocked however the logic is wrapped in the PoA implementation & CLI. This also includes recursive authz ExecMsgs.
+
+```go
+import (
+    ...
+    poaante "github.com/strangelove-ventures/poa/ante"
+)
+
+...
+
+func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
+    ...
+    anteDecorators := []sdk.AnteDecorator{
+        ...
+        poaante.NewPOADisableStakingDecorator(),
+        ...
+    }
+    ...
+}
+```
+
+### [Commission Limits](./ante/commission_limit.go)
+Depending on the chain use case, it may be desired to limit the commission rate range for min, max, or set value.
+
+- `doGenTxRateValidation`: if true, genesis transactions also are required to be within the commission limit for the network.
+- `rateFloor`: The minimum commission rate allowed. *(note: this must be higher than the StakingParams MinCommissionRate)*
+- `rateCeil`: The maximum commission rate allowed.
+
+if both rateFloor and rateCiel are set to the same value, then the commission rate is forced to that value.
+
+```go
+import (
+    ...
+    poaante "github.com/strangelove-ventures/poa/ante"
+)
+
+...
+
+func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
+    ...
+
+    doGenTxRateValidation := false
+    rateFloor := math.LegacyMustNewDecFromStr("0.10")
+	rateCeil := math.LegacyMustNewDecFromStr("0.50")
+
+    anteDecorators := []sdk.AnteDecorator{
+        ...
+        poaante.NewMsgCommissionLimiterDecorator(doGenTxRateValidation, rateFloor, rateCeil),
+        ...
+    }
+    ...
+}
+```
 
 
 ----
