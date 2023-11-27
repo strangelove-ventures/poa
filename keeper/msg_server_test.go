@@ -208,6 +208,58 @@ func TestSetPowerAndCreateValidator(t *testing.T) {
 	}
 }
 
+func TestRemovePending(t *testing.T) {
+	f := SetupTest(t, 2_000_000)
+	require := require.New(t)
+
+	valAddr := f.CreatePendingValidator("val-1", 1_000_000)
+	pendingVals, err := f.k.GetPendingValidators(f.ctx)
+	require.NoError(err)
+	require.EqualValues(1, len(pendingVals.Validators))
+
+	testCases := []struct {
+		name               string
+		request            *poa.MsgRemovePending
+		expectErrMsg       string
+		expectedPendingLen int
+	}{
+		{
+			name: "fail; not an admin",
+			request: &poa.MsgRemovePending{
+				Sender:           "foo",
+				ValidatorAddress: valAddr.String(),
+			},
+			expectedPendingLen: 1,
+			expectErrMsg:       "not an authority",
+		},
+		{
+			name: "success; removed admin",
+			request: &poa.MsgRemovePending{
+				Sender:           f.addrs[0].String(),
+				ValidatorAddress: valAddr.String(),
+			},
+			expectedPendingLen: 0,
+		},
+	}
+
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			_, err := f.msgServer.RemovePending(f.ctx, tc.request)
+			if tc.expectErrMsg != "" {
+				require.Error(err)
+				require.ErrorContains(err, tc.expectErrMsg)
+			} else {
+				require.NoError(err)
+			}
+
+			pendingVals, err := f.k.GetPendingValidators(f.ctx)
+			require.NoError(err)
+			require.EqualValues(tc.expectedPendingLen, len(pendingVals.Validators))
+		})
+	}
+}
+
 func TestRemoveValidator(t *testing.T) {
 	f := SetupTest(t, 2_000_000)
 	require := require.New(t)

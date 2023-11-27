@@ -40,6 +40,7 @@ func NewTxCmd(ac address.Codec) *cobra.Command {
 	txCmd.AddCommand(
 		NewCreateValidatorCmd(ac),
 		NewSetPowerCmd(ac),
+		NewRemovePendingCmd(),
 		NewRemoveValidatorCmd(),
 		NewUpdateParamsCmd(),
 		NewUpdateStakingParamsCmd(),
@@ -50,8 +51,9 @@ func NewTxCmd(ac address.Codec) *cobra.Command {
 
 func NewSetPowerCmd(ac address.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:  "set-power [validator] [power] [--unsafe]",
-		Args: cobra.ExactArgs(2),
+		Use:   "set-power [validator] [power] [--unsafe]",
+		Short: "set the consensus power of a validator in the active set",
+		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -97,8 +99,9 @@ func NewSetPowerCmd(ac address.Codec) *cobra.Command {
 
 func NewRemoveValidatorCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:  "remove [validator]",
-		Args: cobra.ExactArgs(1),
+		Use:   "remove [validator]",
+		Short: "remove a validator from the active set",
+		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -125,10 +128,42 @@ func NewRemoveValidatorCmd() *cobra.Command {
 	return cmd
 }
 
+func NewRemovePendingCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "remove-pending [validator]",
+		Short: "remove a validator from the pending set queue",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			validator := args[0]
+			_, err = sdk.ValAddressFromBech32(validator)
+			if err != nil {
+				return fmt.Errorf("ValAddressFromBech32 failed: %w", err)
+			}
+
+			msg := &poa.MsgRemovePending{
+				Sender:           clientCtx.GetFromAddress().String(),
+				ValidatorAddress: validator,
+			}
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+
+	flags.AddTxFlagsToCmd(cmd)
+
+	return cmd
+}
+
 func NewUpdateParamsCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:  "update-params [admin1,admin2,admin3,...]",
-		Args: cobra.ExactArgs(1),
+		Use:   "update-params [admin1,admin2,admin3,...]",
+		Short: "update the PoA module params",
+		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -165,8 +200,9 @@ func NewUpdateParamsCmd() *cobra.Command {
 
 func NewUpdateStakingParamsCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:  "update-staking-params [unbondingTime] [maxVals] [maxEntries] [historicalEntries] [bondDenom] [minCommissionRate]",
-		Args: cobra.ExactArgs(6),
+		Use:   "update-staking-params [unbondingTime] [maxVals] [maxEntries] [historicalEntries] [bondDenom] [minCommissionRate]",
+		Short: "update the staking module params",
+		Args:  cobra.ExactArgs(6),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -228,7 +264,7 @@ func NewUpdateStakingParamsCmd() *cobra.Command {
 func NewCreateValidatorCmd(ac address.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create-validator [path/to/validator.json]",
-		Short: "create new validator for POA",
+		Short: "create new validator for POA (anyone)",
 		Args:  cobra.ExactArgs(1),
 		Long:  `Create a new validator creates the new validator for the POA module.`,
 		Example: strings.TrimSpace(

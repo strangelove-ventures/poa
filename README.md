@@ -108,6 +108,15 @@ The `AbsoluteChangedPower` of +1 to each validator is 3, which is 33% of the pre
 }
 ```
 
+### RemovePending (admin only)
+```json
+{
+  "@type": "/strangelove_ventures.poa.v1.MsgRemovePending",
+  "sender": "cosmos1hj5fveer5cjtn4wd6wstzugjfdxzl0xpxvjjvr",
+  "validator_address": "cosmosvaloper1efd63aw40lxf3n4mhf7dzhjkr453axurlv4rfe"
+}
+```
+
 ### UpdateParams (admin only)
 ```json
 {

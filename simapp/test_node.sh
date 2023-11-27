@@ -12,10 +12,13 @@
 # poad tx staking delegate $(poad q staking validators --output=json | jq .validators[0].operator_address -r) 1stake --home=$HOME_DIR --yes --from=acc1
 #
 # Create a validator
-# poad tx poa create-validator simapp/validator_file.json --from acc3 --yes --home=$HOME_DIR # no genesis amount
+# poad tx poa create-validator simapp/validator_file.json --from acc3 --yes --home=$HOME_DIR --chain-id=poa-1 --keyring-backend=test
 # poad q poa pending-validators --output json
 # poad tx poa set-power $(poad q poa pending-validators --output=json | jq .pending[0].operator_address -r) 1000000 --home=$HOME_DIR --yes --from=acc1
 # poad tx poa remove $(poad q staking validators --output=json | jq .validators[1].operator_address -r) --home=$HOME_DIR --yes --from=acc1
+#
+# Remove Pending Validator
+# poad tx poa remove-pending $(poad q poa pending-validators --output=json | jq .pending[0].operator_address -r) --home=$HOME_DIR --yes --from=acc1 --chain-id=poa-1 --keyring-backend=test
 #
 # poad tx gov submit-proposal simapp/proposal.json --home=$HOME_DIR --from=acc1 --yes
 # poad tx gov submit-proposal simapp/proposal-params.json --home=$HOME_DIR --from=acc1 --yes

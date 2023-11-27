@@ -1,6 +1,8 @@
 package helpers
 
 import (
+	"time"
+
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 )
 
@@ -163,4 +165,33 @@ type SingingInformation struct {
 	Pagination struct {
 		Total string `json:"total"`
 	} `json:"pagination"`
+}
+
+type POAPending struct {
+	Pending []struct {
+		OperatorAddress string `json:"operator_address"`
+		ConsensusPubkey struct {
+			Type  string `json:"type"`
+			Value string `json:"value"`
+		} `json:"consensus_pubkey"`
+		Status          int    `json:"status"`
+		Tokens          string `json:"tokens"`
+		DelegatorShares string `json:"delegator_shares"`
+		Description     struct {
+			Moniker         string `json:"moniker"`
+			Website         string `json:"website"`
+			SecurityContact string `json:"security_contact"`
+			Details         string `json:"details"`
+		} `json:"description"`
+		UnbondingTime time.Time `json:"unbonding_time"`
+		Commission    struct {
+			CommissionRates struct {
+				Rate          string `json:"rate"`
+				MaxRate       string `json:"max_rate"`
+				MaxChangeRate string `json:"max_change_rate"`
+			} `json:"commission_rates"`
+			UpdateTime time.Time `json:"update_time"`
+		} `json:"commission"`
+		MinSelfDelegation string `json:"min_self_delegation"`
+	} `json:"pending"`
 }
