@@ -41,19 +41,82 @@ The `AbsoluteChangedPower` of +1 to each validator is 3, which is 33% of the pre
 
 ## Messages
 
-TODO: ...
-
-The following messages can only be submitted from the chain admin(s).
-
 ### CreateValidator
+```json
+{
+  "@type": "/strangelove_ventures.poa.v1.MsgCreateValidator",
+  "description": {
+    "moniker": "Validator Name",
+    "identity": "",
+    "website": "https://website.com",
+    "security_contact": "security@cosmos.xyz",
+    "details": "description"
+  },
+  "commission": {
+    "rate": "0.100000000000000000",
+    "max_rate": "0.200000000000000000",
+    "max_change_rate": "0.010000000000000000"
+  },
+  "min_self_delegation": "1",
+  "delegator_address": "",
+  "validator_address": "cosmosvaloper1addr",
+  "pubkey": {
+    "@type": "/cosmos.crypto.ed25519.PubKey",
+    "key": "pl3Q8OQwtC7G2dSqRqsUrO5VZul7l40I+MKUcejqRsg="
+  }
+}
+```
 
-### SetPower
+### SetPower (admin only)
+```json
+{
+  "@type": "/strangelove_ventures.poa.v1.MsgSetPower",
+  "sender": "cosmos1addr",
+  "validator_address": "cosmosvaloper1addr",
+  "power": "12356789",
+  "unsafe": true
+}
+```
 
-### RemoveValidator
+### RemoveValidator (admin only)
+```json
+{
+  "@type": "/strangelove_ventures.poa.v1.MsgRemoveValidator",
+  "sender": "cosmos1addr",
+  "validator_address": "cosmosvaloper1addr"
+}
+```
 
-### UpdateParams
+### UpdateParams (admin only)
+```json
+{
+  "@type": "/strangelove_ventures.poa.v1.MsgUpdateParams",
+  "sender": "cosmos1addr",
+  "params": {
+    "admins": [
+      "cosmos1addr",
+      "cosmos1addr1",
+      "cosmos1addr2",
+    ]
+  }
+}
+```
 
-### UpdateStakingParams
+### UpdateStakingParams (admin only)
+```json
+{
+  "@type": "/strangelove_ventures.poa.v1.MsgUpdateStakingParams",
+  "sender": "cosmos1hj5fveer5cjtn4wd6wstzugjfdxzl0xpxvjjvr",
+  "params": {
+    "unbonding_time": "1209600s",
+    "max_validators": 100,
+    "max_entries": 7,
+    "historical_entries": 7,
+    "bond_denom": "stake",
+    "min_commission_rate": "0.050000000000000000"
+  }
+}
+```
 
 ## [Begin Block](./module/abci.go)
 
@@ -62,22 +125,18 @@ As the PoA logic is dependent on the x/staking module, the PoA module must be ru
 When removing validators, the validator can not be instantly removed from the set and it required a few intermediate blocks.
 
 **Flow**
+
+
 A validator is removed by an admin at height H; it increases the minimum self delegation to current+1. This puts the bonded validator into `Unbonding` status when checked by the x/staking module in it's BeginBlock (at H). The next iteration (H+1) the PoA module force updates the `Unbonding` validator to the status of `Unbonded`. The x/staking module then performs it's BeginBlock logic and sets it as `Unbonded`. The validator is now deleted from consensus at H+2 in the PoA BeginBlock.
-
-
-## Hooks
-
-Hooks are called as would be expected from the x/staking hooks.
-
-e.g. `AfterValidatorCreated` is called after a validator is accepted into the set, not just created into `PendingValidators`.
-
-## Events
-
-Events are broadcast as expected from the x/staking events.
 
 ## Client
 
-TODO: REST / gRPC Endpoints.
+| LCD / API | gRPC |
+|------------------------------|-----------------------------------------------------|
+| `/poa/v1/params`             |`strangelove_ventures.poa.v1.Query/Params`           |
+| `/poa/v1/pending_validators` |`strangelove_ventures.poa.v1.Query/PendingValidators`|
+| `/poa/v1/{consensus_power}`  |`strangelove_ventures.poa.v1.Query/ConsensusPower`   |
+
 
 ### CLI
 
@@ -127,11 +186,11 @@ poad tx poa set-power [validator] [amount] [--unsafe]
 poad tx poa update-params admin1,admin2,admin3,...
 
 # (admin) Update the staking module params
-# - unbondingTime is the time in seconds that a validator must wait to unbond
-# - maxVals is the maximum number of validators allowed in the set
-# - maxEntries is the maximum number of unbonding delegations per validator (this does not apply for PoA)
-# - historicalEntries is the maximum number of historical entries stored per validator (this does not apply for PoA)
-# - bondDenom is the denom of the bond (e.g. uatom)
+# - unbondingTime is the time that a validator must wait to unbond (ex: 336h)
+# - maxVals is the maximum number of validators for the active set.
+# - maxEntries is the maximum number of unbonding delegations per validator (does not apply for PoA)
+# - historicalEntries is the maximum number of historical entries stored per validator (does not apply for PoA)
+# - bondDenom is the denom of the bond token (e.g. uatom)
 # - minCommissionRate is the minimum commission rate a validator can set
 poad tx poa update-staking-params [unbondingTime] [maxVals] [maxEntries] [historicalEntries] [bondDenom] [minCommissionRate]
 ```
