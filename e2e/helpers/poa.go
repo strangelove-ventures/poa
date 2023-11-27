@@ -28,13 +28,16 @@ func POARemovePending(t *testing.T, ctx context.Context, chain *cosmos.CosmosCha
 	return ExecuteTransaction(ctx, chain, cmd)
 }
 
-func POACreatePendingValidator(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, user ibc.Wallet) (TxResponse, error) {
+func POACreatePendingValidator(
+	t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, user ibc.Wallet,
+	ed25519PubKey string, moniker string, commissionRate string, commissionMaxRate string, commissionMaxChangeRate string,
+) (TxResponse, error) {
 	file := "validator_file.json"
 
-	// TODO: allow modifying the values
+
 	content := fmt.Sprintf(`{
-		"pubkey": {"@type":"/cosmos.crypto.ed25519.PubKey","key":"pl3Q8OQwtC7G2dSqRqsUrO5VZul7l40I+MKUcejqRsg="},
-		"amount": "0stake",
+		"pubkey": {"@type":"/cosmos.crypto.ed25519.PubKey","key":"%s"},
+		"amount": "0%s",
 		"moniker": "%s",
 		"identity": "",
 		"website": "https://website.com",
@@ -44,7 +47,8 @@ func POACreatePendingValidator(t *testing.T, ctx context.Context, chain *cosmos.
 		"commission-max-rate": "%s",
 		"commission-max-change-rate": "%s",
 		"min-self-delegation": "1"
-	}`, "testval", "0.10", "0.25", "0.05")
+
+	}`, ed25519PubKey, chain.Config().Denom, moniker, commissionRate, commissionMaxRate, commissionMaxChangeRate)
 
 	err := chain.GetNode().WriteFile(ctx, []byte(content), file)
 	require.NoError(t, err)

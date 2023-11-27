@@ -235,7 +235,7 @@ func testStakingDisabled(t *testing.T, ctx context.Context, chain *cosmos.Cosmos
 func testPending(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, acc0 ibc.Wallet) {
 	t.Log("\n===== TEST PENDING =====")
 	// create a validator
-	_, err := helpers.POACreatePendingValidator(t, ctx, chain, acc0)
+	_, err := helpers.POACreatePendingValidator(t, ctx, chain, acc0, "pl3Q8OQwtC7G2dSqRqsUrO5VZul7l40I+MKUcejqRsg=", "testval", "0.10", "0.25", "0.05")
 	require.NoError(t, err)
 
 	// query pending validators
