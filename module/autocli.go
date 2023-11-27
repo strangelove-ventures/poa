@@ -29,6 +29,7 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					RpcMethod: "SetPower",
 					Use:       "set-power [validator] [power]",
 					Short:     "Sets a validators network power",
+					Long:      "Sets a validators network power",
 					PositionalArgs: []*autocliv1.PositionalArgDescriptor{
 						{ProtoField: "sender"},
 						{ProtoField: "validator"},
@@ -39,6 +40,16 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					RpcMethod: "RemoveValidator",
 					Use:       "remove [validator]",
 					Short:     "Remove an active validator from the set",
+					Long:      "Remove an active validator from the set",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{
+						{ProtoField: "validator"},
+					},
+				},
+				{
+					RpcMethod: "RemovePending",
+					Use:       "remove-pending [validator]",
+					Short:     "Remove an queued validator from the pending set",
+					Long:      "Remove an queued validator from the pending set",
 					PositionalArgs: []*autocliv1.PositionalArgDescriptor{
 						{ProtoField: "validator"},
 					},
@@ -46,12 +57,20 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 				{
 					RpcMethod: "CreateValidator",
 					Use:       "create-validator [validator]",
-					Short:     "Remove a pending validator for the set",
+					Short:     "create a new validator",
+					Long:      "create a new validator",
 				},
 				{
 					RpcMethod: "UpdateParams",
 					Use:       "update-params [admin1,admin2,admin3,...]",
 					Short:     "Update the params for the module",
+					Long:      "Update the params for the module",
+				},
+				{
+					RpcMethod: "UpdateStakingParams",
+					Use:       "update-params [admin1,admin2,admin3,...]",
+					Short:     "Update the params for the module",
+					Long:      "Update the params for the module",
 				},
 			},
 		},

@@ -110,6 +110,14 @@ func (ms msgServer) RemoveValidator(ctx context.Context, msg *poa.MsgRemoveValid
 	return &poa.MsgRemoveValidatorResponse{}, nil
 }
 
+func (ms msgServer) RemovePending(ctx context.Context, msg *poa.MsgRemovePending) (*poa.MsgRemovePendingResponse, error) {
+	if isAdmin := ms.k.IsAdmin(ctx, msg.Sender); !isAdmin {
+		return nil, errorsmod.Wrapf(poa.ErrNotAnAuthority, "sender %s is not an authority", msg.Sender)
+	}
+
+	return &poa.MsgRemovePendingResponse{}, ms.k.RemovePendingValidator(ctx, msg.ValidatorAddress)
+}
+
 func (ms msgServer) UpdateParams(ctx context.Context, msg *poa.MsgUpdateParams) (*poa.MsgUpdateParamsResponse, error) {
 	if ok := ms.k.IsAdmin(ctx, msg.Sender); !ok {
 		return nil, poa.ErrNotAnAuthority

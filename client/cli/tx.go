@@ -40,6 +40,7 @@ func NewTxCmd(ac address.Codec) *cobra.Command {
 	txCmd.AddCommand(
 		NewCreateValidatorCmd(ac),
 		NewSetPowerCmd(ac),
+		NewRemovePendingCmd(),
 		NewRemoveValidatorCmd(),
 		NewUpdateParamsCmd(),
 		NewUpdateStakingParamsCmd(),
@@ -112,6 +113,36 @@ func NewRemoveValidatorCmd() *cobra.Command {
 			}
 
 			msg := &poa.MsgRemoveValidator{
+				Sender:           clientCtx.GetFromAddress().String(),
+				ValidatorAddress: validator,
+			}
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+
+	flags.AddTxFlagsToCmd(cmd)
+
+	return cmd
+}
+
+func NewRemovePendingCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:  "remove-pending [validator]",
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			validator := args[0]
+			_, err = sdk.ValAddressFromBech32(validator)
+			if err != nil {
+				return fmt.Errorf("ValAddressFromBech32 failed: %w", err)
+			}
+
+			msg := &poa.MsgRemovePending{
 				Sender:           clientCtx.GetFromAddress().String(),
 				ValidatorAddress: validator,
 			}

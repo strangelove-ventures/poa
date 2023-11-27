@@ -22,6 +22,7 @@ const (
 	Msg_CreateValidator_FullMethodName     = "/strangelove_ventures.poa.v1.Msg/CreateValidator"
 	Msg_SetPower_FullMethodName            = "/strangelove_ventures.poa.v1.Msg/SetPower"
 	Msg_RemoveValidator_FullMethodName     = "/strangelove_ventures.poa.v1.Msg/RemoveValidator"
+	Msg_RemovePending_FullMethodName       = "/strangelove_ventures.poa.v1.Msg/RemovePending"
 	Msg_UpdateParams_FullMethodName        = "/strangelove_ventures.poa.v1.Msg/UpdateParams"
 	Msg_UpdateStakingParams_FullMethodName = "/strangelove_ventures.poa.v1.Msg/UpdateStakingParams"
 )
@@ -36,6 +37,8 @@ type MsgClient interface {
 	SetPower(ctx context.Context, in *MsgSetPower, opts ...grpc.CallOption) (*MsgSetPowerResponse, error)
 	// RemoveValidator removes a validator from the active set and unbonds their delegations.
 	RemoveValidator(ctx context.Context, in *MsgRemoveValidator, opts ...grpc.CallOption) (*MsgRemoveValidatorResponse, error)
+	// RemovePending removes a pending validator from the queue.
+	RemovePending(ctx context.Context, in *MsgRemovePending, opts ...grpc.CallOption) (*MsgRemovePendingResponse, error)
 	// UpdateParams updates the module parameters.
 	UpdateParams(ctx context.Context, in *MsgUpdateParams, opts ...grpc.CallOption) (*MsgUpdateParamsResponse, error)
 	// UpdateStakingParams updates the module parameters.
@@ -77,6 +80,15 @@ func (c *msgClient) RemoveValidator(ctx context.Context, in *MsgRemoveValidator,
 	return out, nil
 }
 
+func (c *msgClient) RemovePending(ctx context.Context, in *MsgRemovePending, opts ...grpc.CallOption) (*MsgRemovePendingResponse, error) {
+	out := new(MsgRemovePendingResponse)
+	err := c.cc.Invoke(ctx, Msg_RemovePending_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *msgClient) UpdateParams(ctx context.Context, in *MsgUpdateParams, opts ...grpc.CallOption) (*MsgUpdateParamsResponse, error) {
 	out := new(MsgUpdateParamsResponse)
 	err := c.cc.Invoke(ctx, Msg_UpdateParams_FullMethodName, in, out, opts...)
@@ -105,6 +117,8 @@ type MsgServer interface {
 	SetPower(context.Context, *MsgSetPower) (*MsgSetPowerResponse, error)
 	// RemoveValidator removes a validator from the active set and unbonds their delegations.
 	RemoveValidator(context.Context, *MsgRemoveValidator) (*MsgRemoveValidatorResponse, error)
+	// RemovePending removes a pending validator from the queue.
+	RemovePending(context.Context, *MsgRemovePending) (*MsgRemovePendingResponse, error)
 	// UpdateParams updates the module parameters.
 	UpdateParams(context.Context, *MsgUpdateParams) (*MsgUpdateParamsResponse, error)
 	// UpdateStakingParams updates the module parameters.
@@ -124,6 +138,9 @@ func (UnimplementedMsgServer) SetPower(context.Context, *MsgSetPower) (*MsgSetPo
 }
 func (UnimplementedMsgServer) RemoveValidator(context.Context, *MsgRemoveValidator) (*MsgRemoveValidatorResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RemoveValidator not implemented")
+}
+func (UnimplementedMsgServer) RemovePending(context.Context, *MsgRemovePending) (*MsgRemovePendingResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RemovePending not implemented")
 }
 func (UnimplementedMsgServer) UpdateParams(context.Context, *MsgUpdateParams) (*MsgUpdateParamsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateParams not implemented")
@@ -198,6 +215,24 @@ func _Msg_RemoveValidator_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Msg_RemovePending_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgRemovePending)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).RemovePending(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Msg_RemovePending_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).RemovePending(ctx, req.(*MsgRemovePending))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Msg_UpdateParams_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(MsgUpdateParams)
 	if err := dec(in); err != nil {
@@ -252,6 +287,10 @@ var Msg_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RemoveValidator",
 			Handler:    _Msg_RemoveValidator_Handler,
+		},
+		{
+			MethodName: "RemovePending",
+			Handler:    _Msg_RemovePending_Handler,
 		},
 		{
 			MethodName: "UpdateParams",
