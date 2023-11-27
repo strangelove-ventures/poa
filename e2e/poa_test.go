@@ -234,25 +234,21 @@ func testStakingDisabled(t *testing.T, ctx context.Context, chain *cosmos.Cosmos
 
 func testPending(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, acc0 ibc.Wallet) {
 	t.Log("\n===== TEST PENDING =====")
-	// create a validator
+
 	_, err := helpers.POACreatePendingValidator(t, ctx, chain, acc0, "pl3Q8OQwtC7G2dSqRqsUrO5VZul7l40I+MKUcejqRsg=", "testval", "0.10", "0.25", "0.05")
 	require.NoError(t, err)
 
-	// query pending validators
 	pv := helpers.GetPOAPending(t, ctx, chain)
-	fmt.Printf("pendingVal: %+v", pv)
 	require.Equal(t, 1, len(pv.Pending))
 	require.Equal(t, "0", pv.Pending[0].Tokens)
 	require.Equal(t, "1", pv.Pending[0].MinSelfDelegation)
 
-	// remove the pending validator
 	txRes, err := helpers.POARemovePending(t, ctx, chain, acc0, pv.Pending[0].OperatorAddress)
 	require.NoError(t, err)
 	fmt.Printf("%+v", txRes)
 
-	// validate it was removed (len of 0)
+	// validate it was removed
 	pv = helpers.GetPOAPending(t, ctx, chain)
-	fmt.Printf("pendingVal: %+v", pv)
 	require.Equal(t, 0, len(pv.Pending))
 }
 

@@ -217,8 +217,6 @@ func TestRemovePending(t *testing.T) {
 	require.NoError(err)
 	require.EqualValues(1, len(pendingVals.Validators))
 
-	// remove it as a non admin, then as an admin
-
 	testCases := []struct {
 		name               string
 		request            *poa.MsgRemovePending

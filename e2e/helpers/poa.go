@@ -34,7 +34,6 @@ func POACreatePendingValidator(
 ) (TxResponse, error) {
 	file := "validator_file.json"
 
-
 	content := fmt.Sprintf(`{
 		"pubkey": {"@type":"/cosmos.crypto.ed25519.PubKey","key":"%s"},
 		"amount": "0%s",
