@@ -15,7 +15,8 @@ func DefaultParams() Params {
 	govModuleAddress := authtypes.NewModuleAddress(govtypes.ModuleName).String()
 
 	return Params{
-		Admins: []string{govModuleAddress},
+		Admins:                 []string{govModuleAddress},
+		AllowValidatorSelfExit: true,
 	}
 }
 

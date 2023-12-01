@@ -36,9 +36,9 @@ All delegation actions are disabled with the [disabled-staking ante](./INTEGRATI
 ## State
 
 ### Genesis
-`Params` is found in the genesis state. This object contains the `admins` field, which is a list of bech32 addresses that are allowed to modify the validator set. If none are set, then the chain is controlled by governance itself. By allowing for an array of admins, the chain can be controlled by multiple different parties according to your use case. For example, governance can be an admin while also allowing a multisig, DAO, and/or single account to control the validator set.
+`Params` is found in the genesis state. This object contains the `admins` field, which is a list of bech32 addresses that are allowed to modify the validator set, PoA params, and validator params (via x/staking). If no admin is set, then the chain should set the governance account as the admin (default). By allowing for an array of admins, the chain can be controlled by multiple different parties according to your use case. For example, governance can be an admin while also allowing a multisig, DAO, and/or single account to control the validator set. There must be at least one admin in the list at all times.
 
-Only the admins can update the params. This includes the admins themselves. There must be at least one admin in the list at all times. If you do not want a single account to control the set, set it to the chain's governance address.
+`AllowValidatorSelfExit` is a boolean option *(default true)* that toggles validators ability to remove themselves from the active set. This is useful for validators that are no longer able or decide this PoA network is no longer for them. If set to false, only admins can remove validators from the set. **NOTE** This does not stop validators from going down and being jailed for downtime. It just privides a graceful way to self remove power.
 
 ### Pending Validators
 `PendingValidators` stores an array of PoA validator objects pending approval (from the admins) into the active set. This only is required after the chain has started.
