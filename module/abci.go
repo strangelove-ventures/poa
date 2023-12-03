@@ -3,14 +3,17 @@ package module
 import (
 	"context"
 
+	"github.com/cosmos/cosmos-sdk/telemetry"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+	"github.com/strangelove-ventures/poa"
 )
 
 // BeginBlocker updates the validator set without applying updates.
 // Since this module depends on staking, that module will `ApplyAndReturnValidatorSetUpdates` from x/staking.
 func (am AppModule) BeginBlocker(ctx context.Context) error {
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
+	defer telemetry.ModuleMeasureSince(poa.ModuleName, sdkCtx.BlockTime(), telemetry.MetricKeyBeginBlocker)
 
 	vals, err := am.keeper.GetStakingKeeper().GetAllValidators(ctx)
 	if err != nil {
