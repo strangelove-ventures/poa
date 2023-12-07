@@ -19,31 +19,25 @@ func DefaultPendingValidators() poa.Validators {
 
 // AddPendingValidator adds a validator to the pending set
 func (k Keeper) AddPendingValidator(ctx context.Context, newVal stakingtypes.Validator, pubKey cryptotypes.PubKey) error {
-	store := k.storeService.OpenKVStore(ctx)
-
 	pkAny, err := codectypes.NewAnyWithValue(pubKey)
 	if err != nil {
 		return err
 	}
 
 	newVal.ConsensusPubkey = pkAny
-	stdVal := poa.ConvertStakingToPOA(newVal)
+	poaVal := poa.ConvertStakingToPOA(newVal)
 
 	vals, err := k.GetPendingValidators(ctx)
 	if err != nil {
 		return err
 	}
 
-	vals.Validators = append(vals.Validators, stdVal)
+	vals.Validators = append(vals.Validators, poaVal)
 
-	bz := k.cdc.MustMarshal(&vals)
-
-	return store.Set(poa.PendingValidatorsKey, bz)
+	return k.PendingValidators.Set(ctx, vals)
 }
 
 func (k Keeper) RemovePendingValidator(ctx context.Context, valOpAddr string) error {
-	store := k.storeService.OpenKVStore(ctx)
-
 	pending, err := k.GetPendingValidators(ctx)
 	if err != nil {
 		return err
@@ -59,24 +53,17 @@ func (k Keeper) RemovePendingValidator(ctx context.Context, valOpAddr string) er
 		}
 	}
 
-	bz := k.cdc.MustMarshal(&pending)
-
-	return store.Set(poa.PendingValidatorsKey, bz)
+	return k.PendingValidators.Set(ctx, pending)
 }
 
 // GetPendingValidators
 func (k Keeper) GetPendingValidators(ctx context.Context) (poa.Validators, error) {
-	store := k.storeService.OpenKVStore(ctx)
-
-	bz, err := store.Get(poa.PendingValidatorsKey)
-	if err != nil || bz == nil {
-		return DefaultPendingValidators(), err
+	pending, err := k.PendingValidators.Get(ctx)
+	if err != nil {
+		return DefaultPendingValidators(), nil
 	}
 
-	var pv poa.Validators
-	k.cdc.MustUnmarshal(bz, &pv)
-
-	return pv, nil
+	return pending, nil
 }
 
 func (k Keeper) GetPendingValidator(ctx context.Context, operatorAddr string) (poa.Validator, error) {
