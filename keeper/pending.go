@@ -58,6 +58,12 @@ func (k Keeper) RemovePendingValidator(ctx context.Context, valOpAddr string) er
 
 // GetPendingValidators
 func (k Keeper) GetPendingValidators(ctx context.Context) (poa.Validators, error) {
+	if ok, err := k.PendingValidators.Has(ctx); err != nil {
+		return DefaultPendingValidators(), err
+	} else if !ok {
+		return DefaultPendingValidators(), nil
+	}
+
 	pending, err := k.PendingValidators.Get(ctx)
 	if err != nil {
 		return DefaultPendingValidators(), nil
