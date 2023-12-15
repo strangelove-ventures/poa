@@ -12,23 +12,21 @@ func (k Keeper) SetParams(ctx context.Context, p poa.Params) error {
 		return err
 	}
 
-	store := k.storeService.OpenKVStore(ctx)
-	bz := k.cdc.MustMarshal(&p)
-
-	return store.Set(poa.ParamsKey, bz)
+	return k.Params.Set(ctx, p)
 }
 
 // GetParams returns the current module parameters.
 func (k Keeper) GetParams(ctx context.Context) (poa.Params, error) {
-	store := k.storeService.OpenKVStore(ctx)
-
-	bz, err := store.Get(poa.ParamsKey)
-	if err != nil || bz == nil {
+	if ok, err := k.Params.Has(ctx); err != nil {
 		return poa.DefaultParams(), err
+	} else if !ok {
+		return poa.DefaultParams(), nil
 	}
 
-	var p poa.Params
-	k.cdc.MustUnmarshal(bz, &p)
+	p, err := k.Params.Get(ctx)
+	if err != nil {
+		return poa.DefaultParams(), err
+	}
 
 	return p, nil
 }

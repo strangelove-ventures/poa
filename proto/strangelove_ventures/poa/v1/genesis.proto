@@ -13,3 +13,10 @@ message GenesisState {
   // Params defines all the paramaters of the module.
   Params params = 1 [ (gogoproto.nullable) = false ];
 }
+
+// PowerCache is a cached block or absolute change in power for ibc-go validations.
+message PowerCache {
+  option (amino.name) = "poa/PowerCache";
+
+  uint64 power = 1;
+}
