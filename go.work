@@ -2,6 +2,6 @@ go 1.21
 
 use (
 	.
-	./e2e
-	./simapp
+	e2e
+	simapp
 )
