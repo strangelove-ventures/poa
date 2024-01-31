@@ -458,7 +458,7 @@ func TestMultipleUpdatesInASingleBlock(t *testing.T) {
 // mintTokensToBondedPool mints tokens to the bonded pool so the validator set
 // in testing can be removed.
 // In the future, this same logic would be run during the migration from POA->POS.
-func (f *testFixture) mintTokensToBondedPool(t *testing.T) error {
+func (f *testFixture) MintTokensToBondedPool(t *testing.T) error {
 	t.Helper()
 	require := require.New(t)
 

@@ -66,7 +66,7 @@ func (k Keeper) GetPendingValidators(ctx context.Context) (poa.Validators, error
 
 	pending, err := k.PendingValidators.Get(ctx)
 	if err != nil {
-		return DefaultPendingValidators(), nil
+		return DefaultPendingValidators(), err
 	}
 
 	return pending, nil

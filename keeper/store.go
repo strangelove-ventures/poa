@@ -17,7 +17,7 @@ func (k Keeper) SetCachedBlockPower(ctx context.Context, power uint64) error {
 func (k Keeper) GetCachedBlockPower(ctx context.Context) (uint64, error) {
 	cached, err := k.CachedBlockPower.Get(ctx)
 	if err != nil {
-		return 0, nil
+		return 0, err
 	}
 
 	return cached.Power, nil
@@ -34,7 +34,7 @@ func (k Keeper) SetAbsoluteChangedInBlockPower(ctx context.Context, power uint64
 func (k Keeper) GetAbsoluteChangedInBlockPower(ctx context.Context) (uint64, error) {
 	cached, err := k.AbsoluteChangedInBlockPower.Get(ctx)
 	if err != nil {
-		return 0, nil
+		return 0, err
 	}
 
 	return cached.Power, nil
