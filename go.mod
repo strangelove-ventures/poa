@@ -5,9 +5,6 @@ go 1.21
 // SDK v50 fix
 replace cosmossdk.io/core => cosmossdk.io/core v0.11.0
 
-// breaks SDK app.toml parsing in ictest.
-replace github.com/spf13/viper => github.com/spf13/viper v1.17.0
-
 require (
 	cosmossdk.io/api v0.7.2
 	cosmossdk.io/collections v0.4.0

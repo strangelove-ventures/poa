@@ -11,6 +11,9 @@ replace (
 	github.com/btcsuite/btcd => github.com/btcsuite/btcd v0.22.2 //indirect
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 
+	// breaks SDK app.toml parsing in ictest.
+	github.com/spf13/viper => github.com/spf13/viper v1.17.0
+
 	// github.com/strangelove-ventures/interchaintest/v8 => /home/reece/Desktop/Programming/Go/interchaintest
 	github.com/strangelove-ventures/poa => ../.
 
