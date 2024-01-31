@@ -28,7 +28,7 @@ func NewMsgServerImpl(keeper Keeper) poa.MsgServer {
 
 func (ms msgServer) SetPower(ctx context.Context, msg *poa.MsgSetPower) (*poa.MsgSetPowerResponse, error) {
 	if isAdmin := ms.k.IsAdmin(ctx, msg.Sender); !isAdmin {
-		return nil, errorsmod.Wrapf(poa.ErrNotAnAuthority, "sender %s is not an authority", msg.Sender)
+		return nil, errorsmod.Wrapf(poa.ErrNotAnAuthority, "sender %s is not an authority. allowed: %+v", msg.Sender, ms.k.GetAdmins(ctx))
 	}
 
 	if err := msg.Validate(ms.k.validatorAddressCodec); err != nil {

@@ -10,6 +10,7 @@ option go_package = "github.com/strangelove-ventures/poa";
 
 // Params defines the parameters for the module.
 message Params {
+  option (amino.name) = "poa/params";
   option (gogoproto.equal) = true;
   option (gogoproto.goproto_stringer) = false;
 

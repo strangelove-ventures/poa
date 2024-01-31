@@ -9,6 +9,7 @@ import (
 	slashingkeeper "github.com/cosmos/cosmos-sdk/x/slashing/keeper"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 
+	"cosmossdk.io/collections"
 	addresscodec "cosmossdk.io/core/address"
 	storetypes "cosmossdk.io/core/store"
 	"cosmossdk.io/log"
@@ -18,13 +19,20 @@ import (
 
 type Keeper struct {
 	cdc                   codec.BinaryCodec
-	storeService          storetypes.KVStoreService
 	validatorAddressCodec addresscodec.Codec
 
 	stakingKeeper *stakingkeeper.Keeper
 	slashKeeper   slashingkeeper.Keeper
 
 	logger log.Logger
+
+	// state management
+	Schema            collections.Schema
+	Params            collections.Item[poa.Params]
+	PendingValidators collections.Item[poa.Validators]
+
+	CachedBlockPower            collections.Item[poa.PowerCache]
+	AbsoluteChangedInBlockPower collections.Item[poa.PowerCache]
 }
 
 // NewKeeper creates a new poa Keeper instance
@@ -38,14 +46,29 @@ func NewKeeper(
 ) Keeper {
 	logger = logger.With(log.ModuleKey, "x/"+poa.ModuleName)
 
+	sb := collections.NewSchemaBuilder(storeService)
+
 	k := Keeper{
 		cdc:                   cdc,
-		storeService:          storeService,
 		stakingKeeper:         sk,
 		validatorAddressCodec: validatorAddressCodec,
 		slashKeeper:           slk,
 		logger:                logger,
+
+		// Stores
+		Params:            collections.NewItem(sb, poa.ParamsKey, "params", codec.CollValue[poa.Params](cdc)),
+		PendingValidators: collections.NewItem(sb, poa.PendingValidatorsKey, "pending", codec.CollValue[poa.Validators](cdc)),
+
+		CachedBlockPower:            collections.NewItem(sb, poa.CachedPreviousBlockPowerKey, "cached_block", codec.CollValue[poa.PowerCache](cdc)),
+		AbsoluteChangedInBlockPower: collections.NewItem(sb, poa.AbsoluteChangedInBlockPowerKey, "absolute_changed_power", codec.CollValue[poa.PowerCache](cdc)),
 	}
+
+	schema, err := sb.Build()
+	if err != nil {
+		panic(err)
+	}
+
+	k.Schema = schema
 
 	return k
 }

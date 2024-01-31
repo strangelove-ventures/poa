@@ -25,6 +25,7 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	mintkeeper "github.com/cosmos/cosmos-sdk/x/mint/keeper"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	slashingkeeper "github.com/cosmos/cosmos-sdk/x/slashing/keeper"
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
@@ -62,6 +63,7 @@ type testFixture struct {
 	stakingKeeper  *stakingkeeper.Keeper
 	slashingKeeper slashingkeeper.Keeper
 	bankkeeper     bankkeeper.BaseKeeper
+	mintkeeper     mintkeeper.Keeper
 
 	addrs      []sdk.AccAddress
 	govModAddr string
@@ -97,15 +99,27 @@ func SetupTest(t *testing.T, baseValShares int64) *testFixture {
 	// register interfaces
 	registerModuleInterfaces(encCfg)
 
-	// set POA genesis state
-	genState := poa.NewGenesisState()
-	genState.Params.Admins = []string{f.addrs[0].String(), f.govModAddr}
-	err := f.k.InitGenesis(f.ctx, genState)
-	require.NoError(err)
+	// Setup initial keeper states
+	require.NoError(f.accountkeeper.AccountNumber.Set(f.ctx, 1))
+	f.accountkeeper.SetModuleAccount(f.ctx, f.stakingKeeper.GetNotBondedPool(f.ctx))
+	f.accountkeeper.SetModuleAccount(f.ctx, f.stakingKeeper.GetBondedPool(f.ctx))
+	f.accountkeeper.SetModuleAccount(f.ctx, f.accountkeeper.GetModuleAccount(f.ctx, minttypes.ModuleName))
+	f.mintkeeper.InitGenesis(f.ctx, f.accountkeeper, minttypes.DefaultGenesisState())
+
+	// Set initial PoA state
+	f.InitPoAGenesis(t)
 
 	f.createBaseStakingValidators(t, baseValShares)
 
 	return f
+}
+
+func (f *testFixture) InitPoAGenesis(t *testing.T) {
+	t.Helper()
+
+	genState := poa.NewGenesisState()
+	genState.Params.Admins = []string{f.addrs[0].String(), f.govModAddr}
+	require.NoError(t, f.k.InitGenesis(f.ctx, genState))
 }
 
 func registerBaseSDKModules(
@@ -150,6 +164,14 @@ func registerBaseSDKModules(
 	)
 	err = f.slashingKeeper.SetParams(f.ctx, slashingtypes.DefaultParams())
 	require.NoError(err)
+
+	// Mint Keeper.
+	// This is required for `MintTokensToBondedPool` to remain happy.
+	f.mintkeeper = mintkeeper.NewKeeper(
+		encCfg.Codec, storeService,
+		f.stakingKeeper, f.accountkeeper, f.bankkeeper,
+		authtypes.FeeCollectorName, f.govModAddr,
+	)
 }
 
 func registerModuleInterfaces(encCfg moduletestutil.TestEncodingConfig) {

@@ -8,6 +8,24 @@ import (
 
 // InitGenesis initializes the module's state from a genesis state.
 func (k *Keeper) InitGenesis(ctx context.Context, data *poa.GenesisState) error {
+	if err := k.PendingValidators.Set(ctx, poa.Validators{
+		Validators: []poa.Validator{},
+	}); err != nil {
+		return err
+	}
+
+	if err := k.CachedBlockPower.Set(ctx, poa.PowerCache{
+		Power: 0,
+	}); err != nil {
+		return err
+	}
+
+	if err := k.AbsoluteChangedInBlockPower.Set(ctx, poa.PowerCache{
+		Power: 0,
+	}); err != nil {
+		return err
+	}
+
 	return k.SetParams(ctx, data.Params)
 }
 
