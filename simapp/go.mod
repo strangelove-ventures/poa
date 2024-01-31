@@ -9,6 +9,9 @@ replace (
 	github.com/99designs/keyring => github.com/cosmos/keyring v1.2.0
 	// Fix upstream GHSA-h395-qcrw-5vmq and GHSA-3vp4-m3rf-835h vulnerabilities.
 	github.com/gin-gonic/gin => github.com/gin-gonic/gin v1.9.1
+
+	// breaks SDK app.toml parsing in ictest.
+	github.com/spf13/viper => github.com/spf13/viper v1.17.0
 	github.com/strangelove-ventures/poa => ../.
 
 	// replace broken goleveldb
