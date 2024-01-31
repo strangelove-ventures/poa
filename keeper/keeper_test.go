@@ -100,7 +100,7 @@ func SetupTest(t *testing.T, baseValShares int64) *testFixture {
 	registerModuleInterfaces(encCfg)
 
 	// Setup initial keeper states
-	f.accountkeeper.AccountNumber.Set(f.ctx, 1)
+	require.NoError(f.accountkeeper.AccountNumber.Set(f.ctx, 1))
 	f.accountkeeper.SetModuleAccount(f.ctx, f.stakingKeeper.GetNotBondedPool(f.ctx))
 	f.accountkeeper.SetModuleAccount(f.ctx, f.stakingKeeper.GetBondedPool(f.ctx))
 	f.accountkeeper.SetModuleAccount(f.ctx, f.accountkeeper.GetModuleAccount(f.ctx, minttypes.ModuleName))
@@ -115,6 +115,8 @@ func SetupTest(t *testing.T, baseValShares int64) *testFixture {
 }
 
 func (f *testFixture) InitPoAGenesis(t *testing.T) {
+	t.Helper()
+
 	genState := poa.NewGenesisState()
 	genState.Params.Admins = []string{f.addrs[0].String(), f.govModAddr}
 	require.NoError(t, f.k.InitGenesis(f.ctx, genState))
