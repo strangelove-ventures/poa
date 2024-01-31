@@ -374,7 +374,7 @@ func TestRemoveValidator(t *testing.T) {
 
 				// This is only required in testing as we do not have a 'real' validator set
 				// signing blocks.
-				if err := f.mintTokensToBondedPool(t); err != nil {
+				if err := f.MintTokensToBondedPool(t); err != nil {
 					panic(err)
 				}
 
