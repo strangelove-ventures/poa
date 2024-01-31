@@ -17,12 +17,6 @@ func (k Keeper) SetParams(ctx context.Context, p poa.Params) error {
 
 // GetParams returns the current module parameters.
 func (k Keeper) GetParams(ctx context.Context) (poa.Params, error) {
-	if ok, err := k.Params.Has(ctx); err != nil {
-		return poa.DefaultParams(), err
-	} else if !ok {
-		return poa.DefaultParams(), nil
-	}
-
 	p, err := k.Params.Get(ctx)
 	if err != nil {
 		return poa.DefaultParams(), err
