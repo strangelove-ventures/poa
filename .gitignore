@@ -18,6 +18,7 @@
 # vendor/
 
 # Go workspace file
+go.work
 go.work.sum
 
 # Depinject debug file
