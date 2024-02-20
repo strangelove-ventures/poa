@@ -6,6 +6,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	slashingkeeper "github.com/cosmos/cosmos-sdk/x/slashing/keeper"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 
@@ -23,6 +24,7 @@ type Keeper struct {
 
 	stakingKeeper *stakingkeeper.Keeper
 	slashKeeper   slashingkeeper.Keeper
+	bankKeeper    bankkeeper.Keeper
 
 	logger log.Logger
 
@@ -41,6 +43,7 @@ func NewKeeper(
 	storeService storetypes.KVStoreService,
 	sk *stakingkeeper.Keeper,
 	slk slashingkeeper.Keeper,
+	bk bankkeeper.Keeper,
 	validatorAddressCodec addresscodec.Codec,
 	logger log.Logger,
 ) Keeper {
@@ -53,6 +56,7 @@ func NewKeeper(
 		stakingKeeper:         sk,
 		validatorAddressCodec: validatorAddressCodec,
 		slashKeeper:           slk,
+		bankKeeper:            bk,
 		logger:                logger,
 
 		// Stores
@@ -81,6 +85,10 @@ func (k Keeper) GetStakingKeeper() *stakingkeeper.Keeper {
 // GetSlashingKeeper returns the slashing keeper.
 func (k Keeper) GetSlashingKeeper() slashingkeeper.Keeper {
 	return k.slashKeeper
+}
+
+func (k Keeper) GetBankKeeper() bankkeeper.Keeper {
+	return k.bankKeeper
 }
 
 // GetAdmins returns the module's administrators with delegation of power control.

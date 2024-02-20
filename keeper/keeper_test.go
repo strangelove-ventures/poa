@@ -91,7 +91,7 @@ func SetupTest(t *testing.T, baseValShares int64) *testFixture {
 	registerBaseSDKModules(f, encCfg, storeService, logger, require)
 
 	// Setup POA Keeper.
-	f.k = keeper.NewKeeper(encCfg.Codec, storeService, f.stakingKeeper, f.slashingKeeper, addresscodec.NewBech32Codec(sdk.Bech32PrefixValAddr), logger)
+	f.k = keeper.NewKeeper(encCfg.Codec, storeService, f.stakingKeeper, f.slashingKeeper, f.bankkeeper, addresscodec.NewBech32Codec(sdk.Bech32PrefixValAddr), logger)
 	f.msgServer = keeper.NewMsgServerImpl(f.k)
 	f.queryServer = keeper.NewQueryServerImpl(f.k)
 	f.appModule = poamodule.NewAppModule(encCfg.Codec, f.k)

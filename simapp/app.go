@@ -319,6 +319,7 @@ func NewSimApp(
 		runtime.NewKVStoreService(keys[poatypes.StoreKey]),
 		app.StakingKeeper,
 		app.SlashingKeeper,
+		app.BankKeeper,
 		authcodec.NewBech32Codec(sdk.Bech32PrefixValAddr),
 		logger,
 	)
