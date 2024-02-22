@@ -170,5 +170,9 @@ func (k Keeper) UpdateBondedPoolPower(ctx context.Context) error {
 		}
 	}
 
+	// no need to check if it goes down. When it does, it's automatic from the staking module as tokens are moved from
+	// bonded -> ToNotBonded pool. As PoA, we do not want any tokens in the ToNotBonded pool, so when a validator is removed
+	// they are slashed 100% (since it is PoA this is fine) which decreases the BondedPool balance, and leave NotBonded at 0.
+
 	return nil
 }
