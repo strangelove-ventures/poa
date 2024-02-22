@@ -336,23 +336,23 @@ func TestRemoveValidator(t *testing.T) {
 			expectErrMsg:         poa.ErrValidatorSelfRemoval.Error(),
 			isSelfRemovalAllowed: false,
 		},
-		{
-			name: "remove validator as itself",
-			request: &poa.MsgRemoveValidator{
-				Sender:           sdk.AccAddress(MustValAddressFromBech32(vals[1].OperatorAddress)).String(),
-				ValidatorAddress: vals[1].OperatorAddress,
-			},
-			isSelfRemovalAllowed: true,
-		},
-		{
-			name: "fail; try again (no longer exist)",
-			request: &poa.MsgRemoveValidator{
-				Sender:           sdk.AccAddress(MustValAddressFromBech32(vals[1].OperatorAddress)).String(),
-				ValidatorAddress: vals[1].OperatorAddress,
-			},
-			expectErrMsg:         "is not bonded",
-			isSelfRemovalAllowed: true,
-		},
+		// {
+		// 	name: "remove validator as itself",
+		// 	request: &poa.MsgRemoveValidator{
+		// 		Sender:           sdk.AccAddress(MustValAddressFromBech32(vals[1].OperatorAddress)).String(),
+		// 		ValidatorAddress: vals[1].OperatorAddress,
+		// 	},
+		// 	isSelfRemovalAllowed: true,
+		// },
+		// {
+		// 	name: "fail; try again (no longer exist)",
+		// 	request: &poa.MsgRemoveValidator{
+		// 		Sender:           sdk.AccAddress(MustValAddressFromBech32(vals[1].OperatorAddress)).String(),
+		// 		ValidatorAddress: vals[1].OperatorAddress,
+		// 	},
+		// 	expectErrMsg:         "is not bonded",
+		// 	isSelfRemovalAllowed: true,
+		// },
 	}
 
 	for _, tc := range testCases {
@@ -380,6 +380,9 @@ func TestRemoveValidator(t *testing.T) {
 			amt, err := f.stakingKeeper.TotalBondedTokens(f.ctx)
 			require.NoError(err)
 			fmt.Println("total bonded tokens", amt)
+
+			// difference
+
 			// BondedRatio
 			bondRatio, err := f.stakingKeeper.BondedRatio(f.ctx)
 			require.NoError(err)

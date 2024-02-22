@@ -256,7 +256,6 @@ func (ms msgServer) CreateValidator(ctx context.Context, msg *poa.MsgCreateValid
 		return nil, err
 	}
 
-	// TODO: needed here?
 	return &poa.MsgCreateValidatorResponse{}, ms.k.UpdateBondedPoolPower(ctx)
 }
 

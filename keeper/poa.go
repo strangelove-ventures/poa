@@ -101,7 +101,7 @@ func (k Keeper) SetPOAPower(ctx context.Context, valOpBech32 string, newShares i
 		return stakingtypes.Validator{}, err
 	}
 
-	return val, k.UpdateBondedPoolPower(ctx)
+	return val, nil
 }
 
 // AcceptNewValidator accepts a new validator and pushes them into the actives set.

@@ -2,10 +2,12 @@ package keeper
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	slashingkeeper "github.com/cosmos/cosmos-sdk/x/slashing/keeper"
@@ -147,24 +149,25 @@ func (k Keeper) UpdateBondedPoolPower(ctx context.Context) error {
 		newTotal = newTotal.Add(d.Shares.RoundInt())
 	}
 
-	lastPower, err := k.stakingKeeper.GetLastTotalPower(ctx)
-	if err != nil {
-		return err
-	}
-
-	if newTotal.Equal(lastPower) {
-		return nil
-	}
-
 	bondDenom, err := k.stakingKeeper.BondDenom(ctx)
 	if err != nil {
 		return err
 	}
 
-	// if newTotal > lastPower, then mint new tokens to the bonded pool
-	if newTotal.GT(lastPower) {
-		diff := newTotal.Sub(lastPower)
+	addr := authtypes.NewModuleAddress(stakingtypes.BondedPoolName)
+
+	prevBal := k.bankKeeper.GetBalance(ctx, addr, bondDenom).Amount
+
+	if newTotal.Equal(prevBal) {
+		return nil
+	}
+
+	if newTotal.GT(prevBal) {
+		diff := newTotal.Sub(prevBal)
 		coins := sdk.NewCoins(sdk.NewCoin(bondDenom, diff))
+
+		fmt.Println("Minting coins to the bonded pool", coins)
+
 		if err := k.bankKeeper.MintCoins(ctx, minttypes.ModuleName, coins); err != nil {
 			return err
 		}
@@ -174,9 +177,10 @@ func (k Keeper) UpdateBondedPoolPower(ctx context.Context) error {
 		}
 
 	} else {
-		// if newTotal < lastPower, then burn tokens from the bonded pool
-		diff := lastPower.Sub(newTotal)
+		diff := prevBal.Sub(newTotal)
 		coins := sdk.NewCoins(sdk.NewCoin(bondDenom, diff))
+		fmt.Println("Burning coins from the bonded pool", coins)
+
 		if err := k.bankKeeper.BurnCoins(ctx, stakingtypes.BondedPoolName, coins); err != nil {
 			return err
 		}
