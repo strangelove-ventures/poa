@@ -379,7 +379,7 @@ func TestRemoveValidator(t *testing.T) {
 			} else {
 				require.NoError(err)
 
-				_, err := f.IncreaseBlock(5, true)
+				_, err := f.IncreaseBlock(3, true)
 				require.NoError(err)
 			}
 
@@ -387,12 +387,17 @@ func TestRemoveValidator(t *testing.T) {
 			require.NoError(err)
 			fmt.Println("total bonded tokens", amt)
 
+			notBondedPool := f.stakingKeeper.GetNotBondedPool(f.ctx)
+			bondDenom, err := f.stakingKeeper.BondDenom(f.ctx)
+			require.NoError(err)
+			bal := f.bankkeeper.GetBalance(f.ctx, notBondedPool.GetAddress(), bondDenom)
+			fmt.Println("notBondedPool", bal.Amount)
+
 			// BondedRatio
 			bondRatio, err := f.stakingKeeper.BondedRatio(f.ctx)
 			require.NoError(err)
 			fmt.Println("bonded ratio", bondRatio)
-			// require.EqualValues(sdkmath.LegacyOneDec(), bondRatio)
-			require.True(bondRatio.GTE(sdkmath.LegacyNewDecWithPrec(6666, 18)))
+			require.EqualValues(sdkmath.LegacyOneDec(), bondRatio)
 		})
 	}
 }
