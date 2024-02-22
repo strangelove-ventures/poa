@@ -7,13 +7,16 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
+	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	slashingkeeper "github.com/cosmos/cosmos-sdk/x/slashing/keeper"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
 	"cosmossdk.io/collections"
 	addresscodec "cosmossdk.io/core/address"
 	storetypes "cosmossdk.io/core/store"
 	"cosmossdk.io/log"
+	sdkmath "cosmossdk.io/math"
 
 	"github.com/strangelove-ventures/poa"
 )
@@ -129,4 +132,55 @@ func (k Keeper) IsSenderValidator(ctx context.Context, sender string, expectedVa
 
 func (k Keeper) Logger() log.Logger {
 	return k.logger
+}
+
+// updateBondedPoolPower updates the bonded pool to the correct power for the network.
+func (k Keeper) UpdateBondedPoolPower(ctx context.Context) error {
+	newTotal := sdkmath.ZeroInt()
+
+	del, err := k.stakingKeeper.GetAllDelegations(ctx)
+	if err != nil {
+		return err
+	}
+
+	for _, d := range del {
+		newTotal = newTotal.Add(d.Shares.RoundInt())
+	}
+
+	lastPower, err := k.stakingKeeper.GetLastTotalPower(ctx)
+	if err != nil {
+		return err
+	}
+
+	if newTotal.Equal(lastPower) {
+		return nil
+	}
+
+	bondDenom, err := k.stakingKeeper.BondDenom(ctx)
+	if err != nil {
+		return err
+	}
+
+	// if newTotal > lastPower, then mint new tokens to the bonded pool
+	if newTotal.GT(lastPower) {
+		diff := newTotal.Sub(lastPower)
+		coins := sdk.NewCoins(sdk.NewCoin(bondDenom, diff))
+		if err := k.bankKeeper.MintCoins(ctx, minttypes.ModuleName, coins); err != nil {
+			return err
+		}
+
+		if err := k.bankKeeper.SendCoinsFromModuleToModule(ctx, minttypes.ModuleName, stakingtypes.BondedPoolName, coins); err != nil {
+			return err
+		}
+
+	} else {
+		// if newTotal < lastPower, then burn tokens from the bonded pool
+		diff := lastPower.Sub(newTotal)
+		coins := sdk.NewCoins(sdk.NewCoin(bondDenom, diff))
+		if err := k.bankKeeper.BurnCoins(ctx, stakingtypes.BondedPoolName, coins); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

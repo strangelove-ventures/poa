@@ -7,8 +7,9 @@ import (
 	"github.com/stretchr/testify/require"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
-	"github.com/cosmos/cosmos-sdk/x/staking/types"
+	// minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
+	// "github.com/cosmos/cosmos-sdk/x/staking/types"
+	sdkmath "cosmossdk.io/math"
 
 	"cosmossdk.io/math"
 
@@ -361,7 +362,7 @@ func TestRemoveValidator(t *testing.T) {
 			currParams, _ := f.k.GetParams(f.ctx)
 			currParams.AllowValidatorSelfExit = tc.isSelfRemovalAllowed
 
-			err := f.k.SetParams(f.ctx, currParams)
+			err = f.k.SetParams(f.ctx, currParams)
 			require.NoError(err)
 
 			_, err = f.msgServer.RemoveValidator(f.ctx, tc.request)
@@ -372,15 +373,18 @@ func TestRemoveValidator(t *testing.T) {
 			} else {
 				require.NoError(err)
 
-				// This is only required in testing as we do not have a 'real' validator set
-				// signing blocks.
-				if err := f.MintTokensToBondedPool(t); err != nil {
-					panic(err)
-				}
-
 				_, err := f.IncreaseBlock(5, true)
 				require.NoError(err)
 			}
+
+			amt, err := f.stakingKeeper.TotalBondedTokens(f.ctx)
+			require.NoError(err)
+			fmt.Println("total bonded tokens", amt)
+			// BondedRatio
+			bondRatio, err := f.stakingKeeper.BondedRatio(f.ctx)
+			require.NoError(err)
+			fmt.Println("bonded ratio", bondRatio)
+			require.EqualValues(bondRatio, sdkmath.LegacyOneDec())
 		})
 	}
 }
@@ -453,35 +457,4 @@ func TestMultipleUpdatesInASingleBlock(t *testing.T) {
 			}
 		})
 	}
-}
-
-// mintTokensToBondedPool mints tokens to the bonded pool so the validator set
-// in testing can be removed.
-// In the future, this same logic would be run during the migration from POA->POS.
-func (f *testFixture) MintTokensToBondedPool(t *testing.T) error {
-	t.Helper()
-	require := require.New(t)
-
-	bondDenom, err := f.stakingKeeper.BondDenom(f.ctx)
-	require.NoError(err)
-
-	validators, err := f.stakingKeeper.GetAllValidators(f.ctx)
-	require.NoError(err)
-
-	amt := int64(0)
-	for _, v := range validators {
-		amt += v.GetBondedTokens().Int64()
-	}
-
-	coins := sdk.NewCoins(sdk.NewCoin(bondDenom, math.NewInt(amt)))
-
-	if err := f.bankkeeper.MintCoins(f.ctx, minttypes.ModuleName, coins); err != nil {
-		return err
-	}
-
-	if err := f.bankkeeper.SendCoinsFromModuleToModule(f.ctx, minttypes.ModuleName, types.BondedPoolName, coins); err != nil {
-		return err
-	}
-
-	return nil
 }

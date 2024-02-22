@@ -101,7 +101,7 @@ func (k Keeper) SetPOAPower(ctx context.Context, valOpBech32 string, newShares i
 		return stakingtypes.Validator{}, err
 	}
 
-	return val, nil
+	return val, k.UpdateBondedPoolPower(ctx)
 }
 
 // AcceptNewValidator accepts a new validator and pushes them into the actives set.
@@ -140,7 +140,7 @@ func (k Keeper) AcceptNewValidator(ctx context.Context, operatingAddress string,
 		),
 	})
 
-	return nil
+	return k.UpdateBondedPoolPower(ctx)
 }
 
 // setValidatorInternals sets the validator's:
@@ -185,5 +185,9 @@ func (k Keeper) updateTotalPower(ctx context.Context) error {
 
 	// all tokens / 10^6 = new total power
 	totalConsenusPower := allTokens.Quo(k.stakingKeeper.PowerReduction(ctx))
-	return k.stakingKeeper.SetLastTotalPower(ctx, totalConsenusPower)
+	if err := k.stakingKeeper.SetLastTotalPower(ctx, totalConsenusPower); err != nil {
+		return err
+	}
+
+	return k.UpdateBondedPoolPower(ctx)
 }
