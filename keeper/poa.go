@@ -53,7 +53,8 @@ func (k Keeper) UpdateValidatorSet(ctx context.Context, newShares, newConsensusP
 // - updates the validator with the new shares, single delegation
 // - sets the last validator power to the new value.
 func (k Keeper) SetPOAPower(ctx context.Context, valOpBech32 string, newShares int64) (stakingtypes.Validator, error) {
-	newConsensusPower := k.stakingKeeper.TokensToConsensusPower(ctx, sdkmath.NewInt(newShares)) // BFT consensus power
+	// 1 Consenus Power = 1_000_000 shares by default
+	newBFTConsensusPower := k.stakingKeeper.TokensToConsensusPower(ctx, sdkmath.NewInt(newShares))
 
 	valAddr, err := sdk.ValAddressFromBech32(valOpBech32)
 	if err != nil {
@@ -88,16 +89,16 @@ func (k Keeper) SetPOAPower(ctx context.Context, valOpBech32 string, newShares i
 	}
 
 	// Sets the new consensus power for the validator (this is executed in the x/staking ApplyAndReturnValidatorUpdates method)
-	if err := k.stakingKeeper.SetLastValidatorPower(ctx, valAddr, newConsensusPower); err != nil {
+	if err := k.stakingKeeper.SetLastValidatorPower(ctx, valAddr, newBFTConsensusPower); err != nil {
 		return stakingtypes.Validator{}, err
 	}
 
-	absPowerDiff := uint64(math.Abs(float64(newConsensusPower - currentPower)))
+	absPowerDiff := uint64(math.Abs(float64(newBFTConsensusPower - currentPower)))
 
 	k.Logger().Debug("POA updatePOAPower",
 		"valOpBech32", valOpBech32,
 		"New Shares", newShares,
-		"New Consensus Power", newConsensusPower,
+		"New Consensus Power", newBFTConsensusPower,
 		"Previous Power", currentPower,
 		"absPowerDiff", absPowerDiff,
 	)
@@ -106,7 +107,7 @@ func (k Keeper) SetPOAPower(ctx context.Context, valOpBech32 string, newShares i
 		return stakingtypes.Validator{}, err
 	}
 
-	if err := k.UpdateValidatorSet(ctx, newShares, newConsensusPower, val, valAddr); err != nil {
+	if err := k.UpdateValidatorSet(ctx, newShares, newBFTConsensusPower, val, valAddr); err != nil {
 		return stakingtypes.Validator{}, err
 	}
 
