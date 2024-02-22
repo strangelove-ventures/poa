@@ -83,12 +83,10 @@ func (k Keeper) SetPOAPower(ctx context.Context, valOpBech32 string, newShares i
 
 		height := sdk.UnwrapSDKContext(ctx).BlockHeight()
 
-		amt, err := k.stakingKeeper.Slash(ctx, sdk.GetConsAddress(pk), height, currentPower*1_000_000, sdkmath.LegacyOneDec())
+		_, err := k.stakingKeeper.Slash(ctx, sdk.GetConsAddress(pk), height, currentPower*1_000_000, sdkmath.LegacyOneDec())
 		if err != nil {
 			return stakingtypes.Validator{}, err
 		}
-		fmt.Println("Slashed validator", val.OperatorAddress, "by", amt)
-
 	}
 
 	// Sets the new consensus power for the validator (this is executed in the x/staking ApplyAndReturnValidatorUpdates method)

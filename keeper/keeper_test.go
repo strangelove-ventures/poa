@@ -344,7 +344,6 @@ func (f *testFixture) IncreaseBlock(amt int64, debug ...bool) ([]abci.ValidatorU
 		if err := f.appModule.BeginBlock(f.ctx); err != nil {
 			return nil, err
 		}
-
 	}
 
 	return allUpdates, nil

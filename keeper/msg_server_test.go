@@ -7,14 +7,8 @@ import (
 	"github.com/stretchr/testify/require"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
-	// minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
-	// "github.com/cosmos/cosmos-sdk/x/staking/types"
 	sdkmath "cosmossdk.io/math"
-
-	"cosmossdk.io/math"
 
 	"github.com/strangelove-ventures/poa"
 )
@@ -130,7 +124,7 @@ func TestSetPowerAndCreateValidator(t *testing.T) {
 	vals, err := f.stakingKeeper.GetValidators(f.ctx, 100)
 	require.NoError(err)
 
-	totalBonded := math.ZeroInt()
+	totalBonded := sdkmath.ZeroInt()
 	for _, val := range vals {
 		totalBonded = totalBonded.Add(val.GetBondedTokens())
 	}
@@ -370,9 +364,6 @@ func TestRemoveValidator(t *testing.T) {
 
 			_, err = f.msgServer.RemoveValidator(f.ctx, tc.request)
 
-			other := f.bankkeeper.GetBalance(f.ctx, authtypes.NewModuleAddress(stakingtypes.NotBondedPoolName), "stake").Amount
-			fmt.Println("other1", other)
-
 			if tc.expectErrMsg != "" {
 				require.Error(err)
 				require.ErrorContains(err, tc.expectErrMsg)
@@ -385,18 +376,17 @@ func TestRemoveValidator(t *testing.T) {
 
 			amt, err := f.stakingKeeper.TotalBondedTokens(f.ctx)
 			require.NoError(err)
-			fmt.Println("total bonded tokens", amt)
+			require.True(amt.IsPositive())
 
 			notBondedPool := f.stakingKeeper.GetNotBondedPool(f.ctx)
 			bondDenom, err := f.stakingKeeper.BondDenom(f.ctx)
 			require.NoError(err)
 			bal := f.bankkeeper.GetBalance(f.ctx, notBondedPool.GetAddress(), bondDenom)
-			fmt.Println("notBondedPool", bal.Amount)
+			require.EqualValues(0, bal.Amount.Uint64())
 
 			// BondedRatio
 			bondRatio, err := f.stakingKeeper.BondedRatio(f.ctx)
 			require.NoError(err)
-			fmt.Println("bonded ratio", bondRatio)
 			require.EqualValues(sdkmath.LegacyOneDec(), bondRatio)
 		})
 	}

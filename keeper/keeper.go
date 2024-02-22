@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -163,8 +162,6 @@ func (k Keeper) UpdateBondedPoolPower(ctx context.Context) error {
 	if newTotal.GT(prevBal) {
 		diff := newTotal.Sub(prevBal)
 		coins := sdk.NewCoins(sdk.NewCoin(bondDenom, diff))
-
-		fmt.Println("Minting coins to the bonded pool", coins)
 
 		if err := k.bankKeeper.MintCoins(ctx, minttypes.ModuleName, coins); err != nil {
 			return err
