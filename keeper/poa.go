@@ -17,8 +17,6 @@ import (
 
 // UpdateValidatorSet updates a validator to their new share and consensus power, then updates the total power of the set.
 func (k Keeper) UpdateValidatorSet(ctx context.Context, newShares, newConsensusPower int64, val stakingtypes.Validator, valAddr sdk.ValAddress) error {
-	// sdkContext := sdk.UnwrapSDKContext(ctx)
-
 	newShare := sdkmath.LegacyNewDec(newShares)
 	newShareInt := sdkmath.NewIntFromUint64(uint64(newShares))
 
@@ -78,13 +76,14 @@ func (k Keeper) SetPOAPower(ctx context.Context, valOpBech32 string, newShares i
 	if newShares == 0 && currentPower > 0 {
 		pk, ok := val.ConsensusPubkey.GetCachedValue().(cryptotypes.PubKey)
 		if !ok {
-			return stakingtypes.Validator{}, fmt.Errorf("issue getting consensus pubkey")
+			return stakingtypes.Validator{}, fmt.Errorf("issue getting consensus pubkey for %s", valOpBech32)
 		}
 
 		height := sdk.UnwrapSDKContext(ctx).BlockHeight()
 
-		_, err := k.stakingKeeper.Slash(ctx, sdk.GetConsAddress(pk), height, currentPower*1_000_000, sdkmath.LegacyOneDec())
-		if err != nil {
+		normalizedToken := k.stakingKeeper.TokensFromConsensusPower(ctx, currentPower)
+
+		if _, err := k.stakingKeeper.Slash(ctx, sdk.GetConsAddress(pk), height, normalizedToken.Int64(), sdkmath.LegacyOneDec()); err != nil {
 			return stakingtypes.Validator{}, err
 		}
 	}

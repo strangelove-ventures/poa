@@ -27,8 +27,8 @@ type Keeper struct {
 	validatorAddressCodec addresscodec.Codec
 
 	stakingKeeper *stakingkeeper.Keeper
-	slashKeeper   slashingkeeper.Keeper
-	bankKeeper    bankkeeper.Keeper
+	slashKeeper   SlashingKeeper
+	bankKeeper    BankKeeper
 
 	logger log.Logger
 
@@ -87,11 +87,11 @@ func (k Keeper) GetStakingKeeper() *stakingkeeper.Keeper {
 }
 
 // GetSlashingKeeper returns the slashing keeper.
-func (k Keeper) GetSlashingKeeper() slashingkeeper.Keeper {
+func (k Keeper) GetSlashingKeeper() SlashingKeeper {
 	return k.slashKeeper
 }
 
-func (k Keeper) GetBankKeeper() bankkeeper.Keeper {
+func (k Keeper) GetBankKeeper() BankKeeper {
 	return k.bankKeeper
 }
 
