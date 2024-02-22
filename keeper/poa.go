@@ -53,8 +53,7 @@ func (k Keeper) UpdateValidatorSet(ctx context.Context, newShares, newConsensusP
 // - updates the validator with the new shares, single delegation
 // - sets the last validator power to the new value.
 func (k Keeper) SetPOAPower(ctx context.Context, valOpBech32 string, newShares int64) (stakingtypes.Validator, error) {
-	powerReduction := k.stakingKeeper.PowerReduction(ctx)
-	newConsensusPower := newShares / powerReduction.Int64() // BFT consensus power
+	newConsensusPower := k.stakingKeeper.TokensToConsensusPower(ctx, sdkmath.NewInt(newShares)) // BFT consensus power
 
 	valAddr, err := sdk.ValAddressFromBech32(valOpBech32)
 	if err != nil {
