@@ -101,50 +101,6 @@ func (k Keeper) SetPOAPower(ctx context.Context, valOpBech32 string, newShares i
 		return stakingtypes.Validator{}, err
 	}
 
-	// TODO: update bonding pools (does staking take care of this?)
-	sdkValAddr, err := k.validatorAddressCodec.StringToBytes(valOpBech32)
-	if err != nil {
-		return stakingtypes.Validator{}, sdkerrors.ErrInvalidAddress.Wrapf("invalid validator address: %s", err)
-	}
-
-	currVal, err := k.stakingKeeper.GetValidator(ctx, sdkValAddr)
-	if err != nil {
-		return stakingtypes.Validator{}, err
-	}
-
-	bondDenom, err := k.stakingKeeper.BondDenom(ctx)
-	if err != nil {
-		return stakingtypes.Validator{}, err
-	}
-
-	delAddr := sdk.AccAddress(string(sdkValAddr))
-
-	if newShares > currVal.Tokens.Int64() {
-		diff := newShares - currVal.Tokens.Int64()
-		// mint tokens to the bondedPoolName
-		coins := sdk.NewCoins(sdk.NewCoin(bondDenom, sdkmath.NewInt(diff)))
-		// print coins
-		fmt.Println(coins)
-
-		err = k.GetBankKeeper().DelegateCoinsFromAccountToModule(ctx, delAddr, stakingtypes.BondedPoolName, coins)
-		if err != nil {
-			return stakingtypes.Validator{}, err
-		}
-	} else {
-		diff := currVal.Tokens.Int64() - newShares
-		if diff == 0 {
-			return stakingtypes.Validator{}, nil
-		}
-
-		coins := sdk.NewCoins(sdk.NewCoin(bondDenom, sdkmath.NewInt(diff)))
-
-		// unbond tokens from the bondedPoolName
-		err = k.GetBankKeeper().UndelegateCoinsFromModuleToAccount(ctx, stakingtypes.BondedPoolName, delAddr, coins)
-		if err != nil {
-			return stakingtypes.Validator{}, err
-		}
-	}
-
 	return val, nil
 }
 

@@ -7,6 +7,7 @@ import (
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
 	errorsmod "cosmossdk.io/errors"
@@ -24,6 +25,56 @@ var _ poa.MsgServer = msgServer{}
 // NewMsgServerImpl returns an implementation of the module MsgServer interface.
 func NewMsgServerImpl(keeper Keeper) poa.MsgServer {
 	return &msgServer{k: keeper}
+}
+
+func (ms msgServer) updateBondedPoolPower(ctx context.Context) error {
+	newTotal := sdkmath.ZeroInt()
+
+	del, err := ms.k.stakingKeeper.GetAllDelegations(ctx)
+	if err != nil {
+		return err
+	}
+
+	for _, d := range del {
+		newTotal = newTotal.Add(d.Shares.RoundInt())
+	}
+
+	lastPower, err := ms.k.stakingKeeper.GetLastTotalPower(ctx)
+	if err != nil {
+		return err
+	}
+
+	if newTotal.Equal(lastPower) {
+		return nil
+	}
+
+	bondDenom, err := ms.k.stakingKeeper.BondDenom(ctx)
+	if err != nil {
+		return err
+	}
+
+	// if newTotal > lastPower, then mint new tokens to the bonded pool
+	if newTotal.GT(lastPower) {
+		diff := newTotal.Sub(lastPower)
+		coins := sdk.NewCoins(sdk.NewCoin(bondDenom, diff))
+		if err := ms.k.bankKeeper.MintCoins(ctx, minttypes.ModuleName, coins); err != nil {
+			return err
+		}
+
+		if err := ms.k.bankKeeper.SendCoinsFromModuleToModule(ctx, minttypes.ModuleName, stakingtypes.BondedPoolName, coins); err != nil {
+			return err
+		}
+
+	} else {
+		// if newTotal < lastPower, then burn tokens from the bonded pool
+		diff := lastPower.Sub(newTotal)
+		coins := sdk.NewCoins(sdk.NewCoin(bondDenom, diff))
+		if err := ms.k.bankKeeper.BurnCoins(ctx, stakingtypes.BondedPoolName, coins); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (ms msgServer) SetPower(ctx context.Context, msg *poa.MsgSetPower) (*poa.MsgSetPowerResponse, error) {
@@ -80,7 +131,7 @@ func (ms msgServer) SetPower(ctx context.Context, msg *poa.MsgSetPower) (*poa.Ms
 		}
 	}
 
-	return &poa.MsgSetPowerResponse{}, nil
+	return &poa.MsgSetPowerResponse{}, ms.updateBondedPoolPower(ctx)
 }
 
 func (ms msgServer) RemoveValidator(ctx context.Context, msg *poa.MsgRemoveValidator) (*poa.MsgRemoveValidatorResponse, error) {
@@ -143,7 +194,7 @@ func (ms msgServer) RemoveValidator(ctx context.Context, msg *poa.MsgRemoveValid
 		return nil, err
 	}
 
-	return &poa.MsgRemoveValidatorResponse{}, nil
+	return &poa.MsgRemoveValidatorResponse{}, ms.updateBondedPoolPower(ctx)
 }
 
 func (ms msgServer) RemovePending(ctx context.Context, msg *poa.MsgRemovePending) (*poa.MsgRemovePendingResponse, error) {
@@ -256,7 +307,8 @@ func (ms msgServer) CreateValidator(ctx context.Context, msg *poa.MsgCreateValid
 		return nil, err
 	}
 
-	return &poa.MsgCreateValidatorResponse{}, nil
+	// TODO: needed here?
+	return &poa.MsgCreateValidatorResponse{}, ms.updateBondedPoolPower(ctx)
 }
 
 // UpdateStakingParams wraps the x/staking module's UpdateStakingParams method so that only POA admins can invoke it.
