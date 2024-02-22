@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math"
 
+	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
@@ -16,25 +17,20 @@ import (
 
 // UpdateValidatorSet updates a validator to their new share and consensus power, then updates the total power of the set.
 func (k Keeper) UpdateValidatorSet(ctx context.Context, newShares, newConsensusPower int64, val stakingtypes.Validator, valAddr sdk.ValAddress) error {
-	sdkContext := sdk.UnwrapSDKContext(ctx)
+	// sdkContext := sdk.UnwrapSDKContext(ctx)
 
 	newShare := sdkmath.LegacyNewDec(newShares)
 	newShareInt := sdkmath.NewIntFromUint64(uint64(newShares))
 
+	delAddr := sdk.AccAddress(valAddr.Bytes())
 	delegation := stakingtypes.Delegation{
-		DelegatorAddress: sdk.AccAddress(valAddr.Bytes()).String(),
+		DelegatorAddress: delAddr.String(),
 		ValidatorAddress: val.OperatorAddress,
 		Shares:           newShare,
 	}
 
 	if err := k.stakingKeeper.SetDelegation(ctx, delegation); err != nil {
 		return err
-	}
-
-	// if we are removing a validator and it is not a gentx
-	// then we set the min self delegation +=1 so they unbond without slashing.
-	if newShares == 0 && sdkContext.BlockHeight() > 1 {
-		val.MinSelfDelegation = val.MinSelfDelegation.AddRaw(1)
 	}
 
 	val.Tokens = newShareInt
@@ -60,7 +56,7 @@ func (k Keeper) UpdateValidatorSet(ctx context.Context, newShares, newConsensusP
 // - sets the last validator power to the new value.
 func (k Keeper) SetPOAPower(ctx context.Context, valOpBech32 string, newShares int64) (stakingtypes.Validator, error) {
 	powerReduction := k.stakingKeeper.PowerReduction(ctx)
-	newConsensusPower := newShares / powerReduction.Int64()
+	newConsensusPower := newShares / powerReduction.Int64() // BFT consensus power
 
 	valAddr, err := sdk.ValAddressFromBech32(valOpBech32)
 	if err != nil {
@@ -76,6 +72,23 @@ func (k Keeper) SetPOAPower(ctx context.Context, valOpBech32 string, newShares i
 	currentPower, err := k.stakingKeeper.GetLastValidatorPower(ctx, valAddr)
 	if err != nil {
 		return stakingtypes.Validator{}, err
+	}
+
+	// slash all the validator's tokens (100%)
+	if newShares == 0 && currentPower > 0 {
+		pk, ok := val.ConsensusPubkey.GetCachedValue().(cryptotypes.PubKey)
+		if !ok {
+			return stakingtypes.Validator{}, fmt.Errorf("issue getting consensus pubkey")
+		}
+
+		height := sdk.UnwrapSDKContext(ctx).BlockHeight()
+
+		amt, err := k.stakingKeeper.Slash(ctx, sdk.GetConsAddress(pk), height, currentPower*1_000_000, sdkmath.LegacyOneDec())
+		if err != nil {
+			return stakingtypes.Validator{}, err
+		}
+		fmt.Println("Slashed validator", val.OperatorAddress, "by", amt)
+
 	}
 
 	// Sets the new consensus power for the validator (this is executed in the x/staking ApplyAndReturnValidatorUpdates method)
