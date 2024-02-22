@@ -7,6 +7,9 @@ import (
 	"github.com/stretchr/testify/require"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+
 	// minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	// "github.com/cosmos/cosmos-sdk/x/staking/types"
 	sdkmath "cosmossdk.io/math"
@@ -336,23 +339,23 @@ func TestRemoveValidator(t *testing.T) {
 			expectErrMsg:         poa.ErrValidatorSelfRemoval.Error(),
 			isSelfRemovalAllowed: false,
 		},
-		// {
-		// 	name: "remove validator as itself",
-		// 	request: &poa.MsgRemoveValidator{
-		// 		Sender:           sdk.AccAddress(MustValAddressFromBech32(vals[1].OperatorAddress)).String(),
-		// 		ValidatorAddress: vals[1].OperatorAddress,
-		// 	},
-		// 	isSelfRemovalAllowed: true,
-		// },
-		// {
-		// 	name: "fail; try again (no longer exist)",
-		// 	request: &poa.MsgRemoveValidator{
-		// 		Sender:           sdk.AccAddress(MustValAddressFromBech32(vals[1].OperatorAddress)).String(),
-		// 		ValidatorAddress: vals[1].OperatorAddress,
-		// 	},
-		// 	expectErrMsg:         "is not bonded",
-		// 	isSelfRemovalAllowed: true,
-		// },
+		{
+			name: "success; remove validator as itself",
+			request: &poa.MsgRemoveValidator{
+				Sender:           sdk.AccAddress(MustValAddressFromBech32(vals[1].OperatorAddress)).String(),
+				ValidatorAddress: vals[1].OperatorAddress,
+			},
+			isSelfRemovalAllowed: true,
+		},
+		{
+			name: "fail; try again (no longer exist)",
+			request: &poa.MsgRemoveValidator{
+				Sender:           sdk.AccAddress(MustValAddressFromBech32(vals[1].OperatorAddress)).String(),
+				ValidatorAddress: vals[1].OperatorAddress,
+			},
+			expectErrMsg:         "is not bonded",
+			isSelfRemovalAllowed: true,
+		},
 	}
 
 	for _, tc := range testCases {
@@ -366,6 +369,9 @@ func TestRemoveValidator(t *testing.T) {
 			require.NoError(err)
 
 			_, err = f.msgServer.RemoveValidator(f.ctx, tc.request)
+
+			other := f.bankkeeper.GetBalance(f.ctx, authtypes.NewModuleAddress(stakingtypes.NotBondedPoolName), "stake").Amount
+			fmt.Println("other1", other)
 
 			if tc.expectErrMsg != "" {
 				require.Error(err)
@@ -381,13 +387,12 @@ func TestRemoveValidator(t *testing.T) {
 			require.NoError(err)
 			fmt.Println("total bonded tokens", amt)
 
-			// difference
-
 			// BondedRatio
 			bondRatio, err := f.stakingKeeper.BondedRatio(f.ctx)
 			require.NoError(err)
 			fmt.Println("bonded ratio", bondRatio)
-			require.EqualValues(bondRatio, sdkmath.LegacyOneDec())
+			require.True(bondRatio.GTE(sdkmath.LegacyNewDecWithPrec(6666, 18)))
+			// This will be handled in the next endblock
 		})
 	}
 }

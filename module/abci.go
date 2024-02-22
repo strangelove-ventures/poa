@@ -5,6 +5,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/telemetry"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
 	"github.com/strangelove-ventures/poa"
@@ -54,6 +55,30 @@ func (am AppModule) BeginBlocker(ctx context.Context) error {
 
 		if err := am.resetAbsoluteBlockPower(ctx); err != nil {
 			return err
+		}
+	}
+
+	return nil
+}
+
+func (am AppModule) EndBlocker(ctx context.Context) error {
+	sdkCtx := sdk.UnwrapSDKContext(ctx)
+	defer telemetry.ModuleMeasureSince(poa.ModuleName, sdkCtx.BlockTime(), telemetry.MetricKeyEndBlocker)
+
+	bondDenom, err := am.keeper.GetStakingKeeper().BondDenom(ctx)
+	if err != nil {
+		return err
+	}
+
+	notBondedAcc := authtypes.NewModuleAddress(stakingtypes.NotBondedPoolName)
+
+	bal := am.keeper.GetBankKeeper().
+		GetBalance(ctx, notBondedAcc, bondDenom).Amount
+
+	if bal.IsPositive() {
+		coins := sdk.NewCoins(sdk.NewCoin(bondDenom, bal))
+		if err := am.keeper.GetBankKeeper().BurnCoins(ctx, stakingtypes.NotBondedPoolName, coins); err != nil {
+			return nil
 		}
 	}
 

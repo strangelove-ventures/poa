@@ -154,9 +154,7 @@ func (k Keeper) UpdateBondedPoolPower(ctx context.Context) error {
 		return err
 	}
 
-	addr := authtypes.NewModuleAddress(stakingtypes.BondedPoolName)
-
-	prevBal := k.bankKeeper.GetBalance(ctx, addr, bondDenom).Amount
+	prevBal := k.bankKeeper.GetBalance(ctx, authtypes.NewModuleAddress(stakingtypes.BondedPoolName), bondDenom).Amount
 
 	if newTotal.Equal(prevBal) {
 		return nil
@@ -175,15 +173,27 @@ func (k Keeper) UpdateBondedPoolPower(ctx context.Context) error {
 		if err := k.bankKeeper.SendCoinsFromModuleToModule(ctx, minttypes.ModuleName, stakingtypes.BondedPoolName, coins); err != nil {
 			return err
 		}
-
 	} else {
-		diff := prevBal.Sub(newTotal)
-		coins := sdk.NewCoins(sdk.NewCoin(bondDenom, diff))
-		fmt.Println("Burning coins from the bonded pool", coins)
 
-		if err := k.bankKeeper.BurnCoins(ctx, stakingtypes.BondedPoolName, coins); err != nil {
-			return err
-		}
+		other := k.bankKeeper.GetBalance(ctx, authtypes.NewModuleAddress(stakingtypes.NotBondedPoolName), bondDenom).Amount
+		fmt.Println("other", other)
+
+		// diff := prevBal.Sub(newTotal)
+		// fmt.Println("prevBal", prevBal, "newTotal", newTotal, "diff", diff)
+		// coins := sdk.NewCoins(sdk.NewCoin(bondDenom, diff))
+		// fmt.Println("Burning coins from the bonded pool", coins)
+
+		// if err := k.bankKeeper.BurnCoins(ctx, stakingtypes.BondedPoolName, coins); err != nil {
+		// 	return err
+		// }
+
+		// if err := k.bankKeeper.MintCoins(ctx, minttypes.ModuleName, coins); err != nil {
+		// 	return err
+		// }
+
+		// if err := k.bankKeeper.SendCoinsFromModuleToModule(ctx, minttypes.ModuleName, stakingtypes.BondedPoolName, coins); err != nil {
+		// 	return err
+		// }
 	}
 
 	return nil
