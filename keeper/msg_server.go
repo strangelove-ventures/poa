@@ -80,7 +80,7 @@ func (ms msgServer) SetPower(ctx context.Context, msg *poa.MsgSetPower) (*poa.Ms
 		}
 	}
 
-	return &poa.MsgSetPowerResponse{}, nil
+	return &poa.MsgSetPowerResponse{}, ms.k.UpdateBondedPoolPower(ctx)
 }
 
 func (ms msgServer) RemoveValidator(ctx context.Context, msg *poa.MsgRemoveValidator) (*poa.MsgRemoveValidatorResponse, error) {
@@ -143,7 +143,7 @@ func (ms msgServer) RemoveValidator(ctx context.Context, msg *poa.MsgRemoveValid
 		return nil, err
 	}
 
-	return &poa.MsgRemoveValidatorResponse{}, nil
+	return &poa.MsgRemoveValidatorResponse{}, ms.k.UpdateBondedPoolPower(ctx)
 }
 
 func (ms msgServer) RemovePending(ctx context.Context, msg *poa.MsgRemovePending) (*poa.MsgRemovePendingResponse, error) {
@@ -256,7 +256,7 @@ func (ms msgServer) CreateValidator(ctx context.Context, msg *poa.MsgCreateValid
 		return nil, err
 	}
 
-	return &poa.MsgCreateValidatorResponse{}, nil
+	return &poa.MsgCreateValidatorResponse{}, ms.k.UpdateBondedPoolPower(ctx)
 }
 
 // UpdateStakingParams wraps the x/staking module's UpdateStakingParams method so that only POA admins can invoke it.

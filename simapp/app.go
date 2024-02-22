@@ -319,6 +319,7 @@ func NewSimApp(
 		runtime.NewKVStoreService(keys[poatypes.StoreKey]),
 		app.StakingKeeper,
 		app.SlashingKeeper,
+		app.BankKeeper,
 		authcodec.NewBech32Codec(sdk.Bech32PrefixValAddr),
 		logger,
 	)
@@ -450,16 +451,16 @@ func NewSimApp(
 		distrtypes.ModuleName,
 		slashingtypes.ModuleName,
 		evidencetypes.ModuleName,
-		poa.ModuleName,
 		stakingtypes.ModuleName,
+		poa.ModuleName,
 		genutiltypes.ModuleName,
 		authz.ModuleName,
 	)
 	app.ModuleManager.SetOrderEndBlockers(
 		crisistypes.ModuleName,
 		govtypes.ModuleName,
-		poa.ModuleName,
 		stakingtypes.ModuleName,
+		poa.ModuleName,
 		genutiltypes.ModuleName,
 		feegrant.ModuleName,
 		group.ModuleName,

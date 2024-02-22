@@ -6,13 +6,16 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	slashingkeeper "github.com/cosmos/cosmos-sdk/x/slashing/keeper"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
 	"cosmossdk.io/collections"
 	addresscodec "cosmossdk.io/core/address"
 	storetypes "cosmossdk.io/core/store"
 	"cosmossdk.io/log"
+	sdkmath "cosmossdk.io/math"
 
 	"github.com/strangelove-ventures/poa"
 )
@@ -22,7 +25,8 @@ type Keeper struct {
 	validatorAddressCodec addresscodec.Codec
 
 	stakingKeeper *stakingkeeper.Keeper
-	slashKeeper   slashingkeeper.Keeper
+	slashKeeper   SlashingKeeper
+	bankKeeper    BankKeeper
 
 	logger log.Logger
 
@@ -40,7 +44,8 @@ func NewKeeper(
 	cdc codec.BinaryCodec,
 	storeService storetypes.KVStoreService,
 	sk *stakingkeeper.Keeper,
-	slk slashingkeeper.Keeper,
+	slk SlashingKeeper,
+	bk BankKeeper,
 	validatorAddressCodec addresscodec.Codec,
 	logger log.Logger,
 ) Keeper {
@@ -53,6 +58,7 @@ func NewKeeper(
 		stakingKeeper:         sk,
 		validatorAddressCodec: validatorAddressCodec,
 		slashKeeper:           slk,
+		bankKeeper:            bk,
 		logger:                logger,
 
 		// Stores
@@ -79,8 +85,12 @@ func (k Keeper) GetStakingKeeper() *stakingkeeper.Keeper {
 }
 
 // GetSlashingKeeper returns the slashing keeper.
-func (k Keeper) GetSlashingKeeper() slashingkeeper.Keeper {
+func (k Keeper) GetSlashingKeeper() SlashingKeeper {
 	return k.slashKeeper
+}
+
+func (k Keeper) GetBankKeeper() BankKeeper {
+	return k.bankKeeper
 }
 
 // GetAdmins returns the module's administrators with delegation of power control.
@@ -121,4 +131,48 @@ func (k Keeper) IsSenderValidator(ctx context.Context, sender string, expectedVa
 
 func (k Keeper) Logger() log.Logger {
 	return k.logger
+}
+
+// updateBondedPoolPower updates the bonded pool to the correct power for the network.
+func (k Keeper) UpdateBondedPoolPower(ctx context.Context) error {
+	newTotal := sdkmath.ZeroInt()
+
+	del, err := k.stakingKeeper.GetAllDelegations(ctx)
+	if err != nil {
+		return err
+	}
+
+	for _, d := range del {
+		newTotal = newTotal.Add(d.Shares.RoundInt())
+	}
+
+	bondDenom, err := k.stakingKeeper.BondDenom(ctx)
+	if err != nil {
+		return err
+	}
+
+	prevBal := k.bankKeeper.GetBalance(ctx, authtypes.NewModuleAddress(stakingtypes.BondedPoolName), bondDenom).Amount
+
+	if newTotal.Equal(prevBal) {
+		return nil
+	}
+
+	if newTotal.GT(prevBal) {
+		diff := newTotal.Sub(prevBal)
+		coins := sdk.NewCoins(sdk.NewCoin(bondDenom, diff))
+
+		if err := k.bankKeeper.MintCoins(ctx, minttypes.ModuleName, coins); err != nil {
+			return err
+		}
+
+		if err := k.bankKeeper.SendCoinsFromModuleToModule(ctx, minttypes.ModuleName, stakingtypes.BondedPoolName, coins); err != nil {
+			return err
+		}
+	}
+
+	// no need to check if it goes down. When it does, it's automatic from the staking module as tokens are moved from
+	// bonded -> ToNotBonded pool. As PoA, we do not want any tokens in the ToNotBonded pool, so when a validator is removed
+	// they are slashed 100% (since it is PoA this is fine) which decreases the BondedPool balance, and leave NotBonded at 0.
+
+	return nil
 }

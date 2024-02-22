@@ -7,10 +7,8 @@ import (
 	"github.com/stretchr/testify/require"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
-	"github.com/cosmos/cosmos-sdk/x/staking/types"
 
-	"cosmossdk.io/math"
+	sdkmath "cosmossdk.io/math"
 
 	"github.com/strangelove-ventures/poa"
 )
@@ -126,7 +124,7 @@ func TestSetPowerAndCreateValidator(t *testing.T) {
 	vals, err := f.stakingKeeper.GetValidators(f.ctx, 100)
 	require.NoError(err)
 
-	totalBonded := math.ZeroInt()
+	totalBonded := sdkmath.ZeroInt()
 	for _, val := range vals {
 		totalBonded = totalBonded.Add(val.GetBondedTokens())
 	}
@@ -336,7 +334,7 @@ func TestRemoveValidator(t *testing.T) {
 			isSelfRemovalAllowed: false,
 		},
 		{
-			name: "remove validator as itself",
+			name: "success; remove validator as itself",
 			request: &poa.MsgRemoveValidator{
 				Sender:           sdk.AccAddress(MustValAddressFromBech32(vals[1].OperatorAddress)).String(),
 				ValidatorAddress: vals[1].OperatorAddress,
@@ -361,7 +359,7 @@ func TestRemoveValidator(t *testing.T) {
 			currParams, _ := f.k.GetParams(f.ctx)
 			currParams.AllowValidatorSelfExit = tc.isSelfRemovalAllowed
 
-			err := f.k.SetParams(f.ctx, currParams)
+			err = f.k.SetParams(f.ctx, currParams)
 			require.NoError(err)
 
 			_, err = f.msgServer.RemoveValidator(f.ctx, tc.request)
@@ -372,15 +370,24 @@ func TestRemoveValidator(t *testing.T) {
 			} else {
 				require.NoError(err)
 
-				// This is only required in testing as we do not have a 'real' validator set
-				// signing blocks.
-				if err := f.MintTokensToBondedPool(t); err != nil {
-					panic(err)
-				}
-
-				_, err := f.IncreaseBlock(5, true)
+				_, err := f.IncreaseBlock(3, true)
 				require.NoError(err)
 			}
+
+			amt, err := f.stakingKeeper.TotalBondedTokens(f.ctx)
+			require.NoError(err)
+			require.True(amt.IsPositive())
+
+			notBondedPool := f.stakingKeeper.GetNotBondedPool(f.ctx)
+			bondDenom, err := f.stakingKeeper.BondDenom(f.ctx)
+			require.NoError(err)
+			bal := f.bankkeeper.GetBalance(f.ctx, notBondedPool.GetAddress(), bondDenom)
+			require.EqualValues(0, bal.Amount.Uint64())
+
+			// BondedRatio
+			bondRatio, err := f.stakingKeeper.BondedRatio(f.ctx)
+			require.NoError(err)
+			require.EqualValues(sdkmath.LegacyOneDec(), bondRatio)
 		})
 	}
 }
@@ -453,35 +460,4 @@ func TestMultipleUpdatesInASingleBlock(t *testing.T) {
 			}
 		})
 	}
-}
-
-// mintTokensToBondedPool mints tokens to the bonded pool so the validator set
-// in testing can be removed.
-// In the future, this same logic would be run during the migration from POA->POS.
-func (f *testFixture) MintTokensToBondedPool(t *testing.T) error {
-	t.Helper()
-	require := require.New(t)
-
-	bondDenom, err := f.stakingKeeper.BondDenom(f.ctx)
-	require.NoError(err)
-
-	validators, err := f.stakingKeeper.GetAllValidators(f.ctx)
-	require.NoError(err)
-
-	amt := int64(0)
-	for _, v := range validators {
-		amt += v.GetBondedTokens().Int64()
-	}
-
-	coins := sdk.NewCoins(sdk.NewCoin(bondDenom, math.NewInt(amt)))
-
-	if err := f.bankkeeper.MintCoins(f.ctx, minttypes.ModuleName, coins); err != nil {
-		return err
-	}
-
-	if err := f.bankkeeper.SendCoinsFromModuleToModule(f.ctx, minttypes.ModuleName, types.BondedPoolName, coins); err != nil {
-		return err
-	}
-
-	return nil
 }

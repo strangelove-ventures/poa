@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math"
 
+	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
@@ -16,25 +17,18 @@ import (
 
 // UpdateValidatorSet updates a validator to their new share and consensus power, then updates the total power of the set.
 func (k Keeper) UpdateValidatorSet(ctx context.Context, newShares, newConsensusPower int64, val stakingtypes.Validator, valAddr sdk.ValAddress) error {
-	sdkContext := sdk.UnwrapSDKContext(ctx)
-
 	newShare := sdkmath.LegacyNewDec(newShares)
 	newShareInt := sdkmath.NewIntFromUint64(uint64(newShares))
 
+	delAddr := sdk.AccAddress(valAddr.Bytes())
 	delegation := stakingtypes.Delegation{
-		DelegatorAddress: sdk.AccAddress(valAddr.Bytes()).String(),
+		DelegatorAddress: delAddr.String(),
 		ValidatorAddress: val.OperatorAddress,
 		Shares:           newShare,
 	}
 
 	if err := k.stakingKeeper.SetDelegation(ctx, delegation); err != nil {
 		return err
-	}
-
-	// if we are removing a validator and it is not a gentx
-	// then we set the min self delegation +=1 so they unbond without slashing.
-	if newShares == 0 && sdkContext.BlockHeight() > 1 {
-		val.MinSelfDelegation = val.MinSelfDelegation.AddRaw(1)
 	}
 
 	val.Tokens = newShareInt
@@ -59,8 +53,8 @@ func (k Keeper) UpdateValidatorSet(ctx context.Context, newShares, newConsensusP
 // - updates the validator with the new shares, single delegation
 // - sets the last validator power to the new value.
 func (k Keeper) SetPOAPower(ctx context.Context, valOpBech32 string, newShares int64) (stakingtypes.Validator, error) {
-	powerReduction := k.stakingKeeper.PowerReduction(ctx)
-	newConsensusPower := newShares / powerReduction.Int64()
+	// 1 Consenus Power = 1_000_000 shares by default
+	newBFTConsensusPower := k.stakingKeeper.TokensToConsensusPower(ctx, sdkmath.NewInt(newShares))
 
 	valAddr, err := sdk.ValAddressFromBech32(valOpBech32)
 	if err != nil {
@@ -78,17 +72,33 @@ func (k Keeper) SetPOAPower(ctx context.Context, valOpBech32 string, newShares i
 		return stakingtypes.Validator{}, err
 	}
 
+	// slash all the validator's tokens (100%)
+	if newShares == 0 && currentPower > 0 {
+		pk, ok := val.ConsensusPubkey.GetCachedValue().(cryptotypes.PubKey)
+		if !ok {
+			return stakingtypes.Validator{}, fmt.Errorf("issue getting consensus pubkey for %s", valOpBech32)
+		}
+
+		height := sdk.UnwrapSDKContext(ctx).BlockHeight()
+
+		normalizedToken := k.stakingKeeper.TokensFromConsensusPower(ctx, currentPower)
+
+		if _, err := k.stakingKeeper.Slash(ctx, sdk.GetConsAddress(pk), height, normalizedToken.Int64(), sdkmath.LegacyOneDec()); err != nil {
+			return stakingtypes.Validator{}, err
+		}
+	}
+
 	// Sets the new consensus power for the validator (this is executed in the x/staking ApplyAndReturnValidatorUpdates method)
-	if err := k.stakingKeeper.SetLastValidatorPower(ctx, valAddr, newConsensusPower); err != nil {
+	if err := k.stakingKeeper.SetLastValidatorPower(ctx, valAddr, newBFTConsensusPower); err != nil {
 		return stakingtypes.Validator{}, err
 	}
 
-	absPowerDiff := uint64(math.Abs(float64(newConsensusPower - currentPower)))
+	absPowerDiff := uint64(math.Abs(float64(newBFTConsensusPower - currentPower)))
 
 	k.Logger().Debug("POA updatePOAPower",
 		"valOpBech32", valOpBech32,
 		"New Shares", newShares,
-		"New Consensus Power", newConsensusPower,
+		"New Consensus Power", newBFTConsensusPower,
 		"Previous Power", currentPower,
 		"absPowerDiff", absPowerDiff,
 	)
@@ -97,7 +107,7 @@ func (k Keeper) SetPOAPower(ctx context.Context, valOpBech32 string, newShares i
 		return stakingtypes.Validator{}, err
 	}
 
-	if err := k.UpdateValidatorSet(ctx, newShares, newConsensusPower, val, valAddr); err != nil {
+	if err := k.UpdateValidatorSet(ctx, newShares, newBFTConsensusPower, val, valAddr); err != nil {
 		return stakingtypes.Validator{}, err
 	}
 
@@ -140,7 +150,7 @@ func (k Keeper) AcceptNewValidator(ctx context.Context, operatingAddress string,
 		),
 	})
 
-	return nil
+	return k.UpdateBondedPoolPower(ctx)
 }
 
 // setValidatorInternals sets the validator's:
@@ -185,5 +195,9 @@ func (k Keeper) updateTotalPower(ctx context.Context) error {
 
 	// all tokens / 10^6 = new total power
 	totalConsenusPower := allTokens.Quo(k.stakingKeeper.PowerReduction(ctx))
-	return k.stakingKeeper.SetLastTotalPower(ctx, totalConsenusPower)
+	if err := k.stakingKeeper.SetLastTotalPower(ctx, totalConsenusPower); err != nil {
+		return err
+	}
+
+	return k.UpdateBondedPoolPower(ctx)
 }

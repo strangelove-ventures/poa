@@ -56,6 +56,7 @@ app.POAKeeper = poakeeper.NewKeeper(
     runtime.NewKVStoreService(keys[poatypes.StoreKey]),
     app.StakingKeeper,
     app.SlashingKeeper,
+    app.BankKeeper,
     authcodec.NewBech32Codec(sdk.Bech32PrefixValAddr),
     logger,
 )
@@ -75,7 +76,6 @@ app.ModuleManager = module.NewManager(
 app.ModuleManager.SetOrderBeginBlockers(
     ...
     poa.ModuleName,
-    stakingtypes.ModuleName,
     ...
 )
 
@@ -83,7 +83,6 @@ app.ModuleManager.SetOrderBeginBlockers(
 app.ModuleManager.SetOrderEndBlockers(
     ...
     poa.ModuleName,
-    stakingtypes.ModuleName,
     ...
 )
 
@@ -91,7 +90,6 @@ app.ModuleManager.SetOrderEndBlockers(
 // NOTE: This must be after the staking module init genesis
 app.ModuleManager.SetOrderInitGenesis(
     ...
-    stakingtypes.ModuleName,
     poa.ModuleName,
     ...
 )
@@ -164,7 +162,7 @@ func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 
 ### Slashing - Genesis Params
 
-When setting up your network genesis, it is important to consider setting slash infractions to 0%.
+When setting up your network genesis, it is important to consider setting slash infractions to 0%. Setting downtime is more reasonable to diminish their weight in the network.
 
 ```json
 app_state.slashing.params.slash_fraction_double_sign
