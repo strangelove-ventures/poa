@@ -391,8 +391,8 @@ func TestRemoveValidator(t *testing.T) {
 			bondRatio, err := f.stakingKeeper.BondedRatio(f.ctx)
 			require.NoError(err)
 			fmt.Println("bonded ratio", bondRatio)
+			// require.EqualValues(sdkmath.LegacyOneDec(), bondRatio)
 			require.True(bondRatio.GTE(sdkmath.LegacyNewDecWithPrec(6666, 18)))
-			// This will be handled in the next endblock
 		})
 	}
 }

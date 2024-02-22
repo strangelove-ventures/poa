@@ -173,27 +173,6 @@ func (k Keeper) UpdateBondedPoolPower(ctx context.Context) error {
 		if err := k.bankKeeper.SendCoinsFromModuleToModule(ctx, minttypes.ModuleName, stakingtypes.BondedPoolName, coins); err != nil {
 			return err
 		}
-	} else {
-
-		other := k.bankKeeper.GetBalance(ctx, authtypes.NewModuleAddress(stakingtypes.NotBondedPoolName), bondDenom).Amount
-		fmt.Println("other", other)
-
-		// diff := prevBal.Sub(newTotal)
-		// fmt.Println("prevBal", prevBal, "newTotal", newTotal, "diff", diff)
-		// coins := sdk.NewCoins(sdk.NewCoin(bondDenom, diff))
-		// fmt.Println("Burning coins from the bonded pool", coins)
-
-		// if err := k.bankKeeper.BurnCoins(ctx, stakingtypes.BondedPoolName, coins); err != nil {
-		// 	return err
-		// }
-
-		// if err := k.bankKeeper.MintCoins(ctx, minttypes.ModuleName, coins); err != nil {
-		// 	return err
-		// }
-
-		// if err := k.bankKeeper.SendCoinsFromModuleToModule(ctx, minttypes.ModuleName, stakingtypes.BondedPoolName, coins); err != nil {
-		// 	return err
-		// }
 	}
 
 	return nil
