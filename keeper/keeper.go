@@ -37,6 +37,9 @@ type Keeper struct {
 
 	CachedBlockPower            collections.Item[poa.PowerCache]
 	AbsoluteChangedInBlockPower collections.Item[poa.PowerCache]
+
+	// if set, anyone with this token is a PoA admin
+	AdminTokenDenom string
 }
 
 // NewKeeper creates a new poa Keeper instance
@@ -60,6 +63,7 @@ func NewKeeper(
 		slashKeeper:           slk,
 		bankKeeper:            bk,
 		logger:                logger,
+		AdminTokenDenom:       "", // disabled by default
 
 		// Stores
 		Params:            collections.NewItem(sb, poa.ParamsKey, "params", codec.CollValue[poa.Params](cdc)),
@@ -93,6 +97,13 @@ func (k Keeper) GetBankKeeper() BankKeeper {
 	return k.bankKeeper
 }
 
+// SetAdminTokenDenom sets a token denomination that when held by an account, makes them a PoA admin.
+// This allows for key rotation like behaviors using standard bank denoms for PoA.
+// Pairs nicely with tokenfactory.
+func (k *Keeper) SetAdminTokenDenom(denom string) {
+	k.AdminTokenDenom = denom
+}
+
 // GetAdmins returns the module's administrators with delegation of power control.
 func (k Keeper) GetAdmins(ctx context.Context) []string {
 	p, err := k.GetParams(ctx)
@@ -105,6 +116,16 @@ func (k Keeper) GetAdmins(ctx context.Context) []string {
 
 // IsAdmin checks if the given address is an admin.
 func (k Keeper) IsAdmin(ctx context.Context, fromAddr string) bool {
+	if k.AdminTokenDenom != "" {
+		accAddr, err := sdk.AccAddressFromBech32(fromAddr)
+		if err != nil {
+			return false
+		}
+
+		bal := k.bankKeeper.GetBalance(ctx, accAddr, k.AdminTokenDenom)
+		return !bal.IsZero()
+	}
+
 	for _, auth := range k.GetAdmins(ctx) {
 		if auth == fromAddr {
 			return true
