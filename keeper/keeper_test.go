@@ -166,7 +166,6 @@ func registerBaseSDKModules(
 	require.NoError(err)
 
 	// Mint Keeper.
-	// This is required for `MintTokensToBondedPool` to remain happy.
 	f.mintkeeper = mintkeeper.NewKeeper(
 		encCfg.Codec, storeService,
 		f.stakingKeeper, f.accountkeeper, f.bankkeeper,

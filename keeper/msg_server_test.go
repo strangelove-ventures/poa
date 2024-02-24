@@ -7,10 +7,12 @@ import (
 	"github.com/stretchr/testify/require"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
 	sdkmath "cosmossdk.io/math"
 
 	"github.com/strangelove-ventures/poa"
+	"github.com/strangelove-ventures/poa/keeper"
 )
 
 func TestUpdateParams(t *testing.T) {
@@ -59,6 +61,68 @@ func TestUpdateParams(t *testing.T) {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			_, err := f.msgServer.UpdateParams(f.ctx, tc.request)
+			if tc.expectErrMsg != "" {
+				require.Error(err)
+				require.ErrorContains(err, tc.expectErrMsg)
+			} else {
+				require.NoError(err)
+			}
+		})
+	}
+}
+
+func TestTokenGatedAdmins(t *testing.T) {
+	f := SetupTest(t, 2_000_000)
+	require := require.New(t)
+
+	// Any accounts holding this denom can perform admin actions.
+	// This only happens if your app uses `SetAdminTokenDenom`.
+	denom := "admin_denom"
+	coins := sdk.NewCoins(sdk.NewCoin(denom, sdkmath.NewInt(1)))
+
+	authorityAcc := f.addrs[0]
+	notAuthorized := f.addrs[1]
+
+	f.accountkeeper.SetAccount(f.ctx, authtypes.NewBaseAccountWithAddress(authorityAcc))
+
+	// send tokens to the authority account
+	require.NoError(f.mintkeeper.MintCoins(f.ctx, coins))
+	require.NoError(f.bankkeeper.SendCoinsFromModuleToAccount(f.ctx, "mint", authorityAcc, coins))
+
+	testCases := []struct {
+		name         string
+		request      *poa.MsgUpdateParams
+		expectErrMsg string
+	}{
+		{
+			name: "fail; no token held, not authorized",
+			request: &poa.MsgUpdateParams{
+				Sender: notAuthorized.String(),
+				Params: poa.Params{
+					Admins: []string{notAuthorized.String()},
+				},
+			},
+			expectErrMsg: "not an authority",
+		},
+		{
+			name: "success; perform admin action due to holding token",
+			request: &poa.MsgUpdateParams{
+				Sender: authorityAcc.String(),
+				Params: poa.Params{
+					Admins: []string{notAuthorized.String()},
+				},
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			f.InitPoAGenesis(t)
+			f.k.SetAdminTokenDenom(denom)
+			ms := keeper.NewMsgServerImpl(f.k)
+
+			_, err := ms.UpdateParams(f.ctx, tc.request)
 			if tc.expectErrMsg != "" {
 				require.Error(err)
 				require.ErrorContains(err, tc.expectErrMsg)
