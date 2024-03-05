@@ -42,7 +42,7 @@ type App struct {
 
 ...
 
-// Create POA store key
+// Create PoA store key
 keys := storetypes.NewKVStoreKeys(
     ...
     poa.StoreKey,
@@ -50,7 +50,7 @@ keys := storetypes.NewKVStoreKeys(
 
 ...
 
-// Initialize the PoA Keeper and and AppModule
+// Initialize the PoA Keeper and AppModule
 app.POAKeeper = poakeeper.NewKeeper(
     appCodec,
     runtime.NewKVStoreService(keys[poatypes.StoreKey]),
