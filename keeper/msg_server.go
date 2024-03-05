@@ -31,7 +31,7 @@ func (ms msgServer) SetPower(ctx context.Context, msg *poa.MsgSetPower) (*poa.Ms
 		return nil, errorsmod.Wrapf(poa.ErrNotAnAuthority, "sender %s is not an authority. allowed: %+v", msg.Sender, ms.k.GetAdmins(ctx))
 	}
 
-	if err := msg.Validate(ms.k.validatorAddressCodec); err != nil {
+	if err := msg.Validate(ms.k.GetValidatorAddressCodec()); err != nil {
 		return nil, err
 	}
 
@@ -172,12 +172,12 @@ func (ms msgServer) UpdateParams(ctx context.Context, msg *poa.MsgUpdateParams) 
 // - Create hook logic removed (this is done after acceptance).
 // - Valiadtor is added to the pending queue (AddPendingValidator).
 func (ms msgServer) CreateValidator(ctx context.Context, msg *poa.MsgCreateValidator) (*poa.MsgCreateValidatorResponse, error) {
-	valAddr, err := ms.k.validatorAddressCodec.StringToBytes(msg.ValidatorAddress)
+	valAddr, err := ms.k.GetValidatorAddressCodec().StringToBytes(msg.ValidatorAddress)
 	if err != nil {
 		return nil, sdkerrors.ErrInvalidAddress.Wrapf("invalid validator address: %s", err)
 	}
 
-	if err := msg.Validate(ms.k.validatorAddressCodec); err != nil {
+	if err := msg.Validate(ms.k.GetValidatorAddressCodec()); err != nil {
 		return nil, err
 	}
 

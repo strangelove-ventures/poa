@@ -159,7 +159,7 @@ func (k Keeper) AcceptNewValidator(ctx context.Context, operatingAddress string,
 // - create new power index (no power set yet)
 // - Emit `ValidatorCreated` staking hook
 func (k Keeper) setValidatorInternals(ctx context.Context, val stakingtypes.Validator) error {
-	valAddr, err := k.validatorAddressCodec.StringToBytes(val.OperatorAddress)
+	valAddr, err := k.GetValidatorAddressCodec().StringToBytes(val.OperatorAddress)
 	if err != nil {
 		return sdkerrors.ErrInvalidAddress.Wrapf("invalid validator address: %s", err)
 	}
