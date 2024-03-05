@@ -21,8 +21,7 @@ import (
 )
 
 type Keeper struct {
-	cdc                   codec.BinaryCodec
-	validatorAddressCodec addresscodec.Codec
+	cdc codec.BinaryCodec
 
 	stakingKeeper *stakingkeeper.Keeper
 	slashKeeper   SlashingKeeper
@@ -46,7 +45,6 @@ func NewKeeper(
 	sk *stakingkeeper.Keeper,
 	slk SlashingKeeper,
 	bk BankKeeper,
-	validatorAddressCodec addresscodec.Codec,
 	logger log.Logger,
 ) Keeper {
 	logger = logger.With(log.ModuleKey, "x/"+poa.ModuleName)
@@ -54,12 +52,11 @@ func NewKeeper(
 	sb := collections.NewSchemaBuilder(storeService)
 
 	k := Keeper{
-		cdc:                   cdc,
-		stakingKeeper:         sk,
-		validatorAddressCodec: validatorAddressCodec,
-		slashKeeper:           slk,
-		bankKeeper:            bk,
-		logger:                logger,
+		cdc:           cdc,
+		stakingKeeper: sk,
+		slashKeeper:   slk,
+		bankKeeper:    bk,
+		logger:        logger,
 
 		// Stores
 		Params:            collections.NewItem(sb, poa.ParamsKey, "params", codec.CollValue[poa.Params](cdc)),
@@ -82,6 +79,10 @@ func NewKeeper(
 // GetStakingKeeper returns the staking keeper.
 func (k Keeper) GetStakingKeeper() *stakingkeeper.Keeper {
 	return k.stakingKeeper
+}
+
+func (k Keeper) GetValidatorAddressCodec() addresscodec.Codec {
+	return k.stakingKeeper.ValidatorAddressCodec()
 }
 
 // GetSlashingKeeper returns the slashing keeper.

@@ -177,7 +177,7 @@ func TestSetPowerAndCreateValidator(t *testing.T) {
 				// check the pending validators includes the new validator
 				pendingVals, err := f.k.GetPendingValidators(f.ctx)
 				require.NoError(err)
-				require.EqualValues(1, len(pendingVals.Validators))
+				require.Len(pendingVals.Validators, 1)
 			}
 
 			require.NotEmpty(tc.request.ValidatorAddress)
@@ -198,7 +198,7 @@ func TestSetPowerAndCreateValidator(t *testing.T) {
 				postVals, err := f.stakingKeeper.GetValidators(f.ctx, 100)
 				require.NoError(err)
 
-				require.EqualValues(len(preVals)+1, len(postVals))
+				require.Len(postVals, len(preVals)+1)
 			} else {
 				require.EqualValues(len(vals), len(preVals))
 			}
@@ -213,7 +213,7 @@ func TestRemovePending(t *testing.T) {
 	valAddr := f.CreatePendingValidator("val-1", 1_000_000)
 	pendingVals, err := f.k.GetPendingValidators(f.ctx)
 	require.NoError(err)
-	require.EqualValues(1, len(pendingVals.Validators))
+	require.Len(pendingVals.Validators, 1)
 
 	testCases := []struct {
 		name               string
@@ -253,7 +253,7 @@ func TestRemovePending(t *testing.T) {
 
 			pendingVals, err := f.k.GetPendingValidators(f.ctx)
 			require.NoError(err)
-			require.EqualValues(tc.expectedPendingLen, len(pendingVals.Validators))
+			require.Len(pendingVals.Validators, tc.expectedPendingLen)
 		})
 	}
 }

@@ -22,7 +22,7 @@ func TestPendingValidatorsQuery(t *testing.T) {
 	// Validate pending validators equals the number we created.
 	r, err := f.queryServer.PendingValidators(f.ctx, &poa.QueryPendingValidatorsRequest{})
 	require.NoError(err)
-	require.EqualValues(numVals, len(r.Pending))
+	require.Len(r.Pending, numVals)
 
 	// Accept one of the validators from pending into the active set.
 	valAddr := r.Pending[0].OperatorAddress
@@ -42,7 +42,7 @@ func TestPendingValidatorsQuery(t *testing.T) {
 	// 1 less pending validator.
 	r, err = f.queryServer.PendingValidators(f.ctx, &poa.QueryPendingValidatorsRequest{})
 	require.NoError(err)
-	require.EqualValues(numVals-1, len(r.Pending))
+	require.Len(r.Pending, numVals-1)
 
 	// none of the pending validators should be the one we accepted.
 	for _, val := range r.Pending {
