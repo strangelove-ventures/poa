@@ -108,7 +108,7 @@ from_scratch () {
   BINARY genesis add-genesis-account $KEY 1000000000000stake,1000utest --keyring-backend $KEYRING
   BINARY genesis add-genesis-account $KEY2 1000000stake,1000utest --keyring-backend $KEYRING
 
-  # 1 power (these rates will be overwriten)
+  # 1 power (these rates will be overwritten)
   BINARY genesis gentx $KEY 1000000stake --keyring-backend $KEYRING --chain-id $CHAIN_ID --commission-rate="0.05" --commission-max-rate="0.50"
 
   # Collect genesis tx
