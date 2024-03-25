@@ -2,6 +2,7 @@ syntax = "proto3";
 package strangelove_ventures.poa.v1;
 
 import "gogoproto/gogo.proto";
+import "amino/amino.proto";
 import "strangelove_ventures/poa/v1/validator.proto";
 import "strangelove_ventures/poa/v1/params.proto";
 import "strangelove_ventures/poa/v1/tx.proto";
@@ -10,7 +11,7 @@ option go_package = "github.com/strangelove-ventures/poa";
 
 // GenesisState defines the poa module's genesis state.
 message GenesisState {
-  // Params defines all the paramaters of the module.
+  // Params defines all the parameters of the module.
   Params params = 1 [ (gogoproto.nullable) = false ];
 }
 

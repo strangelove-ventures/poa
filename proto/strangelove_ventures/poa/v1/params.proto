@@ -14,7 +14,7 @@ message Params {
   option (gogoproto.equal) = true;
   option (gogoproto.goproto_stringer) = false;
 
-  // Array of addresses that are allowed to controll the chains validators power.
+  // Array of addresses that are allowed to control the chains validators power.
   repeated string admins = 1;
 
   // allow_validator_self_exit allows for a valdiator to remove themselves from the validator set.

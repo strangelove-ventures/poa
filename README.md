@@ -38,7 +38,7 @@ All delegation actions are disabled with the [disabled-staking ante](./INTEGRATI
 ### Genesis
 `Params` is found in the genesis state. This object contains the `admins` field, which is a list of bech32 addresses that are allowed to modify the validator set, PoA params, and validator params (via x/staking). If no admin is set, then the chain should set the governance account as the admin (default). By allowing for an array of admins, the chain can be controlled by multiple different parties according to your use case. For example, governance can be an admin while also allowing a multisig, DAO, and/or single account to control the validator set. There must be at least one admin in the list at all times.
 
-`AllowValidatorSelfExit` is a boolean option *(default true)* that toggles validators ability to remove themselves from the active set. This is useful for validators that are no longer able or decide this PoA network is no longer for them. If set to false, only admins can remove validators from the set. **NOTE** This does not stop validators from going down and being jailed for downtime. It just privides a graceful way to self remove power.
+`AllowValidatorSelfExit` is a boolean option *(default true)* that toggles validators ability to remove themselves from the active set. This is useful for validators that are no longer able or decide this PoA network is no longer for them. If set to false, only admins can remove validators from the set. **NOTE** This does not stop validators from going down and being jailed for downtime. It just provides a graceful way to self remove power.
 
 ### Pending Validators
 `PendingValidators` stores an array of PoA validator objects pending approval (from the admins) into the active set. This only is required after the chain has started.
@@ -46,7 +46,7 @@ All delegation actions are disabled with the [disabled-staking ante](./INTEGRATI
 For better UX, this is accomplished by wrapping the x/staking module's `create-validator` command with our own logic. Validators only have to modify the namespace of their create command (from `tx staking create-validator` -> `tx poa create-validator`) with all else being equal.
 
 ### Previous Block Power
-`CachedPreviousBlockPower` saves the previous blocks total consensus power amount for quieries at Height + 1. It allows for safety checks onm updating too much of the sets power resulting in broken IBC connections. It's protection can be passed by using the `--unsafe` flag in the `set-power` CLI command.
+`CachedPreviousBlockPower` saves the previous blocks total consensus power amount for queries at Height + 1. It allows for safety checks onm updating too much of the sets power resulting in broken IBC connections. It's protection can be passed by using the `--unsafe` flag in the `set-power` CLI command.
 
 ### Absolute Changed Block Power
 `AbsoluteChangedInBlockPower` tracks the per block modification in block power. It follows the absolute power difference a single block can change against the previous block power. Attempting to increase more than 30% of the validator set power (relative to last) will error.
