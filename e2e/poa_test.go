@@ -26,7 +26,7 @@ const (
 	numNodes     = 0
 )
 
-func TestPOA(t *testing.T) {
+func TestPOABase(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping in short mode")
 	}
