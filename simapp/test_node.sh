@@ -1,31 +1,44 @@
 #!/bin/bash
 #
 # Example:
-# cd simapp
-# BINARY="poad" CHAIN_ID="poa-1" HOME_DIR="$HOME/.poad" TIMEOUT_COMMIT="5500ms" CLEAN=true sh test_node.sh
-#
-# poad tx poa set-power $(poad q staking validators --output=json | jq .validators[0].operator_address -r) 12356789 --home=$HOME_DIR --yes --from=acc1 --unsafe
-# poad q staking validators
-# poad tx poa remove $(poad q staking validators --output=json | jq .validators[0].operator_address -r) --home=$HOME_DIR --yes --from=acc1
-#
+: '
+cd simapp
+BINARY="poad" CHAIN_ID="poa-1" HOME_DIR="$HOME/.poad" TIMEOUT_COMMIT="5500ms" CLEAN=true sh test_node.sh\
+
+FLAGS="--keyring-backend=test --chain-id=poa-1 --home="$HOME/.poad" --yes"
+
+poad tx poa set-power $(poad q staking validators --output=json | jq .validators[0].operator_address -r) 12356789 $FLAGS --from=acc1 --unsafe
+poad q staking validators
+
+# failed to execute message; message index: 0: cannot remove the last validator in the set
+poad tx poa remove $(poad q staking validators --output=json | jq .validators[0].operator_address -r) $FLAGS --from=acc1
+
 # validate staking msg err
-# poad tx staking delegate $(poad q staking validators --output=json | jq .validators[0].operator_address -r) 1stake --home=$HOME_DIR --yes --from=acc1
-#
+poad tx staking delegate $(poad q staking validators --output=json | jq .validators[0].operator_address -r) 1stake $FLAGS --from=acc1
+
 # Create a validator
-# poad tx poa create-validator simapp/validator_file.json --from acc3 --yes --home=$HOME_DIR --chain-id=poa-1 --keyring-backend=test
-# poad q poa pending-validators --output json
-# poad tx poa set-power $(poad q poa pending-validators --output=json | jq .pending[0].operator_address -r) 1000000 --home=$HOME_DIR --yes --from=acc1
-# poad tx poa remove $(poad q staking validators --output=json | jq .validators[1].operator_address -r) --home=$HOME_DIR --yes --from=acc1
-#
+poad tx poa create-validator simapp/validator_file.json $FLAGS --from acc3
+poad q poa pending-validators --output json # 1 pending
+poad q staking validators --output json # still only 1
+poad tx poa set-power $(poad q poa pending-validators --output=json | jq .pending[0].operator_address -r) 1000000 $FLAGS --from=acc1
+
+poad q poa pending-validators --output json # 0 now
+poad q staking validators --output json # 2
+
+poad tx poa remove $(poad q staking validators --output=json | jq .validators[1].operator_address -r) --home=$HOME_DIR --yes --from=acc1
+
 # Remove Pending Validator
-# poad tx poa remove-pending $(poad q poa pending-validators --output=json | jq .pending[0].operator_address -r) --home=$HOME_DIR --yes --from=acc1 --chain-id=poa-1 --keyring-backend=test
-#
-# poad tx gov submit-proposal simapp/proposal.json --home=$HOME_DIR --from=acc1 --yes
-# poad tx gov submit-proposal simapp/proposal-params.json --home=$HOME_DIR --from=acc1 --yes
-# poad tx gov vote 1 yes --home=$HOME_DIR --from=acc1 --yes
-#
-# poad q poa params
-# poad tx poa update-params cosmos1hj5fveer5cjtn4wd6wstzugjfdxzl0xpxvjjvr --home=$HOME_DIR --from=acc1 --yes
+poad tx poa remove-pending $(poad q poa pending-validators --output=json | jq .pending[0].operator_address -r) $FLAGS --from=acc1
+
+# Submit via proposal (who is authority of the simapp for governance)
+poad tx gov submit-proposal simapp/proposal.json --home=$HOME_DIR --from=acc1 --yes
+poad tx gov submit-proposal simapp/proposal-params.json --home=$HOME_DIR --from=acc1 --yes
+poad tx gov vote 1 yes --home=$HOME_DIR --from=acc1 --yes
+
+poad q poa params
+poad tx poa update-params cosmos1hj5fveer5cjtn4wd6wstzugjfdxzl0xpxvjjvr --home=$HOME_DIR --from=acc1 --yes
+'
+
 
 export KEY="acc1" # validator
 export KEY2="acc2"
