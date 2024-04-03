@@ -317,12 +317,11 @@ func TestRemoveValidator(t *testing.T) {
 			},
 		},
 		{
-			name: "fail; re-remove same validator as admin",
+			name: "ensure no panic; re-remove same validator as admin",
 			request: &poa.MsgRemoveValidator{
 				Sender:           f.addrs[0].String(),
 				ValidatorAddress: firstVal,
 			},
-			expectErrMsg: "is not bonded",
 		},
 		{
 			name: "fail; try to remove validator as itself with self removal disabled",
@@ -342,12 +341,11 @@ func TestRemoveValidator(t *testing.T) {
 			isSelfRemovalAllowed: true,
 		},
 		{
-			name: "fail; try again (no longer exist)",
+			name: "ensure no panic; try again (no longer exist)",
 			request: &poa.MsgRemoveValidator{
 				Sender:           sdk.AccAddress(MustValAddressFromBech32(vals[1].OperatorAddress)).String(),
 				ValidatorAddress: vals[1].OperatorAddress,
 			},
-			expectErrMsg:         "is not bonded",
 			isSelfRemovalAllowed: true,
 		},
 	}
@@ -369,10 +367,10 @@ func TestRemoveValidator(t *testing.T) {
 				require.ErrorContains(err, tc.expectErrMsg)
 			} else {
 				require.NoError(err)
-
-				_, err := f.IncreaseBlock(3, true)
-				require.NoError(err)
 			}
+
+			_, err := f.IncreaseBlock(3, true)
+			require.NoError(err)
 
 			amt, err := f.stakingKeeper.TotalBondedTokens(f.ctx)
 			require.NoError(err)

@@ -2,8 +2,10 @@ package module
 
 import (
 	"context"
+	"fmt"
 
 	abci "github.com/cometbft/cometbft/abci/types"
+
 	"github.com/cosmos/cosmos-sdk/telemetry"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
@@ -22,7 +24,11 @@ func (am AppModule) EndBlocker(ctx context.Context) ([]abci.ValidatorUpdate, err
 		return nil, err
 	}
 
-	valUpdates := []abci.ValidatorUpdate{}
+	valUpdates, err := am.keeper.GetStakingKeeper().ApplyAndReturnValidatorSetUpdates(ctx)
+	if err != nil {
+		return nil, err
+	}
+	fmt.Printf("\nvalUpdates: %+v\n", valUpdates)
 
 	for _, v := range vals {
 		switch v.GetStatus() {
@@ -32,7 +38,7 @@ func (am AppModule) EndBlocker(ctx context.Context) ([]abci.ValidatorUpdate, err
 			if err := am.keeper.GetStakingKeeper().SetValidator(ctx, v); err != nil {
 				return nil, err
 			}
-			valUpdates = append(valUpdates, v.ABCIValidatorUpdateZero())
+			// valUpdates = append(valUpdates, v.ABCIValidatorUpdateZero())
 
 		case stakingtypes.Unbonded:
 			// if the validator is unbonded (above case), delete the last validator power. (H+2)
@@ -44,9 +50,12 @@ func (am AppModule) EndBlocker(ctx context.Context) ([]abci.ValidatorUpdate, err
 			if err := am.keeper.GetStakingKeeper().DeleteLastValidatorPower(ctx, valAddr); err != nil {
 				return nil, err
 			}
+			// valUpdates = append(valUpdates, v.ABCIValidatorUpdateZero())
 
 		case stakingtypes.Unspecified, stakingtypes.Bonded:
-			valUpdates = append(valUpdates, v.ABCIValidatorUpdate(v.Tokens))
+			// if !v.DelegatorShares.IsZero() {
+			// 	valUpdates = append(valUpdates, v.ABCIValidatorUpdate(v.Tokens))
+			// }
 			continue
 		}
 	}
@@ -62,7 +71,6 @@ func (am AppModule) EndBlocker(ctx context.Context) ([]abci.ValidatorUpdate, err
 		}
 	}
 
-	// TODO: updates here
 	return valUpdates, err
 }
 
