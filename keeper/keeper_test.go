@@ -340,9 +340,12 @@ func (f *testFixture) IncreaseBlock(amt int64, debug ...bool) ([]abci.ValidatorU
 			f.k.Logger().Debug("IncreaseBlock(...) updates", "updates", updates)
 		}
 
-		if err := f.appModule.BeginBlock(f.ctx); err != nil {
+		// TODO: it should be the staking keeper handling this?
+		poaUpdates, err := f.appModule.EndBlock(f.ctx)
+		if err != nil {
 			return nil, err
 		}
+		fmt.Println("poaUpdates", poaUpdates)
 	}
 
 	return allUpdates, nil

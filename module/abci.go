@@ -3,6 +3,7 @@ package module
 import (
 	"context"
 
+	abci "github.com/cometbft/cometbft/abci/types"
 	"github.com/cosmos/cosmos-sdk/telemetry"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
@@ -12,14 +13,16 @@ import (
 
 // BeginBlocker updates the validator set without applying updates.
 // Since this module depends on staking, that module will `ApplyAndReturnValidatorSetUpdates` from x/staking.
-func (am AppModule) BeginBlocker(ctx context.Context) error {
+func (am AppModule) EndBlocker(ctx context.Context) ([]abci.ValidatorUpdate, error) {
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
 	defer telemetry.ModuleMeasureSince(poa.ModuleName, sdkCtx.BlockTime(), telemetry.MetricKeyBeginBlocker)
 
 	vals, err := am.keeper.GetStakingKeeper().GetAllValidators(ctx)
 	if err != nil {
-		return err
+		return nil, err
 	}
+
+	valUpdates := []abci.ValidatorUpdate{}
 
 	for _, v := range vals {
 		switch v.GetStatus() {
@@ -27,21 +30,23 @@ func (am AppModule) BeginBlocker(ctx context.Context) error {
 			// if the validator is unbonding, force it to be unbonded. (H+1)
 			v.Status = stakingtypes.Unbonded
 			if err := am.keeper.GetStakingKeeper().SetValidator(ctx, v); err != nil {
-				return err
+				return nil, err
 			}
+			valUpdates = append(valUpdates, v.ABCIValidatorUpdateZero())
 
 		case stakingtypes.Unbonded:
 			// if the validator is unbonded (above case), delete the last validator power. (H+2)
 			valAddr, err := sdk.ValAddressFromBech32(v.OperatorAddress)
 			if err != nil {
-				return err
+				return nil, err
 			}
 
 			if err := am.keeper.GetStakingKeeper().DeleteLastValidatorPower(ctx, valAddr); err != nil {
-				return err
+				return nil, err
 			}
 
 		case stakingtypes.Unspecified, stakingtypes.Bonded:
+			valUpdates = append(valUpdates, v.ABCIValidatorUpdate(v.Tokens))
 			continue
 		}
 	}
@@ -49,15 +54,16 @@ func (am AppModule) BeginBlocker(ctx context.Context) error {
 	if sdkCtx.BlockHeight() > 1 {
 		// non gentx messages reset the cached block powers for IBC validations.
 		if err := am.resetCachedTotalPower(ctx); err != nil {
-			return err
+			return nil, err
 		}
 
 		if err := am.resetAbsoluteBlockPower(ctx); err != nil {
-			return err
+			return nil, err
 		}
 	}
 
-	return nil
+	// TODO: updates here
+	return valUpdates, err
 }
 
 // resetCachedTotalPower resets the block power index to the current total power.
