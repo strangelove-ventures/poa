@@ -29,6 +29,9 @@ ictest-poa:
 ictest-jail:
 	$(MAKE) -C e2e/ ictest-jail
 
+ictest-val-add:
+	$(MAKE) -C e2e/ ictest-val-add
+
 coverage: ## Run coverage report
 	@echo "--> Running coverage"
 	@go test -race -cpu=$$(nproc) -covermode=atomic -coverprofile=coverage.out $$(go list ./...) ./e2e/... ./simapp/... -coverpkg=github.com/strangelove-ventures/poa/... > /dev/null 2>&1
