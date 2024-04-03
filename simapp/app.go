@@ -105,7 +105,6 @@ import (
 	"github.com/spf13/cast"
 
 	"github.com/strangelove-ventures/poa"
-	poatypes "github.com/strangelove-ventures/poa"
 	poakeeper "github.com/strangelove-ventures/poa/keeper"
 	poamodule "github.com/strangelove-ventures/poa/module"
 )
@@ -129,6 +128,15 @@ var (
 
 	govModAddress = authtypes.NewModuleAddress(govtypes.ModuleName).String()
 )
+
+func GetPoAAdmin() string {
+	// used only in e2e testing with interchaintest or testnets
+	if address := os.Getenv("POA_ADMIN_ADDRESS"); address != "" {
+		return address
+	}
+
+	return govModAddress
+}
 
 var (
 	_ runtime.AppI            = (*SimApp)(nil)
@@ -282,7 +290,7 @@ func NewSimApp(
 	app.ParamsKeeper = initParamsKeeper(appCodec, legacyAmino, keys[paramstypes.StoreKey], tkeys[paramstypes.TStoreKey])
 
 	// set the BaseApp's parameter store
-	app.ConsensusParamsKeeper = consensusparamkeeper.NewKeeper(appCodec, runtime.NewKVStoreService(keys[consensusparamtypes.StoreKey]), govModAddress, runtime.EventService{})
+	app.ConsensusParamsKeeper = consensusparamkeeper.NewKeeper(appCodec, runtime.NewKVStoreService(keys[consensusparamtypes.StoreKey]), GetPoAAdmin(), runtime.EventService{})
 	bApp.SetParamStore(app.ConsensusParamsKeeper.ParamsStore)
 
 	// add keepers
@@ -293,30 +301,30 @@ func NewSimApp(
 		runtime.NewKVStoreService(keys[banktypes.StoreKey]),
 		app.AccountKeeper,
 		BlockedAddresses(),
-		govModAddress,
+		GetPoAAdmin(),
 		logger,
 	)
 	app.StakingKeeper = stakingkeeper.NewKeeper(
-		appCodec, runtime.NewKVStoreService(keys[stakingtypes.StoreKey]), app.AccountKeeper, app.BankKeeper, govModAddress, authcodec.NewBech32Codec(sdk.Bech32PrefixValAddr), authcodec.NewBech32Codec(sdk.Bech32PrefixConsAddr),
+		appCodec, runtime.NewKVStoreService(keys[stakingtypes.StoreKey]), app.AccountKeeper, app.BankKeeper, GetPoAAdmin(), authcodec.NewBech32Codec(sdk.Bech32PrefixValAddr), authcodec.NewBech32Codec(sdk.Bech32PrefixConsAddr),
 	)
 	app.MintKeeper = mintkeeper.NewKeeper(appCodec, runtime.NewKVStoreService(keys[minttypes.StoreKey]), app.StakingKeeper, app.AccountKeeper, app.BankKeeper, authtypes.FeeCollectorName, govModAddress)
 
 	app.DistrKeeper = distrkeeper.NewKeeper(appCodec, runtime.NewKVStoreService(keys[distrtypes.StoreKey]), app.AccountKeeper, app.BankKeeper, app.StakingKeeper, authtypes.FeeCollectorName, govModAddress)
 
 	app.SlashingKeeper = slashingkeeper.NewKeeper(
-		appCodec, legacyAmino, runtime.NewKVStoreService(keys[slashingtypes.StoreKey]), app.StakingKeeper, govModAddress,
+		appCodec, legacyAmino, runtime.NewKVStoreService(keys[slashingtypes.StoreKey]), app.StakingKeeper, GetPoAAdmin(),
 	)
 
 	invCheckPeriod := cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod))
 	app.CrisisKeeper = crisiskeeper.NewKeeper(appCodec, runtime.NewKVStoreService(keys[crisistypes.StoreKey]), invCheckPeriod,
-		app.BankKeeper, authtypes.FeeCollectorName, govModAddress, app.AccountKeeper.AddressCodec())
+		app.BankKeeper, authtypes.FeeCollectorName, GetPoAAdmin(), app.AccountKeeper.AddressCodec())
 
 	app.FeeGrantKeeper = feegrantkeeper.NewKeeper(appCodec, runtime.NewKVStoreService(keys[feegrant.StoreKey]), app.AccountKeeper)
 
 	// POA Module
 	app.POAKeeper = poakeeper.NewKeeper(
 		appCodec,
-		runtime.NewKVStoreService(keys[poatypes.StoreKey]),
+		runtime.NewKVStoreService(keys[poa.StoreKey]),
 		app.StakingKeeper,
 		app.SlashingKeeper,
 		app.BankKeeper,
@@ -329,7 +337,7 @@ func NewSimApp(
 		stakingtypes.NewMultiStakingHooks(app.DistrKeeper.Hooks(), app.SlashingKeeper.Hooks()),
 	)
 
-	app.CircuitKeeper = circuitkeeper.NewKeeper(appCodec, runtime.NewKVStoreService(keys[circuittypes.StoreKey]), govModAddress, app.AccountKeeper.AddressCodec())
+	app.CircuitKeeper = circuitkeeper.NewKeeper(appCodec, runtime.NewKVStoreService(keys[circuittypes.StoreKey]), GetPoAAdmin(), app.AccountKeeper.AddressCodec())
 	app.BaseApp.SetCircuitBreaker(&app.CircuitKeeper)
 
 	app.AuthzKeeper = authzkeeper.NewKeeper(runtime.NewKVStoreService(keys[authzkeeper.StoreKey]), appCodec, app.MsgServiceRouter(), app.AccountKeeper)
@@ -364,7 +372,7 @@ func NewSimApp(
 	*/
 	govKeeper := govkeeper.NewKeeper(
 		appCodec, runtime.NewKVStoreService(keys[govtypes.StoreKey]), app.AccountKeeper, app.BankKeeper,
-		app.StakingKeeper, app.DistrKeeper, app.MsgServiceRouter(), govConfig, govModAddress,
+		app.StakingKeeper, app.DistrKeeper, app.MsgServiceRouter(), govConfig, GetPoAAdmin(),
 	)
 
 	// Set legacy router for backwards compatibility with gov v1beta1
@@ -450,16 +458,16 @@ func NewSimApp(
 		distrtypes.ModuleName,
 		slashingtypes.ModuleName,
 		evidencetypes.ModuleName,
-		stakingtypes.ModuleName,
 		poa.ModuleName,
+		stakingtypes.ModuleName,
 		genutiltypes.ModuleName,
 		authz.ModuleName,
 	)
 	app.ModuleManager.SetOrderEndBlockers(
 		crisistypes.ModuleName,
 		govtypes.ModuleName,
-		stakingtypes.ModuleName,
 		poa.ModuleName,
+		stakingtypes.ModuleName,
 		genutiltypes.ModuleName,
 		feegrant.ModuleName,
 		group.ModuleName,

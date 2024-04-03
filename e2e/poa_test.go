@@ -13,17 +13,6 @@ import (
 	"github.com/strangelove-ventures/poa"
 	"github.com/strangelove-ventures/poa/e2e/helpers"
 	"github.com/stretchr/testify/require"
-
-	cosmosproto "github.com/cosmos/gogoproto/proto"
-)
-
-const (
-	// cosmos1hj5fveer5cjtn4wd6wstzugjfdxzl0xpxvjjvr (test_node.sh)
-	accMnemonic  = "decorate bright ozone fork gallery riot bus exhaust worth way bone indoor calm squirrel merry zero scheme cotton until shop any excess stage laundry"
-	acc1Mnemonic = "wealth flavor believe regret funny network recall kiss grape useless pepper cram hint member few certain unveil rather brick bargain curious require crowd raise"
-	userFunds    = 10_000_000_000
-	numVals      = 2
-	numNodes     = 0
 )
 
 func TestPOABase(t *testing.T) {
@@ -55,6 +44,7 @@ func TestPOABase(t *testing.T) {
 	validators := helpers.GetValidatorsOperatingAddresses(t, ctx, chain)
 	require.Equal(t, len(validators), numVals)
 	assertSignatures(t, ctx, chain, len(validators))
+	assertConsensus(t, ctx, chain, len(validators))
 
 	// === Test Cases ===
 	testStakingDisabled(t, ctx, chain, validators, acc0, acc1)
@@ -62,10 +52,10 @@ func TestPOABase(t *testing.T) {
 	testPowerErrors(t, ctx, chain, validators, incorrectUser, acc0)
 	testPending(t, ctx, chain, acc0)
 	testRemoveValidator(t, ctx, chain, validators, acc0)
-	testUpdatePOAParams(t, ctx, chain, validators, acc0, incorrectUser)
+	testUpdatePOAParams(t, ctx, chain, acc0, incorrectUser)
 }
 
-func testUpdatePOAParams(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, validators []string, acc0, incorrectUser ibc.Wallet) {
+func testUpdatePOAParams(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, acc0, incorrectUser ibc.Wallet) {
 	var tx helpers.TxResponse
 	var err error
 
@@ -142,7 +132,7 @@ func testUpdatePOAParams(t *testing.T, ctx context.Context, chain *cosmos.Cosmos
 		govModule := "cosmos10d07y265gmmuvt4z0w9aw880jnsr700j6zn9kn"
 		randAcc := "cosmos1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqnrql8a"
 
-		updatedParams := []cosmosproto.Message{
+		updatedParams := []cosmos.ProtoMessage{
 			&poa.MsgUpdateParams{
 				Sender: govModule,
 				Params: poa.Params{
@@ -206,6 +196,7 @@ func testRemoveValidator(t *testing.T, ctx context.Context, chain *cosmos.Cosmos
 
 	// only 1 validator is signing now
 	assertSignatures(t, ctx, chain, 1)
+	assertConsensus(t, ctx, chain, 1)
 }
 
 func testStakingDisabled(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, validators []string, acc0, acc1 ibc.Wallet) {
@@ -296,4 +287,11 @@ func assertSignatures(t *testing.T, ctx context.Context, chain *cosmos.CosmosCha
 	require.NoError(t, err)
 	block := helpers.GetBlockData(t, ctx, chain, height)
 	require.Equal(t, len(block.LastCommit.Signatures), expectedSigs)
+
+}
+
+func assertConsensus(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, expected int) {
+	cbft := helpers.GetCometBFTConsensus(t, ctx, chain)
+	amt := len(cbft.Validators)
+	require.EqualValues(t, amt, expected, "expected %d in consensus, got %d", expected, amt)
 }

@@ -11,6 +11,11 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+const (
+	numNodes = 0
+	numVals  = 1
+)
+
 func TestPOAJailing(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping in short mode")
@@ -52,6 +57,7 @@ func TestPOAJailing(t *testing.T) {
 	validators := helpers.GetValidatorsOperatingAddresses(t, ctx, chain)
 	require.Equal(t, len(validators), chainVals)
 	assertSignatures(t, ctx, chain, len(validators))
+	assertConsensus(t, ctx, chain, len(validators))
 
 	// Stop validator 1 from signing
 	if err := chain.Validators[1].StopContainer(ctx); err != nil {

@@ -21,6 +21,7 @@ jobs:
           sudo apt-get install codespell -y
           codespell -w --config .codespellrc
           exit $?
+
   pr-title-format:
     name: Lint PR Title
     permissions:

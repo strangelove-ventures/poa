@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	cosmosproto "github.com/cosmos/gogoproto/proto"
 	"github.com/strangelove-ventures/interchaintest/v8/chain/cosmos"
 	"github.com/strangelove-ventures/interchaintest/v8/ibc"
 	"github.com/strangelove-ventures/poa"
@@ -60,7 +59,7 @@ func POACreatePendingValidator(
 func SubmitGovernanceProposalForValidatorChanges(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, user ibc.Wallet, validator string, power uint64, unsafe bool) string {
 	govAddr := "cosmos10d07y265gmmuvt4z0w9aw880jnsr700j6zn9kn"
 
-	powerMsg := []cosmosproto.Message{
+	powerMsg := []cosmos.ProtoMessage{
 		&poa.MsgSetPower{
 			Sender:           govAddr,
 			ValidatorAddress: validator,

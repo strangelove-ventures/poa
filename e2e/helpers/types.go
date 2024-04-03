@@ -195,3 +195,18 @@ type POAPending struct {
 		MinSelfDelegation string `json:"min_self_delegation"`
 	} `json:"pending"`
 }
+
+type CometBFTConsensus struct {
+	BlockHeight string `json:"block_height"`
+	Validators  []struct {
+		Address string `json:"address"`
+		PubKey  struct {
+			Type  string `json:"type"`
+			Value string `json:"value"`
+		} `json:"pub_key"`
+		VotingPower string `json:"voting_power"`
+	} `json:"validators"`
+	Pagination struct {
+		Total string `json:"total"`
+	} `json:"pagination"`
+}
