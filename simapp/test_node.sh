@@ -7,8 +7,10 @@ BINARY="poad" CHAIN_ID="poa-1" HOME_DIR="$HOME/.poad" TIMEOUT_COMMIT="2500ms" CL
 
 FLAGS="--keyring-backend=test --chain-id=poa-1 --home="$HOME/.poad" --yes"
 
-poad tx poa set-power $(poad q staking validators --output=json | jq .validators[0].operator_address -r) 12356789 $FLAGS --from=acc1 --unsafe
+MAIN_VAL=`poad q staking validators --output=json | jq .validators[0].operator_address -r` && echo $MAIN_VAL
+poad tx poa set-power $MAIN_VAL 18356789 $FLAGS --from=acc1 --unsafe
 poad q staking validators
+poad q consensus comet validator-set
 
 # failed to execute message; message index: 0: cannot remove the last validator in the set
 poad tx poa remove $(poad q staking validators --output=json | jq .validators[0].operator_address -r) $FLAGS --from=acc1
@@ -19,7 +21,6 @@ poad tx staking delegate $(poad q staking validators --output=json | jq .validat
 # Create a validator
 poad tx poa create-validator simapp/validator_file.json $FLAGS --from acc3
 poad q poa pending-validators --output json # 1 pending
-poad q staking validators --output json # still only 1
 poad q consensus comet validator-set
 poad tx poa set-power $(poad q poa pending-validators --output=json | jq .pending[0].operator_address -r) 2000000 $FLAGS --from=acc1
 

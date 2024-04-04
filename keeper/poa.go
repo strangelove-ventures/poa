@@ -34,16 +34,34 @@ func (k Keeper) UpdateValidatorSet(ctx context.Context, newShares, newConsensusP
 	val.Tokens = newShareInt
 	val.DelegatorShares = newShare
 	val.Status = stakingtypes.Bonded
+
+	// This is done later in the lifecycle now for internal validators
+	// pushes it into cometbft
+	isNew, err := k.NewValidatorsCache.Has(ctx, val.OperatorAddress)
+	if err != nil {
+		return err
+	}
+
+	if !isNew {
+		// The new PowerIndex key will change. Delete the current.
+		if err := k.stakingKeeper.DeleteValidatorByPowerIndex(ctx, val); err != nil {
+			return err
+		}
+	}
+
 	if err := k.stakingKeeper.SetValidator(ctx, val); err != nil {
 		return err
 	}
 
-	if err := k.stakingKeeper.SetValidatorByPowerIndex(ctx, val); err != nil {
-		return err
-	}
-
-	if err := k.stakingKeeper.SetLastValidatorPower(ctx, valAddr, newConsensusPower); err != nil {
-		return err
+	if isNew {
+		// Persist new validators -> CometBFT at H+2
+		if err := k.stakingKeeper.SetNewValidatorByPowerIndex(ctx, val); err != nil {
+			return err
+		}
+	} else {
+		if err := k.stakingKeeper.SetValidatorByPowerIndex(ctx, val); err != nil {
+			return err
+		}
 	}
 
 	return k.updateTotalPower(ctx)
@@ -133,6 +151,11 @@ func (k Keeper) AcceptNewValidator(ctx context.Context, operatingAddress string,
 		return err
 	}
 
+	// TODO: keep or remove since this is done in the endblocker now
+	if err := k.stakingKeeper.SetNewValidatorByPowerIndex(ctx, val); err != nil {
+		return err
+	}
+
 	// since the validator is set, remove it from the pending set
 	if err := k.RemovePendingValidator(ctx, val.OperatorAddress); err != nil {
 		return err
@@ -154,6 +177,10 @@ func (k Keeper) AcceptNewValidator(ctx context.Context, operatingAddress string,
 		),
 	})
 
+	if err := k.NewValidatorsCache.Set(ctx, val.OperatorAddress); err != nil {
+		return err
+	}
+
 	return k.UpdateBondedPoolPower(ctx)
 }
 
@@ -168,7 +195,7 @@ func (k Keeper) setValidatorInternals(ctx context.Context, val stakingtypes.Vali
 		return sdkerrors.ErrInvalidAddress.Wrapf("invalid validator address: %s", err)
 	}
 
-	if err := k.stakingKeeper.SetLastValidatorPower(ctx, valAddr, 4); err != nil {
+	if err := k.stakingKeeper.SetLastValidatorPower(ctx, valAddr, val.ConsensusPower(val.Tokens)); err != nil {
 		return err
 	}
 
@@ -177,10 +204,6 @@ func (k Keeper) setValidatorInternals(ctx context.Context, val stakingtypes.Vali
 	}
 
 	if err := k.stakingKeeper.SetValidatorByConsAddr(ctx, val); err != nil {
-		return err
-	}
-
-	if err := k.stakingKeeper.SetNewValidatorByPowerIndex(ctx, val); err != nil {
 		return err
 	}
 
