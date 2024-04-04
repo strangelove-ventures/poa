@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"cosmossdk.io/core/appmodule"
 	gwruntime "github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/spf13/cobra"
 
@@ -24,7 +25,7 @@ import (
 var (
 	_ module.AppModule        = AppModule{}
 	_ module.AppModuleGenesis = AppModule{}
-	_ module.HasABCIEndBlock  = AppModule{}
+	_ appmodule.HasEndBlocker = AppModule{}
 )
 
 // ConsensusVersion defines the current module consensus version.
@@ -127,11 +128,6 @@ func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONCodec) json.Raw
 	return cdc.MustMarshalJSON(gs)
 }
 
-// func (am AppModule) BeginBlock(ctx context.Context) error {
-// return am.BeginBlocker(ctx)
-// }
-
-// EndBlock implements module.HasABCIEndBlock.
-func (am AppModule) EndBlock(ctx context.Context) ([]abci.ValidatorUpdate, error) {
+func (am AppModule) EndBlock(ctx context.Context) error {
 	return am.EndBlocker(ctx)
 }

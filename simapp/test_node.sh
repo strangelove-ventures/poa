@@ -3,7 +3,7 @@
 # Example:
 : '
 cd simapp
-BINARY="poad" CHAIN_ID="poa-1" HOME_DIR="$HOME/.poad" TIMEOUT_COMMIT="5500ms" CLEAN=true sh test_node.sh
+BINARY="poad" CHAIN_ID="poa-1" HOME_DIR="$HOME/.poad" TIMEOUT_COMMIT="2500ms" CLEAN=true sh test_node.sh
 
 FLAGS="--keyring-backend=test --chain-id=poa-1 --home="$HOME/.poad" --yes"
 
@@ -21,7 +21,7 @@ poad tx poa create-validator simapp/validator_file.json $FLAGS --from acc3
 poad q poa pending-validators --output json # 1 pending
 poad q staking validators --output json # still only 1
 poad q consensus comet validator-set
-poad tx poa set-power $(poad q poa pending-validators --output=json | jq .pending[0].operator_address -r) 1000000 $FLAGS --from=acc1
+poad tx poa set-power $(poad q poa pending-validators --output=json | jq .pending[0].operator_address -r) 2000000 $FLAGS --from=acc1
 
 poad q poa pending-validators --output json # 0 now
 poad q staking validators --output json # 2

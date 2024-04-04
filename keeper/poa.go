@@ -38,6 +38,10 @@ func (k Keeper) UpdateValidatorSet(ctx context.Context, newShares, newConsensusP
 		return err
 	}
 
+	if err := k.stakingKeeper.SetValidatorByPowerIndex(ctx, val); err != nil {
+		return err
+	}
+
 	if err := k.stakingKeeper.SetLastValidatorPower(ctx, valAddr, newConsensusPower); err != nil {
 		return err
 	}
@@ -162,6 +166,10 @@ func (k Keeper) setValidatorInternals(ctx context.Context, val stakingtypes.Vali
 	valAddr, err := k.GetValidatorAddressCodec().StringToBytes(val.OperatorAddress)
 	if err != nil {
 		return sdkerrors.ErrInvalidAddress.Wrapf("invalid validator address: %s", err)
+	}
+
+	if err := k.stakingKeeper.SetLastValidatorPower(ctx, valAddr, 4); err != nil {
+		return err
 	}
 
 	if err := k.stakingKeeper.SetValidator(ctx, val); err != nil {

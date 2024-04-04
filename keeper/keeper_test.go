@@ -334,14 +334,12 @@ func (f *testFixture) IncreaseBlock(amt int64, debug ...bool) ([]abci.ValidatorU
 			return nil, err
 		}
 
-		updates, err := f.appModule.EndBlock(f.ctx)
-		if err != nil {
+		if err := f.appModule.EndBlock(f.ctx); err != nil {
 			return nil, err
 		}
-		allUpdates = append(allUpdates, updates...)
 
-		if len(debug) > 0 && debug[0] && len(updates) > 0 {
-			f.k.Logger().Debug("IncreaseBlock(...) updates", "updates", updates)
+		if len(debug) > 0 && debug[0] && len(allUpdates) > 0 {
+			f.k.Logger().Debug("IncreaseBlock(...) updates", "updates", allUpdates)
 		}
 	}
 

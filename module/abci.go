@@ -2,9 +2,6 @@ package module
 
 import (
 	"context"
-	"fmt"
-
-	abci "github.com/cometbft/cometbft/abci/types"
 
 	"github.com/cosmos/cosmos-sdk/telemetry"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -15,20 +12,19 @@ import (
 
 // BeginBlocker updates the validator set without applying updates.
 // Since this module depends on staking, that module will `ApplyAndReturnValidatorSetUpdates` from x/staking.
-func (am AppModule) EndBlocker(ctx context.Context) ([]abci.ValidatorUpdate, error) {
+func (am AppModule) EndBlocker(ctx context.Context) error {
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
 	defer telemetry.ModuleMeasureSince(poa.ModuleName, sdkCtx.BlockTime(), telemetry.MetricKeyBeginBlocker)
 
 	vals, err := am.keeper.GetStakingKeeper().GetAllValidators(ctx)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	valUpdates, err := am.keeper.GetStakingKeeper().ApplyAndReturnValidatorSetUpdates(ctx)
+	valUpdates, err := am.keeper.GetStakingKeeper().GetValidatorUpdates(ctx)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	fmt.Printf("\nvalUpdates: %+v\n", valUpdates)
 
 	for _, v := range vals {
 		switch v.GetStatus() {
@@ -36,7 +32,7 @@ func (am AppModule) EndBlocker(ctx context.Context) ([]abci.ValidatorUpdate, err
 			// if the validator is unbonding, force it to be unbonded. (H+1)
 			v.Status = stakingtypes.Unbonded
 			if err := am.keeper.GetStakingKeeper().SetValidator(ctx, v); err != nil {
-				return nil, err
+				return err
 			}
 			// valUpdates = append(valUpdates, v.ABCIValidatorUpdateZero())
 
@@ -44,18 +40,28 @@ func (am AppModule) EndBlocker(ctx context.Context) ([]abci.ValidatorUpdate, err
 			// if the validator is unbonded (above case), delete the last validator power. (H+2)
 			valAddr, err := sdk.ValAddressFromBech32(v.OperatorAddress)
 			if err != nil {
-				return nil, err
+				return err
 			}
 
 			if err := am.keeper.GetStakingKeeper().DeleteLastValidatorPower(ctx, valAddr); err != nil {
-				return nil, err
+				return err
 			}
 			// valUpdates = append(valUpdates, v.ABCIValidatorUpdateZero())
 
 		case stakingtypes.Unspecified, stakingtypes.Bonded:
-			// if !v.DelegatorShares.IsZero() {
-			// 	valUpdates = append(valUpdates, v.ABCIValidatorUpdate(v.Tokens))
-			// }
+			if !v.DelegatorShares.IsZero() {
+				for i, valUpdate := range valUpdates {
+					pk, err := v.ConsPubKey()
+					if err != nil {
+						return err
+					}
+
+					if valUpdate.PubKey.Equal(pk) {
+						valUpdates[i] = v.ABCIValidatorUpdate(v.Tokens)
+					}
+				}
+
+			}
 			continue
 		}
 	}
@@ -63,15 +69,19 @@ func (am AppModule) EndBlocker(ctx context.Context) ([]abci.ValidatorUpdate, err
 	if sdkCtx.BlockHeight() > 1 {
 		// non gentx messages reset the cached block powers for IBC validations.
 		if err := am.resetCachedTotalPower(ctx); err != nil {
-			return nil, err
+			return err
 		}
 
 		if err := am.resetAbsoluteBlockPower(ctx); err != nil {
-			return nil, err
+			return err
 		}
 	}
 
-	return valUpdates, err
+	if err := am.keeper.GetStakingKeeper().SetValidatorUpdates(ctx, valUpdates); err != nil {
+		return err
+	}
+
+	return err
 }
 
 // resetCachedTotalPower resets the block power index to the current total power.
