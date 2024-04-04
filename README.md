@@ -1,6 +1,6 @@
 # `PoA` Module
 
-The Proof of Authority (PoA) module allows for permissioned networks to be controlled by a predefined set of validators to verify transactions. This implementation extends the Cosmos-SDK's x/staking module to a a set of administrators over the chain. These administrators gate keep the chain by whitelisting validators, updating cosnensus power, and removing validators from the network.
+The Proof of Authority (PoA) module allows for permissioned networks to be controlled by a predefined set of validators to verify transactions. This implementation extends the Cosmos-SDK's x/staking module to a set of administrators over the chain. These administrators gate keep the chain by whitelisting validators, updating consensus power, and removing validators from the network.
 
 ## Integration
 
@@ -46,7 +46,7 @@ All delegation actions are disabled with the [disabled-staking ante](./INTEGRATI
 For better UX, this is accomplished by wrapping the x/staking module's `create-validator` command with our own logic. Validators only have to modify the namespace of their create command (from `tx staking create-validator` -> `tx poa create-validator`) with all else being equal.
 
 ### Previous Block Power
-`CachedPreviousBlockPower` saves the previous blocks total consensus power amount for queries at Height + 1. It allows for safety checks onm updating too much of the sets power resulting in broken IBC connections. It's protection can be passed by using the `--unsafe` flag in the `set-power` CLI command.
+`CachedPreviousBlockPower` saves the previous blocks total consensus power amount for queries at Height + 1. It allows for safety checks on updating too much of the sets power resulting in broken IBC connections. Its protection can be passed by using the `--unsafe` flag in the `set-power` CLI command.
 
 ### Absolute Changed Block Power
 `AbsoluteChangedInBlockPower` tracks the per block modification in block power. It follows the absolute power difference a single block can change against the previous block power. Attempting to increase more than 30% of the validator set power (relative to last) will error.
@@ -166,7 +166,7 @@ When removing validators, the validator can not be instantly removed from the se
 **Flow**
 
 
-A validator is removed by an admin at height H; it increases the minimum self delegation to current+1. This puts the bonded validator into `Unbonding` status when checked by the x/staking module in it's BeginBlock (at H). The next iteration (H+1) the PoA module force updates the `Unbonding` validator to the status of `Unbonded`. The x/staking module then performs it's BeginBlock logic and sets it as `Unbonded`. The validator is now deleted from consensus at H+2 in the PoA BeginBlock.
+A validator is removed by an admin at height H; it increases the minimum self delegation to current+1. This puts the bonded validator into `Unbonding` status when checked by the x/staking module in its BeginBlock (at H). The next iteration (H+1) the PoA module force updates the `Unbonding` validator to the status of `Unbonded`. The x/staking module then performs its BeginBlock logic and sets it as `Unbonded`. The validator is now deleted from consensus at H+2 in the PoA BeginBlock.
 
 ## Client
 
