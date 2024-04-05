@@ -27,7 +27,12 @@ poad tx poa set-power $(poad q poa pending-validators --output=json | jq .pendin
 poad q poa pending-validators --output json # 0 now
 poad q staking validators --output json # 2
 
-poad tx poa remove $(poad q staking validators --output=json | jq .validators[1].operator_address -r) --home=$HOME_DIR --yes --from=acc1
+SECOND_VAL=`poad q staking validators --output=json | jq .validators[1].operator_address -r` && echo $SECOND_VAL
+if [ "$MAIN_VAL" == "$SECOND_VAL" ]; then
+  echo "Validators are the same, incorrect query" && exit 1
+fi
+
+poad tx poa remove $SECOND_VAL $FLAGS --from=acc1
 
 # Remove Pending Validator
 poad tx poa remove-pending $(poad q poa pending-validators --output=json | jq .pending[0].operator_address -r) $FLAGS --from=acc1

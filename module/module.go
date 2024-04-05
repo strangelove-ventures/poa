@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"cosmossdk.io/core/appmodule"
 	gwruntime "github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/spf13/cobra"
 
@@ -16,6 +15,8 @@ import (
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
+
+	"cosmossdk.io/core/appmodule"
 
 	"github.com/strangelove-ventures/poa"
 	"github.com/strangelove-ventures/poa/client/cli"

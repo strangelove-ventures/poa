@@ -4,8 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	abci "github.com/cometbft/cometbft/abci/types"
-	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	"github.com/cosmos/cosmos-sdk/telemetry"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
@@ -21,31 +19,35 @@ func (am AppModule) BeginBlocker(ctx context.Context) error {
 		return nil
 	}
 
-	vals, err := am.keeper.GetStakingKeeper().GetAllValidators(ctx)
-	if err != nil {
-		return err
-	}
-
 	valUpdates, err := am.keeper.GetStakingKeeper().GetValidatorUpdates(ctx)
 	if err != nil {
 		return err
 	}
 
-	if len(valUpdates) == 0 {
-		return nil
-	}
+	if len(valUpdates) != 0 {
+		vals, err := am.keeper.GetStakingKeeper().GetAllValidators(ctx)
+		if err != nil {
+			return err
+		}
 
-	for _, valUpdate := range valUpdates {
-		pk := valUpdate.PubKey
 		for _, val := range vals {
-			valPk, ok := val.ConsensusPubkey.GetCachedValue().(cryptotypes.PubKey)
-			if !ok {
-				return fmt.Errorf("issue getting consensus pubkey for %s", val.GetOperator())
-			}
+			if val.Status == stakingtypes.Bonded {
+				valBz, err := sdk.ValAddressFromBech32(val.OperatorAddress)
+				if err != nil {
+					return err
+				}
 
-			if pk.Sum.Compare(valPk.Bytes()) == 1 {
-				// delete the validator index
+				lastPower, err := am.keeper.GetStakingKeeper().GetLastValidatorPower(ctx, valBz)
+				if err != nil {
+					return err
+				}
+
+				// This fixes: "failed to apply block; error commit failed for application: changing validator set: duplicate entry"
 				if err := am.keeper.GetStakingKeeper().DeleteValidatorByPowerIndex(ctx, val); err != nil {
+					return err
+				}
+
+				if err := am.keeper.GetStakingKeeper().SetLastValidatorPower(ctx, valBz, lastPower); err != nil {
 					return err
 				}
 			}
@@ -53,7 +55,6 @@ func (am AppModule) BeginBlocker(ctx context.Context) error {
 	}
 
 	return nil
-
 }
 
 // BeginBlocker updates the validator set without applying updates.
@@ -71,7 +72,7 @@ func (am AppModule) EndBlocker(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("\nPOA valUpdates before:")
+	fmt.Printf("\nENDBLOCK POA valUpdates before:\n")
 	for _, valUpdate := range valUpdates {
 		fmt.Printf(" - %v: %d\n", valUpdate.PubKey.String(), valUpdate.Power)
 	}
@@ -98,9 +99,9 @@ func (am AppModule) EndBlocker(ctx context.Context) error {
 
 		case stakingtypes.Unspecified, stakingtypes.Bonded:
 			if !v.DelegatorShares.IsZero() {
-
 				// if the validator is freshly created, then perform the validator update.
 
+				// TODO: get last validator power from x/staking here instead? (then we can remove the cache)
 				isNewVal, err := am.keeper.NewValidatorsCache.Has(ctx, v.GetOperator())
 				if err != nil {
 					return err
@@ -116,7 +117,6 @@ func (am AppModule) EndBlocker(ctx context.Context) error {
 						return err
 					}
 				}
-
 			}
 			continue
 		}
@@ -133,23 +133,9 @@ func (am AppModule) EndBlocker(ctx context.Context) error {
 		}
 	}
 
-	// remove any duplicate updates from
-	rmDups := make(map[string]struct{})
-	uniqueValUpdates := []abci.ValidatorUpdate{}
+	fmt.Printf("POA valUpdates after:\n")
 	for _, valUpdate := range valUpdates {
-		if _, ok := rmDups[valUpdate.PubKey.String()]; !ok {
-			uniqueValUpdates = append(uniqueValUpdates, valUpdate)
-			rmDups[valUpdate.PubKey.String()] = struct{}{}
-		}
-	}
-
-	fmt.Printf("POA valUpdates after:")
-	for _, valUpdate := range uniqueValUpdates {
 		fmt.Printf(" - %v: %d\n", valUpdate.PubKey.String(), valUpdate.Power)
-	}
-
-	if err := am.keeper.GetStakingKeeper().SetValidatorUpdates(ctx, uniqueValUpdates); err != nil {
-		return err
 	}
 
 	return err
