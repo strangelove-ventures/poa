@@ -261,7 +261,8 @@ func testPowerErrors(t *testing.T, ctx context.Context, chain *cosmos.CosmosChai
 	var err error
 
 	t.Run("fail: set-power message from a non authorized user", func(t *testing.T) {
-		res, _ = helpers.POASetPower(t, ctx, chain, incorrectUser, validators[1], 1_000_000)
+		// runtime error: index out of range [1] with length 1 [recovered]
+		res, _ = helpers.POASetPower(t, ctx, chain, incorrectUser, validators[0], 1_000_000)
 		res, err := chain.GetTransaction(res.Txhash)
 		require.NoError(t, err)
 		require.Contains(t, res.RawLog, poa.ErrNotAnAuthority.Error())
