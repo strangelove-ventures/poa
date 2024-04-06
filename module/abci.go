@@ -12,47 +12,48 @@ import (
 )
 
 func (am AppModule) BeginBlocker(ctx context.Context) error {
-	sdkCtx := sdk.UnwrapSDKContext(ctx)
-	defer telemetry.ModuleMeasureSince(poa.ModuleName, sdkCtx.BlockTime(), telemetry.MetricKeyBeginBlocker)
+	// TODO: Removing this allows for the jailed val to enter into unbonding, but not instant unbond.
+	// sdkCtx := sdk.UnwrapSDKContext(ctx)
+	// defer telemetry.ModuleMeasureSince(poa.ModuleName, sdkCtx.BlockTime(), telemetry.MetricKeyBeginBlocker)
 
-	if sdkCtx.BlockHeight() <= 1 {
-		return nil
-	}
+	// if sdkCtx.BlockHeight() <= 1 {
+	// 	return nil
+	// }
 
-	valUpdates, err := am.keeper.GetStakingKeeper().GetValidatorUpdates(ctx)
-	if err != nil {
-		return err
-	}
+	// valUpdates, err := am.keeper.GetStakingKeeper().GetValidatorUpdates(ctx)
+	// if err != nil {
+	// 	return err
+	// }
 
-	if len(valUpdates) != 0 {
-		vals, err := am.keeper.GetStakingKeeper().GetAllValidators(ctx)
-		if err != nil {
-			return err
-		}
+	// if len(valUpdates) != 0 {
+	// 	vals, err := am.keeper.GetStakingKeeper().GetAllValidators(ctx)
+	// 	if err != nil {
+	// 		return err
+	// 	}
 
-		for _, val := range vals {
-			if val.Status == stakingtypes.Bonded {
-				valBz, err := sdk.ValAddressFromBech32(val.OperatorAddress)
-				if err != nil {
-					return err
-				}
+	// 	for _, val := range vals {
+	// 		if val.Status == stakingtypes.Bonded {
+	// 			valBz, err := sdk.ValAddressFromBech32(val.OperatorAddress)
+	// 			if err != nil {
+	// 				return err
+	// 			}
 
-				lastPower, err := am.keeper.GetStakingKeeper().GetLastValidatorPower(ctx, valBz)
-				if err != nil {
-					return err
-				}
+	// 			lastPower, err := am.keeper.GetStakingKeeper().GetLastValidatorPower(ctx, valBz)
+	// 			if err != nil {
+	// 				return err
+	// 			}
 
-				// This fixes: "failed to apply block; error commit failed for application: changing validator set: duplicate entry"
-				if err := am.keeper.GetStakingKeeper().DeleteValidatorByPowerIndex(ctx, val); err != nil {
-					return err
-				}
+	// 			// This fixes: "failed to apply block; error commit failed for application: changing validator set: duplicate entry"
+	// 			if err := am.keeper.GetStakingKeeper().DeleteValidatorByPowerIndex(ctx, val); err != nil {
+	// 				return err
+	// 			}
 
-				if err := am.keeper.GetStakingKeeper().SetLastValidatorPower(ctx, valBz, lastPower); err != nil {
-					return err
-				}
-			}
-		}
-	}
+	// 			if err := am.keeper.GetStakingKeeper().SetLastValidatorPower(ctx, valBz, lastPower); err != nil {
+	// 				return err
+	// 			}
+	// 		}
+	// 	}
+	// }
 
 	return nil
 }

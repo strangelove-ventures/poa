@@ -4,6 +4,8 @@ import (
 	"testing"
 	"time"
 
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+
 	"github.com/strangelove-ventures/interchaintest/v8"
 	"github.com/strangelove-ventures/interchaintest/v8/chain/cosmos"
 	"github.com/strangelove-ventures/interchaintest/v8/testutil"
@@ -65,14 +67,14 @@ func TestPOAJailing(t *testing.T) {
 	}
 
 	// Wait for the stopped node to be jailed.
-	require.NoError(t, testutil.WaitForBlocks(ctx, 3, chain.Validators[0]))
+	require.NoError(t, testutil.WaitForBlocks(ctx, 4, chain.Validators[0]))
 
 	// Validate 1 validator is jailed (status 1)
 	vals := helpers.GetValidators(t, ctx, chain)
 	jailedValAddr := ""
 	require.True(t, func() bool {
 		for _, v := range vals.Validators {
-			if v.Status == 1 {
+			if v.Status == int(stakingtypes.Unbonded) || v.Status == int(stakingtypes.Unbonding) {
 				jailedValAddr = v.OperatorAddress
 				return true
 			}
