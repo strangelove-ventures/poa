@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func ValidatorVote(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, proposalID string, voteOp string, searchHeightDelta uint64) {
+func ValidatorVote(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, proposalID string, voteOp string, searchHeightDelta int64) {
 	chain.VoteOnProposalAllValidators(ctx, proposalID, voteOp)
 
 	height, err := chain.Height(ctx)
@@ -27,7 +27,7 @@ func ValidatorVote(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain,
 	require.EqualValues(t, govv1.ProposalStatus_PROPOSAL_STATUS_PASSED, resp.Status, "proposal status did not change to passed in expected number of blocks")
 }
 
-func SubmitParamChangeProp(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, user ibc.Wallet, updatedParams []cosmos.ProtoMessage, sender string, waitForBlocks uint64) string {
+func SubmitParamChangeProp(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, user ibc.Wallet, updatedParams []cosmos.ProtoMessage, sender string, waitForBlocks int64) string {
 	expedited := false
 	proposal, err := chain.BuildProposal(updatedParams, "UpdateParams", "params", "ipfs://CID", fmt.Sprintf(`50%s`, chain.Config().Denom), sender, expedited)
 	require.NoError(t, err, "error building proposal")

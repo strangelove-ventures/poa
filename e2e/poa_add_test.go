@@ -34,7 +34,7 @@ func TestPOAAddValidator(t *testing.T) {
 	cfg.Env = []string{
 		fmt.Sprintf("POA_ADMIN_ADDRESS=%s", "cosmos1hj5fveer5cjtn4wd6wstzugjfdxzl0xpxvjjvr"), // acc0 / admin
 	}
-	cfg.ModifyGenesisAmounts = func() (sdk.Coin, sdk.Coin) {
+	cfg.ModifyGenesisAmounts = func(i int) (sdk.Coin, sdk.Coin) {
 		var delegation int64 = 1_000_000000
 		return sdk.NewCoin(cfg.Denom, sdkmath.NewInt(userFunds.Int64())), sdk.NewCoin(cfg.Denom, sdkmath.NewInt(delegation))
 	}

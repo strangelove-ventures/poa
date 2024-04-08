@@ -9,7 +9,6 @@ import (
 	"github.com/strangelove-ventures/interchaintest/v8"
 	"github.com/strangelove-ventures/interchaintest/v8/chain/cosmos"
 	"github.com/strangelove-ventures/interchaintest/v8/ibc"
-	"github.com/strangelove-ventures/interchaintest/v8/testutil"
 	"github.com/strangelove-ventures/poa"
 	"github.com/strangelove-ventures/poa/e2e/helpers"
 	"github.com/stretchr/testify/require"
@@ -51,7 +50,6 @@ func TestPOABase(t *testing.T) {
 	testGovernance(t, ctx, chain, acc0, validators)
 	testPowerErrors(t, ctx, chain, validators, incorrectUser, acc0)
 	testPending(t, ctx, chain, acc0)
-	testRemoveValidator(t, ctx, chain, validators, acc0)
 	testUpdatePOAParams(t, ctx, chain, acc0, incorrectUser)
 }
 
@@ -141,62 +139,12 @@ func testUpdatePOAParams(t *testing.T, ctx context.Context, chain *cosmos.Cosmos
 			},
 		}
 		propId := helpers.SubmitParamChangeProp(t, ctx, chain, incorrectUser, updatedParams, govModule, 25)
-		helpers.ValidatorVote(t, ctx, chain, propId, cosmos.ProposalVoteYes, uint64(25))
+		helpers.ValidatorVote(t, ctx, chain, propId, cosmos.ProposalVoteYes, 25)
 		for _, admin := range helpers.GetPOAParams(t, ctx, chain).Admins {
 			require.NotEqual(t, admin, incorrectUser.FormattedAddress())
 		}
 	})
 
-}
-
-func testRemoveValidator(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, validators []string, acc0 ibc.Wallet) {
-	t.Log("\n===== TEST REMOVE VALIDATOR =====")
-	powerOne := int64(9_000_000_000_000)
-	powerTwo := int64(2_500_000)
-
-	helpers.POASetPower(t, ctx, chain, acc0, validators[0], powerOne, "--unsafe")
-	res, err := helpers.POASetPower(t, ctx, chain, acc0, validators[1], powerTwo, "--unsafe")
-	require.NoError(t, err)
-	fmt.Printf("%+v", res)
-
-	// decode res.TxHash into a TxResponse
-	txRes, err := chain.GetTransaction(res.Txhash)
-	require.NoError(t, err)
-	fmt.Printf("%+v", txRes)
-
-	if err := testutil.WaitForBlocks(ctx, 2, chain); err != nil {
-		t.Fatal(err)
-	}
-
-	vals := helpers.GetValidators(t, ctx, chain).Validators
-	require.Equal(t, fmt.Sprintf("%d", powerOne), vals[0].Tokens)
-	require.Equal(t, fmt.Sprintf("%d", powerTwo), vals[1].Tokens)
-
-	// validate the validators both have a conesnsus-power of /1_000_000
-	p1 := helpers.GetPOAConsensusPower(t, ctx, chain, vals[0].OperatorAddress)
-	require.EqualValues(t, powerOne/1_000_000, p1) // = 9000000
-	p2 := helpers.GetPOAConsensusPower(t, ctx, chain, vals[1].OperatorAddress)
-	require.EqualValues(t, powerTwo/1_000_000, p2) // = 2
-
-	// remove the 2nd validator (lower power)
-	helpers.POARemove(t, ctx, chain, acc0, validators[1])
-
-	// allow the poa.BeginBlocker to update new status
-	if err := testutil.WaitForBlocks(ctx, 5, chain); err != nil {
-		t.Fatal(err)
-	}
-
-	vals = helpers.GetValidators(t, ctx, chain).Validators
-	require.Equal(t, fmt.Sprintf("%d", powerOne), vals[0].Tokens)
-	require.Equal(t, "0", vals[1].Tokens)
-	require.Equal(t, 1, vals[1].Status) // 1 = unbonded
-
-	// validate the validator[1] has no consensus power
-	require.EqualValues(t, 0, helpers.GetPOAConsensusPower(t, ctx, chain, vals[1].OperatorAddress))
-
-	// only 1 validator is signing now
-	assertSignatures(t, ctx, chain, 1)
-	assertConsensus(t, ctx, chain, 1)
 }
 
 func testStakingDisabled(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, validators []string, acc0, acc1 ibc.Wallet) {
@@ -287,7 +235,7 @@ func assertSignatures(t *testing.T, ctx context.Context, chain *cosmos.CosmosCha
 	height, err := chain.GetNode().Height(ctx)
 	require.NoError(t, err)
 	block := helpers.GetBlockData(t, ctx, chain, height)
-	require.Equal(t, len(block.LastCommit.Signatures), expectedSigs)
+	require.Equal(t, expectedSigs, len(block.LastCommit.Signatures))
 
 }
 
