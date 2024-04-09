@@ -53,6 +53,7 @@ jobs:
           - "ictest-poa"
           - "ictest-jail"
           - "ictest-val-add"
+          - "ictest-gov"
       fail-fast: false
 
     steps:

@@ -9,3 +9,6 @@ ictest-val-add:
 
 ictest-val-remove:
 	go clean -testcache && go test -race -v -run TestPOARemoval .
+
+ictest-gov:
+	go clean -testcache && go test -race -v -run TestPOAGovernance .
