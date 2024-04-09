@@ -56,12 +56,10 @@ func POACreatePendingValidator(
 	return ExecuteTransaction(ctx, chain, cmd)
 }
 
-func SubmitGovernanceProposalForValidatorChanges(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, user ibc.Wallet, validator string, power uint64, unsafe bool) string {
-	govAddr := "cosmos10d07y265gmmuvt4z0w9aw880jnsr700j6zn9kn"
-
+func SubmitGovernanceProposalForValidatorChanges(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, user ibc.Wallet, validator string, power uint64, unsafe bool, authority string) string {
 	powerMsg := []cosmos.ProtoMessage{
 		&poa.MsgSetPower{
-			Sender:           govAddr,
+			Sender:           authority,
 			ValidatorAddress: validator,
 			Power:            power,
 			Unsafe:           unsafe,

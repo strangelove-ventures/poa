@@ -47,9 +47,9 @@ func TestPOABase(t *testing.T) {
 
 	// === Test Cases ===
 	testStakingDisabled(t, ctx, chain, validators, acc0, acc1)
-	testGovernance(t, ctx, chain, acc0, validators)
 	testPowerErrors(t, ctx, chain, validators, incorrectUser, acc0)
 	testPending(t, ctx, chain, acc0)
+	testGovernance(t, ctx, chain, acc0, validators)
 	testUpdatePOAParams(t, ctx, chain, acc0, incorrectUser)
 }
 
@@ -192,8 +192,11 @@ func testPending(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, a
 
 func testGovernance(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, acc0 ibc.Wallet, validators []string) {
 	t.Log("\n===== TEST GOVERNANCE =====")
+
+	authorityAddr := "cosmos10d07y265gmmuvt4z0w9aw880jnsr700j6zn9kn" // gov
+
 	// ibc.ChainConfig key: app_state.poa.params.admins must contain the governance address.
-	propID := helpers.SubmitGovernanceProposalForValidatorChanges(t, ctx, chain, acc0, validators[0], 1_234_567, true)
+	propID := helpers.SubmitGovernanceProposalForValidatorChanges(t, ctx, chain, acc0, validators[0], 1_234_567, true, authorityAddr)
 	helpers.ValidatorVote(t, ctx, chain, propID, cosmos.ProposalVoteYes, 25)
 
 	// validate the validator[0] was set to 1_234_567

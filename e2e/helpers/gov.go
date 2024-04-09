@@ -22,8 +22,10 @@ func ValidatorVote(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain,
 	propID, err := strconv.ParseUint(proposalID, 10, 64)
 	require.NoError(t, err, "failed to parse proposalID")
 
-	resp, _ := cosmos.PollForProposalStatusV1(ctx, chain, height, height+searchHeightDelta, propID, govv1.ProposalStatus_PROPOSAL_STATUS_PASSED)
+	resp, _ := cosmos.PollForProposalStatusV1(ctx, chain, height, (height-1)+searchHeightDelta, propID, govv1.ProposalStatus_PROPOSAL_STATUS_PASSED)
 	t.Log("PollForProposalStatusV8 resp", resp)
+	require.NotNil(t, resp, "proposal not found", propID)
+
 	require.EqualValues(t, govv1.ProposalStatus_PROPOSAL_STATUS_PASSED, resp.Status, "proposal status did not change to passed in expected number of blocks")
 }
 
