@@ -5,13 +5,14 @@ import (
 	"fmt"
 	"testing"
 
-	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/strangelove-ventures/interchaintest/v8"
 	"github.com/strangelove-ventures/interchaintest/v8/chain/cosmos"
 	"github.com/strangelove-ventures/interchaintest/v8/ibc"
 	"github.com/strangelove-ventures/poa"
 	"github.com/strangelove-ventures/poa/e2e/helpers"
 	"github.com/stretchr/testify/require"
+
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 )
 
 func TestPOABase(t *testing.T) {
@@ -139,7 +140,7 @@ func testUpdatePOAParams(t *testing.T, ctx context.Context, chain *cosmos.Cosmos
 			},
 		}
 		propId := helpers.SubmitParamChangeProp(t, ctx, chain, incorrectUser, updatedParams, govModule, 25)
-		helpers.ValidatorVote(t, ctx, chain, propId, cosmos.ProposalVoteYes, 25)
+		helpers.ValidatorVote(t, ctx, chain, propId, cosmos.ProposalVoteYes, 30)
 		for _, admin := range helpers.GetPOAParams(t, ctx, chain).Admins {
 			require.NotEqual(t, admin, incorrectUser.FormattedAddress())
 		}
