@@ -458,15 +458,15 @@ func NewSimApp(
 		distrtypes.ModuleName,
 		slashingtypes.ModuleName,
 		evidencetypes.ModuleName,
-		poa.ModuleName,
 		stakingtypes.ModuleName,
+		poa.ModuleName, // After staking
 		genutiltypes.ModuleName,
 		authz.ModuleName,
 	)
 	app.ModuleManager.SetOrderEndBlockers(
 		crisistypes.ModuleName,
 		govtypes.ModuleName,
-		poa.ModuleName,
+		poa.ModuleName, // Before staking
 		stakingtypes.ModuleName,
 		genutiltypes.ModuleName,
 		feegrant.ModuleName,

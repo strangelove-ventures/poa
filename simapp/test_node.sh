@@ -21,8 +21,12 @@ poad tx staking delegate $(poad q staking validators --output=json | jq .validat
 # Create a validator
 poad tx poa create-validator simapp/validator_file.json $FLAGS --from acc3
 poad q poa pending-validators --output json # 1 pending
+
+PENIDNG_OPPERATOR_ADDR=$(poad q poa pending-validators --output=json | jq .pending[0].operator_address -r) && echo $PENIDNG_OPPERATOR_ADDR
+poad tx poa set-power $PENIDNG_OPPERATOR_ADDR 2000000 $FLAGS --from=acc1
 poad q consensus comet validator-set
-poad tx poa set-power $(poad q poa pending-validators --output=json | jq .pending[0].operator_address -r) 2000000 $FLAGS --from=acc1
+
+# poad tx poa remove $PENIDNG_OPPERATOR_ADDR $FLAGS --from=acc1
 
 poad q poa pending-validators --output json # 0 now
 poad q staking validators --output json # 2
