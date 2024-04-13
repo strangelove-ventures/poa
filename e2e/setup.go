@@ -1,10 +1,15 @@
 package e2e
 
 import (
+	"context"
+	"testing"
+
 	moduletestutil "github.com/cosmos/cosmos-sdk/types/module/testutil"
 	"github.com/strangelove-ventures/interchaintest/v8/chain/cosmos"
 	"github.com/strangelove-ventures/interchaintest/v8/ibc"
 	"github.com/strangelove-ventures/poa"
+	"github.com/strangelove-ventures/poa/e2e/helpers"
+	"github.com/stretchr/testify/require"
 )
 
 var (
@@ -67,4 +72,19 @@ func poaEncoding() *moduletestutil.TestEncodingConfig {
 	cfg := cosmos.DefaultEncoding()
 	poa.RegisterInterfaces(cfg.InterfaceRegistry)
 	return &cfg
+}
+
+// assertSignatures asserts that the current block has the exact number of signatures as expected
+func assertSignatures(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, expectedSigs int) {
+	height, err := chain.GetNode().Height(ctx)
+	require.NoError(t, err)
+	block := helpers.GetBlockData(t, ctx, chain, height)
+	require.Equal(t, expectedSigs, len(block.LastCommit.Signatures))
+
+}
+
+func assertConsensus(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, expected int) {
+	cbft := helpers.GetCometBFTConsensus(t, ctx, chain)
+	amt := len(cbft.Validators)
+	require.EqualValues(t, amt, expected, "expected %d in consensus, got %d", expected, amt)
 }

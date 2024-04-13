@@ -34,7 +34,7 @@ func TestPOAAddValidator(t *testing.T) {
 	cfg.Env = []string{
 		fmt.Sprintf("POA_ADMIN_ADDRESS=%s", "cosmos1hj5fveer5cjtn4wd6wstzugjfdxzl0xpxvjjvr"), // acc0 / admin
 	}
-	cfg.ModifyGenesisAmounts = func() (sdk.Coin, sdk.Coin) {
+	cfg.ModifyGenesisAmounts = func(i int) (sdk.Coin, sdk.Coin) {
 		var delegation int64 = 1_000_000000
 		return sdk.NewCoin(cfg.Denom, sdkmath.NewInt(userFunds.Int64())), sdk.NewCoin(cfg.Denom, sdkmath.NewInt(delegation))
 	}
@@ -70,14 +70,19 @@ func TestPOAAddValidator(t *testing.T) {
 	commissionMaxRate := "0.2"
 	commissionMaxChangeRate := "0.01"
 
+	require.EqualValues(t, 0, len(helpers.GetPOAPending(t, ctx, chain).Pending))
+
 	txRes, err := helpers.POACreatePendingValidator(t, ctx, chain, fakeVal, pubKeyJSON, moniker, commissionRate, commissionMaxRate, commissionMaxChangeRate)
 	require.NoError(t, err)
 	log.Debug().Msgf("Create pending validator: %v", txRes)
 
-	pending := helpers.GetPOAPending(t, ctx, chain)
+	pending := helpers.GetPOAPending(t, ctx, chain).Pending
+	require.EqualValues(t, 1, len(pending))
+	require.Equal(t, "0", pending[0].Tokens)
+	require.Equal(t, "1", pending[0].MinSelfDelegation)
 
 	// set power from Gov
-	txRes, err = helpers.POASetPower(t, ctx, chain, admin, pending.Pending[0].OperatorAddress, 1_000_000)
+	txRes, err = helpers.POASetPower(t, ctx, chain, admin, pending[0].OperatorAddress, 1_000_000)
 	require.NoError(t, err)
 	log.Debug().Msgf("Set pending's power: %v", txRes)
 
