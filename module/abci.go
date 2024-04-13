@@ -2,7 +2,6 @@ package module
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/cosmos/cosmos-sdk/telemetry"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -34,12 +33,12 @@ func (am AppModule) BeginBlocker(ctx context.Context) error {
 		}
 
 		for _, val := range vals {
-			if val.Status == stakingtypes.Bonded {
-				valBz, err := sdk.ValAddressFromBech32(val.OperatorAddress)
-				if err != nil {
-					return err
-				}
+			valBz, err := sdk.ValAddressFromBech32(val.OperatorAddress)
+			if err != nil {
+				return err
+			}
 
+			if val.Status == stakingtypes.Bonded {
 				lastPower, err := am.keeper.GetStakingKeeper().GetLastValidatorPower(ctx, valBz)
 				if err != nil {
 					return err
@@ -52,6 +51,10 @@ func (am AppModule) BeginBlocker(ctx context.Context) error {
 				}
 
 				if err := am.keeper.GetStakingKeeper().SetLastValidatorPower(ctx, valBz, lastPower); err != nil {
+					return err
+				}
+
+				if err := am.keeper.GetStakingKeeper().SetValidatorByPowerIndex(ctx, val); err != nil {
 					return err
 				}
 			}
@@ -76,9 +79,9 @@ func (am AppModule) EndBlocker(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("\nENDBLOCK POA valUpdates before:\n")
+
 	for _, valUpdate := range valUpdates {
-		fmt.Printf(" - %v: %d\n", valUpdate.PubKey.String(), valUpdate.Power)
+		am.keeper.Logger().Info("ValUpdate Before", "pubkey", valUpdate.PubKey.String(), "power", valUpdate.Power)
 	}
 
 	for _, v := range vals {
@@ -89,12 +92,7 @@ func (am AppModule) EndBlocker(ctx context.Context) error {
 
 		switch v.GetStatus() {
 		case stakingtypes.Unbonding:
-			// if the validator is unbonding, force it to be unbonded. (H+1)
-			v.Status = stakingtypes.Unbonded
-			if err := am.keeper.GetStakingKeeper().SetValidator(ctx, v); err != nil {
-				return err
-			}
-
+			continue
 		case stakingtypes.Unbonded:
 			// if the validator is unbonded (above case), delete the last validator power. (H+2)
 			if err := am.keeper.GetStakingKeeper().DeleteLastValidatorPower(ctx, valAddr); err != nil {
@@ -103,20 +101,20 @@ func (am AppModule) EndBlocker(ctx context.Context) error {
 
 		case stakingtypes.Unspecified, stakingtypes.Bonded:
 			if !v.DelegatorShares.IsZero() {
+				// TODO: new val cache still needed?
 				// if the validator is freshly created, then perform the validator update.
-
-				// TODO: get last validator power from x/staking here instead? (then we can remove the cache)
 				isNewVal, err := am.keeper.NewValidatorsCache.Has(ctx, v.GetOperator())
 				if err != nil {
 					return err
 				}
 
-				power, err := am.keeper.GetStakingKeeper().GetLastValidatorPower(ctx, valAddr)
-				fmt.Println("\nisNewVal", isNewVal)
-				fmt.Println("power", power)
-				fmt.Println("err", err)
+				// power, err := am.keeper.GetStakingKeeper().GetLastValidatorPower(ctx, valAddr)
+				// if err != nil {
+				// 	return err
+				// }
 
 				if isNewVal {
+					am.keeper.Logger().Info("New Validator", "operator", v.GetOperator(), "bonded_tokens", v.GetBondedTokens())
 					if err := am.keeper.NewValidatorsCache.Remove(ctx, v.GetOperator()); err != nil {
 						return err
 					}
@@ -137,9 +135,8 @@ func (am AppModule) EndBlocker(ctx context.Context) error {
 		}
 	}
 
-	fmt.Printf("POA valUpdates after:\n")
 	for _, valUpdate := range valUpdates {
-		fmt.Printf(" - %v: %d\n", valUpdate.PubKey.String(), valUpdate.Power)
+		am.keeper.Logger().Info("ValUpdate After", "pubkey", valUpdate.PubKey.String(), "power", valUpdate.Power)
 	}
 
 	return err
