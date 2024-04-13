@@ -50,13 +50,17 @@ func (am AppModule) BeginBlocker(ctx context.Context) error {
 					return err
 				}
 
+				// sets new indexes for which we control
 				if err := am.keeper.GetStakingKeeper().SetLastValidatorPower(ctx, valBz, lastPower); err != nil {
 					return err
 				}
 
-				if err := am.keeper.GetStakingKeeper().SetValidatorByPowerIndex(ctx, val); err != nil {
-					return err
-				}
+				// `SetValidatorByPowerIndex` would forever persist if you do not DeleteValidatorByPowerIndex first.
+				// This is used as reference for any future code written as a reminder.
+				// Instead, staking handles it for us :)
+				// if err := am.keeper.GetStakingKeeper().SetValidatorByPowerIndex(ctx, val); err != nil {
+				// 	return err
+				// }
 			}
 		}
 	}
@@ -85,15 +89,15 @@ func (am AppModule) EndBlocker(ctx context.Context) error {
 	}
 
 	for _, v := range vals {
-		valAddr, err := sdk.ValAddressFromBech32(v.OperatorAddress)
-		if err != nil {
-			return err
-		}
-
 		switch v.GetStatus() {
 		case stakingtypes.Unbonding:
 			continue
 		case stakingtypes.Unbonded:
+			valAddr, err := sdk.ValAddressFromBech32(v.OperatorAddress)
+			if err != nil {
+				return err
+			}
+
 			// if the validator is unbonded (above case), delete the last validator power. (H+2)
 			if err := am.keeper.GetStakingKeeper().DeleteLastValidatorPower(ctx, valAddr); err != nil {
 				return err
@@ -101,17 +105,11 @@ func (am AppModule) EndBlocker(ctx context.Context) error {
 
 		case stakingtypes.Unspecified, stakingtypes.Bonded:
 			if !v.DelegatorShares.IsZero() {
-				// TODO: new val cache still needed?
-				// if the validator is freshly created, then perform the validator update.
+				// used in keeper/poa.go for setting a new validator by index, or previous validator.
 				isNewVal, err := am.keeper.NewValidatorsCache.Has(ctx, v.GetOperator())
 				if err != nil {
 					return err
 				}
-
-				// power, err := am.keeper.GetStakingKeeper().GetLastValidatorPower(ctx, valAddr)
-				// if err != nil {
-				// 	return err
-				// }
 
 				if isNewVal {
 					am.keeper.Logger().Info("New Validator", "operator", v.GetOperator(), "bonded_tokens", v.GetBondedTokens())
@@ -126,50 +124,17 @@ func (am AppModule) EndBlocker(ctx context.Context) error {
 
 	if sdkCtx.BlockHeight() > 1 {
 		// non gentx messages reset the cached block powers for IBC validations.
-		if err := am.resetCachedTotalPower(ctx); err != nil {
+		if err := am.keeper.ResetCachedTotalPower(ctx); err != nil {
 			return err
 		}
 
-		if err := am.resetAbsoluteBlockPower(ctx); err != nil {
+		if err := am.keeper.ResetAbsoluteBlockPower(ctx); err != nil {
 			return err
 		}
 	}
 
 	for _, valUpdate := range valUpdates {
 		am.keeper.Logger().Info("ValUpdate After", "pubkey", valUpdate.PubKey.String(), "power", valUpdate.Power)
-	}
-
-	return err
-}
-
-// resetCachedTotalPower resets the block power index to the current total power.
-func (am AppModule) resetCachedTotalPower(ctx context.Context) error {
-	currValPower, err := am.keeper.GetStakingKeeper().GetLastTotalPower(ctx)
-	if err != nil {
-		return err
-	}
-
-	prev, err := am.keeper.GetCachedBlockPower(ctx)
-	if err != nil {
-		return err
-	}
-
-	if currValPower.Uint64() != prev {
-		return am.keeper.SetCachedBlockPower(ctx, currValPower.Uint64())
-	}
-
-	return nil
-}
-
-// resetAbsoluteBlockPower resets the absolute block power to 0 since updates per block have been executed upon.
-func (am AppModule) resetAbsoluteBlockPower(ctx context.Context) error {
-	var err error
-
-	val, err := am.keeper.GetAbsoluteChangedInBlockPower(ctx)
-	if err != nil {
-		return err
-	} else if val != 0 {
-		return am.keeper.SetAbsoluteChangedInBlockPower(ctx, 0)
 	}
 
 	return err

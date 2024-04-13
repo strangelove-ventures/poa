@@ -73,14 +73,9 @@ func TestPOARemoval(t *testing.T) {
 
 	require.EqualValues(t, 0, helpers.GetPOAConsensusPower(t, ctx, chain, valToRemove))
 
-	// consensus needs to be len of initialValidators - 1
-	// TODO: validator is not being removed. Instead is stuck in unbonding (this is technically fine, but I don't like).
-	// - So signatures are still committed to the block but not really contributing
 	assertSignatures(t, ctx, chain, initialValidators-1)
 	require.Equal(t, initialValidators-1, len(consensus.Validators), "BFT consensus should have one less validator")
 	require.Equal(t, initialValidators-1, len(vals), "Validators should have one less validator")
-
-	// TODO: validate it is in unbonded status with 0 tokens
 }
 
 func getValToRemove(t *testing.T, vals helpers.Validators, delegationAmt int64) string {

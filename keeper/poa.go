@@ -151,7 +151,6 @@ func (k Keeper) AcceptNewValidator(ctx context.Context, operatingAddress string,
 		return err
 	}
 
-	// TODO: keep or remove since this is done in the endblocker now
 	if err := k.stakingKeeper.SetNewValidatorByPowerIndex(ctx, val); err != nil {
 		return err
 	}
