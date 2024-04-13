@@ -72,17 +72,18 @@ app.ModuleManager = module.NewManager(
 ...
 
 // Add PoA to BeginBlock logic
-// NOTE: This must be before the staking module begin blocker
+// NOTE: This must be after the staking module begin blocker
 app.ModuleManager.SetOrderBeginBlockers(
     ...
-    poa.ModuleName,
+    poa.ModuleName, // after staking module
     ...
 )
 
 // Add PoA to end blocker logic
+// NOTE: This must be before the staking module begin blocker
 app.ModuleManager.SetOrderEndBlockers(
     ...
-    poa.ModuleName,
+    poa.ModuleName, // before staking module
     ...
 )
 
