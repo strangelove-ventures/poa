@@ -329,7 +329,7 @@ func NewSimApp(
 		stakingtypes.NewMultiStakingHooks(
 			app.DistrKeeper.Hooks(),
 			app.SlashingKeeper.Hooks(),
-			app.POAKeeper.Hooks(),
+			app.POAKeeper.Hooks(), // must impl for jailing functionality
 		),
 	)
 
@@ -454,7 +454,7 @@ func NewSimApp(
 		distrtypes.ModuleName,
 		slashingtypes.ModuleName,
 		evidencetypes.ModuleName,
-		poa.ModuleName, // TODO: has to be first
+		poa.ModuleName, // before staking
 		stakingtypes.ModuleName,
 		genutiltypes.ModuleName,
 		authz.ModuleName,
@@ -462,7 +462,7 @@ func NewSimApp(
 	app.ModuleManager.SetOrderEndBlockers(
 		crisistypes.ModuleName,
 		govtypes.ModuleName,
-		poa.ModuleName, // TODO: pretty sure this has to go first so we can remove jailed before BlockValidatorUpdates
+		poa.ModuleName, // before staking
 		stakingtypes.ModuleName,
 		genutiltypes.ModuleName,
 		feegrant.ModuleName,

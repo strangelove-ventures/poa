@@ -11,13 +11,6 @@ import (
 )
 
 func (am AppModule) EndBlocker(ctx context.Context) error {
-	sk := am.keeper.GetStakingKeeper()
-
-	// Front running x/staking maturity ?
-	if err := sk.UnbondAllMatureValidators(ctx); err != nil {
-		return err
-	}
-
 	if err := am.handleBeforeJailedValidators(ctx); err != nil {
 		return err
 	}
