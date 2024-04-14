@@ -48,47 +48,14 @@ func (am AppModule) BeginBlocker(ctx context.Context) error {
 
 	if sdkCtx.BlockHeight() > 1 {
 		// non gentx messages reset the cached block powers for IBC validations.
-		if err := am.resetCachedTotalPower(ctx); err != nil {
+		if err := am.keeper.ResetCachedTotalPower(ctx); err != nil {
 			return err
 		}
 
-		if err := am.resetAbsoluteBlockPower(ctx); err != nil {
+		if err := am.keeper.ResetAbsoluteBlockPower(ctx); err != nil {
 			return err
 		}
 	}
 
 	return nil
-}
-
-// resetCachedTotalPower resets the block power index to the current total power.
-func (am AppModule) resetCachedTotalPower(ctx context.Context) error {
-	currValPower, err := am.keeper.GetStakingKeeper().GetLastTotalPower(ctx)
-	if err != nil {
-		return err
-	}
-
-	prev, err := am.keeper.GetCachedBlockPower(ctx)
-	if err != nil {
-		return err
-	}
-
-	if currValPower.Uint64() != prev {
-		return am.keeper.SetCachedBlockPower(ctx, currValPower.Uint64())
-	}
-
-	return nil
-}
-
-// resetAbsoluteBlockPower resets the absolute block power to 0 since updates per block have been executed upon.
-func (am AppModule) resetAbsoluteBlockPower(ctx context.Context) error {
-	var err error
-
-	val, err := am.keeper.GetAbsoluteChangedInBlockPower(ctx)
-	if err != nil {
-		return err
-	} else if val != 0 {
-		return am.keeper.SetAbsoluteChangedInBlockPower(ctx, 0)
-	}
-
-	return err
 }

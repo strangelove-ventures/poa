@@ -177,3 +177,36 @@ func (k Keeper) UpdateBondedPoolPower(ctx context.Context) error {
 
 	return nil
 }
+
+// ResetCachedTotalPower resets the block power index to the current total power.
+func (k Keeper) ResetCachedTotalPower(ctx context.Context) error {
+	currValPower, err := k.GetStakingKeeper().GetLastTotalPower(ctx)
+	if err != nil {
+		return err
+	}
+
+	prev, err := k.GetCachedBlockPower(ctx)
+	if err != nil {
+		return err
+	}
+
+	if currValPower.Uint64() != prev {
+		return k.SetCachedBlockPower(ctx, currValPower.Uint64())
+	}
+
+	return nil
+}
+
+// resetAbsoluteBlockPower resets the absolute block power to 0 since updates per block have been executed upon.
+func (k Keeper) ResetAbsoluteBlockPower(ctx context.Context) error {
+	var err error
+
+	val, err := k.GetAbsoluteChangedInBlockPower(ctx)
+	if err != nil {
+		return err
+	} else if val != 0 {
+		return k.SetAbsoluteChangedInBlockPower(ctx, 0)
+	}
+
+	return err
+}
