@@ -17,6 +17,9 @@ var (
 	// AbsoluteChangedInBlockPowerKey tracks the current blocks total power amount.
 	// If this becomes >30% of CachedPreviousBlockPowerKey, messages will fail to limit IBC issues.
 	AbsoluteChangedInBlockPowerKey = collections.NewPrefix(3)
+
+	// UpdatedValidatorsCacheKey tracks recently updated validators from SetPower.
+	UpdatedValidatorsCacheKey = collections.NewPrefix(4)
 )
 
 const (
