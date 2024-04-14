@@ -88,6 +88,8 @@ func (k Keeper) SetPOAPower(ctx context.Context, valOpBech32 string, newShares i
 			return stakingtypes.Validator{}, fmt.Errorf("issue getting consensus pubkey for %s", valOpBech32)
 		}
 
+		consAddr := sdk.GetConsAddress(pk)
+
 		height := sdk.UnwrapSDKContext(ctx).BlockHeight()
 
 		normalizedToken := k.stakingKeeper.TokensFromConsensusPower(ctx, currentPower)
@@ -95,8 +97,16 @@ func (k Keeper) SetPOAPower(ctx context.Context, valOpBech32 string, newShares i
 		if _, err := k.stakingKeeper.Slash(ctx, sdk.GetConsAddress(pk), height, normalizedToken.Int64(), sdkmath.LegacyOneDec()); err != nil {
 			return stakingtypes.Validator{}, err
 		}
-
-		// TODO: delete the validator power index, or staking will handle?
+		// TODO:
+		if err := k.stakingKeeper.DeleteLastValidatorPower(ctx, valAddr); err != nil {
+			return stakingtypes.Validator{}, err
+		}
+		if err := k.stakingKeeper.DeleteValidatorByPowerIndex(ctx, val); err != nil {
+			return stakingtypes.Validator{}, err
+		}
+		if err := k.slashKeeper.DeleteMissedBlockBitmap(ctx, consAddr); err != nil {
+			return stakingtypes.Validator{}, err
+		}
 
 	} else {
 		// Sets the new consensus power for the validator (this is executed in the x/staking ApplyAndReturnValidatorUpdates method)
