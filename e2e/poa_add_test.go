@@ -11,6 +11,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/strangelove-ventures/interchaintest/v8"
 	"github.com/strangelove-ventures/interchaintest/v8/chain/cosmos"
+	"github.com/strangelove-ventures/interchaintest/v8/testutil"
 	"github.com/strangelove-ventures/poa/e2e/helpers"
 	"github.com/stretchr/testify/require"
 )
@@ -81,8 +82,10 @@ func TestPOAAddValidator(t *testing.T) {
 	require.Equal(t, "0", pending[0].Tokens)
 	require.Equal(t, "1", pending[0].MinSelfDelegation)
 
+	opAddr := pending[0].OperatorAddress
+
 	// set power from Gov
-	txRes, err = helpers.POASetPower(t, ctx, chain, admin, pending[0].OperatorAddress, 1_000_000)
+	txRes, err = helpers.POASetPower(t, ctx, chain, admin, opAddr, 1_000_000)
 	require.NoError(t, err)
 	log.Debug().Msgf("Set pending's power: %v", txRes)
 
@@ -94,5 +97,11 @@ func TestPOAAddValidator(t *testing.T) {
 
 	assertSignatures(t, ctx, chain, 1) // They are not signing, should be 0
 	assertConsensus(t, ctx, chain, 2)  // ensure they were added to CometBFT
+
+	// validate that the ABCI events are not "stuck" (where the event is not cleared by POA or x/staking)
+	_, err = helpers.POASetPower(t, ctx, chain, admin, opAddr, 2_000_000)
+	require.NoError(t, err)
+
+	require.NoError(t, testutil.WaitForBlocks(ctx, 4, chain))
 
 }
