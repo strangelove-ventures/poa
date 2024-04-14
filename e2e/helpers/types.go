@@ -6,31 +6,33 @@ import (
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 )
 
+type Validators []struct {
+	OperatorAddress string `json:"operator_address"`
+	ConsensusPubkey struct {
+		Type  string `json:"type"`
+		Value string `json:"value"`
+	} `json:"consensus_pubkey"`
+	Status          int    `json:"status"`
+	Tokens          string `json:"tokens"`
+	DelegatorShares string `json:"delegator_shares"`
+	Description     struct {
+		Moniker string `json:"moniker"`
+	} `json:"description"`
+	UnbondingTime string `json:"unbonding_time"`
+	Commission    struct {
+		CommissionRates struct {
+			Rate          string `json:"rate"`
+			MaxRate       string `json:"max_rate"`
+			MaxChangeRate string `json:"max_change_rate"`
+		} `json:"commission_rates"`
+		UpdateTime string `json:"update_time"`
+	} `json:"commission"`
+	MinSelfDelegation string `json:"min_self_delegation"`
+}
+
 // From stakingtypes.Validator
 type Vals struct {
-	Validators []struct {
-		OperatorAddress string `json:"operator_address"`
-		ConsensusPubkey struct {
-			Type  string `json:"type"`
-			Value string `json:"value"`
-		} `json:"consensus_pubkey"`
-		Status          int    `json:"status"`
-		Tokens          string `json:"tokens"`
-		DelegatorShares string `json:"delegator_shares"`
-		Description     struct {
-			Moniker string `json:"moniker"`
-		} `json:"description"`
-		UnbondingTime string `json:"unbonding_time"`
-		Commission    struct {
-			CommissionRates struct {
-				Rate          string `json:"rate"`
-				MaxRate       string `json:"max_rate"`
-				MaxChangeRate string `json:"max_change_rate"`
-			} `json:"commission_rates"`
-			UpdateTime string `json:"update_time"`
-		} `json:"commission"`
-		MinSelfDelegation string `json:"min_self_delegation"`
-	} `json:"validators"`
+	Validators Validators `json:"validators"`
 	Pagination struct {
 		Total string `json:"total"`
 	} `json:"pagination"`
@@ -194,4 +196,19 @@ type POAPending struct {
 		} `json:"commission"`
 		MinSelfDelegation string `json:"min_self_delegation"`
 	} `json:"pending"`
+}
+
+type CometBFTConsensus struct {
+	BlockHeight string `json:"block_height"`
+	Validators  []struct {
+		Address string `json:"address"`
+		PubKey  struct {
+			Type  string `json:"type"`
+			Value string `json:"value"`
+		} `json:"pub_key"`
+		VotingPower string `json:"voting_power"`
+	} `json:"validators"`
+	Pagination struct {
+		Total string `json:"total"`
+	} `json:"pagination"`
 }

@@ -4,11 +4,18 @@ import (
 	"testing"
 	"time"
 
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+
 	"github.com/strangelove-ventures/interchaintest/v8"
 	"github.com/strangelove-ventures/interchaintest/v8/chain/cosmos"
 	"github.com/strangelove-ventures/interchaintest/v8/testutil"
 	"github.com/strangelove-ventures/poa/e2e/helpers"
 	"github.com/stretchr/testify/require"
+)
+
+const (
+	numNodes = 0
+	numVals  = 1
 )
 
 func TestPOAJailing(t *testing.T) {
@@ -21,7 +28,7 @@ func TestPOAJailing(t *testing.T) {
 	updatedSlashingCfg.ModifyGenesis = cosmos.ModifyGenesis(append(defaultGenesis, []cosmos.GenesisKV{
 		{
 			Key:   "app_state.slashing.params.signed_blocks_window",
-			Value: "2",
+			Value: "3",
 		},
 		{
 			Key:   "app_state.slashing.params.min_signed_per_window",
@@ -52,21 +59,22 @@ func TestPOAJailing(t *testing.T) {
 	validators := helpers.GetValidatorsOperatingAddresses(t, ctx, chain)
 	require.Equal(t, len(validators), chainVals)
 	assertSignatures(t, ctx, chain, len(validators))
+	assertConsensus(t, ctx, chain, len(validators))
 
 	// Stop validator 1 from signing
 	if err := chain.Validators[1].StopContainer(ctx); err != nil {
 		t.Fatal(err)
 	}
 
-	// Wait for the stopped node to be jailed.
-	require.NoError(t, testutil.WaitForBlocks(ctx, 3, chain.Validators[0]))
+	// Wait for the stopped node to be jailed & persist
+	require.NoError(t, testutil.WaitForBlocks(ctx, 5, chain.Validators[0]))
 
 	// Validate 1 validator is jailed (status 1)
 	vals := helpers.GetValidators(t, ctx, chain)
 	jailedValAddr := ""
 	require.True(t, func() bool {
 		for _, v := range vals.Validators {
-			if v.Status == 1 {
+			if v.Status == int(stakingtypes.Unbonded) || v.Status == int(stakingtypes.Unbonding) {
 				jailedValAddr = v.OperatorAddress
 				return true
 			}
