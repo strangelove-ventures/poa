@@ -2,11 +2,11 @@ package keeper
 
 import (
 	"context"
-	"fmt"
 
-	"cosmossdk.io/math"
 	"github.com/cosmos/cosmos-sdk/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+
+	"cosmossdk.io/math"
 )
 
 // Before a validator is jailed, we must delete it from the power index. else:
@@ -26,13 +26,13 @@ func (k Keeper) Hooks() Hooks {
 
 // BeforeValidatorModified implements types.StakingHooks.
 func (h Hooks) BeforeValidatorModified(ctx context.Context, valAddr types.ValAddress) error {
-	fmt.Println("BeforeValidatorModified", valAddr.String())
+	h.k.logger.Info("BeforeValidatorModified", "valAddr", valAddr.String())
 	return h.k.BeforeJailedValidators.Set(ctx, valAddr.String())
 }
 
 // BeforeValidatorSlashed implements types.StakingHooks.
 func (h Hooks) BeforeValidatorSlashed(ctx context.Context, valAddr types.ValAddress, fraction math.LegacyDec) error {
-	fmt.Println("BeforeValidatorSlashed", valAddr.String(), fraction.String())
+	h.k.logger.Info("BeforeValidatorSlashed", valAddr.String(), fraction.String())
 	return nil
 }
 

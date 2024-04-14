@@ -44,7 +44,7 @@ func (am AppModule) BeginBlocker(ctx context.Context) error {
 		if err != nil {
 			return err
 		}
-		fmt.Printf("UpdatedValidatorsCache: %s\n", valOperAddr)
+		am.keeper.Logger().Info("UpdatedValidatorsCache: %s\n", valOperAddr)
 
 		valAddr, err := sk.ValidatorAddressCodec().StringToBytes(valOperAddr)
 		if err != nil {
@@ -87,11 +87,12 @@ func (am AppModule) BeginBlocker(ctx context.Context) error {
 		return nil
 	}
 
-	fmt.Println("\nBeginBlocker events:")
+	// TODO: Error here so it's easy to see (remove later)
+	am.keeper.Logger().Error("BeginBlocker events:\n")
 	for _, e := range events {
-		fmt.Printf(" %s: %d\n", &e.PubKey, e.Power)
+		am.keeper.Logger().Error(fmt.Sprintf("PubKey: %s, Power: %d", &e.PubKey, e.Power))
 	}
-	fmt.Println()
+	am.keeper.Logger().Info("\n")
 
 	return nil
 }
@@ -111,7 +112,7 @@ func (am AppModule) handleBeforeJailedValidators(ctx context.Context) error {
 		if err != nil {
 			return err
 		}
-		fmt.Printf("EndBlocker BeforeJailedValidators: %s\n", valOperAddr)
+		am.keeper.Logger().Info("EndBlocker BeforeJailedValidators", valOperAddr, "\n")
 
 		valAddr, err := sk.ValidatorAddressCodec().StringToBytes(valOperAddr)
 		if err != nil {
