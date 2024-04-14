@@ -2,10 +2,10 @@ package module
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/cosmos/cosmos-sdk/telemetry"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
 	"github.com/strangelove-ventures/poa"
 )
@@ -16,33 +16,44 @@ func (am AppModule) BeginBlocker(ctx context.Context) error {
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
 	defer telemetry.ModuleMeasureSince(poa.ModuleName, sdkCtx.BlockTime(), telemetry.MetricKeyBeginBlocker)
 
-	vals, err := am.keeper.GetStakingKeeper().GetAllValidators(ctx)
+	// iterate through any UpdatedValidatorsCache
+	iterator, err := am.keeper.UpdatedValidatorsCache.Iterate(ctx, nil)
 	if err != nil {
 		return err
 	}
+	defer iterator.Close()
 
-	for _, v := range vals {
-		switch v.GetStatus() {
-		case stakingtypes.Unbonding:
-			// if the validator is unbonding, force it to be unbonded. (H+1)
-			v.Status = stakingtypes.Unbonded
-			if err := am.keeper.GetStakingKeeper().SetValidator(ctx, v); err != nil {
-				return err
-			}
+	for ; iterator.Valid(); iterator.Next() {
+		valOperAddr, err := iterator.Key()
+		if err != nil {
+			return err
+		}
+		fmt.Printf("UpdatedValidatorsCache: %s\n", valOperAddr)
 
-		case stakingtypes.Unbonded:
-			// if the validator is unbonded (above case), delete the last validator power. (H+2)
-			valAddr, err := sdk.ValAddressFromBech32(v.OperatorAddress)
-			if err != nil {
-				return err
-			}
+		sk := am.keeper.GetStakingKeeper()
 
-			if err := am.keeper.GetStakingKeeper().DeleteLastValidatorPower(ctx, valAddr); err != nil {
-				return err
-			}
+		valAddr, err := sk.ValidatorAddressCodec().StringToBytes(valOperAddr)
+		if err != nil {
+			return err
+		}
 
-		case stakingtypes.Unspecified, stakingtypes.Bonded:
-			continue
+		val, err := sk.GetValidator(ctx, valAddr)
+		if err != nil {
+			return err
+		}
+
+		// TODO: needed?
+		// if err := k.stakingKeeper.DeleteLastValidatorPower(ctx, valAddr); err != nil {
+		// 	return stakingtypes.Validator{}, err
+		// }
+
+		// Remove it from persisting across many blocks
+		if err := sk.DeleteValidatorByPowerIndex(ctx, val); err != nil {
+			return err
+		}
+
+		if err := am.keeper.UpdatedValidatorsCache.Remove(ctx, valOperAddr); err != nil {
+			return err
 		}
 	}
 
@@ -56,6 +67,21 @@ func (am AppModule) BeginBlocker(ctx context.Context) error {
 			return err
 		}
 	}
+
+	// get events
+	events, err := am.keeper.GetStakingKeeper().GetValidatorUpdates(ctx)
+	if err != nil {
+		return err
+	}
+	if len(events) == 0 {
+		return nil
+	}
+
+	fmt.Println("\nBeginBlocker events:")
+	for _, e := range events {
+		fmt.Printf(" %s: %d\n", &e.PubKey, e.Power)
+	}
+	fmt.Println()
 
 	return nil
 }
