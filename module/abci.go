@@ -5,7 +5,6 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/telemetry"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
 	"github.com/strangelove-ventures/poa"
 )
@@ -21,10 +20,10 @@ func (am AppModule) BeginBlocker(ctx context.Context) error {
 		return nil
 	}
 
-	valUpdates, err := am.keeper.GetStakingKeeper().GetValidatorUpdates(ctx)
-	if err != nil {
-		return err
-	}
+	// valUpdates, err := am.keeper.GetStakingKeeper().GetValidatorUpdates(ctx)
+	// if err != nil {
+	// 	return err
+	// }
 
 	// if len(valUpdates) != 0 {
 	vals, err := am.keeper.GetStakingKeeper().GetAllValidators(ctx)
@@ -46,10 +45,12 @@ func (am AppModule) BeginBlocker(ctx context.Context) error {
 				return err
 			}
 			// TODO: empty set issues on jail
-		} else if val.Status == stakingtypes.Bonded && len(valUpdates) > 0 {
-			if err := am.keeper.GetStakingKeeper().DeleteValidatorByPowerIndex(ctx, val); err != nil {
-				return err
-			}
+			// } else if val.Status == stakingtypes.Bonded && len(valUpdates) > 0 {
+			// if err := am.keeper.GetStakingKeeper().DeleteValidatorByPowerIndex(ctx, val); err != nil {
+			// 	return err
+			// }
+
+			// set it back to bonded
 		}
 		// }
 
