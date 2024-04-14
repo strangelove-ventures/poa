@@ -1,12 +1,15 @@
 package e2e
 
 import (
+	"context"
 	"fmt"
 	"testing"
 
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
+
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
 	"github.com/strangelove-ventures/interchaintest/v8"
 	"github.com/strangelove-ventures/interchaintest/v8/chain/cosmos"
@@ -75,7 +78,7 @@ func TestPOARemoval(t *testing.T) {
 
 	assertSignatures(t, ctx, chain, initialValidators-1)
 	require.Equal(t, initialValidators-1, len(consensus.Validators), "BFT consensus should have one less validator")
-	require.Equal(t, initialValidators-1, len(vals), "Validators should have one less validator")
+	require.Equal(t, initialValidators-1, getBondedValidators(t, ctx, chain), "Bonded validators should have one less active validator")
 }
 
 func getValToRemove(t *testing.T, vals helpers.Validators, delegationAmt int64) string {
@@ -89,4 +92,17 @@ func getValToRemove(t *testing.T, vals helpers.Validators, delegationAmt int64) 
 	require.NotEmpty(t, valToRemove)
 
 	return valToRemove
+}
+
+func getBondedValidators(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain) int {
+	vals := helpers.GetValidators(t, ctx, chain).Validators
+
+	bonded := 0
+	for _, v := range vals {
+		if v.Status == int(stakingtypes.Bonded) {
+			bonded++
+		}
+	}
+
+	return bonded
 }

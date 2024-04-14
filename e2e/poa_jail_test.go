@@ -1,6 +1,7 @@
 package e2e
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -28,7 +29,7 @@ func TestPOAJailing(t *testing.T) {
 	updatedSlashingCfg.ModifyGenesis = cosmos.ModifyGenesis(append(defaultGenesis, []cosmos.GenesisKV{
 		{
 			Key:   "app_state.slashing.params.signed_blocks_window",
-			Value: "3",
+			Value: "10",
 		},
 		{
 			Key:   "app_state.slashing.params.min_signed_per_window",
@@ -67,7 +68,8 @@ func TestPOAJailing(t *testing.T) {
 	}
 
 	// Wait for the stopped node to be jailed & persist
-	require.NoError(t, testutil.WaitForBlocks(ctx, 5, chain.Validators[0]))
+	t.Log("Waiting for validator to become jailed")
+	require.NoError(t, testutil.WaitForBlocks(ctx, 15, chain.Validators[0]))
 
 	// Validate 1 validator is jailed (status 1)
 	vals := helpers.GetValidators(t, ctx, chain)
@@ -75,6 +77,7 @@ func TestPOAJailing(t *testing.T) {
 	require.True(t, func() bool {
 		for _, v := range vals.Validators {
 			if v.Status == int(stakingtypes.Unbonded) || v.Status == int(stakingtypes.Unbonding) {
+				fmt.Println("Validator", v.OperatorAddress, "is jailed", v.Status)
 				jailedValAddr = v.OperatorAddress
 				return true
 			}
@@ -94,4 +97,8 @@ func TestPOAJailing(t *testing.T) {
 			require.True(t, unjailTime.After(now))
 		}
 	}
+
+	// wait to ensure the chain is not halted
+	t.Log("Waiting for chain to progress")
+	require.NoError(t, testutil.WaitForBlocks(ctx, 5, chain))
 }

@@ -3,7 +3,7 @@
 # Example:
 : '
 cd simapp
-BINARY="poad" CHAIN_ID="poa-1" HOME_DIR="$HOME/.poad" TIMEOUT_COMMIT="2500ms" CLEAN=true sh test_node.sh
+BINARY="poad" CHAIN_ID="poa-1" HOME_DIR="$HOME/.poad" TIMEOUT_COMMIT="1200ms" CLEAN=true sh test_node.sh
 
 FLAGS="--keyring-backend=test --chain-id=poa-1 --home="$HOME/.poad" --yes"
 
@@ -118,6 +118,11 @@ from_scratch () {
   # staking
   update_test_genesis '.app_state["staking"]["params"]["bond_denom"]="stake"'
   update_test_genesis '.app_state["staking"]["params"]["min_commission_rate"]="0.050000000000000000"'
+  # slashing
+  update_test_genesis '.app_state["slashing"]["params"]["signed_blocks_window"]="10"'
+  update_test_genesis '.app_state["slashing"]["params"]["min_signed_per_window"]="1.000000000000000000"'
+  update_test_genesis '.app_state["slashing"]["params"]["slash_fraction_double_sign"]="0.000000000000000000"' # no need to slash, no stake
+  update_test_genesis '.app_state["slashing"]["params"]["slash_fraction_downtime"]="0.000000000000000000"'
   # mint
   update_test_genesis '.app_state["mint"]["params"]["mint_denom"]="stake"'
   # crisis
