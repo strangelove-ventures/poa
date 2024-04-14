@@ -68,6 +68,7 @@ func TestPOAJailing(t *testing.T) {
 	}
 
 	// Wait for the stopped node to be jailed & persist
+	t.Log("Waiting for validator to become jailed")
 	require.NoError(t, testutil.WaitForBlocks(ctx, 15, chain.Validators[0]))
 
 	// Validate 1 validator is jailed (status 1)
@@ -97,6 +98,7 @@ func TestPOAJailing(t *testing.T) {
 		}
 	}
 
-	// wait for 2 blocks
-	require.NoError(t, testutil.WaitForBlocks(ctx, 2, chain))
+	// wait to ensure the chain is not halted
+	t.Log("Waiting for chain to progress")
+	require.NoError(t, testutil.WaitForBlocks(ctx, 5, chain))
 }
