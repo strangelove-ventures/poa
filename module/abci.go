@@ -78,7 +78,7 @@ func (am AppModule) BeginBlocker(ctx context.Context) error {
 		}
 	}
 
-	// get events
+	// Event Debugging
 	events, err := am.keeper.GetStakingKeeper().GetValidatorUpdates(ctx)
 	if err != nil {
 		return err
@@ -87,11 +87,10 @@ func (am AppModule) BeginBlocker(ctx context.Context) error {
 		return nil
 	}
 
-	// TODO: Error here so it's easy to see (remove later)
-	am.keeper.Logger().Error("BeginBlocker events:\n")
+	am.keeper.Logger().Info("BeginBlocker events:\n")
 	for _, e := range events {
 		e := e
-		am.keeper.Logger().Error(fmt.Sprintf("PubKey: %s, Power: %d", &e.PubKey, e.Power))
+		am.keeper.Logger().Info(fmt.Sprintf("PubKey: %s, Power: %d", &e.PubKey, e.Power))
 	}
 	am.keeper.Logger().Info("\n")
 

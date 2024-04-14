@@ -329,7 +329,7 @@ func NewSimApp(
 		stakingtypes.NewMultiStakingHooks(
 			app.DistrKeeper.Hooks(),
 			app.SlashingKeeper.Hooks(),
-			app.POAKeeper.Hooks(), // TODO: Document / add to spawn
+			app.POAKeeper.Hooks(),
 		),
 	)
 
