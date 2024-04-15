@@ -91,10 +91,10 @@ func (am AppModule) BeginBlocker(ctx context.Context) error {
 }
 
 func (am AppModule) handleBeforeJailedValidators(ctx context.Context) error {
-	sdkCtx := sdk.UnwrapSDKContext(ctx)
 	sk := am.keeper.GetStakingKeeper()
-
+	sdkCtx := sdk.UnwrapSDKContext(ctx)
 	curHeight := sdkCtx.BlockHeight()
+	logger := am.keeper.Logger()
 
 	iterator, err := am.keeper.CheckForJailedValidators.Iterate(ctx, nil)
 	if err != nil {
@@ -114,7 +114,8 @@ func (am AppModule) handleBeforeJailedValidators(ctx context.Context) error {
 			return err
 		}
 
-		am.keeper.Logger().Info("EndBlocker BeforeJailedValidators", valOperAddr, height, "\n")
+		// .Error for viewability
+		logger.Error("EndBlocker BeforeJailedValidators", "opperator", valOperAddr, "height", height)
 
 		valAddr, err := sk.ValidatorAddressCodec().StringToBytes(valOperAddr)
 		if err != nil {
@@ -131,17 +132,25 @@ func (am AppModule) handleBeforeJailedValidators(ctx context.Context) error {
 		// We only want to perform height logic after jailing stuff has persisted. So we attempt in future blocks.
 		// TODO: use x/evidence or slashing instead to pull if the validator is really jailed?
 		if height == curHeight {
-			fmt.Printf("height: %d, blockHeight: %d\n", height, curHeight)
+			logger.Error("handleBeforeJailedValidators deleting jailed validator", "height", height, "blockHeight", curHeight)
 
-			if err := sk.DeleteLastValidatorPower(ctx, valAddr); err != nil {
+			val.Jailed = false
+			if err := sk.SetValidator(ctx, val); err != nil {
 				return err
 			}
+
 			if err := sk.DeleteValidatorByPowerIndex(ctx, val); err != nil {
 				return err
 			}
 
 		} else if height+5 == curHeight {
-			// we wait 2 blocks so that the delete last val power has cleared through x/staking
+			// Why is staking / slashing not handling this for us anyways?
+			logger.Error("handleBeforeJailedValidators setting val to jailed", "height", height, "blockHeight", curHeight)
+
+			if err := sk.DeleteLastValidatorPower(ctx, valAddr); err != nil {
+				return err
+			}
+
 			val.Jailed = true
 			if err := sk.SetValidator(ctx, val); err != nil {
 				return err
