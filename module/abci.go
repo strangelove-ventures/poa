@@ -91,9 +91,12 @@ func (am AppModule) BeginBlocker(ctx context.Context) error {
 }
 
 func (am AppModule) handleBeforeJailedValidators(ctx context.Context) error {
+	sdkCtx := sdk.UnwrapSDKContext(ctx)
 	sk := am.keeper.GetStakingKeeper()
 
-	iterator, err := am.keeper.BeforeJailedValidators.Iterate(ctx, nil)
+	curHeight := sdkCtx.BlockHeight()
+
+	iterator, err := am.keeper.CheckForJailedValidators.Iterate(ctx, nil)
 	if err != nil {
 		return err
 	}
@@ -105,7 +108,13 @@ func (am AppModule) handleBeforeJailedValidators(ctx context.Context) error {
 		if err != nil {
 			return err
 		}
-		am.keeper.Logger().Info("EndBlocker BeforeJailedValidators", valOperAddr, "\n")
+
+		height, err := iterator.Value()
+		if err != nil {
+			return err
+		}
+
+		am.keeper.Logger().Info("EndBlocker BeforeJailedValidators", valOperAddr, height, "\n")
 
 		valAddr, err := sk.ValidatorAddressCodec().StringToBytes(valOperAddr)
 		if err != nil {
@@ -117,27 +126,29 @@ func (am AppModule) handleBeforeJailedValidators(ctx context.Context) error {
 			return err
 		}
 
-		if err := sk.DeleteValidatorByPowerIndex(ctx, val); err != nil {
-			return err
+		// !GOAL: Jail a validator properly without `CONSENSUS FAILURE!!! err="should never retrieve a jailed validator from the power store"`  (x/staking/keeper/val_state_change.go) being triggered
+
+		// We only want to perform height logic after jailing stuff has persisted. So we attempt in future blocks.
+		// TODO: use x/evidence or slashing instead to pull if the validator is really jailed?
+		if height == curHeight {
+			fmt.Printf("height: %d, blockHeight: %d\n", height, curHeight)
+
+			if err := sk.DeleteLastValidatorPower(ctx, valAddr); err != nil {
+				return err
+			}
+			if err := sk.DeleteValidatorByPowerIndex(ctx, val); err != nil {
+				return err
+			}
+
+		} else if height+5 == curHeight {
+			// we wait 2 blocks so that the delete last val power has cleared through x/staking
+			val.Jailed = true
+			if err := sk.SetValidator(ctx, val); err != nil {
+				return err
+			}
+			// issue: still does not like - CONSENSUS FAILURE!!! err="should never retrieve a jailed validator from the power store"
 		}
 
-		// TODO: If this is used here, it persist ABCI Updates. When removes, it looks like the validator gets slashed every block in x/staking? (when we do the hack and force set jailed = false)
-		// if err := sk.DeleteLastValidatorPower(ctx, valAddr); err != nil {
-		// 	return err
-		// }
-
-		// !IMPORTANT HACK: Set validator from jailed to not jailed to see what happens
-		// Okay so this like kind of worked for a split second
-		// Issue: the validator keeps trying to be converted to a jailed validator every single block when x/staking is calling it
-		val.Jailed = false
-		if err := sk.SetValidator(ctx, val); err != nil {
-			return err
-		}
-
-		// remove it from persisting
-		if err := am.keeper.BeforeJailedValidators.Remove(ctx, valOperAddr); err != nil {
-			return err
-		}
 	}
 
 	return nil
