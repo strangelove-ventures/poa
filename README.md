@@ -2,6 +2,10 @@
 
 The Proof of Authority (PoA) module allows for permissioned networks to be controlled by a predefined set of validators to verify transactions. This implementation extends the Cosmos-SDK's x/staking module to a set of administrators over the chain. These administrators gate keep the chain by whitelisting validators, updating consensus power, and removing validators from the network.
 
+## Security
+
+Our security policy can be found in the [SECURITY.md](./SECURITY.md) file.
+
 ## Integration
 
 Since this module depends on x/staking, carefully read through the [Integration Guide](./INTEGRATION.md) to add it to your network. This design choice was made to allow for the PoA module to have backwards compatibility with:
