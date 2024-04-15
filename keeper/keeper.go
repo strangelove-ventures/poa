@@ -30,9 +30,11 @@ type Keeper struct {
 	logger log.Logger
 
 	// state management
-	Schema            collections.Schema
-	Params            collections.Item[poa.Params]
-	PendingValidators collections.Item[poa.Validators]
+	Schema                 collections.Schema
+	Params                 collections.Item[poa.Params]
+	PendingValidators      collections.Item[poa.Validators]
+	UpdatedValidatorsCache collections.KeySet[string]
+	BeforeJailedValidators collections.KeySet[string]
 
 	CachedBlockPower            collections.Item[poa.PowerCache]
 	AbsoluteChangedInBlockPower collections.Item[poa.PowerCache]
@@ -59,8 +61,10 @@ func NewKeeper(
 		logger:        logger,
 
 		// Stores
-		Params:            collections.NewItem(sb, poa.ParamsKey, "params", codec.CollValue[poa.Params](cdc)),
-		PendingValidators: collections.NewItem(sb, poa.PendingValidatorsKey, "pending", codec.CollValue[poa.Validators](cdc)),
+		Params:                 collections.NewItem(sb, poa.ParamsKey, "params", codec.CollValue[poa.Params](cdc)),
+		PendingValidators:      collections.NewItem(sb, poa.PendingValidatorsKey, "pending", codec.CollValue[poa.Validators](cdc)),
+		UpdatedValidatorsCache: collections.NewKeySet(sb, poa.UpdatedValidatorsCacheKey, "updated_validators", collections.StringKey),
+		BeforeJailedValidators: collections.NewKeySet(sb, poa.BeforeJailedValidatorsKey, "before_jailed", collections.StringKey),
 
 		CachedBlockPower:            collections.NewItem(sb, poa.CachedPreviousBlockPowerKey, "cached_block", codec.CollValue[poa.PowerCache](cdc)),
 		AbsoluteChangedInBlockPower: collections.NewItem(sb, poa.AbsoluteChangedInBlockPowerKey, "absolute_changed_power", codec.CollValue[poa.PowerCache](cdc)),
@@ -176,4 +180,37 @@ func (k Keeper) UpdateBondedPoolPower(ctx context.Context) error {
 	// they are slashed 100% (since it is PoA this is fine) which decreases the BondedPool balance, and leave NotBonded at 0.
 
 	return nil
+}
+
+// ResetCachedTotalPower resets the block power index to the current total power.
+func (k Keeper) ResetCachedTotalPower(ctx context.Context) error {
+	currValPower, err := k.GetStakingKeeper().GetLastTotalPower(ctx)
+	if err != nil {
+		return err
+	}
+
+	prev, err := k.GetCachedBlockPower(ctx)
+	if err != nil {
+		return err
+	}
+
+	if currValPower.Uint64() != prev {
+		return k.SetCachedBlockPower(ctx, currValPower.Uint64())
+	}
+
+	return nil
+}
+
+// resetAbsoluteBlockPower resets the absolute block power to 0 since updates per block have been executed upon.
+func (k Keeper) ResetAbsoluteBlockPower(ctx context.Context) error {
+	var err error
+
+	val, err := k.GetAbsoluteChangedInBlockPower(ctx)
+	if err != nil {
+		return err
+	} else if val != 0 {
+		return k.SetAbsoluteChangedInBlockPower(ctx, 0)
+	}
+
+	return err
 }

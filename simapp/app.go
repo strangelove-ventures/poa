@@ -326,7 +326,11 @@ func NewSimApp(
 	// register the staking hooks
 	// NOTE: stakingKeeper above is passed by reference, so that it will contain these hooks
 	app.StakingKeeper.SetHooks(
-		stakingtypes.NewMultiStakingHooks(app.DistrKeeper.Hooks(), app.SlashingKeeper.Hooks()),
+		stakingtypes.NewMultiStakingHooks(
+			app.DistrKeeper.Hooks(),
+			app.SlashingKeeper.Hooks(),
+			app.POAKeeper.Hooks(), // must impl for jailing functionality
+		),
 	)
 
 	app.CircuitKeeper = circuitkeeper.NewKeeper(appCodec, runtime.NewKVStoreService(keys[circuittypes.StoreKey]), govModAddress, app.AccountKeeper.AddressCodec())
@@ -450,16 +454,16 @@ func NewSimApp(
 		distrtypes.ModuleName,
 		slashingtypes.ModuleName,
 		evidencetypes.ModuleName,
+		poa.ModuleName, // before staking
 		stakingtypes.ModuleName,
-		poa.ModuleName,
 		genutiltypes.ModuleName,
 		authz.ModuleName,
 	)
 	app.ModuleManager.SetOrderEndBlockers(
 		crisistypes.ModuleName,
 		govtypes.ModuleName,
+		poa.ModuleName, // before staking
 		stakingtypes.ModuleName,
-		poa.ModuleName,
 		genutiltypes.ModuleName,
 		feegrant.ModuleName,
 		group.ModuleName,

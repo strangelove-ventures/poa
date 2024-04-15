@@ -72,12 +72,23 @@ func (k Keeper) SetPOAPower(ctx context.Context, valOpBech32 string, newShares i
 		return stakingtypes.Validator{}, err
 	}
 
+	// no need to process anything, same values
+	if newBFTConsensusPower == currentPower {
+		return val, fmt.Errorf("current power (%d) is the same as the new power (%d) for %s", currentPower, newBFTConsensusPower, valOpBech32)
+	}
+
+	// When we SetValidatorByPowerIndex, the Tokens are used to get the shares of power for CometBFT consensus (voting_power).
+	// We don't `k.stakingKeeper.SetValidator` since we only use this for CometBFT consensus power.
+	val.Tokens = sdkmath.NewIntFromUint64(uint64(newShares))
+
 	// slash all the validator's tokens (100%)
 	if newShares == 0 && currentPower > 0 {
 		pk, ok := val.ConsensusPubkey.GetCachedValue().(cryptotypes.PubKey)
 		if !ok {
 			return stakingtypes.Validator{}, fmt.Errorf("issue getting consensus pubkey for %s", valOpBech32)
 		}
+
+		consAddr := sdk.GetConsAddress(pk)
 
 		height := sdk.UnwrapSDKContext(ctx).BlockHeight()
 
@@ -86,11 +97,31 @@ func (k Keeper) SetPOAPower(ctx context.Context, valOpBech32 string, newShares i
 		if _, err := k.stakingKeeper.Slash(ctx, sdk.GetConsAddress(pk), height, normalizedToken.Int64(), sdkmath.LegacyOneDec()); err != nil {
 			return stakingtypes.Validator{}, err
 		}
-	}
+		// TODO:
+		if err := k.stakingKeeper.DeleteLastValidatorPower(ctx, valAddr); err != nil {
+			return stakingtypes.Validator{}, err
+		}
+		if err := k.stakingKeeper.DeleteValidatorByPowerIndex(ctx, val); err != nil {
+			return stakingtypes.Validator{}, err
+		}
+		if err := k.slashKeeper.DeleteMissedBlockBitmap(ctx, consAddr); err != nil {
+			return stakingtypes.Validator{}, err
+		}
+	} else {
+		// Sets the new consensus power for the validator (this is executed in the x/staking ApplyAndReturnValidatorUpdates method)
+		if err := k.GetStakingKeeper().SetLastValidatorPower(ctx, valAddr, newBFTConsensusPower); err != nil {
+			return stakingtypes.Validator{}, err
+		}
+		if err := k.GetStakingKeeper().SetValidatorByPowerIndex(ctx, val); err != nil {
+			return stakingtypes.Validator{}, err
+		}
 
-	// Sets the new consensus power for the validator (this is executed in the x/staking ApplyAndReturnValidatorUpdates method)
-	if err := k.stakingKeeper.SetLastValidatorPower(ctx, valAddr, newBFTConsensusPower); err != nil {
-		return stakingtypes.Validator{}, err
+		// A cache to handle updated validators power. Once set, the next begin block will remove it from the cache.
+		// This allows us to Delete the validator index on the staking side, and ensures power updates do not persist over many blocks.
+		// This multi block persistence would break ABCI updates via x/staking if the validator's power is updated again, or removed.
+		if err := k.UpdatedValidatorsCache.Set(ctx, val.OperatorAddress); err != nil {
+			return stakingtypes.Validator{}, err
+		}
 	}
 
 	absPowerDiff := uint64(math.Abs(float64(newBFTConsensusPower - currentPower)))
@@ -126,6 +157,10 @@ func (k Keeper) AcceptNewValidator(ctx context.Context, operatingAddress string,
 
 	// setup the validator into the state and base power
 	if err := k.setValidatorInternals(ctx, val); err != nil {
+		return err
+	}
+
+	if err := k.stakingKeeper.SetNewValidatorByPowerIndex(ctx, val); err != nil {
 		return err
 	}
 
@@ -169,10 +204,6 @@ func (k Keeper) setValidatorInternals(ctx context.Context, val stakingtypes.Vali
 	}
 
 	if err := k.stakingKeeper.SetValidatorByConsAddr(ctx, val); err != nil {
-		return err
-	}
-
-	if err := k.stakingKeeper.SetNewValidatorByPowerIndex(ctx, val); err != nil {
 		return err
 	}
 

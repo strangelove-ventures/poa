@@ -2,13 +2,21 @@ package module
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/cosmos/cosmos-sdk/telemetry"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
 	"github.com/strangelove-ventures/poa"
 )
+
+func (am AppModule) EndBlocker(ctx context.Context) error {
+	if err := am.handleBeforeJailedValidators(ctx); err != nil {
+		return err
+	}
+
+	return nil
+}
 
 // BeginBlocker updates the validator set without applying updates.
 // Since this module depends on staking, that module will `ApplyAndReturnValidatorSetUpdates` from x/staking.
@@ -16,79 +24,121 @@ func (am AppModule) BeginBlocker(ctx context.Context) error {
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
 	defer telemetry.ModuleMeasureSince(poa.ModuleName, sdkCtx.BlockTime(), telemetry.MetricKeyBeginBlocker)
 
-	vals, err := am.keeper.GetStakingKeeper().GetAllValidators(ctx)
+	iterator, err := am.keeper.UpdatedValidatorsCache.Iterate(ctx, nil)
 	if err != nil {
 		return err
 	}
+	defer iterator.Close()
 
-	for _, v := range vals {
-		switch v.GetStatus() {
-		case stakingtypes.Unbonding:
-			// if the validator is unbonding, force it to be unbonded. (H+1)
-			v.Status = stakingtypes.Unbonded
-			if err := am.keeper.GetStakingKeeper().SetValidator(ctx, v); err != nil {
-				return err
-			}
+	sk := am.keeper.GetStakingKeeper()
 
-		case stakingtypes.Unbonded:
-			// if the validator is unbonded (above case), delete the last validator power. (H+2)
-			valAddr, err := sdk.ValAddressFromBech32(v.OperatorAddress)
-			if err != nil {
-				return err
-			}
+	for ; iterator.Valid(); iterator.Next() {
+		valOperAddr, err := iterator.Key()
+		if err != nil {
+			return err
+		}
+		am.keeper.Logger().Info("UpdatedValidatorsCache: %s\n", valOperAddr)
 
-			if err := am.keeper.GetStakingKeeper().DeleteLastValidatorPower(ctx, valAddr); err != nil {
-				return err
-			}
+		valAddr, err := sk.ValidatorAddressCodec().StringToBytes(valOperAddr)
+		if err != nil {
+			return err
+		}
 
-		case stakingtypes.Unspecified, stakingtypes.Bonded:
-			continue
+		val, err := sk.GetValidator(ctx, valAddr)
+		if err != nil {
+			return err
+		}
+
+		// Remove it from persisting across many blocks
+		if err := sk.DeleteValidatorByPowerIndex(ctx, val); err != nil {
+			return err
+		}
+
+		if err := am.keeper.UpdatedValidatorsCache.Remove(ctx, valOperAddr); err != nil {
+			return err
 		}
 	}
 
+	// reset caches
 	if sdkCtx.BlockHeight() > 1 {
 		// non gentx messages reset the cached block powers for IBC validations.
-		if err := am.resetCachedTotalPower(ctx); err != nil {
+		if err := am.keeper.ResetCachedTotalPower(ctx); err != nil {
 			return err
 		}
 
-		if err := am.resetAbsoluteBlockPower(ctx); err != nil {
+		if err := am.keeper.ResetAbsoluteBlockPower(ctx); err != nil {
+			return err
+		}
+	}
+
+	// Event Debugging
+	events, err := am.keeper.GetStakingKeeper().GetValidatorUpdates(ctx)
+	if err != nil {
+		return err
+	}
+	if len(events) == 0 {
+		return nil
+	}
+
+	am.keeper.Logger().Info("BeginBlocker events:\n")
+	for _, e := range events {
+		e := e
+		am.keeper.Logger().Info(fmt.Sprintf("PubKey: %s, Power: %d", &e.PubKey, e.Power))
+	}
+	am.keeper.Logger().Info("\n")
+
+	return nil
+}
+
+func (am AppModule) handleBeforeJailedValidators(ctx context.Context) error {
+	sk := am.keeper.GetStakingKeeper()
+
+	iterator, err := am.keeper.BeforeJailedValidators.Iterate(ctx, nil)
+	if err != nil {
+		return err
+	}
+	defer iterator.Close()
+
+	// Why? we don't want it in the store w/ the val state change in x/staking
+	for ; iterator.Valid(); iterator.Next() {
+		valOperAddr, err := iterator.Key()
+		if err != nil {
+			return err
+		}
+		am.keeper.Logger().Info("EndBlocker BeforeJailedValidators", valOperAddr, "\n")
+
+		valAddr, err := sk.ValidatorAddressCodec().StringToBytes(valOperAddr)
+		if err != nil {
+			return err
+		}
+
+		val, err := sk.GetValidator(ctx, valAddr)
+		if err != nil {
+			return err
+		}
+
+		if err := sk.DeleteValidatorByPowerIndex(ctx, val); err != nil {
+			return err
+		}
+
+		// TODO: If this is used here, it persist ABCI Updates. When removes, it looks like the validator gets slashed every block in x/staking? (when we do the hack and force set jailed = false)
+		// if err := sk.DeleteLastValidatorPower(ctx, valAddr); err != nil {
+		// 	return err
+		// }
+
+		// !IMPORTANT HACK: Set validator from jailed to not jailed to see what happens
+		// Okay so this like kind of worked for a split second
+		// Issue: the validator keeps trying to be converted to a jailed validator every single block when x/staking is calling it
+		val.Jailed = false
+		if err := sk.SetValidator(ctx, val); err != nil {
+			return err
+		}
+
+		// remove it from persisting
+		if err := am.keeper.BeforeJailedValidators.Remove(ctx, valOperAddr); err != nil {
 			return err
 		}
 	}
 
 	return nil
-}
-
-// resetCachedTotalPower resets the block power index to the current total power.
-func (am AppModule) resetCachedTotalPower(ctx context.Context) error {
-	currValPower, err := am.keeper.GetStakingKeeper().GetLastTotalPower(ctx)
-	if err != nil {
-		return err
-	}
-
-	prev, err := am.keeper.GetCachedBlockPower(ctx)
-	if err != nil {
-		return err
-	}
-
-	if currValPower.Uint64() != prev {
-		return am.keeper.SetCachedBlockPower(ctx, currValPower.Uint64())
-	}
-
-	return nil
-}
-
-// resetAbsoluteBlockPower resets the absolute block power to 0 since updates per block have been executed upon.
-func (am AppModule) resetAbsoluteBlockPower(ctx context.Context) error {
-	var err error
-
-	val, err := am.keeper.GetAbsoluteChangedInBlockPower(ctx)
-	if err != nil {
-		return err
-	} else if val != 0 {
-		return am.keeper.SetAbsoluteChangedInBlockPower(ctx, 0)
-	}
-
-	return err
 }
