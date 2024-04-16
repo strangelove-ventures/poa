@@ -26,10 +26,18 @@ func (k Keeper) Hooks() Hooks {
 // BeforeValidatorModified implements sdk.StakingHooks.
 func (h Hooks) BeforeValidatorModified(ctx context.Context, valAddr sdk.ValAddress) error {
 	h.k.logger.Info("BeforeValidatorModified", "valAddr", valAddr.String())
-
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
+
+	// ignore setting a new value if we already have in the cache
+	// Could also do a jail check here but that is redundant imo
+	if ok, err := h.k.CheckForJailedValidators.Has(ctx, valAddr.String()); err != nil {
+		return err
+	} else if ok {
+		return nil
+	}
+
 	// we increase by 5 for when we actually check this in the end blocker
-	return h.k.CheckForJailedValidators.Set(ctx, valAddr.String(), sdkCtx.BlockHeight()+5)
+	return h.k.CheckForJailedValidators.Set(ctx, valAddr.String(), sdkCtx.BlockHeight())
 }
 
 // BeforeValidatorSlashed implements sdk.StakingHooks.

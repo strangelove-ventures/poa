@@ -8,6 +8,9 @@ replace cosmossdk.io/core => cosmossdk.io/core v0.11.0
 // breaks SDK app.toml parsing in ictest.
 replace github.com/spf13/viper => github.com/spf13/viper v1.17.0
 
+// TODO: not for production, seeing if removing .Jailed check panic from `ApplyAndReturnValidatorSetUpdates` fixes jailing issue.
+replace github.com/cosmos/cosmos-sdk => /home/reece/Desktop/Programming/Go/cosmos-sdk
+
 require (
 	cosmossdk.io/api v0.7.3
 	cosmossdk.io/collections v0.4.0
