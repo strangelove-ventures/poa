@@ -138,27 +138,8 @@ func (am AppModule) handleBeforeJailedValidators(ctx context.Context) error {
 			return err
 		}
 
-		// !GOAL:
-		// - Jail a validator properly without `CONSENSUS FAILURE!!! err="should never retrieve a jailed validator from the power store"`  (x/staking/keeper/val_state_change.go) being triggered
-
-		// precaution, if not jailed we set back
-		// lastPower, err := sk.GetLastValidatorPower(ctx, valAddr)
-		// if err != nil {
-		// 	return err
-		// }
-		// if err := sk.DeleteLastValidatorPower(ctx, valAddr); err != nil {
-		// 	return err
-		// }
-		// if err := sk.DeleteValidatorByPowerIndex(ctx, val); err != nil {
-		// 	return err
-		// }
-
-		// We only want to perform height logic after jailing stuff has persisted. So we attempt in future blocks.
 		if height == curHeight {
-			// if jaileduntil is after current block time, run logic. else, remove (TODO: do this in the if statement)
-			// logger.Error("EndBlocker BeforeJailedValidators", "si.JailedUntil", si.JailedUntil, "bt", bt, "isAfter", si.JailedUntil.After(bt))
-
-			// if si.JailedUntil.After(bt) is false, then we remove from the keeper store (false positive for the val modification wrt jailing)
+			// if si.JailedUntil.After(bt) is false, then we remove from the keeper store (false positive for the val modification wrt jailing from staking hook)
 			if !si.JailedUntil.After(bt) {
 				logger.Error("EndBlocker BeforeJailedValidators validator was not jailed, removing from cache",
 					"height", height, "blockHeight", curHeight, "si.JailedUntil", si.JailedUntil, "block_time", bt, "operator", valOperAddr,
@@ -184,20 +165,12 @@ func (am AppModule) handleBeforeJailedValidators(ctx context.Context) error {
 				return err
 			}
 
-		} else if height+3 == curHeight {
+		} else if height+2 == curHeight {
 			// Why is staking / slashing not handling this for us anyways?
 			logger.Error("handleBeforeJailedValidators setting val to jailed", "height", height, "blockHeight", curHeight)
 
-			// val.Jailed = true
-			// if err := sk.SetValidator(ctx, val); err != nil {
-			// 	return err
-			// }
-
-			// TODO: do we set a power here? idk or after or something
-			if err := sk.DeleteLastValidatorPower(ctx, valAddr); err != nil {
-				return err
-			}
-			if err := sk.DeleteValidatorByPowerIndex(ctx, val); err != nil {
+			val.Jailed = true
+			if err := sk.SetValidator(ctx, val); err != nil {
 				return err
 			}
 
@@ -205,14 +178,6 @@ func (am AppModule) handleBeforeJailedValidators(ctx context.Context) error {
 				return err
 			}
 		}
-		// else {
-		// 	if err := sk.SetLastValidatorPower(ctx, valAddr, lastPower); err != nil {
-		// 		return err
-		// 	}
-		// 	if err := sk.SetValidatorByPowerIndex(ctx, val); err != nil {
-		// 		return err
-		// 	}
-		// }
 
 	}
 

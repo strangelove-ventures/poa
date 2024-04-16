@@ -9,7 +9,8 @@ replace cosmossdk.io/core => cosmossdk.io/core v0.11.0
 replace github.com/spf13/viper => github.com/spf13/viper v1.17.0
 
 // TODO: not for production, seeing if removing .Jailed check panic from `ApplyAndReturnValidatorSetUpdates` fixes jailing issue.
-replace github.com/cosmos/cosmos-sdk => /home/reece/Desktop/Programming/Go/cosmos-sdk
+// https://github.com/Reecepbcups/cosmos-sdk/commit/26ff44b40ec78ca3e003aa49d9db1ce8199ae7dd
+replace github.com/cosmos/cosmos-sdk => github.com/Reecepbcups/cosmos-sdk v0.50.3-0.20240416135850-26ff44b40ec7
 
 require (
 	cosmossdk.io/api v0.7.3
