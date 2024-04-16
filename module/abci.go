@@ -10,14 +10,6 @@ import (
 	"github.com/strangelove-ventures/poa"
 )
 
-func (am AppModule) EndBlocker(ctx context.Context) error {
-	// if err := am.handleBeforeJailedValidators(ctx); err != nil {
-	// 	return err
-	// }
-
-	return nil
-}
-
 // BeginBlocker updates the validator set without applying updates.
 // Since this module depends on staking, that module will `ApplyAndReturnValidatorSetUpdates` from x/staking.
 func (am AppModule) BeginBlocker(ctx context.Context) error {
