@@ -164,7 +164,6 @@ func (am AppModule) handleBeforeJailedValidators(ctx context.Context) error {
 			if err := sk.SetValidator(ctx, val); err != nil {
 				return err
 			}
-
 		} else if height+2 == curHeight {
 			// Why is staking / slashing not handling this for us anyways?
 			logger.Error("handleBeforeJailedValidators setting val to jailed", "height", height, "blockHeight", curHeight)
@@ -178,7 +177,6 @@ func (am AppModule) handleBeforeJailedValidators(ctx context.Context) error {
 				return err
 			}
 		}
-
 	}
 
 	return nil
