@@ -37,7 +37,6 @@ func (h Hooks) BeforeValidatorModified(ctx context.Context, valAddr sdk.ValAddre
 		return nil
 	}
 
-	// we increase by 5 for when we actually check this in the end blocker
 	return h.k.CheckForJailedValidators.Set(ctx, valAddr.String(), sdkCtx.BlockHeight())
 }
 
