@@ -71,16 +71,6 @@ app.ModuleManager = module.NewManager(
 
 ...
 
-// Register POA Staking Hooks
-app.StakingKeeper.SetHooks(
-    stakingtypes.NewMultiStakingHooks(
-        ...
-        app.POAKeeper.Hooks(),
-    ),
-)
-
-...
-
 // Add PoA to BeginBlock logic
 // NOTE: This must be before the staking module begin blocker
 app.ModuleManager.SetOrderBeginBlockers(
