@@ -19,6 +19,12 @@ The integration steps include the following:
 
 ## Example integration of the PoA Module
 
+Use this fork of the SDK which has very minor configurations to support PoA (a single line). Changes can be found in the rollchains [.gitpatch](https://github.com/rollchains/cosmos-sdk/tree/v0.50.6/.gitpatches) directory.
+
+```go.mod
+replace github.com/cosmos-sdk/cosmos-sdk v0.50.6 => github.com/rollchains/cosmos-sdk v0.50.6
+```
+
 ```go
 // app.go
 
