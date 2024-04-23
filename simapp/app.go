@@ -329,7 +329,6 @@ func NewSimApp(
 		stakingtypes.NewMultiStakingHooks(
 			app.DistrKeeper.Hooks(),
 			app.SlashingKeeper.Hooks(),
-			app.POAKeeper.Hooks(), // must impl for jailing functionality
 		),
 	)
 

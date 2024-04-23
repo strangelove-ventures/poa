@@ -27,7 +27,6 @@ var (
 	_ module.AppModule          = AppModule{}
 	_ module.AppModuleGenesis   = AppModule{}
 	_ appmodule.HasBeginBlocker = AppModule{}
-	_ appmodule.HasEndBlocker   = AppModule{}
 )
 
 // ConsensusVersion defines the current module consensus version.
@@ -132,8 +131,4 @@ func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONCodec) json.Raw
 
 func (am AppModule) BeginBlock(ctx context.Context) error {
 	return am.BeginBlocker(ctx)
-}
-
-func (am AppModule) EndBlock(ctx context.Context) error {
-	return am.EndBlocker(ctx)
 }

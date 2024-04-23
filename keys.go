@@ -20,9 +20,6 @@ var (
 
 	// UpdatedValidatorsCacheKey tracks recently updated validators from SetPower.
 	UpdatedValidatorsCacheKey = collections.NewPrefix(4)
-
-	// BeforeJailedValidatorsKey tracks validators that are about to be jailed (from staking hooks).
-	BeforeJailedValidatorsKey = collections.NewPrefix(5)
 )
 
 const (

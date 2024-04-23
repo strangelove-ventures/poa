@@ -34,7 +34,6 @@ type Keeper struct {
 	Params                 collections.Item[poa.Params]
 	PendingValidators      collections.Item[poa.Validators]
 	UpdatedValidatorsCache collections.KeySet[string]
-	BeforeJailedValidators collections.KeySet[string]
 
 	CachedBlockPower            collections.Item[poa.PowerCache]
 	AbsoluteChangedInBlockPower collections.Item[poa.PowerCache]
@@ -64,7 +63,6 @@ func NewKeeper(
 		Params:                 collections.NewItem(sb, poa.ParamsKey, "params", codec.CollValue[poa.Params](cdc)),
 		PendingValidators:      collections.NewItem(sb, poa.PendingValidatorsKey, "pending", codec.CollValue[poa.Validators](cdc)),
 		UpdatedValidatorsCache: collections.NewKeySet(sb, poa.UpdatedValidatorsCacheKey, "updated_validators", collections.StringKey),
-		BeforeJailedValidators: collections.NewKeySet(sb, poa.BeforeJailedValidatorsKey, "before_jailed", collections.StringKey),
 
 		CachedBlockPower:            collections.NewItem(sb, poa.CachedPreviousBlockPowerKey, "cached_block", codec.CollValue[poa.PowerCache](cdc)),
 		AbsoluteChangedInBlockPower: collections.NewItem(sb, poa.AbsoluteChangedInBlockPowerKey, "absolute_changed_power", codec.CollValue[poa.PowerCache](cdc)),
