@@ -320,6 +320,7 @@ func NewSimApp(
 		app.StakingKeeper,
 		app.SlashingKeeper,
 		app.BankKeeper,
+		// app.AccountKeeper.AddressCodec(), // TODO:?
 		logger,
 	)
 

@@ -2,7 +2,6 @@ syntax = "proto3";
 package strangelove_ventures.poa.v1;
 
 import "gogoproto/gogo.proto";
-import "amino/amino.proto";
 import "strangelove_ventures/poa/v1/validator.proto";
 import "strangelove_ventures/poa/v1/params.proto";
 import "strangelove_ventures/poa/v1/tx.proto";
@@ -13,11 +12,4 @@ option go_package = "github.com/strangelove-ventures/poa";
 message GenesisState {
   // Params defines all the parameters of the module.
   Params params = 1 [ (gogoproto.nullable) = false ];
-}
-
-// PowerCache is a cached block or absolute change in power for ibc-go validations.
-message PowerCache {
-  option (amino.name) = "poa/PowerCache";
-
-  uint64 power = 1;
 }

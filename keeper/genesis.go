@@ -8,44 +8,7 @@ import (
 
 // InitGenesis initializes the module's state from a genesis state.
 func (k *Keeper) InitGenesis(ctx context.Context, data *poa.GenesisState) error {
-	if err := k.PendingValidators.Set(ctx, poa.Validators{
-		Validators: []poa.Validator{},
-	}); err != nil {
-		return err
-	}
-
-	if err := k.CachedBlockPower.Set(ctx, poa.PowerCache{
-		Power: 0,
-	}); err != nil {
-		return err
-	}
-
-	if err := k.AbsoluteChangedInBlockPower.Set(ctx, poa.PowerCache{
-		Power: 0,
-	}); err != nil {
-		return err
-	}
-
 	return k.SetParams(ctx, data.Params)
-}
-
-// InitStores sets the `AbsoluteChangedBlock` and `PreviousBlockPower` as a cache into the poa store.
-func (k *Keeper) InitCacheStores(ctx context.Context) error {
-	currValPower, err := k.GetStakingKeeper().GetLastTotalPower(ctx)
-	if err != nil {
-		return err
-	}
-
-	// Set the current block (last power) as a H-1 cache.
-	if err := k.SetCachedBlockPower(ctx, currValPower.Uint64()); err != nil {
-		return err
-	}
-
-	if err := k.SetAbsoluteChangedInBlockPower(ctx, 0); err != nil {
-		return err
-	}
-
-	return nil
 }
 
 // ExportGenesis exports the module's state to a genesis state.

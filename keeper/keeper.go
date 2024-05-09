@@ -24,19 +24,19 @@ type Keeper struct {
 	cdc codec.BinaryCodec
 
 	stakingKeeper *stakingkeeper.Keeper
-	slashKeeper   SlashingKeeper
-	bankKeeper    BankKeeper
+	// slashKeeper   SlashingKeeper
+	bankKeeper BankKeeper
+
+	// addressCodec address.Codec
 
 	logger log.Logger
 
 	// state management
-	Schema                 collections.Schema
-	Params                 collections.Item[poa.Params]
-	PendingValidators      collections.Item[poa.Validators]
-	UpdatedValidatorsCache collections.KeySet[string]
+	Schema collections.Schema
+	Params collections.Item[poa.Params]
 
-	CachedBlockPower            collections.Item[poa.PowerCache]
-	AbsoluteChangedInBlockPower collections.Item[poa.PowerCache]
+	// TODO: make this a map[valAddr -> string] where string is some note, contact info, etc
+	PendingValidators collections.Map[sdk.AccAddress, string]
 }
 
 // NewKeeper creates a new poa Keeper instance
@@ -46,6 +46,7 @@ func NewKeeper(
 	sk *stakingkeeper.Keeper,
 	slk SlashingKeeper,
 	bk BankKeeper,
+	// ac address.Codec,
 	logger log.Logger,
 ) Keeper {
 	logger = logger.With(log.ModuleKey, "x/"+poa.ModuleName)
@@ -55,17 +56,14 @@ func NewKeeper(
 	k := Keeper{
 		cdc:           cdc,
 		stakingKeeper: sk,
-		slashKeeper:   slk,
-		bankKeeper:    bk,
-		logger:        logger,
+		// slashKeeper:   slk,
+		bankKeeper: bk,
+		// addressCodec: ac,
+		logger: logger,
 
 		// Stores
-		Params:                 collections.NewItem(sb, poa.ParamsKey, "params", codec.CollValue[poa.Params](cdc)),
-		PendingValidators:      collections.NewItem(sb, poa.PendingValidatorsKey, "pending", codec.CollValue[poa.Validators](cdc)),
-		UpdatedValidatorsCache: collections.NewKeySet(sb, poa.UpdatedValidatorsCacheKey, "updated_validators", collections.StringKey),
-
-		CachedBlockPower:            collections.NewItem(sb, poa.CachedPreviousBlockPowerKey, "cached_block", codec.CollValue[poa.PowerCache](cdc)),
-		AbsoluteChangedInBlockPower: collections.NewItem(sb, poa.AbsoluteChangedInBlockPowerKey, "absolute_changed_power", codec.CollValue[poa.PowerCache](cdc)),
+		Params:            collections.NewItem(sb, poa.ParamsKey, "params", codec.CollValue[poa.Params](cdc)),
+		PendingValidators: collections.NewMap[sdk.AccAddress, string](sb, poa.PendingValidatorsKey, "pending", sdk.AccAddressKey, collections.StringValue),
 	}
 
 	schema, err := sb.Build()
@@ -87,10 +85,14 @@ func (k Keeper) GetValidatorAddressCodec() addresscodec.Codec {
 	return k.stakingKeeper.ValidatorAddressCodec()
 }
 
+// func (k Keeper) GetAccountAddressCodec() addresscodec.Codec {
+// 	return k.addressCodec
+// }
+
 // GetSlashingKeeper returns the slashing keeper.
-func (k Keeper) GetSlashingKeeper() SlashingKeeper {
-	return k.slashKeeper
-}
+// func (k Keeper) GetSlashingKeeper() SlashingKeeper {
+// 	return k.slashKeeper
+// }
 
 func (k Keeper) GetBankKeeper() BankKeeper {
 	return k.bankKeeper
