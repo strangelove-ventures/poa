@@ -19,30 +19,15 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Msg_CreateValidator_FullMethodName     = "/strangelove_ventures.poa.v1.Msg/CreateValidator"
-	Msg_SetPower_FullMethodName            = "/strangelove_ventures.poa.v1.Msg/SetPower"
-	Msg_RemoveValidator_FullMethodName     = "/strangelove_ventures.poa.v1.Msg/RemoveValidator"
-	Msg_RemovePending_FullMethodName       = "/strangelove_ventures.poa.v1.Msg/RemovePending"
-	Msg_UpdateParams_FullMethodName        = "/strangelove_ventures.poa.v1.Msg/UpdateParams"
-	Msg_UpdateStakingParams_FullMethodName = "/strangelove_ventures.poa.v1.Msg/UpdateStakingParams"
+	Msg_UpdateParams_FullMethodName = "/strangelove_ventures.poa.v1.Msg/UpdateParams"
 )
 
 // MsgClient is the client API for Msg service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type MsgClient interface {
-	// CreateValidator is a wrapper method around the SDK's x/staking MsgCreateValidator.
-	CreateValidator(ctx context.Context, in *MsgCreateValidator, opts ...grpc.CallOption) (*MsgCreateValidatorResponse, error)
-	// SetPower sets the new power of a validator and accepts new validators into the set.
-	SetPower(ctx context.Context, in *MsgSetPower, opts ...grpc.CallOption) (*MsgSetPowerResponse, error)
-	// RemoveValidator removes a validator from the active set and unbonds their delegations.
-	RemoveValidator(ctx context.Context, in *MsgRemoveValidator, opts ...grpc.CallOption) (*MsgRemoveValidatorResponse, error)
-	// RemovePending removes a pending validator from the queue.
-	RemovePending(ctx context.Context, in *MsgRemovePending, opts ...grpc.CallOption) (*MsgRemovePendingResponse, error)
 	// UpdateParams updates the module parameters.
 	UpdateParams(ctx context.Context, in *MsgUpdateParams, opts ...grpc.CallOption) (*MsgUpdateParamsResponse, error)
-	// UpdateStakingParams updates the module parameters.
-	UpdateStakingParams(ctx context.Context, in *MsgUpdateStakingParams, opts ...grpc.CallOption) (*MsgUpdateStakingParamsResponse, error)
 }
 
 type msgClient struct {
@@ -51,42 +36,6 @@ type msgClient struct {
 
 func NewMsgClient(cc grpc.ClientConnInterface) MsgClient {
 	return &msgClient{cc}
-}
-
-func (c *msgClient) CreateValidator(ctx context.Context, in *MsgCreateValidator, opts ...grpc.CallOption) (*MsgCreateValidatorResponse, error) {
-	out := new(MsgCreateValidatorResponse)
-	err := c.cc.Invoke(ctx, Msg_CreateValidator_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *msgClient) SetPower(ctx context.Context, in *MsgSetPower, opts ...grpc.CallOption) (*MsgSetPowerResponse, error) {
-	out := new(MsgSetPowerResponse)
-	err := c.cc.Invoke(ctx, Msg_SetPower_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *msgClient) RemoveValidator(ctx context.Context, in *MsgRemoveValidator, opts ...grpc.CallOption) (*MsgRemoveValidatorResponse, error) {
-	out := new(MsgRemoveValidatorResponse)
-	err := c.cc.Invoke(ctx, Msg_RemoveValidator_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *msgClient) RemovePending(ctx context.Context, in *MsgRemovePending, opts ...grpc.CallOption) (*MsgRemovePendingResponse, error) {
-	out := new(MsgRemovePendingResponse)
-	err := c.cc.Invoke(ctx, Msg_RemovePending_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
 }
 
 func (c *msgClient) UpdateParams(ctx context.Context, in *MsgUpdateParams, opts ...grpc.CallOption) (*MsgUpdateParamsResponse, error) {
@@ -98,31 +47,12 @@ func (c *msgClient) UpdateParams(ctx context.Context, in *MsgUpdateParams, opts 
 	return out, nil
 }
 
-func (c *msgClient) UpdateStakingParams(ctx context.Context, in *MsgUpdateStakingParams, opts ...grpc.CallOption) (*MsgUpdateStakingParamsResponse, error) {
-	out := new(MsgUpdateStakingParamsResponse)
-	err := c.cc.Invoke(ctx, Msg_UpdateStakingParams_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // MsgServer is the server API for Msg service.
 // All implementations must embed UnimplementedMsgServer
 // for forward compatibility
 type MsgServer interface {
-	// CreateValidator is a wrapper method around the SDK's x/staking MsgCreateValidator.
-	CreateValidator(context.Context, *MsgCreateValidator) (*MsgCreateValidatorResponse, error)
-	// SetPower sets the new power of a validator and accepts new validators into the set.
-	SetPower(context.Context, *MsgSetPower) (*MsgSetPowerResponse, error)
-	// RemoveValidator removes a validator from the active set and unbonds their delegations.
-	RemoveValidator(context.Context, *MsgRemoveValidator) (*MsgRemoveValidatorResponse, error)
-	// RemovePending removes a pending validator from the queue.
-	RemovePending(context.Context, *MsgRemovePending) (*MsgRemovePendingResponse, error)
 	// UpdateParams updates the module parameters.
 	UpdateParams(context.Context, *MsgUpdateParams) (*MsgUpdateParamsResponse, error)
-	// UpdateStakingParams updates the module parameters.
-	UpdateStakingParams(context.Context, *MsgUpdateStakingParams) (*MsgUpdateStakingParamsResponse, error)
 	mustEmbedUnimplementedMsgServer()
 }
 
@@ -130,23 +60,8 @@ type MsgServer interface {
 type UnimplementedMsgServer struct {
 }
 
-func (UnimplementedMsgServer) CreateValidator(context.Context, *MsgCreateValidator) (*MsgCreateValidatorResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CreateValidator not implemented")
-}
-func (UnimplementedMsgServer) SetPower(context.Context, *MsgSetPower) (*MsgSetPowerResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SetPower not implemented")
-}
-func (UnimplementedMsgServer) RemoveValidator(context.Context, *MsgRemoveValidator) (*MsgRemoveValidatorResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method RemoveValidator not implemented")
-}
-func (UnimplementedMsgServer) RemovePending(context.Context, *MsgRemovePending) (*MsgRemovePendingResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method RemovePending not implemented")
-}
 func (UnimplementedMsgServer) UpdateParams(context.Context, *MsgUpdateParams) (*MsgUpdateParamsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateParams not implemented")
-}
-func (UnimplementedMsgServer) UpdateStakingParams(context.Context, *MsgUpdateStakingParams) (*MsgUpdateStakingParamsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateStakingParams not implemented")
 }
 func (UnimplementedMsgServer) mustEmbedUnimplementedMsgServer() {}
 
@@ -159,78 +74,6 @@ type UnsafeMsgServer interface {
 
 func RegisterMsgServer(s grpc.ServiceRegistrar, srv MsgServer) {
 	s.RegisterService(&Msg_ServiceDesc, srv)
-}
-
-func _Msg_CreateValidator_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgCreateValidator)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MsgServer).CreateValidator(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Msg_CreateValidator_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).CreateValidator(ctx, req.(*MsgCreateValidator))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Msg_SetPower_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgSetPower)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MsgServer).SetPower(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Msg_SetPower_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).SetPower(ctx, req.(*MsgSetPower))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Msg_RemoveValidator_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgRemoveValidator)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MsgServer).RemoveValidator(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Msg_RemoveValidator_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).RemoveValidator(ctx, req.(*MsgRemoveValidator))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Msg_RemovePending_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgRemovePending)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MsgServer).RemovePending(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Msg_RemovePending_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).RemovePending(ctx, req.(*MsgRemovePending))
-	}
-	return interceptor(ctx, in, info, handler)
 }
 
 func _Msg_UpdateParams_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -251,24 +94,6 @@ func _Msg_UpdateParams_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Msg_UpdateStakingParams_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgUpdateStakingParams)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MsgServer).UpdateStakingParams(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Msg_UpdateStakingParams_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).UpdateStakingParams(ctx, req.(*MsgUpdateStakingParams))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // Msg_ServiceDesc is the grpc.ServiceDesc for Msg service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -277,28 +102,8 @@ var Msg_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*MsgServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "CreateValidator",
-			Handler:    _Msg_CreateValidator_Handler,
-		},
-		{
-			MethodName: "SetPower",
-			Handler:    _Msg_SetPower_Handler,
-		},
-		{
-			MethodName: "RemoveValidator",
-			Handler:    _Msg_RemoveValidator_Handler,
-		},
-		{
-			MethodName: "RemovePending",
-			Handler:    _Msg_RemovePending_Handler,
-		},
-		{
 			MethodName: "UpdateParams",
 			Handler:    _Msg_UpdateParams_Handler,
-		},
-		{
-			MethodName: "UpdateStakingParams",
-			Handler:    _Msg_UpdateStakingParams_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

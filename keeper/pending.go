@@ -3,94 +3,61 @@ package keeper
 import (
 	"context"
 
-	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
-	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
-	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/strangelove-ventures/poa"
 )
 
-// DefaultPendingValidators returns an empty pending validators set
-func DefaultPendingValidators() poa.Validators {
-	return poa.Validators{
-		Validators: []poa.Validator{},
-	}
-}
-
 // AddPendingValidator adds a validator to the pending set
-func (k Keeper) AddPendingValidator(ctx context.Context, newVal stakingtypes.Validator, pubKey cryptotypes.PubKey) error {
-	pkAny, err := codectypes.NewAnyWithValue(pubKey)
-	if err != nil {
-		return err
-	}
-
-	newVal.ConsensusPubkey = pkAny
-	poaVal := poa.ConvertStakingToPOA(newVal)
-
-	vals, err := k.GetPendingValidators(ctx)
-	if err != nil {
-		return err
-	}
-
-	vals.Validators = append(vals.Validators, poaVal)
-
-	return k.PendingValidators.Set(ctx, vals)
+func (k Keeper) AddPendingValidator(ctx context.Context, valAddr []byte, info string) error {
+	return k.PendingValidators.Set(ctx, valAddr, info)
 }
 
-func (k Keeper) RemovePendingValidator(ctx context.Context, valOpAddr string) error {
-	pending, err := k.GetPendingValidators(ctx)
-	if err != nil {
-		return err
-	}
-
-	vals := pending.Validators
-
-	for i, val := range vals {
-		if val.OperatorAddress == valOpAddr {
-			vals = append(vals[:i], vals[i+1:]...)
-			pending.Validators = vals
-			break
-		}
-	}
-
-	return k.PendingValidators.Set(ctx, pending)
+func (k Keeper) RemovePendingValidator(ctx context.Context, valAddr sdk.AccAddress) error {
+	return k.PendingValidators.Remove(ctx, valAddr)
 }
 
 // GetPendingValidators
-func (k Keeper) GetPendingValidators(ctx context.Context) (poa.Validators, error) {
-	pending, err := k.PendingValidators.Get(ctx)
+func (k Keeper) GetPendingValidators(ctx context.Context) ([]poa.PendingValidator, error) {
+	iter, err := k.PendingValidators.Iterate(ctx, nil)
 	if err != nil {
-		return DefaultPendingValidators(), err
+		return nil, err
 	}
+	defer iter.Close()
 
-	return pending, nil
-}
+	pendingValidators := make([]poa.PendingValidator, 0)
 
-func (k Keeper) GetPendingValidator(ctx context.Context, operatorAddr string) (poa.Validator, error) {
-	pending, err := k.GetPendingValidators(ctx)
-	if err != nil {
-		return poa.Validator{}, err
-	}
-
-	for _, val := range pending.Validators {
-		if val.OperatorAddress == operatorAddr {
-			// required to unpack the pubKey properly
-			if err := val.UnpackInterfaces(k.cdc); err != nil {
-				return poa.Validator{}, err
-			}
-
-			return val, nil
+	for ; iter.Valid(); iter.Next() {
+		key, err := iter.Key()
+		if err != nil {
+			return nil, err
 		}
+
+		val, err := iter.Value()
+		if err != nil {
+			return nil, err
+		}
+
+		pendingValidators = append(pendingValidators, poa.PendingValidator{
+			Address: key,
+			Info:    val,
+		})
 	}
 
-	return poa.Validator{}, nil
+	return pendingValidators, nil
 }
 
-func (k Keeper) IsValidatorPending(ctx context.Context, operatorAddr string) (bool, error) {
-	pending, err := k.GetPendingValidator(ctx, operatorAddr)
+func (k Keeper) GetPendingValidator(ctx context.Context, addr sdk.AccAddress) (poa.PendingValidator, error) {
+	info, err := k.PendingValidators.Get(ctx, addr)
 	if err != nil {
-		return false, err
+		return poa.PendingValidator{}, err
 	}
 
-	return pending.OperatorAddress == operatorAddr, nil
+	return poa.PendingValidator{
+		Address: addr,
+		Info:    info,
+	}, nil
+}
+
+func (k Keeper) IsValidatorPending(ctx context.Context, operator sdk.AccAddress) (bool, error) {
+	return k.PendingValidators.Has(ctx, operator)
 }

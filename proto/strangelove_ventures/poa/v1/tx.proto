@@ -17,22 +17,22 @@ service Msg {
   option (cosmos.msg.v1.service) = true;
 
   // CreateValidator is a wrapper method around the SDK's x/staking MsgCreateValidator.
-  rpc CreateValidator(MsgCreateValidator) returns (MsgCreateValidatorResponse);
+  // rpc CreateValidator(MsgCreateValidator) returns (MsgCreateValidatorResponse);
 
   // SetPower sets the new power of a validator and accepts new validators into the set.
-  rpc SetPower(MsgSetPower) returns (MsgSetPowerResponse);
+  // rpc SetPower(MsgSetPower) returns (MsgSetPowerResponse);
 
   // RemoveValidator removes a validator from the active set and unbonds their delegations.
-  rpc RemoveValidator(MsgRemoveValidator) returns (MsgRemoveValidatorResponse);
+  // rpc RemoveValidator(MsgRemoveValidator) returns (MsgRemoveValidatorResponse);
 
    // RemovePending removes a pending validator from the queue.
-   rpc RemovePending(MsgRemovePending) returns (MsgRemovePendingResponse);
+  //  rpc RemovePending(MsgRemovePending) returns (MsgRemovePendingResponse);
 
   // UpdateParams updates the module parameters.
   rpc UpdateParams(MsgUpdateParams) returns (MsgUpdateParamsResponse);
 
   // UpdateStakingParams updates the module parameters.
-  rpc UpdateStakingParams(MsgUpdateStakingParams) returns (MsgUpdateStakingParamsResponse);
+  // rpc UpdateStakingParams(MsgUpdateStakingParams) returns (MsgUpdateStakingParamsResponse);
 }
 
 // SetPower sets the new power of the validator and accepts new validators into the set.
@@ -102,22 +102,23 @@ message MsgUpdateParams {
 // MsgUpdateParams message.
 message MsgUpdateParamsResponse {}
 
+// TODO: Can this just be done easier?
 // MsgUpdateStakingParams is the Msg/UpdateStakingParams request type.
-message MsgUpdateStakingParams {
-  option (cosmos.msg.v1.signer) = "sender";
-  option (amino.name) = "poa/MsgUpdateStakingParams";
+// message MsgUpdateStakingParams {
+//   option (cosmos.msg.v1.signer) = "sender";
+//   option (amino.name) = "poa/MsgUpdateStakingParams";
 
-  // sender is the address of the admin account with permission to update.
-  // ex: governance, multisig/DAO, or standard account found in Params.
-  string sender = 1 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+//   // sender is the address of the admin account with permission to update.
+//   // ex: governance, multisig/DAO, or standard account found in Params.
+//   string sender = 1 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
 
-  // x/staking  module parameters (all must be supplied).
-  StakingParams params = 2 [ (gogoproto.nullable) = false ];
-}
+//   // x/staking  module parameters (all must be supplied).
+//   StakingParams params = 2 [ (gogoproto.nullable) = false ];
+// }
 
-// MsgUpdateStakingParamsResponse defines the response structure for executing a
-// MsgUpdateStakingParams message.
-message MsgUpdateStakingParamsResponse {}
+// // MsgUpdateStakingParamsResponse defines the response structure for executing a
+// // MsgUpdateStakingParams message.
+// message MsgUpdateStakingParamsResponse {}
 
 // cosmos-sdk/proto/staking/v1beta1/tx.proto
 // MsgCreateValidator defines a SDK message for creating a new validator.

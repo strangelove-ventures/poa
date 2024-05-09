@@ -19,9 +19,8 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Query_Params_FullMethodName            = "/strangelove_ventures.poa.v1.Query/Params"
-	Query_PendingValidators_FullMethodName = "/strangelove_ventures.poa.v1.Query/PendingValidators"
-	Query_ConsensusPower_FullMethodName    = "/strangelove_ventures.poa.v1.Query/ConsensusPower"
+	Query_Params_FullMethodName              = "/strangelove_ventures.poa.v1.Query/Params"
+	Query_WhitelistValidators_FullMethodName = "/strangelove_ventures.poa.v1.Query/WhitelistValidators"
 )
 
 // QueryClient is the client API for Query service.
@@ -30,10 +29,9 @@ const (
 type QueryClient interface {
 	// Params returns the current params of the module.
 	Params(ctx context.Context, in *QueryParamsRequest, opts ...grpc.CallOption) (*ParamsResponse, error)
-	// PendingValidators returns currently pending validators of the module.
-	PendingValidators(ctx context.Context, in *QueryPendingValidatorsRequest, opts ...grpc.CallOption) (*PendingValidatorsResponse, error)
-	// ConsensusPower returns the current consensus power of a validator.
-	ConsensusPower(ctx context.Context, in *QueryConsensusPowerRequest, opts ...grpc.CallOption) (*QueryConsensusPowerResponse, error)
+	// PendingValidators returns currently pending whitelist of validators of the module.
+	// These accounts have not yet created their validator, they just are allowed to do so once the team sends them the initial token.
+	WhitelistValidators(ctx context.Context, in *QueryWhitelistedValidatorsRequest, opts ...grpc.CallOption) (*WhitelistValidatorsResponse, error)
 }
 
 type queryClient struct {
@@ -53,18 +51,9 @@ func (c *queryClient) Params(ctx context.Context, in *QueryParamsRequest, opts .
 	return out, nil
 }
 
-func (c *queryClient) PendingValidators(ctx context.Context, in *QueryPendingValidatorsRequest, opts ...grpc.CallOption) (*PendingValidatorsResponse, error) {
-	out := new(PendingValidatorsResponse)
-	err := c.cc.Invoke(ctx, Query_PendingValidators_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *queryClient) ConsensusPower(ctx context.Context, in *QueryConsensusPowerRequest, opts ...grpc.CallOption) (*QueryConsensusPowerResponse, error) {
-	out := new(QueryConsensusPowerResponse)
-	err := c.cc.Invoke(ctx, Query_ConsensusPower_FullMethodName, in, out, opts...)
+func (c *queryClient) WhitelistValidators(ctx context.Context, in *QueryWhitelistedValidatorsRequest, opts ...grpc.CallOption) (*WhitelistValidatorsResponse, error) {
+	out := new(WhitelistValidatorsResponse)
+	err := c.cc.Invoke(ctx, Query_WhitelistValidators_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -77,10 +66,9 @@ func (c *queryClient) ConsensusPower(ctx context.Context, in *QueryConsensusPowe
 type QueryServer interface {
 	// Params returns the current params of the module.
 	Params(context.Context, *QueryParamsRequest) (*ParamsResponse, error)
-	// PendingValidators returns currently pending validators of the module.
-	PendingValidators(context.Context, *QueryPendingValidatorsRequest) (*PendingValidatorsResponse, error)
-	// ConsensusPower returns the current consensus power of a validator.
-	ConsensusPower(context.Context, *QueryConsensusPowerRequest) (*QueryConsensusPowerResponse, error)
+	// PendingValidators returns currently pending whitelist of validators of the module.
+	// These accounts have not yet created their validator, they just are allowed to do so once the team sends them the initial token.
+	WhitelistValidators(context.Context, *QueryWhitelistedValidatorsRequest) (*WhitelistValidatorsResponse, error)
 	mustEmbedUnimplementedQueryServer()
 }
 
@@ -91,11 +79,8 @@ type UnimplementedQueryServer struct {
 func (UnimplementedQueryServer) Params(context.Context, *QueryParamsRequest) (*ParamsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Params not implemented")
 }
-func (UnimplementedQueryServer) PendingValidators(context.Context, *QueryPendingValidatorsRequest) (*PendingValidatorsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method PendingValidators not implemented")
-}
-func (UnimplementedQueryServer) ConsensusPower(context.Context, *QueryConsensusPowerRequest) (*QueryConsensusPowerResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ConsensusPower not implemented")
+func (UnimplementedQueryServer) WhitelistValidators(context.Context, *QueryWhitelistedValidatorsRequest) (*WhitelistValidatorsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method WhitelistValidators not implemented")
 }
 func (UnimplementedQueryServer) mustEmbedUnimplementedQueryServer() {}
 
@@ -128,38 +113,20 @@ func _Query_Params_Handler(srv interface{}, ctx context.Context, dec func(interf
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Query_PendingValidators_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryPendingValidatorsRequest)
+func _Query_WhitelistValidators_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryWhitelistedValidatorsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(QueryServer).PendingValidators(ctx, in)
+		return srv.(QueryServer).WhitelistValidators(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Query_PendingValidators_FullMethodName,
+		FullMethod: Query_WhitelistValidators_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).PendingValidators(ctx, req.(*QueryPendingValidatorsRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Query_ConsensusPower_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryConsensusPowerRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(QueryServer).ConsensusPower(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Query_ConsensusPower_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).ConsensusPower(ctx, req.(*QueryConsensusPowerRequest))
+		return srv.(QueryServer).WhitelistValidators(ctx, req.(*QueryWhitelistedValidatorsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -176,12 +143,8 @@ var Query_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Query_Params_Handler,
 		},
 		{
-			MethodName: "PendingValidators",
-			Handler:    _Query_PendingValidators_Handler,
-		},
-		{
-			MethodName: "ConsensusPower",
-			Handler:    _Query_ConsensusPower_Handler,
+			MethodName: "WhitelistValidators",
+			Handler:    _Query_WhitelistValidators_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
