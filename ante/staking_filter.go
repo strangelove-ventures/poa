@@ -32,13 +32,14 @@ func (msfd MsgStakingFilterDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, sim
 	}
 
 	if err := msfd.hasAdminOnlyStakingMessage(ctx, tx.GetMsgs()); err != nil {
-		// return ctx, poa.ErrStakingActionNotAllowed
-		return ctx, err
+		return ctx, fmt.Errorf("ante error: %w", err)
 	}
 
 	return next(ctx, tx, simulate)
 }
 
+// - Allow MsgCreateValidator if they are in the PendingValidator whitelist. Mint tokens for them here on create.
+// - ? Removal handled via unbonding directly (admin & the validator themself only)
 func (msfd MsgStakingFilterDecorator) hasAdminOnlyStakingMessage(ctx context.Context, msgs []sdk.Msg) error {
 
 	for _, msg := range msgs {
@@ -96,14 +97,20 @@ func (msfd MsgStakingFilterDecorator) hasAdminOnlyStakingMessage(ctx context.Con
 			return nil
 
 		case *stakingtypes.MsgUpdateParams:
+			// TODO:control via the POA module or something? or just require updates as well tbh
 			return nil
 
-		// Blocked entirely when POA is enabled
-		case *stakingtypes.MsgBeginRedelegate,
-			*stakingtypes.MsgCancelUnbondingDelegation,
-			*stakingtypes.MsgDelegate,
-			*stakingtypes.MsgUndelegate:
+		case *stakingtypes.MsgDelegate:
+			// m.DelegatorAddress
 			return nil
+		case *stakingtypes.MsgUndelegate:
+			// m.ValidatorAddress
+			return nil
+
+		case *stakingtypes.MsgBeginRedelegate:
+			return fmt.Errorf("redelegate is not allowed")
+		case *stakingtypes.MsgCancelUnbondingDelegation:
+			return fmt.Errorf("cancel unbonding is not allowed")
 		}
 
 		// stakingtypes.MsgEditValidator is the only allowed message. We do not need to check for it.
