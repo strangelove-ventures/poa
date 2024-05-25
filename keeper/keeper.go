@@ -37,6 +37,8 @@ type Keeper struct {
 
 	CachedBlockPower            collections.Item[poa.PowerCache]
 	AbsoluteChangedInBlockPower collections.Item[poa.PowerCache]
+
+	authority string
 }
 
 // NewKeeper creates a new poa Keeper instance
@@ -47,6 +49,7 @@ func NewKeeper(
 	slk SlashingKeeper,
 	bk BankKeeper,
 	logger log.Logger,
+	adminAuthority string,
 ) Keeper {
 	logger = logger.With(log.ModuleKey, "x/"+poa.ModuleName)
 
@@ -66,6 +69,8 @@ func NewKeeper(
 
 		CachedBlockPower:            collections.NewItem(sb, poa.CachedPreviousBlockPowerKey, "cached_block", codec.CollValue[poa.PowerCache](cdc)),
 		AbsoluteChangedInBlockPower: collections.NewItem(sb, poa.AbsoluteChangedInBlockPowerKey, "absolute_changed_power", codec.CollValue[poa.PowerCache](cdc)),
+
+		authority: adminAuthority,
 	}
 
 	schema, err := sb.Build()
@@ -103,7 +108,20 @@ func (k Keeper) GetAdmins(ctx context.Context) []string {
 		return []string{}
 	}
 
-	return p.Admins
+	admins := p.Admins
+
+	found := false
+	for _, auth := range admins {
+		if auth == k.authority {
+			found = true
+			break
+		}
+	}
+	if !found {
+		admins = append(admins, k.authority)
+	}
+
+	return admins
 }
 
 // IsAdmin checks if the given address is an admin.
@@ -114,7 +132,8 @@ func (k Keeper) IsAdmin(ctx context.Context, fromAddr string) bool {
 		}
 	}
 
-	return false
+	// the main authority may already be in the GetAdmins list. If not, we check here.
+	return k.authority == fromAddr
 }
 
 // IsSenderValidator checks if the given sender address is the same address as the validator by bytes.

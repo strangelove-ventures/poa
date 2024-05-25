@@ -321,6 +321,7 @@ func NewSimApp(
 		app.SlashingKeeper,
 		app.BankKeeper,
 		logger,
+		govModAddress,
 	)
 
 	// register the staking hooks
