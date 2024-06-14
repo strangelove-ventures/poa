@@ -6,8 +6,7 @@ import (
 	"math/rand"
 
 	"github.com/cosmos/cosmos-sdk/types/module"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	"github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/strangelove-ventures/poa"
 )
 
@@ -16,22 +15,27 @@ const (
 	allowValSelfExit = "allow_validator_self_exit"
 )
 
-// TODO: Fix randomization
-func genAdmins(r *rand.Rand) []string {
-	govModuleAddress := authtypes.NewModuleAddress(govtypes.ModuleName).String()
-	return []string{govModuleAddress}
-}
-
 func RandomizedGenState(simState *module.SimulationState) {
 	var (
 		adm           []string
 		allowSelfExit bool
 	)
 
-	// The POA admin is the governance module address N% of the time
-	// Allow validator self exit is enabled 50% of the time
+	simState.AppParams.GetOrGenerate(admins, &adm, simState.Rand, func(r *rand.Rand) {
+		// Select a random number of admins from the simState accounts
+		adminSet := make(map[string]bool)
+		numAdmins := simulation.RandIntBetween(r, 1, len(simState.Accounts))
+		for i := 0; i < numAdmins; i++ {
+			acc, _ := simulation.RandomAcc(r, simState.Accounts)
+			adminSet[acc.Address.String()] = true
+		}
 
-	simState.AppParams.GetOrGenerate(admins, &adm, simState.Rand, func(r *rand.Rand) { adm = genAdmins(r) })
+		for k := range adminSet {
+			adm = append(adm, k)
+		}
+	})
+
+	// Allow validator self exit is enabled 50% of the time
 	simState.AppParams.GetOrGenerate(allowValSelfExit, &allowSelfExit, simState.Rand, func(r *rand.Rand) { allowSelfExit = r.Intn(2) == 1 })
 
 	poaGenesis := poa.GenesisState{

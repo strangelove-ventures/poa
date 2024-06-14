@@ -24,6 +24,7 @@ type Keeper struct {
 	cdc codec.BinaryCodec
 
 	stakingKeeper *stakingkeeper.Keeper
+	accountKeeper AccountKeeper
 	slashKeeper   SlashingKeeper
 	bankKeeper    BankKeeper
 
@@ -46,6 +47,7 @@ func NewKeeper(
 	sk *stakingkeeper.Keeper,
 	slk SlashingKeeper,
 	bk BankKeeper,
+	ak AccountKeeper,
 	logger log.Logger,
 ) Keeper {
 	logger = logger.With(log.ModuleKey, "x/"+poa.ModuleName)
@@ -57,6 +59,7 @@ func NewKeeper(
 		stakingKeeper: sk,
 		slashKeeper:   slk,
 		bankKeeper:    bk,
+		accountKeeper: ak,
 		logger:        logger,
 
 		// Stores
@@ -94,6 +97,10 @@ func (k Keeper) GetSlashingKeeper() SlashingKeeper {
 
 func (k Keeper) GetBankKeeper() BankKeeper {
 	return k.bankKeeper
+}
+
+func (k Keeper) GetAccountKeeper() AccountKeeper {
+	return k.accountKeeper
 }
 
 // GetAdmins returns the module's administrators with delegation of power control.
