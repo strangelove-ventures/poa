@@ -10,8 +10,6 @@ import (
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	slashingkeeper "github.com/cosmos/cosmos-sdk/x/slashing/keeper"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
-	"github.com/strangelove-ventures/poa"
-	"github.com/strangelove-ventures/poa/simulation"
 
 	"cosmossdk.io/core/address"
 	"cosmossdk.io/core/appmodule"
@@ -19,8 +17,10 @@ import (
 	"cosmossdk.io/depinject"
 	"cosmossdk.io/log"
 
+	"github.com/strangelove-ventures/poa"
 	modulev1 "github.com/strangelove-ventures/poa/api/module/v1"
 	"github.com/strangelove-ventures/poa/keeper"
+	"github.com/strangelove-ventures/poa/simulation"
 )
 
 var _ appmodule.AppModule = AppModule{}
@@ -78,7 +78,7 @@ func (am AppModule) RegisterStoreDecoder(sdr simtypes.StoreDecoderRegistry) {
 }
 
 //// ProposalMsgs returns msgs used for governance proposals for simulations.
-//func (AppModule) ProposalMsgs(simState module.SimulationState) []simtypes.WeightedProposalMsg {
+// func (AppModule) ProposalMsgs(simState module.SimulationState) []simtypes.WeightedProposalMsg {
 //	return simulation.ProposalMsgs()
 //}
 

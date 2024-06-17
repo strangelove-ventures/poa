@@ -7,6 +7,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/types/simulation"
+
 	"github.com/strangelove-ventures/poa"
 )
 
@@ -49,6 +50,6 @@ func RandomizedGenState(simState *module.SimulationState) {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("Selected randomly generated poa parameters:\n%s\n", bz)
+	fmt.Printf("Selected randomly generated poa parameters:\n%s\n", bz) // nolint: forbidigo
 	simState.GenState[poa.ModuleName] = simState.Cdc.MustMarshalJSON(&poaGenesis)
 }
