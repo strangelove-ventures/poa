@@ -3,25 +3,28 @@ package simulation
 import (
 	"math/rand"
 
-	sdkmath "cosmossdk.io/math"
+	"github.com/pkg/errors"
+
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
-	"github.com/pkg/errors"
+
+	sdkmath "cosmossdk.io/math"
+
 	poatypes "github.com/strangelove-ventures/poa"
 	"github.com/strangelove-ventures/poa/keeper"
 )
 
 const (
-	OpWeightMsgSetPower               = "op_weight_msg_set_power"
-	OpWeightMsgRemoveValidator        = "op_weight_msg_remove_validator"
-	OpWeightMsgRemovePendingValidator = "op_weight_msg_remove_pending_validator"
-	OpWeightMsgUpdateParams           = "op_weight_msg_update_params"
-	OpWeightMsgCreateValidator        = "op_weight_msg_create_validator"
-	OpWeightMsgUpdateStakingParams    = "op_weight_msg_update_staking_params"
+	OpWeightMsgSetPower               = "op_weight_msg_set_power"                // nolint: gosec
+	OpWeightMsgRemoveValidator        = "op_weight_msg_remove_validator"         // nolint: gosec
+	OpWeightMsgRemovePendingValidator = "op_weight_msg_remove_pending_validator" // nolint: gosec
+	OpWeightMsgUpdateParams           = "op_weight_msg_update_params"            // nolint: gosec
+	OpWeightMsgCreateValidator        = "op_weight_msg_create_validator"         // nolint: gosec
+	OpWeightMsgUpdateStakingParams    = "op_weight_msg_update_staking_params"    // nolint: gosec
 
 	DefaultWeightMsgSetPower               = 100
 	DefaultWeightMsgRemoveValidator        = 5
@@ -175,7 +178,7 @@ func SimulateMsgRemovePendingValidator(txGen client.TxConfig, k keeper.Keeper) s
 
 		admin, err := getRandomPOAAdmin(r, k.GetAdmins(ctx))
 		if err != nil {
-			return simtypes.NoOpMsg(poatypes.ModuleName, msgType, "no admins found"), nil, err
+			return simtypes.NoOpMsg(poatypes.ModuleName, msgType, err.Error()), nil, err
 		}
 
 		// Verify that the POA admin is a simulation accounts
@@ -190,6 +193,9 @@ func SimulateMsgRemovePendingValidator(txGen client.TxConfig, k keeper.Keeper) s
 		// Generate random transaction fees
 		spendable := k.GetBankKeeper().SpendableCoins(ctx, adminAddr)
 		fees, err := simtypes.RandomFees(r, ctx, spendable)
+		if err != nil {
+			return simtypes.NoOpMsg(poatypes.ModuleName, msgType, "error generating random fees"), nil, err
+		}
 
 		msg := poatypes.MsgRemovePending{
 			Sender:           adminAddr.String(),
@@ -224,43 +230,50 @@ func SimulateMsgSetPower(txGen client.TxConfig, k keeper.Keeper) simtypes.Operat
 	return func(r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
 		msgType := sdk.MsgTypeURL(&poatypes.MsgSetPower{})
+
 		validators, err := k.GetStakingKeeper().GetAllValidators(ctx)
 		if err != nil {
 			return simtypes.NoOpMsg(poatypes.ModuleName, msgType, "unable to get validators"), nil, err
 		}
-
 		if len(validators) == 0 {
 			return simtypes.NoOpMsg(poatypes.ModuleName, msgType, "no validators found"), nil, nil
 		}
 
+		// Get the power reduction value used to convert tokens to consensus power
+		powerReduction := k.GetStakingKeeper().PowerReduction(ctx)
+
 		// Compute the total power of all validators
-		//totalPower := int64(0)
-		//for _, val := range validators {
-		//	fmt.Printf("Validator %s : %d\n", val.OperatorAddress, val.GetConsensusPower(k.GetStakingKeeper().PowerReduction(ctx)))
-		//	totalPower += val.GetConsensusPower(k.GetStakingKeeper().PowerReduction(ctx))
-		//}
+		totalPower := int64(0)
+		for _, val := range validators {
+			totalPower += val.GetConsensusPower(powerReduction)
+		}
 
 		// Select a random validator to update
 		validator := validators[r.Intn(len(validators))]
 
 		// Compute the new power of the validator
-		//minPower := 1_000_000 // 1 Consensus Power = 1_000_000 shares by default
+		minPower := 1_000_000 // 1 Consensus Power = 1_000_000 shares by default
 
 		// The new power needs to be <= totalPower * 0.3 (30% of the total power)
-		//maxPower := int(float64(totalPower) * 0.3)
-		//fmt.Println("Max Power: ", maxPower)
-		//if maxPower < minPower {
-		//	return simtypes.NoOpMsg(poatypes.ModuleName, msgType, "total power too low"), nil, nil
-		//}
+		maxPower := int(float64(totalPower) * 0.3)
+		if maxPower < minPower {
+			return simtypes.NoOpMsg(poatypes.ModuleName, msgType, "total power too low"), nil, nil
+		}
 
-		//newPower := simtypes.RandIntBetween(r, minPower, maxPower)
-		//newPower := simtypes.RandIntBetween(r, minPower, 2_000_000)
-		//newPower := minPower
-		//unsafe := r.Intn(2) == 1
+		// Generate a safe random power
+		newPower := uint64(simtypes.RandIntBetween(r, minPower, maxPower))
 
+		// Check if the new power is the same as the current power
+		// If it is, return a no-op
+		ttcp := sdk.TokensToConsensusPower(sdkmath.NewIntFromUint64(newPower), powerReduction)
+		if validator.GetConsensusPower(powerReduction) == ttcp {
+			return simtypes.NoOpMsg(poatypes.ModuleName, msgType, "same power"), nil, nil
+		}
+
+		// Select a random POA admin
 		admin, err := getRandomPOAAdmin(r, k.GetAdmins(ctx))
 		if err != nil {
-			return simtypes.NoOpMsg(poatypes.ModuleName, msgType, "no admins found"), nil, err
+			return simtypes.NoOpMsg(poatypes.ModuleName, msgType, err.Error()), nil, err
 		}
 
 		// Verify that the POA admin is a simulation accounts
@@ -269,19 +282,19 @@ func SimulateMsgSetPower(txGen client.TxConfig, k keeper.Keeper) simtypes.Operat
 			return simtypes.NoOpMsg(poatypes.ModuleName, msgType, "admin not found in simulator accounts"), nil, nil
 		}
 
-		adminAddr := adminAcc.Address
 		// Generate random transaction fees
+		adminAddr := adminAcc.Address
 		spendable := k.GetBankKeeper().SpendableCoins(ctx, adminAddr)
 		fees, err := simtypes.RandomFees(r, ctx, spendable)
-
-		//fmt.Println("Total Power: ", totalPower)
-		//fmt.Println("New Power: ", newPower)
+		if err != nil {
+			return simtypes.NoOpMsg(poatypes.ModuleName, msgType, "error generating random fees"), nil, err
+		}
 
 		msg := poatypes.MsgSetPower{
 			Sender:           admin,
 			ValidatorAddress: validator.OperatorAddress,
-			Power:            1_000_000,
-			Unsafe:           false,
+			Power:            newPower,
+			Unsafe:           false, // We only cover the case where the power is <= 30% of the total power
 		}
 
 		txCtx := simulation.OperationInput{
