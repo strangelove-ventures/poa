@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math/rand"
+	"sort"
 
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/types/simulation"
@@ -31,9 +32,13 @@ func RandomizedGenState(simState *module.SimulationState) {
 			adminSet[acc.Address.String()] = true
 		}
 
+		// Iteration order on map is non-deterministic
 		for k := range adminSet {
 			adm = append(adm, k)
 		}
+
+		// Sort the admin list for determinism
+		sort.Strings(adm)
 	})
 
 	// Allow validator self exit is enabled 50% of the time
