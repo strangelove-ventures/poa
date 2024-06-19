@@ -4,7 +4,6 @@ import (
 	"math/rand"
 	"sort"
 
-	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/pkg/errors"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
@@ -13,6 +12,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
 	sdkmath "cosmossdk.io/math"
 
