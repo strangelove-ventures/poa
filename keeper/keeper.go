@@ -24,6 +24,7 @@ type Keeper struct {
 	cdc codec.BinaryCodec
 
 	stakingKeeper *stakingkeeper.Keeper
+	accountKeeper AccountKeeper // for testing
 	slashKeeper   SlashingKeeper
 	bankKeeper    BankKeeper
 
@@ -94,6 +95,14 @@ func (k Keeper) GetSlashingKeeper() SlashingKeeper {
 
 func (k Keeper) GetBankKeeper() BankKeeper {
 	return k.bankKeeper
+}
+
+func (k *Keeper) GetTestAccountKeeper() AccountKeeper {
+	return k.accountKeeper
+}
+
+func (k *Keeper) SetTestAccountKeeper(ak AccountKeeper) {
+	k.accountKeeper = ak
 }
 
 // GetAdmins returns the module's administrators with delegation of power control.
