@@ -1,6 +1,7 @@
 package simulation
 
 import (
+	"math"
 	"math/rand"
 	"sort"
 
@@ -272,45 +273,66 @@ func SimulateMsgSetPower(txGen client.TxConfig, k keeper.Keeper) simtypes.Operat
 	}
 }
 
+// getNewPower returns a random new power value for a validator.
 func getNewPower(r *rand.Rand, k keeper.Keeper, ctx sdk.Context, validator stakingtypes.Validator) (uint64, string, bool) {
+	// Get the total power of the *previous* block
 	cachedPower, err := k.GetCachedBlockPower(ctx)
 	if err != nil {
 		return 0, "unable to get cached block power", true
 	}
 
+	// Get the total power changed in the *current* block
 	totalChangedPower, err := k.GetAbsoluteChangedInBlockPower(ctx)
 	if err != nil {
 		return 0, "unable to get absolute changed in block power", true
+	}
+
+	valAddr, err := sdk.ValAddressFromBech32(validator.OperatorAddress)
+	if err != nil {
+		return 0, "unable to get validator address", true
+	}
+
+	// Get the current power of the validator
+	currentPower, err := k.GetStakingKeeper().GetLastValidatorPower(ctx, valAddr)
+	if err != nil {
+		return 0, "unable to get last validator power", true
 	}
 
 	// Get the power reduction value used to convert tokens to consensus power
 	powerReduction := k.GetStakingKeeper().PowerReduction(ctx)
 
 	// Compute the new power of the validator
-	minPower := 1_000_000 // 1 Consensus Power = 1_000_000 shares by default
+	const minPower = 1 // 1 Consensus Power = 1_000_000 shares by default
 
-	// The new power needs to be < totalPower * 0.3 (30% of the total power)
-	maxPower := int(float64(cachedPower) * 0.3)
+	// The new power is between 1 and 30% of the total power of the *previous* block
+	// Changes over 30% of the total power are considered unsafe
+	// See the `unsafe` flag of `MsgSetPower`
+	maxPower := int(float64(cachedPower) * 0.3) // Decimal places are truncated
 	if maxPower < minPower {
 		return 0, "total power too low", false
 	}
 
-	newPower := uint64(simtypes.RandIntBetween(r, minPower, maxPower))
+	// Generate a random new power value
+	newPower := simtypes.RandIntBetween(r, minPower, maxPower)
 
-	// Check if the new power is safe
-	percentChange := ((newPower + totalChangedPower) * 100) / cachedPower
+	// No change in power
+	if currentPower == int64(newPower) {
+		return 0, "same power", false
+	}
+
+	// Compute the absolute change for this operation, i.e., how much the power of the validator will change
+	absPowerDiff := uint64(math.Abs(float64(newPower) - float64(currentPower)))
+
+	// The power change for the *entire block* needs to be below 30%
+	percentChange := ((absPowerDiff + totalChangedPower) * 100) / cachedPower
 	if percentChange >= 30 {
 		return 0, "unsafe power", false
 	}
 
-	// Check if the new power is the same as the current power of a randomly picked validator
-	// If it is, return a no-op
-	ttcp := sdk.TokensToConsensusPower(sdkmath.NewIntFromUint64(newPower), powerReduction)
-	if validator.GetConsensusPower(powerReduction) == ttcp {
-		return 0, "same power", false
-	}
+	// Convert the new power to tokens
+	newPowerTokens := sdk.TokensFromConsensusPower(int64(newPower), powerReduction)
 
-	return newPower, "", false
+	return newPowerTokens.Uint64(), "", false
 }
 
 func selectRandomPOAAccount(r *rand.Rand, admins []string, accs []simtypes.Account) (simtypes.Account, error) {
