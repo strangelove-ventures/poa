@@ -208,6 +208,9 @@ func SimulateMsgRemoveValidator(txGen client.TxConfig, k keeper.Keeper) simtypes
 		if len(validators) == 0 {
 			return simtypes.NoOpMsg(poatypes.ModuleName, msgType, "no bonded validators found"), nil, nil
 		}
+		if len(validators) == 1 {
+			return simtypes.NoOpMsg(poatypes.ModuleName, msgType, "cannot remove the last validator in the set"), nil, nil
+		}
 
 		// Select a random bonded validator to remove
 		validator := validators[r.Intn(len(validators))]
