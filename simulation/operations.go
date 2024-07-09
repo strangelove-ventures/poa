@@ -106,8 +106,8 @@ func SimulateMsgCreateValidator(txGen client.TxConfig, k keeper.Keeper) simtypes
 		}
 
 		balance := k.GetBankKeeper().GetBalance(ctx, simAccount.Address, denom)
-		if !balance.IsPositive() || balance.IsZero() {
-			return simtypes.NoOpMsg(poatypes.ModuleName, msgType, "balance is negative or zero"), nil, nil
+		if balance.Amount.LT(sdkmath.NewInt(2)) {
+			return simtypes.NoOpMsg(poatypes.ModuleName, msgType, "balance is less than two"), nil, nil
 		}
 
 		// Generate a random self-delegation amount between 1 and balance
