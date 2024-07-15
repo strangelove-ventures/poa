@@ -6,11 +6,12 @@ import (
 	"strings"
 	"testing"
 
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/strangelove-ventures/interchaintest/v8/chain/cosmos"
 	"github.com/strangelove-ventures/interchaintest/v8/ibc"
 )
 
-func ExecuteAuthzGrantMsg(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, granter ibc.Wallet, grantee ibc.Wallet, msgType string) (TxResponse, error) {
+func ExecuteAuthzGrantMsg(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, granter ibc.Wallet, grantee ibc.Wallet, msgType string) (sdk.TxResponse, error) {
 	if !strings.HasPrefix(msgType, "/") {
 		msgType = "/" + msgType
 	}
@@ -19,7 +20,7 @@ func ExecuteAuthzGrantMsg(t *testing.T, ctx context.Context, chain *cosmos.Cosmo
 	return ExecuteTransaction(ctx, chain, cmd)
 }
 
-func ExecuteAuthzExecMsg(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, grantee ibc.Wallet, nestedMsgCmd []string) (TxResponse, error) {
+func ExecuteAuthzExecMsg(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, grantee ibc.Wallet, nestedMsgCmd []string) (sdk.TxResponse, error) {
 	// generate the message to JSON, then exec the message
 	fileName := "authz.json"
 	node := chain.GetNode()
