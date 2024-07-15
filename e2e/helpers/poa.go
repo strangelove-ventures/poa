@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"testing"
 
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/strangelove-ventures/interchaintest/v8/chain/cosmos"
 	"github.com/strangelove-ventures/interchaintest/v8/ibc"
@@ -12,17 +13,17 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func POASetPower(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, user ibc.Wallet, valoper string, power int64, flags ...string) (TxResponse, error) {
+func POASetPower(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, user ibc.Wallet, valoper string, power int64, flags ...string) (sdk.TxResponse, error) {
 	cmd := TxCommandBuilder(ctx, chain, []string{"tx", "poa", "set-power", valoper, fmt.Sprintf("%d", power)}, user.KeyName(), flags...)
 	return ExecuteTransaction(ctx, chain, cmd)
 }
 
-func POARemove(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, user ibc.Wallet, valoper string) (TxResponse, error) {
+func POARemove(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, user ibc.Wallet, valoper string) (sdk.TxResponse, error) {
 	cmd := TxCommandBuilder(ctx, chain, []string{"tx", "poa", "remove", valoper}, user.KeyName())
 	return ExecuteTransaction(ctx, chain, cmd)
 }
 
-func POARemovePending(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, user ibc.Wallet, valoper string) (TxResponse, error) {
+func POARemovePending(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, user ibc.Wallet, valoper string) (sdk.TxResponse, error) {
 	cmd := TxCommandBuilder(ctx, chain, []string{"tx", "poa", "remove-pending", valoper}, user.KeyName())
 	return ExecuteTransaction(ctx, chain, cmd)
 }
@@ -30,7 +31,7 @@ func POARemovePending(t *testing.T, ctx context.Context, chain *cosmos.CosmosCha
 func POACreatePendingValidator(
 	t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, user ibc.Wallet,
 	ed25519PubKey string, moniker string, commissionRate string, commissionMaxRate string, commissionMaxChangeRate string,
-) (TxResponse, error) {
+) (sdk.TxResponse, error) {
 	file := "validator_file.json"
 
 	content := fmt.Sprintf(`{
@@ -106,7 +107,7 @@ func GetPOAPending(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain)
 	return res
 }
 
-func POAUpdateParams(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, user ibc.Wallet, admins []string, gracefulExit bool) (TxResponse, error) {
+func POAUpdateParams(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, user ibc.Wallet, admins []string, gracefulExit bool) (sdk.TxResponse, error) {
 	// admin1,admin2,admin3
 	adminList := ""
 	for _, admin := range admins {
@@ -123,7 +124,7 @@ func POAUpdateParams(t *testing.T, ctx context.Context, chain *cosmos.CosmosChai
 	return ExecuteTransaction(ctx, chain, cmd)
 }
 
-func POAUpdateStakingParams(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, user ibc.Wallet, sp stakingtypes.Params) (TxResponse, error) {
+func POAUpdateStakingParams(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, user ibc.Wallet, sp stakingtypes.Params) (sdk.TxResponse, error) {
 	command := []string{"tx", "poa", "update-staking-params",
 		sp.UnbondingTime.String(),
 		fmt.Sprintf("%d", sp.MaxValidators),

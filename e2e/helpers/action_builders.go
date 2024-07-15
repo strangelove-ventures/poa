@@ -4,8 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/strangelove-ventures/interchaintest/v8/chain/cosmos"
 	"github.com/strangelove-ventures/interchaintest/v8/testutil"
 )
@@ -33,34 +35,43 @@ func ExecuteExec(ctx context.Context, chain *cosmos.CosmosChain, cmd []string, i
 	}
 
 	fmt.Println(string(stdout))
-	if err := json.Unmarshal(stdout, &i); err != nil {
-		fmt.Println(err)
+	if err := chain.GetCodec().UnmarshalInterface(stdout, &i); err != nil {
+		// If the codec can not properly unmarshal, then it may be a standard json Unmarshal request.
+		// This is required since we are ExecuteExec'ing an interface{} instead of some concrete type.
+		if strings.Contains(err.Error(), "illegal wireType") {
+			if err2 := json.Unmarshal(stdout, &i); err2 != nil {
+				fmt.Println(err2)
+			}
+		} else {
+			fmt.Println(err)
+		}
+
 	}
 }
 
 // Executes a command from CommandBuilder
-func ExecuteTransaction(ctx context.Context, chain *cosmos.CosmosChain, cmd []string) (TxResponse, error) {
+func ExecuteTransaction(ctx context.Context, chain *cosmos.CosmosChain, cmd []string) (sdk.TxResponse, error) {
 	var err error
 	var stdout []byte
 
 	stdout, _, err = chain.Exec(ctx, cmd, nil)
 	if err != nil {
-		return TxResponse{}, err
+		return sdk.TxResponse{}, err
 	}
 
 	if err := testutil.WaitForBlocks(ctx, waitForBlocks, chain); err != nil {
-		return TxResponse{}, err
+		return sdk.TxResponse{}, err
 	}
 
-	var res TxResponse
-	if err := json.Unmarshal(stdout, &res); err != nil {
-		return TxResponse{}, err
+	var res sdk.TxResponse
+	if err := chain.GetCodec().UnmarshalJSON(stdout, &res); err != nil {
+		return sdk.TxResponse{}, err
 	}
 
 	return res, err
 }
 
-func ExecuteTransactionNoError(ctx context.Context, chain *cosmos.CosmosChain, cmd []string) TxResponse {
+func ExecuteTransactionNoError(ctx context.Context, chain *cosmos.CosmosChain, cmd []string) sdk.TxResponse {
 	res, _ := ExecuteTransaction(ctx, chain, cmd)
 	return res
 }

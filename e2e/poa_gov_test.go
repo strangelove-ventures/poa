@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"testing"
 
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/strangelove-ventures/interchaintest/v8"
 	"github.com/strangelove-ventures/interchaintest/v8/chain/cosmos"
 	"github.com/strangelove-ventures/interchaintest/v8/ibc"
@@ -85,7 +86,7 @@ func testGovernance(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain
 }
 
 func testUpdatePOAParams(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, acc0, incorrectUser ibc.Wallet) {
-	var tx helpers.TxResponse
+	var tx sdk.TxResponse
 	var err error
 
 	t.Log("\n===== TEST UPDATE POA PARAMS =====")
@@ -95,7 +96,7 @@ func testUpdatePOAParams(t *testing.T, ctx context.Context, chain *cosmos.Cosmos
 		if err != nil {
 			t.Fatal(err)
 		}
-		txRes, err := chain.GetTransaction(tx.Txhash)
+		txRes, err := chain.GetTransaction(tx.TxHash)
 		require.NoError(t, err)
 		fmt.Printf("%+v", txRes)
 		require.Contains(t, txRes.RawLog, poa.ErrNotAnAuthority.Error())
@@ -106,7 +107,7 @@ func testUpdatePOAParams(t *testing.T, ctx context.Context, chain *cosmos.Cosmos
 		if err != nil {
 			t.Fatal(err)
 		}
-		txRes, err := chain.GetTransaction(tx.Txhash)
+		txRes, err := chain.GetTransaction(tx.TxHash)
 		require.NoError(t, err)
 		fmt.Printf("%+v", txRes)
 		require.EqualValues(t, txRes.Code, 3)
@@ -129,7 +130,7 @@ func testUpdatePOAParams(t *testing.T, ctx context.Context, chain *cosmos.Cosmos
 			t.Fatal(err)
 		}
 
-		txRes, err := chain.GetTransaction(tx.Txhash)
+		txRes, err := chain.GetTransaction(tx.TxHash)
 		require.NoError(t, err)
 		fmt.Printf("%+v", txRes)
 		require.EqualValues(t, txRes.Code, 0)
@@ -145,7 +146,7 @@ func testUpdatePOAParams(t *testing.T, ctx context.Context, chain *cosmos.Cosmos
 		if err != nil {
 			t.Fatal(err)
 		}
-		txRes, err := chain.GetTransaction(tx.Txhash)
+		txRes, err := chain.GetTransaction(tx.TxHash)
 		require.NoError(t, err)
 		fmt.Printf("%+v", txRes)
 		require.EqualValues(t, txRes.Code, 0)
