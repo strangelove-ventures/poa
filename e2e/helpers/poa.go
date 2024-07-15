@@ -93,9 +93,9 @@ func GetPOAConsensusPower(t *testing.T, ctx context.Context, chain *cosmos.Cosmo
 	ExecuteQuery(ctx, chain, []string{"query", "poa", "consensus-power", valoperAddr}, &res)
 
 	power := int64(0)
-	if _, err := fmt.Sscanf(res.Power, "%d", &power); err != nil {
-		t.Fatalf("error converting power to int64: %s", err)
-	}
+	_, err := fmt.Sscanf(res.Power, "%d", &power)
+	fmt.Println("error", err) // does not panic incase omitempty
+
 	return power
 }
 

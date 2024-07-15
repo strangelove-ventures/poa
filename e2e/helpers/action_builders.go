@@ -29,27 +29,24 @@ func ExecuteExec(ctx context.Context, chain *cosmos.CosmosChain, cmd []string, i
 	command = append(command, extraFlags...)
 	fmt.Println(command)
 
-	stdout, _, err := chain.Exec(ctx, command, nil)
+	stdout, stderr, err := chain.Exec(ctx, command, nil)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	fmt.Println("ExecuteExec", string(stdout))
+	fmt.Println("ExecuteExec", "stdout", string(stdout), "stderr", string(stderr))
 
+	err2 := json.Unmarshal(stdout, &i)
+	if err2 != nil {
+		fmt.Println("json.Unmarshal", err2)
+		return // guard return as to not show the next error
+	}
+
+	// If the codec can not properly unmarshal, then it may be a standard json Unmarshal request.
+	// This is required since we are ExecuteExec'ing an interface{} instead of some concrete type.
 	err = chain.GetCodec().UnmarshalInterface(stdout, &i)
-	if err != nil {
-
-		// If the codec can not properly unmarshal, then it may be a standard json Unmarshal request.
-		// This is required since we are ExecuteExec'ing an interface{} instead of some concrete type.
-		err2 := json.Unmarshal(stdout, &i)
-		if err2 != nil {
-			fmt.Println("json.Unmarshal", err2)
-			return // guard return as to not show the next error
-		}
-
-		if !strings.Contains(err.Error(), "illegal wireType") {
-			fmt.Println("chain.GetCodec.UnmarshalInterface", err)
-		}
+	if err != nil && !strings.Contains(err.Error(), "illegal wireType") {
+		fmt.Println("chain.GetCodec.UnmarshalInterface", err)
 	}
 }
 
