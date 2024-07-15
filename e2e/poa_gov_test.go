@@ -74,14 +74,15 @@ func testGovernance(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain
 
 	t.Run("success: gov proposal validator change", func(t *testing.T) {
 		// ibc.ChainConfig key: app_state.poa.params.admins must contain the governance address.
-		propID := helpers.SubmitGovernanceProposalForValidatorChanges(t, ctx, chain, acc0, validators[0], 1_234_567, true, GovModuleAddress)
+		powerAmt := uint64(1_234_567)
+		propID := helpers.SubmitGovernanceProposalForValidatorChanges(t, ctx, chain, acc0, validators[0], powerAmt, true, GovModuleAddress)
 		helpers.ValidatorVote(t, ctx, chain, propID, cosmos.ProposalVoteYes, 25)
 
-		// validate the validator[0] was set to 1_234_567
+		// validate the validator[0] was set to powerAmt
 		val := helpers.GetValidators(t, ctx, chain).Validators[0]
 		require.Equal(t, val.Tokens, "1234567")
 		p := helpers.GetPOAConsensusPower(t, ctx, chain, val.OperatorAddress)
-		require.EqualValues(t, 1_234_567/1_000_000, p)
+		require.EqualValues(t, powerAmt/1_000_000, p, "Validator[0] should have 1 consensus power")
 	})
 }
 
