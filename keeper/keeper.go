@@ -101,38 +101,13 @@ func (k Keeper) GetBankKeeper() BankKeeper {
 	return k.bankKeeper
 }
 
-// GetAdmins returns the module's administrators with delegation of power control.
-func (k Keeper) GetAdmins(ctx context.Context) []string {
-	p, err := k.GetParams(ctx)
-	if err != nil {
-		return []string{}
-	}
-
-	admins := p.Admins
-
-	found := false
-	for _, auth := range admins {
-		if auth == k.authority {
-			found = true
-			break
-		}
-	}
-	if !found {
-		admins = append(admins, k.authority)
-	}
-
-	return admins
+// GetAdmin returns the module's administrators with delegation of power control (authority)
+func (k Keeper) GetAdmin(ctx context.Context) string {
+	return k.authority
 }
 
 // IsAdmin checks if the given address is an admin.
 func (k Keeper) IsAdmin(ctx context.Context, fromAddr string) bool {
-	for _, auth := range k.GetAdmins(ctx) {
-		if auth == fromAddr {
-			return true
-		}
-	}
-
-	// the main authority may already be in the GetAdmins list. If not, we check here.
 	return k.authority == fromAddr
 }
 

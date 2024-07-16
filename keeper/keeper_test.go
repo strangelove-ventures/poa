@@ -41,13 +41,16 @@ import (
 	poamodule "github.com/strangelove-ventures/poa/module"
 )
 
-var maccPerms = map[string][]string{
-	authtypes.FeeCollectorName:     nil,
-	stakingtypes.BondedPoolName:    {authtypes.Burner, authtypes.Staking},
-	stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
-	minttypes.ModuleName:           {authtypes.Minter},
-	govtypes.ModuleName:            {authtypes.Burner},
-}
+var (
+	authorityAddr = "cosmos15ky9du8a2wlstz6fpx3p4mqpjyrm5cgqjwl8sq"
+	maccPerms     = map[string][]string{
+		authtypes.FeeCollectorName:     nil,
+		stakingtypes.BondedPoolName:    {authtypes.Burner, authtypes.Staking},
+		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
+		minttypes.ModuleName:           {authtypes.Minter},
+		govtypes.ModuleName:            {authtypes.Burner},
+	}
+)
 
 type testFixture struct {
 	suite.Suite
@@ -64,8 +67,8 @@ type testFixture struct {
 	bankkeeper     bankkeeper.BaseKeeper
 	mintkeeper     mintkeeper.Keeper
 
-	addrs      []sdk.AccAddress
-	govModAddr string
+	addrs         []sdk.AccAddress
+	authorityAddr string
 }
 
 func SetupTest(t *testing.T, baseValShares int64) *testFixture {
@@ -77,7 +80,7 @@ func SetupTest(t *testing.T, baseValShares int64) *testFixture {
 	logger := log.NewTestLogger(t)
 	encCfg := moduletestutil.MakeTestEncodingConfig()
 
-	f.govModAddr = authtypes.NewModuleAddress(govtypes.ModuleName).String()
+	f.authorityAddr = authorityAddr
 	f.addrs = simtestutil.CreateIncrementalAccounts(3)
 
 	key := storetypes.NewKVStoreKey(poa.ModuleName)
@@ -90,7 +93,7 @@ func SetupTest(t *testing.T, baseValShares int64) *testFixture {
 	registerBaseSDKModules(f, encCfg, storeService, logger, require)
 
 	// Setup POA Keeper.
-	f.k = keeper.NewKeeper(encCfg.Codec, storeService, f.stakingKeeper, f.slashingKeeper, f.bankkeeper, logger, "")
+	f.k = keeper.NewKeeper(encCfg.Codec, storeService, f.stakingKeeper, f.slashingKeeper, f.bankkeeper, logger, authorityAddr)
 	f.msgServer = keeper.NewMsgServerImpl(f.k)
 	f.queryServer = keeper.NewQueryServerImpl(f.k)
 	f.appModule = poamodule.NewAppModule(encCfg.Codec, f.k)
@@ -117,7 +120,6 @@ func (f *testFixture) InitPoAGenesis(t *testing.T) {
 	t.Helper()
 
 	genState := poa.NewGenesisState()
-	genState.Params.Admins = []string{f.addrs[0].String(), f.govModAddr}
 	require.NoError(t, f.k.InitGenesis(f.ctx, genState))
 }
 
@@ -134,7 +136,7 @@ func registerBaseSDKModules(
 		authtypes.ProtoBaseAccount,
 		maccPerms,
 		authcodec.NewBech32Codec(sdk.Bech32MainPrefix), sdk.Bech32MainPrefix,
-		f.govModAddr,
+		f.authorityAddr,
 	)
 
 	// Bank Keeper.
@@ -142,13 +144,13 @@ func registerBaseSDKModules(
 		encCfg.Codec, storeService,
 		f.accountkeeper,
 		nil,
-		f.govModAddr, logger,
+		f.authorityAddr, logger,
 	)
 
 	// Staking Keeper.
 	f.stakingKeeper = stakingkeeper.NewKeeper(
 		encCfg.Codec, storeService,
-		f.accountkeeper, f.bankkeeper, f.govModAddr,
+		f.accountkeeper, f.bankkeeper, f.authorityAddr,
 		authcodec.NewBech32Codec(sdk.Bech32PrefixValAddr),
 		authcodec.NewBech32Codec(sdk.Bech32PrefixConsAddr),
 	)
@@ -159,7 +161,7 @@ func registerBaseSDKModules(
 	f.slashingKeeper = slashingkeeper.NewKeeper(
 		encCfg.Codec, encCfg.Amino, storeService,
 		f.stakingKeeper,
-		f.govModAddr,
+		f.authorityAddr,
 	)
 	err = f.slashingKeeper.SetParams(f.ctx, slashingtypes.DefaultParams())
 	require.NoError(err)
@@ -169,7 +171,7 @@ func registerBaseSDKModules(
 	f.mintkeeper = mintkeeper.NewKeeper(
 		encCfg.Codec, storeService,
 		f.stakingKeeper, f.accountkeeper, f.bankkeeper,
-		authtypes.FeeCollectorName, f.govModAddr,
+		authtypes.FeeCollectorName, f.authorityAddr,
 	)
 }
 

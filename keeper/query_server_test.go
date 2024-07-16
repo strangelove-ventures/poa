@@ -67,30 +67,6 @@ func TestParamsQuery(t *testing.T) {
 			},
 			expected: poa.DefaultParams(),
 		},
-		{
-			name: "two admins",
-			request: &poa.MsgUpdateParams{
-				Sender: f.govModAddr,
-				Params: poa.Params{
-					Admins: []string{f.govModAddr, f.addrs[0].String()},
-				},
-			},
-			expected: poa.Params{
-				Admins: []string{f.govModAddr, f.addrs[0].String()},
-			},
-		},
-		{
-			name: "duplicate admins",
-			request: &poa.MsgUpdateParams{
-				Sender: f.govModAddr,
-				Params: poa.Params{
-					Admins: []string{f.govModAddr, f.govModAddr},
-				},
-			},
-			expected: poa.Params{
-				Admins: []string{f.govModAddr, f.govModAddr},
-			},
-		},
 	}
 
 	for _, tc := range testCases {

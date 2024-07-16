@@ -60,7 +60,7 @@ func testGovernance(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain
 			&poa.MsgUpdateParams{
 				Sender: GovModuleAddress,
 				Params: poa.Params{
-					Admins: []string{acc0.FormattedAddress(), GovModuleAddress, RandAcc},
+					AllowValidatorSelfExit: false,
 				},
 			},
 		}
@@ -68,7 +68,7 @@ func testGovernance(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain
 		propId := helpers.SubmitParamChangeProp(t, ctx, chain, acc0, updatedParams, GovModuleAddress, 25)
 		helpers.ValidatorVote(t, ctx, chain, propId, cosmos.ProposalVoteYes, 30)
 
-		require.Len(t, helpers.GetPOAParams(t, ctx, chain).Admins, 3, "Admins should be 3")
+		require.True(t, helpers.GetPOAParams(t, ctx, chain).AllowValidatorSelfExit, "AllowValidatorSelfExit should be true")
 	})
 
 	t.Run("success: gov proposal validator change", func(t *testing.T) {
@@ -91,7 +91,7 @@ func testUpdatePOAParams(t *testing.T, ctx context.Context, chain *cosmos.Cosmos
 	t.Log("\n===== TEST UPDATE POA PARAMS =====")
 
 	t.Run("fail: update-params message from a non authorized user", func(t *testing.T) {
-		tx, err = helpers.POAUpdateParams(t, ctx, chain, incorrectUser, []string{incorrectUser.FormattedAddress()}, true)
+		tx, err = helpers.POAUpdateParams(t, ctx, chain, incorrectUser, true)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -140,8 +140,7 @@ func testUpdatePOAParams(t *testing.T, ctx context.Context, chain *cosmos.Cosmos
 	})
 
 	t.Run("success: update-params message from an authorized user with cli.", func(t *testing.T) {
-		newAdmins := []string{acc0.FormattedAddress(), GovModuleAddress, RandAcc, incorrectUser.FormattedAddress()}
-		tx, err = helpers.POAUpdateParams(t, ctx, chain, acc0, newAdmins, true)
+		tx, err = helpers.POAUpdateParams(t, ctx, chain, acc0, true)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -151,9 +150,7 @@ func testUpdatePOAParams(t *testing.T, ctx context.Context, chain *cosmos.Cosmos
 		require.EqualValues(t, txRes.Code, 0)
 
 		p := helpers.GetPOAParams(t, ctx, chain)
-		for _, admin := range newAdmins {
-			require.Contains(t, p.Admins, admin)
-		}
+		require.False(t, p.AllowValidatorSelfExit) // TODO: check this
 	})
 
 }

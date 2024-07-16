@@ -30,7 +30,7 @@ func TestInitGenesis(t *testing.T) {
 	})
 
 	t.Run("custom params", func(t *testing.T) {
-		p, err := poa.NewParams([]string{fixture.addrs[0].String(), fixture.addrs[1].String()}, true)
+		p, err := poa.NewParams(true)
 		require.NoError(err)
 
 		data := &poa.GenesisState{
@@ -44,13 +44,8 @@ func TestInitGenesis(t *testing.T) {
 		require.Equal(p, params)
 	})
 
-	t.Run("bad params", func(t *testing.T) {
-		_, err := poa.NewParams(nil, false)
-		require.Error(err)
-	})
-
 	t.Run("pending validator export", func(t *testing.T) {
-		p, err := poa.NewParams([]string{fixture.addrs[0].String(), fixture.addrs[1].String()}, true)
+		p, err := poa.NewParams(true)
 		require.NoError(err)
 
 		acc := GenAcc()

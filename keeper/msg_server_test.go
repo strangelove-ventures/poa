@@ -37,19 +37,11 @@ func TestUpdateParams(t *testing.T) {
 			expectErrMsg: "not an authority",
 		},
 		{
-			name: "set invalid admins",
-			request: &poa.MsgUpdateParams{
-				Sender: f.govModAddr,
-				Params: poa.Params{},
-			},
-			expectErrMsg: poa.ErrMustProvideAtLeastOneAddress.Error(),
-		},
-		{
 			name: "set valid params",
 			request: &poa.MsgUpdateParams{
-				Sender: f.govModAddr,
+				Sender: f.authorityAddr,
 				Params: poa.Params{
-					Admins: []string{f.addrs[0].String()},
+					AllowValidatorSelfExit: true,
 				},
 			},
 		},
@@ -96,7 +88,7 @@ func TestUpdateStakingParams(t *testing.T) {
 		{
 			name: "set valid params",
 			request: &poa.MsgUpdateStakingParams{
-				Sender: f.govModAddr,
+				Sender: f.authorityAddr,
 				Params: poa.DefaultStakingParams(),
 			},
 			expectErrMsg: "",
