@@ -35,9 +35,6 @@ ictest-val-add:
 ictest-val-remove:
 	$(MAKE) -C e2e/ ictest-val-remove
 
-ictest-gov:
-	$(MAKE) -C e2e/ ictest-gov
-
 .PHONY: test ictest-poa ictest-jail ictest-val-add ictest-val-remove
 
 coverage: ## Run coverage report
