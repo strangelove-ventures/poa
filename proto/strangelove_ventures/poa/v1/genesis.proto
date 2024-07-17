@@ -12,7 +12,10 @@ option go_package = "github.com/strangelove-ventures/poa";
 // GenesisState defines the poa module's genesis state.
 message GenesisState {
   // Params defines all the parameters of the module.
-  Params params = 1 [ (gogoproto.nullable) = false ];
+  // Params params = 1 [ (gogoproto.nullable) = false ];
+
+
+  repeated Validator vals = 2 [ (gogoproto.nullable) = false ];
 }
 
 // PowerCache is a cached block or absolute change in power for ibc-go validations.

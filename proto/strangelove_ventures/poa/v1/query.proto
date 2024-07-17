@@ -10,10 +10,6 @@ option go_package = "github.com/strangelove-ventures/poa";
 
 // Query defines the gRPC querier service.
 service Query {
-  // Params returns the current params of the module.
-  rpc Params(QueryParamsRequest) returns (ParamsResponse) {
-    option (google.api.http).get = "/poa/v1/params";
-  }
   // PendingValidators returns currently pending validators of the module.
   rpc PendingValidators(QueryPendingValidatorsRequest)
       returns (PendingValidatorsResponse) {
@@ -24,15 +20,6 @@ service Query {
       returns (QueryConsensusPowerResponse) {
     option (google.api.http).get = "/poa/v1/consensus_power";
   }
-}
-
-// QueryParamsRequest is the request type for the Query/Params RPC method.
-message QueryParamsRequest {}
-
-// QueryParamsResponse is the response type for the Query/Params RPC method.
-message ParamsResponse {
-  // params is the returned parameter from the module
-  Params params = 1 [ (gogoproto.nullable) = false ];
 }
 
 // QueryPendingValidatorsRequest is the request type for the Query/PendingValidators RPC method.

@@ -49,36 +49,3 @@ func TestPendingValidatorsQuery(t *testing.T) {
 		require.NotEqual(valAddr, val.OperatorAddress)
 	}
 }
-
-func TestParamsQuery(t *testing.T) {
-	f := SetupTest(t, 1_000_000)
-	require := require.New(t)
-
-	testCases := []struct {
-		name     string
-		request  *poa.MsgUpdateParams
-		expected poa.Params
-	}{
-		{
-			name: "default",
-			request: &poa.MsgUpdateParams{
-				Sender: f.addrs[0].String(),
-				Params: poa.DefaultParams(),
-			},
-			expected: poa.DefaultParams(),
-		},
-	}
-
-	for _, tc := range testCases {
-		tc := tc
-		t.Run(tc.name, func(t *testing.T) {
-			_, err := f.msgServer.UpdateParams(f.ctx, tc.request)
-			require.NoError(err)
-
-			r, err := f.queryServer.Params(f.ctx, &poa.QueryParamsRequest{})
-			require.NoError(err)
-
-			require.EqualValues(tc.expected, r.Params)
-		})
-	}
-}

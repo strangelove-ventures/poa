@@ -13,7 +13,6 @@ import (
 func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	legacy.RegisterAminoMsg(cdc, &MsgSetPower{}, "poa/MsgSetPower")
 	legacy.RegisterAminoMsg(cdc, &MsgCreateValidator{}, "poa/MsgCreateValidator")
-	legacy.RegisterAminoMsg(cdc, &MsgUpdateParams{}, "poa/MsgUpdateParams")
 	legacy.RegisterAminoMsg(cdc, &MsgRemoveValidator{}, "poa/MsgRemoveValidator")
 	legacy.RegisterAminoMsg(cdc, &MsgUpdateStakingParams{}, "poa/MsgUpdateStakingParams")
 }
@@ -23,7 +22,6 @@ func RegisterInterfaces(registry types.InterfaceRegistry) {
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgSetPower{},
 		&MsgCreateValidator{},
-		&MsgUpdateParams{},
 		&MsgRemoveValidator{},
 		&MsgUpdateStakingParams{},
 	)

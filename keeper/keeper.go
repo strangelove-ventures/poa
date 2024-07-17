@@ -31,7 +31,6 @@ type Keeper struct {
 
 	// state management
 	Schema                 collections.Schema
-	Params                 collections.Item[poa.Params]
 	PendingValidators      collections.Item[poa.Validators]
 	UpdatedValidatorsCache collections.KeySet[string]
 
@@ -63,7 +62,6 @@ func NewKeeper(
 		logger:        logger,
 
 		// Stores
-		Params:                 collections.NewItem(sb, poa.ParamsKey, "params", codec.CollValue[poa.Params](cdc)),
 		PendingValidators:      collections.NewItem(sb, poa.PendingValidatorsKey, "pending", codec.CollValue[poa.Validators](cdc)),
 		UpdatedValidatorsCache: collections.NewKeySet(sb, poa.UpdatedValidatorsCacheKey, "updated_validators", collections.StringKey),
 
