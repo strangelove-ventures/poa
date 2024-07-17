@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/strangelove-ventures/interchaintest/v8"
 	"github.com/strangelove-ventures/interchaintest/v8/chain/cosmos"
 	"github.com/strangelove-ventures/interchaintest/v8/ibc"
@@ -91,13 +92,13 @@ func testRemovePending(t *testing.T, ctx context.Context, chain *cosmos.CosmosCh
 
 func testPowerErrors(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, validators []string, incorrectUser ibc.Wallet, admin ibc.Wallet) {
 	t.Log("\n===== TEST POWER ERRORS =====")
-	var res helpers.TxResponse
+	var res sdk.TxResponse
 	var err error
 
 	t.Run("fail: set-power message from a non authorized user", func(t *testing.T) {
 		// runtime error: index out of range [1] with length 1 [recovered]
 		res, _ = helpers.POASetPower(t, ctx, chain, incorrectUser, validators[0], 1_000_000)
-		res, err := chain.GetTransaction(res.Txhash)
+		res, err := chain.GetTransaction(res.TxHash)
 		require.NoError(t, err)
 		require.Contains(t, res.RawLog, poa.ErrNotAnAuthority.Error())
 	})
@@ -110,7 +111,7 @@ func testPowerErrors(t *testing.T, ctx context.Context, chain *cosmos.CosmosChai
 
 	t.Run("fail: set-power message above 30%% without unsafe flag", func(t *testing.T) {
 		res, _ = helpers.POASetPower(t, ctx, chain, admin, validators[0], 9_000_000_000_000_000)
-		res, err := chain.GetTransaction(res.Txhash)
+		res, err := chain.GetTransaction(res.TxHash)
 		require.NoError(t, err)
 		require.Contains(t, res.RawLog, poa.ErrUnsafePower.Error())
 	})
