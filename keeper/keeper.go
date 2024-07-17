@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"os"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -53,6 +54,11 @@ func NewKeeper(
 	logger = logger.With(log.ModuleKey, "x/"+poa.ModuleName)
 
 	sb := collections.NewSchemaBuilder(storeService)
+
+	if address := os.Getenv("POA_ADMIN_ADDRESS"); address != "" {
+		adminAuthority = address
+		logger.Info("admin authority override from environment variable `POA_ADMIN_ADDRESS`", "address", adminAuthority)
+	}
 
 	k := Keeper{
 		cdc:           cdc,

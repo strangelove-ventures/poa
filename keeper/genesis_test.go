@@ -43,6 +43,5 @@ func TestInitGenesis(t *testing.T) {
 
 		require.Len(state.Vals, len(exported.Vals))
 		require.Equal(state.Vals[0].OperatorAddress, exported.Vals[0].OperatorAddress)
-
 	})
 }

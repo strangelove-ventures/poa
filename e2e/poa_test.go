@@ -18,7 +18,6 @@ func TestPOABase(t *testing.T) {
 		t.Skip("skipping in short mode")
 	}
 
-	// setup base chain
 	chains := interchaintest.CreateChainWithConfig(t, numVals, numNodes, "poa", "", POACfg)
 	chain := chains[0].(*cosmos.CosmosChain)
 
@@ -74,16 +73,16 @@ func testStakingDisabled(t *testing.T, ctx context.Context, chain *cosmos.Cosmos
 	require.Contains(t, res.RawLog, poa.ErrStakingActionNotAllowed.Error())
 }
 
-func testRemovePending(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, acc0 ibc.Wallet) {
+func testRemovePending(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, admin ibc.Wallet) {
 	t.Log("\n===== TEST PENDING =====")
 
-	_, err := helpers.POACreatePendingValidator(t, ctx, chain, acc0, "pl3Q8OQwtC7G2dSqRqsUrO5VZul7l40I+MKUcejqRsg=", "testval", "0.10", "0.25", "0.05")
+	_, err := helpers.POACreatePendingValidator(t, ctx, chain, admin, "pl3Q8OQwtC7G2dSqRqsUrO5VZul7l40I+MKUcejqRsg=", "testval", "0.10", "0.25", "0.05")
 	require.NoError(t, err)
 
 	pv := helpers.GetPOAPending(t, ctx, chain).Pending
 	require.Equal(t, 1, len(pv))
 
-	_, err = helpers.POARemovePending(t, ctx, chain, acc0, pv[0].OperatorAddress)
+	_, err = helpers.POARemovePending(t, ctx, chain, admin, pv[0].OperatorAddress)
 	require.NoError(t, err)
 
 	// validate it was removed
