@@ -2,6 +2,7 @@ package poa
 
 import (
 	"encoding/json"
+	fmt "fmt"
 
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 )
@@ -9,6 +10,7 @@ import (
 // DefaultParams returns default module parameters.
 func DefaultParams() Params {
 	return Params{
+		Admins:                 []string(nil), // uses the authority as admin only now
 		AllowValidatorSelfExit: true,
 	}
 }
@@ -48,5 +50,9 @@ func (p Params) String() string {
 
 // Validate does the sanity check on the params.
 func (p Params) Validate() error {
+	if len(p.Admins) != 0 {
+		return fmt.Errorf("DEPERECATED: admins must be empty as only the keeper authority is used")
+	}
+
 	return nil
 }
