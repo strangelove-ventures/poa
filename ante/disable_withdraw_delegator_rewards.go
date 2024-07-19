@@ -2,6 +2,7 @@ package poaante
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/x/authz"
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 
 	"github.com/strangelove-ventures/poa"
@@ -30,6 +31,18 @@ func (mdwr MsgDisableWithdrawDelegatorRewards) AnteHandle(ctx sdk.Context, tx sd
 
 func (mdwr MsgDisableWithdrawDelegatorRewards) hasWithdrawDelegatorRewardsMsg(msgs []sdk.Msg) bool {
 	for _, msg := range msgs {
+		// authz nested message check (recursive)
+		if execMsg, ok := msg.(*authz.MsgExec); ok {
+			msgs, err := execMsg.GetMessages()
+			if err != nil {
+				return true
+			}
+
+			if mdwr.hasWithdrawDelegatorRewardsMsg(msgs) {
+				return true
+			}
+		}
+
 		if _, ok := msg.(*distrtypes.MsgWithdrawDelegatorReward); ok {
 			return true
 		}
