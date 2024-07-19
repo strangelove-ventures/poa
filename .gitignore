@@ -21,3 +21,5 @@
 debug_container.dot
 
 build/
+
+go.work.sum
