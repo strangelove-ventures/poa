@@ -30,7 +30,7 @@ func (mdwr MsgDisableWithdrawDelegatorRewards) AnteHandle(ctx sdk.Context, tx sd
 
 func (mdwr MsgDisableWithdrawDelegatorRewards) hasWithdrawDelegatorRewardsMsg(msgs []sdk.Msg) bool {
 	for _, msg := range msgs {
-		if msg.(*distrtypes.MsgWithdrawDelegatorReward) != nil {
+		if _, ok := msg.(*distrtypes.MsgWithdrawDelegatorReward); ok {
 			return true
 		}
 	}
