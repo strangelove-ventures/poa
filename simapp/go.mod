@@ -10,7 +10,7 @@ replace (
 
 	// Fixes POA retreaving jailed validators.
 	// - https://github.com/cosmos/cosmos-sdk/pull/20059
-	github.com/cosmos/cosmos-sdk => github.com/rollchains/cosmos-sdk v0.50.6
+	github.com/cosmos/cosmos-sdk => github.com/rollchains/cosmos-sdk v0.50.8
 	// Fix upstream GHSA-h395-qcrw-5vmq and GHSA-3vp4-m3rf-835h vulnerabilities.
 	github.com/gin-gonic/gin => github.com/gin-gonic/gin v1.9.1
 
