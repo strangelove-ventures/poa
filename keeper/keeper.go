@@ -44,7 +44,7 @@ type Keeper struct {
 func NewKeeper(
 	cdc codec.BinaryCodec,
 	storeService storetypes.KVStoreService,
-	sk *stakingkeeper.Keeper,
+	//sk *stakingkeeper.Keeper, // TODO: Breaks depinject
 	slk SlashingKeeper,
 	bk BankKeeper,
 	logger log.Logger,
@@ -55,7 +55,7 @@ func NewKeeper(
 
 	k := Keeper{
 		cdc:           cdc,
-		stakingKeeper: sk,
+		stakingKeeper: nil, // TODO: Breaks depinject
 		slashKeeper:   slk,
 		bankKeeper:    bk,
 		logger:        logger,
