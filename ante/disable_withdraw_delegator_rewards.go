@@ -3,6 +3,7 @@ package poaante
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
+
 	"github.com/strangelove-ventures/poa"
 )
 
@@ -29,8 +30,7 @@ func (mdwr MsgDisableWithdrawDelegatorRewards) AnteHandle(ctx sdk.Context, tx sd
 
 func (mdwr MsgDisableWithdrawDelegatorRewards) hasWithdrawDelegatorRewardsMsg(msgs []sdk.Msg) bool {
 	for _, msg := range msgs {
-		switch msg.(type) {
-		case *distrtypes.MsgWithdrawDelegatorReward:
+		if msg.(*distrtypes.MsgWithdrawDelegatorReward) != nil {
 			return true
 		}
 	}

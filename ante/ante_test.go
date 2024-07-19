@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"testing"
 
-	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	"github.com/stretchr/testify/require"
 	protov2 "google.golang.org/protobuf/proto"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
 	"cosmossdk.io/math"
@@ -179,7 +179,6 @@ func TestAnteDisableWithdrawRewards(t *testing.T) {
 			}
 		})
 	}
-
 }
 
 func setBlockHeader(ctx sdk.Context, height uint64) sdk.Context {
