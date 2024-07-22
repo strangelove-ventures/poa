@@ -24,9 +24,7 @@ jobs:
         run: make sim-full-app
       - name: Simulation after state import (fixed seed)
         run: make sim-after-import
-#      #  Requires wiring v2
-#      # https://github.com/strangelove-ventures/poa/issues/199
-#      - name: Simulation export/import (fixed seed)
-#        run: make sim-export-import
+      - name: Simulation export/import (fixed seed)
+        run: make sim-export-import
       - name: Simulate application state determinism (fixed seed)
         run: make sim-app-determinism
