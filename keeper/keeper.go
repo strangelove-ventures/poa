@@ -8,7 +8,6 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
-	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
 	"cosmossdk.io/collections"
@@ -23,7 +22,7 @@ import (
 type Keeper struct {
 	cdc codec.BinaryCodec
 
-	stakingKeeper *stakingkeeper.Keeper
+	stakingKeeper StakingKeeper
 	accountKeeper AccountKeeper // for testing
 	slashKeeper   SlashingKeeper
 	bankKeeper    BankKeeper
@@ -44,7 +43,7 @@ type Keeper struct {
 func NewKeeper(
 	cdc codec.BinaryCodec,
 	storeService storetypes.KVStoreService,
-	//sk *stakingkeeper.Keeper, // TODO: Breaks depinject
+	sk StakingKeeper,
 	slk SlashingKeeper,
 	bk BankKeeper,
 	logger log.Logger,
@@ -55,7 +54,7 @@ func NewKeeper(
 
 	k := Keeper{
 		cdc:           cdc,
-		stakingKeeper: nil, // TODO: Breaks depinject
+		stakingKeeper: sk,
 		slashKeeper:   slk,
 		bankKeeper:    bk,
 		logger:        logger,
@@ -80,7 +79,7 @@ func NewKeeper(
 }
 
 // GetStakingKeeper returns the staking keeper.
-func (k Keeper) GetStakingKeeper() *stakingkeeper.Keeper {
+func (k Keeper) GetStakingKeeper() StakingKeeper {
 	return k.stakingKeeper
 }
 

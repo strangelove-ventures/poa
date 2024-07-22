@@ -3,19 +3,20 @@ package module
 import (
 	"os"
 
+	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/cosmos/cosmos-sdk/types/module"
+	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
+
 	"cosmossdk.io/core/address"
 	"cosmossdk.io/core/appmodule"
 	"cosmossdk.io/core/store"
 	"cosmossdk.io/depinject"
 	"cosmossdk.io/log"
-	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/cosmos/cosmos-sdk/types/module"
-	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
+
 	"github.com/strangelove-ventures/poa"
+	modulev1 "github.com/strangelove-ventures/poa/api/module/v1"
 	"github.com/strangelove-ventures/poa/keeper"
 	"github.com/strangelove-ventures/poa/simulation"
-
-	modulev1 "github.com/strangelove-ventures/poa/api/module/v1"
 )
 
 var _ appmodule.AppModule = AppModule{}
@@ -40,10 +41,10 @@ type ModuleInputs struct {
 	StoreService store.KVStoreService
 	AddressCodec address.Codec
 
-	// TODO: Breaks depinject
-	//StakingKeeper  stakingkeeper.Keeper
+	StakingKeeper  keeper.StakingKeeper
 	SlashingKeeper keeper.SlashingKeeper
 	BankKeeper     keeper.BankKeeper
+	AccountKeeper  keeper.AccountKeeper // for testing
 }
 
 type ModuleOutputs struct {
@@ -54,8 +55,8 @@ type ModuleOutputs struct {
 }
 
 func ProvideModule(in ModuleInputs) ModuleOutputs {
-	// TODO: Breaks depinject
-	k := keeper.NewKeeper(in.Cdc, in.StoreService /*&in.StakingKeeper,*/, in.SlashingKeeper, in.BankKeeper, log.NewLogger(os.Stderr))
+	k := keeper.NewKeeper(in.Cdc, in.StoreService, in.StakingKeeper, in.SlashingKeeper, in.BankKeeper, log.NewLogger(os.Stderr))
+	k.SetTestAccountKeeper(in.AccountKeeper) // for testing
 	m := NewAppModule(in.Cdc, k)
 
 	return ModuleOutputs{Module: m, Keeper: k, Out: depinject.Out{}}

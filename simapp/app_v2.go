@@ -8,7 +8,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"cosmossdk.io/core/appconfig"
 	"cosmossdk.io/depinject"
 	"cosmossdk.io/log"
 	storetypes "cosmossdk.io/store/types"
@@ -28,9 +27,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/server/api"
 	"github.com/cosmos/cosmos-sdk/server/config"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
-	testdata_pulsar "github.com/cosmos/cosmos-sdk/testutil/testdata/testpb"
+	testdatapulsar "github.com/cosmos/cosmos-sdk/testutil/testdata/testpb"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/x/auth"
+	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authsims "github.com/cosmos/cosmos-sdk/x/auth/simulation"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -39,8 +39,6 @@ import (
 	consensusparamkeeper "github.com/cosmos/cosmos-sdk/x/consensus/keeper"
 	crisiskeeper "github.com/cosmos/cosmos-sdk/x/crisis/keeper"
 	distrkeeper "github.com/cosmos/cosmos-sdk/x/distribution/keeper"
-	"github.com/cosmos/cosmos-sdk/x/genutil"
-	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
 	govkeeper "github.com/cosmos/cosmos-sdk/x/gov/keeper"
 	groupkeeper "github.com/cosmos/cosmos-sdk/x/group/keeper"
 	mintkeeper "github.com/cosmos/cosmos-sdk/x/mint/keeper"
@@ -49,26 +47,9 @@ import (
 	slashingkeeper "github.com/cosmos/cosmos-sdk/x/slashing/keeper"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	poakeeper "github.com/strangelove-ventures/poa/keeper"
-
-	_ "cosmossdk.io/x/circuit"                      // import for side-effects
-	_ "cosmossdk.io/x/evidence"                     // import for side-effects
-	_ "cosmossdk.io/x/feegrant/module"              // import for side-effects
-	_ "cosmossdk.io/x/nft/module"                   // import for side-effects
-	_ "cosmossdk.io/x/upgrade"                      // import for side-effects
-	_ "github.com/cosmos/cosmos-sdk/x/auth/vesting" // import for side-effects
-	_ "github.com/cosmos/cosmos-sdk/x/authz/module" // import for side-effects
-	_ "github.com/cosmos/cosmos-sdk/x/distribution" // import for side-effects
-	_ "github.com/cosmos/cosmos-sdk/x/gov"          // import for side-effects
-	_ "github.com/cosmos/cosmos-sdk/x/group/module" // import for side-effects
-	_ "github.com/cosmos/cosmos-sdk/x/mint"         // import for side-effects
-	_ "github.com/cosmos/cosmos-sdk/x/slashing"     // import for side-effects
-	_ "github.com/strangelove-ventures/poa/module"  // import for side-effects
 )
 
 var DefaultNodeHome string
-
-//go:embed app_v2.yaml
-var AppConfigYAML []byte
 
 var (
 	_ runtime.AppI            = (*SimApp)(nil)
@@ -89,7 +70,7 @@ type SimApp struct {
 	SlashingKeeper        slashingkeeper.Keeper
 	MintKeeper            mintkeeper.Keeper
 	DistrKeeper           distrkeeper.Keeper
-	GovKeeper             govkeeper.Keeper
+	GovKeeper             *govkeeper.Keeper
 	CrisisKeeper          *crisiskeeper.Keeper
 	UpgradeKeeper         *upgradekeeper.Keeper
 	ParamsKeeper          paramskeeper.Keeper
@@ -115,18 +96,6 @@ func init() {
 	DefaultNodeHome = filepath.Join(userHomeDir, ".simapp")
 }
 
-func AppConfig() depinject.Config {
-	return depinject.Configs(
-		appconfig.LoadYAML(AppConfigYAML),
-		depinject.Supply(
-			// supply custom module basics
-			map[string]module.AppModuleBasic{
-				genutiltypes.ModuleName: genutil.NewAppModuleBasic(genutiltypes.DefaultMessageValidator),
-			},
-		),
-	)
-}
-
 // NewSimApp returns a reference to an initialized SimApp.
 func NewSimApp(
 	logger log.Logger,
@@ -139,55 +108,11 @@ func NewSimApp(
 	var (
 		app        = &SimApp{}
 		appBuilder *runtime.AppBuilder
-
-		// merge the AppConfig and other configuration in one config
-		appConfig = depinject.Configs(
-			AppConfig(),
+		appConfig  = depinject.Configs(
+			AppConfig,
 			depinject.Supply(
-				// supply the application options
 				appOpts,
-				// supply the logger
 				logger,
-
-				// ADVANCED CONFIGURATION
-
-				//
-				// AUTH
-				//
-				// For providing a custom function required in auth to generate custom account types
-				// add it below. By default the auth module uses simulation.RandomGenesisAccounts.
-				//
-				// authtypes.RandomGenesisAccountsFn(simulation.RandomGenesisAccounts),
-				//
-				// For providing a custom a base account type add it below.
-				// By default the auth module uses authtypes.ProtoBaseAccount().
-				//
-				// func() sdk.AccountI { return authtypes.ProtoBaseAccount() },
-				//
-				// For providing a different address codec, add it below.
-				// By default the auth module uses a Bech32 address codec,
-				// with the prefix defined in the auth module configuration.
-				//
-				// func() address.Codec { return <- custom address codec type -> }
-
-				//
-				// STAKING
-				//
-				// For provinding a different validator and consensus address codec, add it below.
-				// By default the staking module uses the bech32 prefix provided in the auth config,
-				// and appends "valoper" and "valcons" for validator and consensus addresses respectively.
-				// When providing a custom address codec in auth, custom address codecs must be provided here as well.
-				//
-				// func() runtime.ValidatorAddressCodec { return <- custom validator address codec type -> }
-				// func() runtime.ConsensusAddressCodec { return <- custom consensus address codec type -> }
-
-				//
-				// MINT
-				//
-
-				// For providing a custom inflation function for x/mint add here your
-				// custom function that implements the minttypes.InflationCalculationFn
-				// interface.
 			),
 		)
 	)
@@ -220,33 +145,6 @@ func NewSimApp(
 		panic(err)
 	}
 
-	// Below we could construct and set an application specific mempool and
-	// ABCI 1.0 PrepareProposal and ProcessProposal handlers. These defaults are
-	// already set in the SDK's BaseApp, this shows an example of how to override
-	// them.
-	//
-	// Example:
-	//
-	// app.App = appBuilder.Build(...)
-	// nonceMempool := mempool.NewSenderNonceMempool()
-	// abciPropHandler := NewDefaultProposalHandler(nonceMempool, app.App.BaseApp)
-	//
-	// app.App.BaseApp.SetMempool(nonceMempool)
-	// app.App.BaseApp.SetPrepareProposal(abciPropHandler.PrepareProposalHandler())
-	// app.App.BaseApp.SetProcessProposal(abciPropHandler.ProcessProposalHandler())
-	//
-	// Alternatively, you can construct BaseApp options, append those to
-	// baseAppOptions and pass them to the appBuilder.
-	//
-	// Example:
-	//
-	// prepareOpt = func(app *baseapp.BaseApp) {
-	// 	abciPropHandler := baseapp.NewDefaultProposalHandler(nonceMempool, app)
-	// 	app.SetPrepareProposal(abciPropHandler.PrepareProposalHandler())
-	// }
-	// baseAppOptions = append(baseAppOptions, prepareOpt)
-
-	// create and set dummy vote extension handler
 	voteExtOp := func(bApp *baseapp.BaseApp) {
 		voteExtHandler := NewVoteExtensionHandler()
 		voteExtHandler.SetHandlers(bApp)
@@ -255,20 +153,15 @@ func NewSimApp(
 
 	app.App = appBuilder.Build(db, traceStore, baseAppOptions...)
 
-	// register streaming services
 	if err := app.RegisterStreamingServices(appOpts, app.kvStoreKeys()); err != nil {
 		panic(err)
 	}
 
-	/****  Module Options ****/
-
 	app.ModuleManager.RegisterInvariants(app.CrisisKeeper)
 
-	// RegisterUpgradeHandlers is used for registering any on-chain upgrades.
 	app.RegisterUpgradeHandlers()
 
-	// add test gRPC service for testing gRPC queries in isolation
-	testdata_pulsar.RegisterQueryServer(app.GRPCQueryRouter(), testdata_pulsar.QueryImpl{})
+	testdatapulsar.RegisterQueryServer(app.GRPCQueryRouter(), testdatapulsar.QueryImpl{})
 
 	// create the simulation manager and define the order of the modules for deterministic simulations
 	//
@@ -281,22 +174,34 @@ func NewSimApp(
 
 	app.sm.RegisterStoreDecoders()
 
-	// A custom InitChainer can be set if extra pre-init-genesis logic is required.
-	// By default, when using app wiring enabled module, this is not required.
-	// For instance, the upgrade module will set automatically the module version map in its init genesis thanks to app wiring.
-	// However, when registering a module manually (i.e. that does not support app wiring), the module version map
-	// must be set manually as follow. The upgrade module will de-duplicate the module version map.
-	//
-	// app.SetInitChainer(func(ctx sdk.Context, req *abci.RequestInitChain) (*abci.ResponseInitChain, error) {
-	// 	app.UpgradeKeeper.SetModuleVersionMap(ctx, app.ModuleManager.GetVersionMap())
-	// 	return app.App.InitChainer(ctx, req)
-	// })
+	app.setAnteHandler()
 
 	if err := app.Load(loadLatest); err != nil {
 		panic(err)
 	}
 
 	return app
+}
+
+func (app *SimApp) setAnteHandler() {
+	anteHandler, err := NewAnteHandler(
+		HandlerOptions{
+			ante.HandlerOptions{
+				AccountKeeper:   app.AccountKeeper,
+				BankKeeper:      app.BankKeeper,
+				SignModeHandler: app.txConfig.SignModeHandler(),
+				FeegrantKeeper:  app.FeeGrantKeeper,
+				SigGasConsumer:  ante.DefaultSigVerificationGasConsumer,
+			},
+			&app.CircuitKeeper,
+		},
+	)
+	if err != nil {
+		panic(err)
+	}
+
+	// Set the AnteHandler for the app
+	app.SetAnteHandler(anteHandler)
 }
 
 // LegacyAmino returns SimApp's amino codec.
@@ -369,4 +274,33 @@ func (app *SimApp) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APICon
 	if err := server.RegisterSwaggerAPI(apiSvr.ClientCtx, apiSvr.Router, apiConfig.Swagger); err != nil {
 		panic(err)
 	}
+}
+
+// GetMaccPerms returns a copy of the module account permissions
+//
+// NOTE: This is solely to be used for testing purposes.
+func GetMaccPerms() map[string][]string {
+	dup := make(map[string][]string)
+	for _, perms := range moduleAccPerms {
+		dup[perms.Account] = perms.Permissions
+	}
+
+	return dup
+}
+
+// BlockedAddresses returns all the app's blocked account addresses.
+func BlockedAddresses() map[string]bool {
+	result := make(map[string]bool)
+
+	if len(blockAccAddrs) > 0 {
+		for _, addr := range blockAccAddrs {
+			result[addr] = true
+		}
+	} else {
+		for addr := range GetMaccPerms() {
+			result[addr] = true
+		}
+	}
+
+	return result
 }
