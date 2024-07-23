@@ -25,7 +25,6 @@ const (
 	OpWeightMsgPOASetPower               = "op_weight_msg_poa_set_power"                // nolint: gosec
 	OpWeightMsgPOARemoveValidator        = "op_weight_msg_poa_remove_validator"         // nolint: gosec
 	OpWeightMsgPOARemovePendingValidator = "op_weight_msg_poa_remove_pending_validator" // nolint: gosec
-	OpWeightMsgPOAUpdateParams           = "op_weight_msg_poa_update_params"            // nolint: gosec
 	OpWeightMsgPOACreateValidator        = "op_weight_msg_poa_create_validator"         // nolint: gosec
 
 )
@@ -35,7 +34,6 @@ var (
 		OpWeightMsgPOASetPower:               100,
 		OpWeightMsgPOARemoveValidator:        20,
 		OpWeightMsgPOARemovePendingValidator: 100,
-		OpWeightMsgPOAUpdateParams:           85,
 		OpWeightMsgPOACreateValidator:        100,
 	}
 )
@@ -72,8 +70,6 @@ func getWeightedOperation(op string, weight int, txGen client.TxConfig, k keeper
 		return simulation.NewWeightedOperation(weight, SimulateMsgRemoveValidator(txGen, k))
 	case OpWeightMsgPOARemovePendingValidator:
 		return simulation.NewWeightedOperation(weight, SimulateMsgRemovePendingValidator(txGen, k))
-	case OpWeightMsgPOAUpdateParams:
-		return simulation.NewWeightedOperation(weight, SimulateMsgUpdateParams(txGen, k))
 	case OpWeightMsgPOACreateValidator:
 		return simulation.NewWeightedOperation(weight, SimulateMsgCreateValidator(txGen, k))
 	default:
@@ -129,43 +125,6 @@ func SimulateMsgCreateValidator(txGen client.TxConfig, k keeper.Keeper) simtypes
 	}
 }
 
-func SimulateMsgUpdateParams(txGen client.TxConfig, k keeper.Keeper) simtypes.Operation {
-	return func(r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
-	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
-		msgType := sdk.MsgTypeURL(&poatypes.MsgUpdateParams{})
-
-		params, err := k.GetParams(ctx)
-		if err != nil {
-			return simtypes.NoOpMsg(poatypes.ModuleName, msgType, "unable to get params"), nil, err
-		}
-
-		admins := params.GetAdmins()
-		if len(admins) < 2 {
-			return simtypes.NoOpMsg(poatypes.ModuleName, msgType, "not enough admins found"), nil, nil
-		}
-
-		// Remove a random admin from the list
-		idx := r.Intn(len(admins))
-		admins[idx] = admins[len(admins)-1]
-		admins = admins[:len(admins)-1]
-
-		adminAcc, err := selectRandomPOAAccount(r, admins, accs)
-		if err != nil {
-			return simtypes.NoOpMsg(poatypes.ModuleName, msgType, err.Error()), nil, err
-		}
-
-		msg := poatypes.MsgUpdateParams{
-			Sender: adminAcc.Address.String(),
-			Params: poatypes.Params{
-				Admins:                 admins,
-				AllowValidatorSelfExit: r.Intn(2) == 1,
-			},
-		}
-
-		return genAndDeliverTxWithRandFees(r, app, ctx, txGen, adminAcc, &msg, k)
-	}
-}
-
 func SimulateMsgRemovePendingValidator(txGen client.TxConfig, k keeper.Keeper) simtypes.Operation {
 	return func(r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
@@ -182,7 +141,7 @@ func SimulateMsgRemovePendingValidator(txGen client.TxConfig, k keeper.Keeper) s
 		// Pick a random pending validator address
 		valAddr := pending.Validators[r.Intn(len(pending.Validators))].OperatorAddress
 
-		adminAcc, err := selectRandomPOAAccount(r, k.GetAdmins(ctx), accs)
+		adminAcc, err := getPOAAdmin(accs, k.GetAdmin(ctx))
 		if err != nil {
 			return simtypes.NoOpMsg(poatypes.ModuleName, msgType, err.Error()), nil, err
 		}
@@ -215,7 +174,7 @@ func SimulateMsgRemoveValidator(txGen client.TxConfig, k keeper.Keeper) simtypes
 		// Select a random bonded validator to remove
 		validator := validators[r.Intn(len(validators))]
 
-		adminAcc, err := selectRandomPOAAccount(r, k.GetAdmins(ctx), accs)
+		adminAcc, err := getPOAAdmin(accs, k.GetAdmin(ctx))
 		if err != nil {
 			return simtypes.NoOpMsg(poatypes.ModuleName, msgType, err.Error()), nil, err
 		}
@@ -259,7 +218,7 @@ func SimulateMsgSetPower(txGen client.TxConfig, k keeper.Keeper) simtypes.Operat
 			return simtypes.NoOpMsg(poatypes.ModuleName, msgType, errStr), nil, nil
 		}
 
-		adminAcc, err := selectRandomPOAAccount(r, k.GetAdmins(ctx), accs)
+		adminAcc, err := getPOAAdmin(accs, k.GetAdmin(ctx))
 		if err != nil {
 			return simtypes.NoOpMsg(poatypes.ModuleName, msgType, err.Error()), nil, err
 		}
@@ -338,29 +297,13 @@ func getNewPower(r *rand.Rand, k keeper.Keeper, ctx sdk.Context, validator staki
 	return newPowerTokens.Uint64(), "", false
 }
 
-func selectRandomPOAAccount(r *rand.Rand, admins []string, accs []simtypes.Account) (simtypes.Account, error) {
-	randomAdminAddr, err := getRandomPOAAdmin(r, admins)
-	if err != nil {
-		return simtypes.Account{}, err
-	}
-
-	acc, found := simtypes.FindAccount(accs, sdk.MustAccAddressFromBech32(randomAdminAddr))
+func getPOAAdmin(accs []simtypes.Account, admin string) (simtypes.Account, error) {
+	acc, found := simtypes.FindAccount(accs, sdk.MustAccAddressFromBech32(admin))
 	if !found {
 		return simtypes.Account{}, errors.New("admin not found in simulator accounts")
 	}
 
 	return acc, nil
-}
-
-func getRandomPOAAdmin(r *rand.Rand, admins []string) (string, error) {
-	if len(admins) == 0 {
-		return "", errors.New("no admins found")
-	}
-
-	idx := r.Intn(len(admins))
-	admin := admins[idx]
-
-	return admin, nil
 }
 
 func generateRandomDescription(r *rand.Rand) poatypes.Description {
