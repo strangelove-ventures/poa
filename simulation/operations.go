@@ -108,7 +108,7 @@ func SimulateMsgCreateValidator(txGen client.TxConfig, k keeper.Keeper) simtypes
 
 		// Generate a random self-delegation amount between 1 and balance
 		amount := sdkmath.NewInt(r.Int63n(balance.Amount.Int64()-1) + 1)
-		if err != nil {
+		if amount.IsNegative() {
 			return simtypes.NoOpMsg(poatypes.ModuleName, msgType, "unable to generate positive amount"), nil, err
 		}
 
@@ -196,6 +196,8 @@ func SimulateMsgRemoveValidator(txGen client.TxConfig, k keeper.Keeper) simtypes
 func SimulateMsgSetPower(txGen client.TxConfig, k keeper.Keeper) simtypes.Operation {
 	return func(r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
+		k.SetTestAuthority(accs[0].Address.String())
+
 		msgType := sdk.MsgTypeURL(&poatypes.MsgSetPower{})
 
 		validators, err := k.GetStakingKeeper().GetAllValidators(ctx)

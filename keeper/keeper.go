@@ -113,6 +113,10 @@ func (k *Keeper) SetTestAccountKeeper(ak AccountKeeper) {
 	k.accountKeeper = ak
 }
 
+func (k *Keeper) SetTestAuthority(addr string) {
+	k.authority = addr
+}
+
 func (k Keeper) GetAdmin(ctx context.Context) string {
 	return k.authority
 }

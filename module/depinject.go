@@ -13,6 +13,8 @@ import (
 	"cosmossdk.io/depinject"
 	"cosmossdk.io/log"
 
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	"github.com/strangelove-ventures/poa"
 	modulev1 "github.com/strangelove-ventures/poa/api/module/v1"
 	"github.com/strangelove-ventures/poa/keeper"
@@ -38,6 +40,7 @@ type ModuleInputs struct {
 	depinject.In
 
 	Cdc          codec.Codec
+	Config       *modulev1.Module
 	StoreService store.KVStoreService
 	AddressCodec address.Codec
 
@@ -45,8 +48,6 @@ type ModuleInputs struct {
 	SlashingKeeper keeper.SlashingKeeper
 	BankKeeper     keeper.BankKeeper
 	AccountKeeper  keeper.AccountKeeper // for testing
-
-	Authority string
 }
 
 type ModuleOutputs struct {
@@ -57,7 +58,12 @@ type ModuleOutputs struct {
 }
 
 func ProvideModule(in ModuleInputs) ModuleOutputs {
-	k := keeper.NewKeeper(in.Cdc, in.StoreService, in.StakingKeeper, in.SlashingKeeper, in.BankKeeper, log.NewLogger(os.Stderr), in.Authority)
+	authority := authtypes.NewModuleAddress(govtypes.ModuleName)
+	if len(in.Config.Admins) > 0 && in.Config.Admins[0] != "" {
+		authority = authtypes.NewModuleAddressOrBech32Address(in.Config.Admins[0])
+	}
+
+	k := keeper.NewKeeper(in.Cdc, in.StoreService, in.StakingKeeper, in.SlashingKeeper, in.BankKeeper, log.NewLogger(os.Stderr), authority.String())
 	k.SetTestAccountKeeper(in.AccountKeeper) // for testing
 	m := NewAppModule(in.Cdc, k)
 
