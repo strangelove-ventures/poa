@@ -11,8 +11,6 @@ replace (
 	// Fixes POA retreaving jailed validators.
 	// - https://github.com/cosmos/cosmos-sdk/pull/20059
 	github.com/cosmos/cosmos-sdk => github.com/rollchains/cosmos-sdk v0.50.8
-	// Fix upstream GHSA-h395-qcrw-5vmq and GHSA-3vp4-m3rf-835h vulnerabilities.
-	github.com/gin-gonic/gin => github.com/gin-gonic/gin v1.9.1
 
 	// breaks SDK app.toml parsing in ictest.
 	github.com/spf13/viper => github.com/spf13/viper v1.17.0
@@ -40,7 +38,7 @@ require (
 	cosmossdk.io/x/upgrade v0.0.0-20230925151519-64e0e8980834
 	github.com/cometbft/cometbft v0.38.10
 	github.com/cosmos/cosmos-db v1.0.2
-	github.com/cosmos/cosmos-sdk v0.50.6
+	github.com/cosmos/cosmos-sdk v0.50.8
 	github.com/cosmos/gogoproto v1.5.0
 	github.com/golang/mock v1.6.0
 	github.com/spf13/cast v1.6.0
