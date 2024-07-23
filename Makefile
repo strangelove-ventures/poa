@@ -58,9 +58,8 @@ coverage: ## Run coverage report
 	@${COV_SIM_CMD} -test.run TestFullAppSimulation ${COV_SIM_COMMON} > /dev/null 2>&1
 	@echo "  --> Running App Simulation After Import"
 	@${COV_SIM_CMD} -test.run TestAppSimulationAfterImport ${COV_SIM_COMMON} > /dev/null 2>&1
-#   Enable when https://github.com/strangelove-ventures/poa/pull/202 is merged
-#	@echo "  --> Running App Import/Export Simulation"
-#	@${COV_SIM_CMD} -test.run TestAppImportExport ${COV_SIM_COMMON} > /dev/null 2>&1
+	@echo "  --> Running App Import/Export Simulation"
+	@${COV_SIM_CMD} -test.run TestAppImportExport ${COV_SIM_COMMON} > /dev/null 2>&1
 	@echo "  --> Running App State Determinism Simulation"
 	@${COV_SIM_CMD} -test.run TestAppStateDeterminism ${COV_SIM_COMMON} > /dev/null 2>&1
 	@echo "--> Running unit & e2e tests coverage"
