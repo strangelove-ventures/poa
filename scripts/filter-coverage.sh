@@ -1,7 +1,7 @@
 #!/bin/bash
 
-coverage_profile="coverage.out"
-filtered_coverage_profile="coverage-filtered.out"
+coverage_profile="$1"
+filtered_coverage_profile="$2"
 exclusion_file=".coverageignore"
 
 cp "$coverage_profile" "$filtered_coverage_profile"
