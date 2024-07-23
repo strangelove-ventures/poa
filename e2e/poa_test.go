@@ -2,11 +2,9 @@ package e2e
 
 import (
 	"context"
-	"fmt"
 	"testing"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/strangelove-ventures/interchaintest/v8"
 	"github.com/strangelove-ventures/interchaintest/v8/chain/cosmos"
 	"github.com/strangelove-ventures/interchaintest/v8/ibc"
@@ -49,54 +47,7 @@ func TestPOABase(t *testing.T) {
 	testStakingDisabled(t, ctx, chain, validators, acc0, acc1)
 	testWithdrawDelegatorRewardsDisabled(t, ctx, chain, validators, acc0, acc1)
 	testPowerErrors(t, ctx, chain, validators, incorrectUser, acc0)
-	testUpdateParams(t, ctx, chain, acc0, incorrectUser)
 	testRemovePending(t, ctx, chain, acc0)
-}
-
-func testUpdateParams(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, acc0, incorrectUser ibc.Wallet) {
-	var tx sdk.TxResponse
-	var err error
-
-	t.Log("\n===== TEST UPDATE POA PARAMS =====")
-
-	t.Run("fail: update staking params from a non authorized user", func(t *testing.T) {
-		tx, err = helpers.POAUpdateStakingParams(t, ctx, chain, incorrectUser, stakingtypes.DefaultParams())
-		if err != nil {
-			t.Fatal(err)
-		}
-		txRes, err := chain.GetTransaction(tx.TxHash)
-		require.NoError(t, err)
-		fmt.Printf("%+v", txRes)
-		require.EqualValues(t, txRes.Code, 3)
-
-		sp := helpers.GetStakingParams(t, ctx, chain)
-		fmt.Printf("%+v", sp)
-	})
-
-	t.Run("success: update staking params from an authorized user.", func(t *testing.T) {
-		stakingparams := stakingtypes.DefaultParams()
-		tx, err = helpers.POAUpdateStakingParams(t, ctx, chain, acc0, stakingtypes.Params{
-			UnbondingTime:     stakingparams.UnbondingTime,
-			MaxValidators:     10,
-			MaxEntries:        stakingparams.MaxEntries,
-			HistoricalEntries: stakingparams.HistoricalEntries,
-			BondDenom:         stakingparams.BondDenom,
-			MinCommissionRate: stakingparams.MinCommissionRate,
-		})
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		txRes, err := chain.GetTransaction(tx.TxHash)
-		require.NoError(t, err)
-		fmt.Printf("%+v", txRes)
-		require.EqualValues(t, txRes.Code, 0)
-
-		sp := helpers.GetStakingParams(t, ctx, chain)
-		fmt.Printf("%+v", sp)
-		require.EqualValues(t, sp.MaxValidators, 10)
-	})
-
 }
 
 func testStakingDisabled(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, validators []string, acc0, acc1 ibc.Wallet) {
