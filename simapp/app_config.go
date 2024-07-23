@@ -1,10 +1,6 @@
 package simapp
 
 import (
-	"time"
-
-	"google.golang.org/protobuf/types/known/durationpb"
-
 	runtimev1alpha1 "cosmossdk.io/api/cosmos/app/runtime/v1alpha1"
 	appv1alpha1 "cosmossdk.io/api/cosmos/app/v1alpha1"
 	authmodulev1 "cosmossdk.io/api/cosmos/auth/module/v1"
@@ -29,32 +25,19 @@ import (
 	vestingmodulev1 "cosmossdk.io/api/cosmos/vesting/module/v1"
 	"cosmossdk.io/core/appconfig"
 	"cosmossdk.io/depinject"
-	_ "cosmossdk.io/x/circuit" // import for side-effects
 	circuittypes "cosmossdk.io/x/circuit/types"
-	_ "cosmossdk.io/x/evidence" // import for side-effects
 	evidencetypes "cosmossdk.io/x/evidence/types"
 	"cosmossdk.io/x/feegrant"
-	_ "cosmossdk.io/x/feegrant/module" // import for side-effects
 	"cosmossdk.io/x/nft"
-	_ "cosmossdk.io/x/nft/module" // import for side-effects
-	_ "cosmossdk.io/x/upgrade"    // import for side-effects
 	upgradetypes "cosmossdk.io/x/upgrade/types"
-
 	"github.com/cosmos/cosmos-sdk/runtime"
 	"github.com/cosmos/cosmos-sdk/types/module"
-	_ "github.com/cosmos/cosmos-sdk/x/auth/tx/config" // import for side-effects
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	_ "github.com/cosmos/cosmos-sdk/x/auth/vesting" // import for side-effects
 	vestingtypes "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
 	"github.com/cosmos/cosmos-sdk/x/authz"
-	_ "github.com/cosmos/cosmos-sdk/x/authz/module" // import for side-effects
-	_ "github.com/cosmos/cosmos-sdk/x/bank"         // import for side-effects
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
-	_ "github.com/cosmos/cosmos-sdk/x/consensus" // import for side-effects
 	consensustypes "github.com/cosmos/cosmos-sdk/x/consensus/types"
-	_ "github.com/cosmos/cosmos-sdk/x/crisis" // import for side-effects
 	crisistypes "github.com/cosmos/cosmos-sdk/x/crisis/types"
-	_ "github.com/cosmos/cosmos-sdk/x/distribution" // import for side-effects
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	"github.com/cosmos/cosmos-sdk/x/genutil"
 	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
@@ -62,20 +45,36 @@ import (
 	govclient "github.com/cosmos/cosmos-sdk/x/gov/client"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	"github.com/cosmos/cosmos-sdk/x/group"
-	_ "github.com/cosmos/cosmos-sdk/x/group/module" // import for side-effects
-	_ "github.com/cosmos/cosmos-sdk/x/mint"         // import for side-effects
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
-	_ "github.com/cosmos/cosmos-sdk/x/params" // import for side-effects
 	paramsclient "github.com/cosmos/cosmos-sdk/x/params/client"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
-	_ "github.com/cosmos/cosmos-sdk/x/slashing" // import for side-effects
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
-	_ "github.com/cosmos/cosmos-sdk/x/staking" // import for side-effects
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+	"github.com/strangelove-ventures/poa"
+	poamodulev1 "github.com/strangelove-ventures/poa/api/module/v1"
+
+	_ "cosmossdk.io/x/circuit"                      // import for side-effects
+	_ "cosmossdk.io/x/evidence"                     // import for side-effects
+	_ "cosmossdk.io/x/feegrant/module"              // import for side-effects
+	_ "cosmossdk.io/x/nft/module"                   // import for side-effects
+	_ "cosmossdk.io/x/upgrade"                      // import for side-effects
+	_ "github.com/cosmos/cosmos-sdk/x/auth"         // import for side-effects
+	_ "github.com/cosmos/cosmos-sdk/x/auth/vesting" // import for side-effects
+	_ "github.com/cosmos/cosmos-sdk/x/authz/module" // import for side-effects
+	_ "github.com/cosmos/cosmos-sdk/x/bank"         // import for side-effects
+	_ "github.com/cosmos/cosmos-sdk/x/consensus"    // import for side-effects
+	_ "github.com/cosmos/cosmos-sdk/x/crisis"       // import for side-effects
+	_ "github.com/cosmos/cosmos-sdk/x/distribution" // import for side-effects
+	_ "github.com/cosmos/cosmos-sdk/x/gov"          // import for side-effects
+	_ "github.com/cosmos/cosmos-sdk/x/group/module" // import for side-effects
+	_ "github.com/cosmos/cosmos-sdk/x/mint"         // import for side-effects
+	_ "github.com/cosmos/cosmos-sdk/x/params"       // import for side-effects
+	_ "github.com/cosmos/cosmos-sdk/x/slashing"     // import for side-effects
+	_ "github.com/cosmos/cosmos-sdk/x/staking"      // import for side-effects
+	_ "github.com/strangelove-ventures/poa/module"  // import for side-effects
 )
 
 var (
-	// module account permissions
 	moduleAccPerms = []*authmodulev1.ModuleAccountPermission{
 		{Account: authtypes.FeeCollectorName},
 		{Account: distrtypes.ModuleName},
@@ -118,13 +117,17 @@ var (
 						distrtypes.ModuleName,
 						slashingtypes.ModuleName,
 						evidencetypes.ModuleName,
+						poa.ModuleName,
 						stakingtypes.ModuleName,
+						genutiltypes.ModuleName,
 						authz.ModuleName,
 					},
 					EndBlockers: []string{
 						crisistypes.ModuleName,
 						govtypes.ModuleName,
+						poa.ModuleName,
 						stakingtypes.ModuleName,
+						genutiltypes.ModuleName,
 						feegrant.ModuleName,
 						group.ModuleName,
 					},
@@ -155,7 +158,9 @@ var (
 						paramstypes.ModuleName,
 						upgradetypes.ModuleName,
 						vestingtypes.ModuleName,
+						consensustypes.ModuleName,
 						circuittypes.ModuleName,
+						poa.ModuleName,
 					},
 					// When ExportGenesis is not specified, the export genesis module order
 					// is equal to the init genesis order
@@ -188,7 +193,7 @@ var (
 				Name: stakingtypes.ModuleName,
 				Config: appconfig.WrapAny(&stakingmodulev1.Module{
 					// NOTE: specifying a prefix is only necessary when using bech32 addresses
-					// If not specified, the auth Bech32Prefix appended with "valoper" and "valcons" is used by default
+					// If not specfied, the auth Bech32Prefix appended with "valoper" and "valcons" is used by default
 					Bech32PrefixValidator: "cosmosvaloper",
 					Bech32PrefixConsensus: "cosmosvalcons",
 				}),
@@ -230,11 +235,8 @@ var (
 				Config: appconfig.WrapAny(&mintmodulev1.Module{}),
 			},
 			{
-				Name: group.ModuleName,
-				Config: appconfig.WrapAny(&groupmodulev1.Module{
-					MaxExecutionPeriod: durationpb.New(time.Second * 1209600),
-					MaxMetadataLen:     255,
-				}),
+				Name:   group.ModuleName,
+				Config: appconfig.WrapAny(&groupmodulev1.Module{}),
 			},
 			{
 				Name:   nft.ModuleName,
@@ -259,6 +261,10 @@ var (
 			{
 				Name:   circuittypes.ModuleName,
 				Config: appconfig.WrapAny(&circuitmodulev1.Module{}),
+			},
+			{
+				Name:   poa.ModuleName,
+				Config: appconfig.WrapAny(&poamodulev1.Module{}),
 			},
 		},
 	}),

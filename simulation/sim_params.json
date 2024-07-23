@@ -1,0 +1,22 @@
+{
+  "op_weight_msg_delegate": 0,
+  "op_weight_msg_undelegate": 0,
+  "op_weight_msg_begin_redelegate": 0,
+  "op_weight_msg_cancel_unbonding_delegation": 0,
+  "op_weight_msg_create_validator": 0,
+  "op_weight_msg_edit_validator": 0,
+  "op_weight_msg_withdraw_delegation_reward": 0,
+
+  "inflation": "0.000000000000000000",
+  "annual_provisions": "0.000000000000000000",
+  "inflation_rate_change": "0.000000000000000000",
+  "inflation_max": "0.000000000000000000",
+  "inflation_min": "0.000000000000000000",
+  "goal_bonded": "0.670000000000000000",
+  "blocks_per_year": "6311520",
+
+  "slash_fraction_double_sign": "0.000000000000000000",
+  "slash_fraction_downtime": "0.000000000000000000",
+
+  "community_tax": "0.0"
+}

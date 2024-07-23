@@ -4,9 +4,8 @@ import (
 	"os"
 
 	"github.com/cosmos/cosmos-sdk/codec"
-	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
-	slashingkeeper "github.com/cosmos/cosmos-sdk/x/slashing/keeper"
-	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
+	"github.com/cosmos/cosmos-sdk/types/module"
+	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 
 	"cosmossdk.io/core/address"
 	"cosmossdk.io/core/appmodule"
@@ -14,8 +13,10 @@ import (
 	"cosmossdk.io/depinject"
 	"cosmossdk.io/log"
 
+	"github.com/strangelove-ventures/poa"
 	modulev1 "github.com/strangelove-ventures/poa/api/module/v1"
 	"github.com/strangelove-ventures/poa/keeper"
+	"github.com/strangelove-ventures/poa/simulation"
 )
 
 var _ appmodule.AppModule = AppModule{}
@@ -40,9 +41,10 @@ type ModuleInputs struct {
 	StoreService store.KVStoreService
 	AddressCodec address.Codec
 
-	StakingKeeper  stakingkeeper.Keeper
-	SlashingKeeper slashingkeeper.Keeper
-	BankKeeper     bankkeeper.Keeper
+	StakingKeeper  keeper.StakingKeeper
+	SlashingKeeper keeper.SlashingKeeper
+	BankKeeper     keeper.BankKeeper
+	AccountKeeper  keeper.AccountKeeper // for testing
 
 	Authority string
 }
@@ -55,8 +57,31 @@ type ModuleOutputs struct {
 }
 
 func ProvideModule(in ModuleInputs) ModuleOutputs {
-	k := keeper.NewKeeper(in.Cdc, in.StoreService, &in.StakingKeeper, in.SlashingKeeper, in.BankKeeper, log.NewLogger(os.Stderr), in.Authority)
+	k := keeper.NewKeeper(in.Cdc, in.StoreService, in.StakingKeeper, in.SlashingKeeper, in.BankKeeper, log.NewLogger(os.Stderr), in.Authority)
+	k.SetTestAccountKeeper(in.AccountKeeper) // for testing
 	m := NewAppModule(in.Cdc, k)
 
 	return ModuleOutputs{Module: m, Keeper: k, Out: depinject.Out{}}
+}
+
+// AppModuleSimulation functions
+
+// GenerateGenesisState creates a randomized GenState of the slashing module.
+func (AppModule) GenerateGenesisState(simState *module.SimulationState) {
+	simulation.RandomizedGenState(simState)
+}
+
+// RegisterStoreDecoder registers a decoder for supply module's types
+func (am AppModule) RegisterStoreDecoder(sdr simtypes.StoreDecoderRegistry) {
+	sdr[poa.StoreKey] = simtypes.NewStoreDecoderFuncFromCollectionsSchema(am.keeper.Schema)
+}
+
+//// ProposalMsgs returns msgs used for governance proposals for simulations.
+// func (AppModule) ProposalMsgs(simState module.SimulationState) []simtypes.WeightedProposalMsg {
+//	return simulation.ProposalMsgs()
+//}
+
+// WeightedOperations returns the all the gov module operations with their respective weights.
+func (am AppModule) WeightedOperations(simState module.SimulationState) []simtypes.WeightedOperation {
+	return simulation.WeightedOperations(simState.AppParams, simState.Cdc, simState.TxConfig, am.keeper)
 }

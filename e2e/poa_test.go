@@ -47,6 +47,7 @@ func TestPOABase(t *testing.T) {
 
 	// === Test Cases ===
 	testStakingDisabled(t, ctx, chain, validators, acc0, acc1)
+	testWithdrawDelegatorRewardsDisabled(t, ctx, chain, validators, acc0, acc1)
 	testPowerErrors(t, ctx, chain, validators, incorrectUser, acc0)
 	testUpdateParams(t, ctx, chain, acc0, incorrectUser)
 	testRemovePending(t, ctx, chain, acc0)
@@ -120,6 +121,30 @@ func testStakingDisabled(t *testing.T, ctx context.Context, chain *cosmos.Cosmos
 	res, err = helpers.ExecuteAuthzExecMsg(t, ctx, chain, grantee, nestedCmd)
 	require.NoError(t, err)
 	require.Contains(t, res.RawLog, poa.ErrStakingActionNotAllowed.Error())
+}
+func testWithdrawDelegatorRewardsDisabled(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, validators []string, acc0, acc1 ibc.Wallet) {
+	t.Log("\n===== TEST WITHDRAW DELEGATOR REWARDS DISABLED =====")
+
+	// Normal withdraw delegation rewards execution fails
+	txRes, _ := helpers.WithdrawDelegatorRewards(t, ctx, chain, acc0, validators[0])
+	require.Contains(t, txRes.RawLog, poa.ErrWithdrawDelegatorRewardsNotAllowed.Error())
+
+	granter := acc1
+	grantee := acc0
+
+	// Grant grantee (acc0) the ability to delegate from granter (acc1)
+	res, err := helpers.ExecuteAuthzGrantMsg(t, ctx, chain, granter, grantee, "/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward")
+	require.NoError(t, err)
+	require.EqualValues(t, res.Code, 0)
+
+	// Generate nested message
+	nested := []string{"tx", "distribution", "withdraw-rewards", validators[0]}
+	nestedCmd := helpers.TxCommandBuilder(ctx, chain, nested, granter.FormattedAddress())
+
+	// Execute nested message via a wrapped Exec
+	res, err = helpers.ExecuteAuthzExecMsg(t, ctx, chain, grantee, nestedCmd)
+	require.NoError(t, err)
+	require.Contains(t, res.RawLog, poa.ErrWithdrawDelegatorRewardsNotAllowed.Error())
 }
 
 func testRemovePending(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, admin ibc.Wallet) {

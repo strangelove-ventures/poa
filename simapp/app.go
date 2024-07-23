@@ -1,3 +1,5 @@
+//go:build app_v1
+
 package simapp
 
 import (
@@ -323,6 +325,7 @@ func NewSimApp(
 		logger,
 		govModAddress,
 	)
+	app.POAKeeper.SetTestAccountKeeper(app.AccountKeeper)
 
 	// register the staking hooks
 	// NOTE: stakingKeeper above is passed by reference, so that it will contain these hooks

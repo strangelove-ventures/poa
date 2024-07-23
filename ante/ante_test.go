@@ -8,6 +8,7 @@ import (
 	protov2 "google.golang.org/protobuf/proto"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
 	"cosmossdk.io/math"
@@ -143,6 +144,37 @@ func TestAnteStakingFilter(t *testing.T) {
 			for h := uint64(2); h < 10; h++ {
 				ctx = setBlockHeader(ctx, h)
 				_, err := sf.AnteHandle(ctx, tx, false, EmptyAnte)
+				require.Error(t, err)
+			}
+		})
+	}
+}
+
+func TestAnteDisableWithdrawRewards(t *testing.T) {
+	ctx := sdk.Context{}
+	dwr := NewPOADisableWithdrawDelegatorRewards()
+
+	blockedMsgs := map[string]sdk.Msg{
+		"WithdrawDelegatorReward": &distrtypes.MsgWithdrawDelegatorReward{},
+	}
+
+	for k, msg := range blockedMsgs {
+		tx := MockTx{
+			msgs: []sdk.Msg{
+				msg,
+			},
+		}
+
+		t.Run(fmt.Sprintf("allow GenTx to pass (%s)", k), func(t *testing.T) {
+			ctx = setBlockHeader(ctx, 1)
+			_, err := dwr.AnteHandle(ctx, tx, false, EmptyAnte)
+			require.NoError(t, err)
+		})
+
+		t.Run(fmt.Sprintf("fail: withdraw rewards not allowed after gentx (%s)", k), func(t *testing.T) {
+			for h := uint64(2); h < 10; h++ {
+				ctx = setBlockHeader(ctx, h)
+				_, err := dwr.AnteHandle(ctx, tx, false, EmptyAnte)
 				require.Error(t, err)
 			}
 		})

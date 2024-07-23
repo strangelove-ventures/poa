@@ -131,6 +131,31 @@ func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 }
 ```
 
+### [Disable Withdraw Delegation Rewards](./ante/disable_withdraw_delegator_rewards.go)
+
+This decorator blocks the `MsgWithdrawDelegatorReward` message from the CosmosSDK `x/distribution` module. The decorator acts as a preventive measure against a crash caused by an interaction between the POA module and the CosmosSDK `x/distribution` module. 
+
+While the crash has a low probability of occurring in the wild, it is a critical issue that can cause the chain to halt.
+
+More information about this issue can be found in https://github.com/strangelove-ventures/poa/issues/170
+
+```go
+import (
+    ...
+    poaante "github.com/strangelove-ventures/poa/ante"
+)
+
+func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
+    ...
+    anteDecorators := []sdk.AnteDecorator{
+        ...
+        poaante.NewPOADisableWithdrawDelegatorRewardsDecorator(),
+        ...
+    }
+    ...
+}
+```
+
 ### [Commission Limits](./ante/commission_limit.go)
 Depending on the chain use case, it may be desired to limit the commission rate range for min, max, or set value.
 

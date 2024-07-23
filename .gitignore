@@ -20,6 +20,6 @@
 # Depinject debug file
 debug_container.dot
 
-build/\
+build/
 
 go.work.sum
