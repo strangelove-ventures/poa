@@ -7,7 +7,11 @@ import (
 	"github.com/stretchr/testify/require"
 	protov2 "google.golang.org/protobuf/proto"
 
+	"github.com/cosmos/gogoproto/proto"
+
+	"github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/x/authz"
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
@@ -110,6 +114,108 @@ func TestAnteCommissionRanges(t *testing.T) {
 			require.NoError(t, err, tc.name+" (edit)")
 		} else {
 			require.Error(t, err, tc.name+" (edit)")
+		}
+	}
+}
+
+func TestAnteNested(t *testing.T) {
+	ctx := sdk.Context{}
+	ctx = setBlockHeader(ctx, 2)
+
+	const invalidRequestErr = "messages contains *types.Any which is not a sdk.MsgRequest"
+	cases := []struct {
+		name      string
+		decorator sdk.AnteDecorator
+		msg       proto.Message
+		err       string
+	}{
+		{
+			name:      "fail: commission nested rate < floor",
+			decorator: NewCommissionLimitDecorator(true, math.LegacyMustNewDecFromStr("0.10"), math.LegacyMustNewDecFromStr("0.50")),
+			msg: &poa.MsgCreateValidator{
+				Commission: poa.CommissionRates{
+					Rate: math.LegacyMustNewDecFromStr("0.09"),
+				},
+			},
+			err: "rate 0.090000000000000000 is not between 0.100000000000000000 and 0.500000000000000000",
+		},
+		{
+			name:      "fail: commission nested rate > ceil",
+			decorator: NewCommissionLimitDecorator(true, math.LegacyMustNewDecFromStr("0.10"), math.LegacyMustNewDecFromStr("0.50")),
+			msg: &poa.MsgCreateValidator{
+				Commission: poa.CommissionRates{
+					Rate: math.LegacyMustNewDecFromStr("0.51"),
+				},
+			},
+			err: "rate 0.510000000000000000 is not between 0.100000000000000000 and 0.500000000000000000",
+		},
+		{
+			name:      "fail: commission nested rate != ceil and floor",
+			decorator: NewCommissionLimitDecorator(true, math.LegacyMustNewDecFromStr("0.14"), math.LegacyMustNewDecFromStr("0.14")),
+			msg: &poa.MsgCreateValidator{
+				Commission: poa.CommissionRates{
+					Rate: math.LegacyMustNewDecFromStr("0.1"),
+				},
+			},
+			err: "rate 0.100000000000000000 is not equal to 0.140000000000000000",
+		},
+		{
+			name:      "failed: commission rate msg is nil",
+			decorator: NewCommissionLimitDecorator(true, math.LegacyMustNewDecFromStr("0.10"), math.LegacyMustNewDecFromStr("0.50")),
+			msg:       nil,
+			err:       invalidRequestErr,
+		},
+		{
+			name:      "failed: staking action not allowed",
+			decorator: NewPOADisableStakingDecorator(),
+			msg:       &stakingtypes.MsgCreateValidator{},
+			err:       poa.ErrStakingActionNotAllowed.Error(),
+		},
+		{
+			name:      "failed: staking filter nil msg",
+			decorator: NewPOADisableStakingDecorator(),
+			msg:       nil,
+			err:       invalidRequestErr,
+		},
+		{
+			name:      "failed: withdraw rewards not allowed",
+			decorator: NewPOADisableWithdrawDelegatorRewards(),
+			msg:       &distrtypes.MsgWithdrawDelegatorReward{},
+			err:       poa.ErrWithdrawDelegatorRewardsNotAllowed.Error(),
+		},
+		{
+			name:      "failed: withdraw rewards nil msg",
+			decorator: NewPOADisableWithdrawDelegatorRewards(),
+			msg:       nil,
+			err:       invalidRequestErr,
+		},
+	}
+
+	for _, tc := range cases {
+		tc := tc
+
+		var anyMsg *types.Any
+		var err error
+		if tc.msg != nil {
+			anyMsg, err = types.NewAnyWithValue(tc.msg)
+			require.NoError(t, err)
+		} else {
+			anyMsg = &types.Any{
+				TypeUrl: "",
+				Value:   nil,
+			}
+		}
+
+		nestedTx := NewMockTx(&authz.MsgExec{
+			Grantee: "",
+			Msgs:    []*types.Any{anyMsg},
+		})
+
+		_, err = tc.decorator.AnteHandle(ctx, nestedTx, false, EmptyAnte)
+		require.Error(t, err)
+
+		if tc.err != "" {
+			require.ErrorContains(t, err, tc.err)
 		}
 	}
 }
