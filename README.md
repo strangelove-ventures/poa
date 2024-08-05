@@ -1,5 +1,9 @@
 # `PoA` Module
 
+![GitHub commit check runs](https://img.shields.io/github/check-runs/strangelove-ventures/poa/main)
+![Codecov](https://img.shields.io/codecov/c/github/strangelove-ventures/poa)
+
+
 The Proof of Authority (PoA) module allows for permissioned networks to be controlled by a predefined set of validators to verify transactions. This implementation extends the Cosmos-SDK's x/staking module to a set of administrators over the chain. These administrators gate keep the chain by whitelisting validators, updating consensus power, and removing validators from the network.
 
 ## Security
