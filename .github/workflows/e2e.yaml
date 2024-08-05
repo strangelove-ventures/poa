@@ -79,3 +79,35 @@ jobs:
 
       - name: Run Test
         run: make ${{ matrix.test }}
+
+  coverage:
+    needs: build-docker
+    runs-on: ubuntu-latest
+    steps:
+     - uses: actions/checkout@v4
+
+     - uses: actions/setup-go@v4
+       with:
+         go-version: ${{ env.GO_VERSION }}
+
+     - name: Download Host Artifact
+       uses: actions/download-artifact@v3
+       with:
+         name: ${{ env.IMAGE_NAME }}
+         path: /tmp
+
+     - name: Load Docker Image
+       run: |
+         docker image load -i ${{ env.TAR_PATH }}
+         docker image ls -a
+
+     - name: Run coverage
+       run: make coverage
+
+     - name: Upload coverage to Codecov
+       uses: codecov/codecov-action@v4
+       with:
+         file: /tmp/poa-coverage/coverage-merged-filtered.out
+         token: ${{ secrets.CODECOV_TOKEN }}
+       env:
+         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
