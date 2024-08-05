@@ -12,7 +12,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/types/address"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
@@ -36,8 +35,6 @@ func init() {
 }
 
 var (
-	authority sdk.AccAddress = address.Module("gov")
-
 	weights = map[string]int{
 		OpWeightMsgPOASetPower:               100,
 		OpWeightMsgPOARemoveValidator:        20,
