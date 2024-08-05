@@ -17,42 +17,13 @@ func TestInitGenesis(t *testing.T) {
 	fixture := SetupTest(t, 2_000_000)
 	require := require.New(t)
 
-	t.Run("default params", func(t *testing.T) {
-		data := &poa.GenesisState{
-			Params: poa.DefaultParams(),
-		}
+	t.Run("default state", func(t *testing.T) {
+		data := &poa.GenesisState{}
 		err := fixture.k.InitGenesis(fixture.ctx, data)
 		require.NoError(err)
-
-		params, err := fixture.k.GetParams(fixture.ctx)
-		require.NoError(err)
-		require.Equal(poa.DefaultParams(), params)
-	})
-
-	t.Run("custom params", func(t *testing.T) {
-		p, err := poa.NewParams([]string{fixture.addrs[0].String(), fixture.addrs[1].String()}, true)
-		require.NoError(err)
-
-		data := &poa.GenesisState{
-			Params: p,
-		}
-		err = fixture.k.InitGenesis(fixture.ctx, data)
-		require.NoError(err)
-
-		params, err := fixture.k.GetParams(fixture.ctx)
-		require.NoError(err)
-		require.Equal(p, params)
-	})
-
-	t.Run("bad params", func(t *testing.T) {
-		_, err := poa.NewParams(nil, false)
-		require.Error(err)
 	})
 
 	t.Run("pending validator export", func(t *testing.T) {
-		p, err := poa.NewParams([]string{fixture.addrs[0].String(), fixture.addrs[1].String()}, true)
-		require.NoError(err)
-
 		acc := GenAcc()
 		valAddr := sdk.ValAddress(acc.addr)
 
@@ -61,15 +32,16 @@ func TestInitGenesis(t *testing.T) {
 
 		val.Tokens = sdkmath.NewInt(1_234_567)
 
-		err = fixture.k.InitGenesis(fixture.ctx, &poa.GenesisState{
-			Params: p,
-		})
+		state := &poa.GenesisState{
+			Vals: []poa.Validator{poa.ConvertStakingToPOA(val)},
+		}
+
+		err = fixture.k.InitGenesis(fixture.ctx, state)
 		require.NoError(err)
 
-		// load params
-		params, err := fixture.k.GetParams(fixture.ctx)
-		require.NoError(err)
+		exported := fixture.k.ExportGenesis(fixture.ctx)
 
-		require.Equal(p, params)
+		require.Len(state.Vals, len(exported.Vals))
+		require.Equal(state.Vals[0].OperatorAddress, exported.Vals[0].OperatorAddress)
 	})
 }

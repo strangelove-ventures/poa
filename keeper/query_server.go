@@ -48,13 +48,3 @@ func (qs queryServer) PendingValidators(ctx context.Context, _ *poa.QueryPending
 
 	return &poa.PendingValidatorsResponse{Pending: pending.Validators}, nil
 }
-
-// Params returns the current module params.
-func (qs queryServer) Params(ctx context.Context, msg *poa.QueryParamsRequest) (*poa.ParamsResponse, error) {
-	params, err := qs.k.GetParams(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	return &poa.ParamsResponse{Params: params}, nil
-}

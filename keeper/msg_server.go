@@ -27,8 +27,8 @@ func NewMsgServerImpl(keeper Keeper) poa.MsgServer {
 }
 
 func (ms msgServer) SetPower(ctx context.Context, msg *poa.MsgSetPower) (*poa.MsgSetPowerResponse, error) {
-	if isAdmin := ms.k.IsAdmin(ctx, msg.Sender); !isAdmin {
-		return nil, errorsmod.Wrapf(poa.ErrNotAnAuthority, "sender %s is not an authority. allowed: %+v", msg.Sender, ms.k.GetAdmins(ctx))
+	if !ms.k.IsAdmin(ctx, msg.Sender) {
+		return nil, errorsmod.Wrapf(poa.ErrNotAnAuthority, "sender %s is not an authority. allowed: %+v", msg.Sender, ms.k.GetAdmin(ctx))
 	}
 
 	if err := msg.Validate(ms.k.GetValidatorAddressCodec()); err != nil {
@@ -86,11 +86,6 @@ func (ms msgServer) SetPower(ctx context.Context, msg *poa.MsgSetPower) (*poa.Ms
 func (ms msgServer) RemoveValidator(ctx context.Context, msg *poa.MsgRemoveValidator) (*poa.MsgRemoveValidatorResponse, error) {
 	// Sender is not an admin. Check if the sender is the validator and that validator exist.
 	if !ms.k.IsAdmin(ctx, msg.Sender) {
-		params, err := ms.k.GetParams(ctx)
-		if err != nil {
-			return nil, err
-		}
-
 		// check if the sender is the validator being removed.
 		hasPermission, err := ms.k.IsSenderValidator(ctx, msg.Sender, msg.ValidatorAddress)
 		if err != nil {
@@ -99,10 +94,6 @@ func (ms msgServer) RemoveValidator(ctx context.Context, msg *poa.MsgRemoveValid
 
 		if !hasPermission {
 			return nil, poa.ErrNotAnAuthority
-		}
-
-		if !params.AllowValidatorSelfExit {
-			return nil, poa.ErrValidatorSelfRemoval
 		}
 	}
 
@@ -152,18 +143,6 @@ func (ms msgServer) RemovePending(ctx context.Context, msg *poa.MsgRemovePending
 	}
 
 	return &poa.MsgRemovePendingResponse{}, ms.k.RemovePendingValidator(ctx, msg.ValidatorAddress)
-}
-
-func (ms msgServer) UpdateParams(ctx context.Context, msg *poa.MsgUpdateParams) (*poa.MsgUpdateParamsResponse, error) {
-	if ok := ms.k.IsAdmin(ctx, msg.Sender); !ok {
-		return nil, poa.ErrNotAnAuthority
-	}
-
-	if err := msg.Params.Validate(); err != nil {
-		return nil, err
-	}
-
-	return &poa.MsgUpdateParamsResponse{}, ms.k.SetParams(ctx, msg.Params)
 }
 
 // CreateValidator is from the x/staking module.

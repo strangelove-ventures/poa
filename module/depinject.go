@@ -6,6 +6,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 
 	"cosmossdk.io/core/address"
 	"cosmossdk.io/core/appmodule"
@@ -38,6 +40,7 @@ type ModuleInputs struct {
 	depinject.In
 
 	Cdc          codec.Codec
+	Config       *modulev1.Module
 	StoreService store.KVStoreService
 	AddressCodec address.Codec
 
@@ -55,7 +58,12 @@ type ModuleOutputs struct {
 }
 
 func ProvideModule(in ModuleInputs) ModuleOutputs {
-	k := keeper.NewKeeper(in.Cdc, in.StoreService, in.StakingKeeper, in.SlashingKeeper, in.BankKeeper, log.NewLogger(os.Stderr))
+	authority := authtypes.NewModuleAddress(govtypes.ModuleName)
+	if in.Config.Authority != "" {
+		authority = authtypes.NewModuleAddress(in.Config.Authority)
+	}
+
+	k := keeper.NewKeeper(in.Cdc, in.StoreService, in.StakingKeeper, in.SlashingKeeper, in.BankKeeper, log.NewLogger(os.Stderr), authority.String())
 	k.SetTestAccountKeeper(in.AccountKeeper) // for testing
 	m := NewAppModule(in.Cdc, k)
 

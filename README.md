@@ -39,11 +39,6 @@ All delegation actions are disabled with the [disabled-staking ante](./INTEGRATI
 
 ## State
 
-### Genesis
-`Params` is found in the genesis state. This object contains the `admins` field, which is a list of bech32 addresses that are allowed to modify the validator set, PoA params, and validator params (via x/staking). If no admin is set, then the chain should set the governance account as the admin (default). By allowing for an array of admins, the chain can be controlled by multiple different parties according to your use case. For example, governance can be an admin while also allowing a multisig, DAO, and/or single account to control the validator set. There must be at least one admin in the list at all times.
-
-`AllowValidatorSelfExit` is a boolean option *(default true)* that toggles validators ability to remove themselves from the active set. This is useful for validators that are no longer able or decide this PoA network is no longer for them. If set to false, only admins can remove validators from the set. **NOTE** This does not stop validators from going down and being jailed for downtime. It just provides a graceful way to self remove power.
-
 ### Pending Validators
 `PendingValidators` stores an array of PoA validator objects pending approval (from the admins) into the active set. This only is required after the chain has started.
 
@@ -125,26 +120,6 @@ The `AbsoluteChangedPower` of +1 to each validator is 3, which is 33% of the pre
 }
 ```
 
-### UpdateParams (admin only)
-
-- `admins` is a list of bech32 addresses that control the validator set and parameters of the chain.
-- `allow_validator_self_exit` allows validators to force remove themselves from the active set at any time.
-
-```json
-{
-  "@type": "/strangelove_ventures.poa.v1.MsgUpdateParams",
-  "sender": "cosmos1addr",
-  "params": {
-    "admins": [
-      "cosmos1addr",
-      "cosmos1addr1",
-      "cosmos1addr2",
-    ],
-    "allow_validator_self_exit": true
-  }
-}
-```
-
 ### UpdateStakingParams (admin only)
 ```json
 {
@@ -176,7 +151,6 @@ A validator is removed by an admin at height H; it increases the minimum self de
 
 | LCD / API | gRPC |
 |------------------------------|-----------------------------------------------------|
-| `/poa/v1/params`             |`strangelove_ventures.poa.v1.Query/Params`           |
 | `/poa/v1/pending_validators` |`strangelove_ventures.poa.v1.Query/PendingValidators`|
 | `/poa/v1/{consensus_power}`  |`strangelove_ventures.poa.v1.Query/ConsensusPower`   |
 
@@ -189,9 +163,6 @@ A user can query and interact with the `poa` module using the CLI.
 The `query` commands allow users to query the `poa` state.
 
 ```bash
-# Get module params (admins list)
-poad q poa params
-
 # Get validators waiting to be added to the set
 poad q poa pending-validators
 
@@ -221,13 +192,6 @@ poad tx poa remove [validator]
 # - amount uses 10^6 precision (1,000,000 = 1 power)
 # - --unsafe flag allows for bypassing the 30% max change per block
 poad tx poa set-power [validator] [amount] [--unsafe]
-
-# (admin) Update the PoA module params
-# - admins is a comma separated list of bech32 addresses
-# - any admin can modify the list at any time
-# - there must be at least one admin in the list at all times
-# - allow_validator_self_exit is a bool to allow validators to force remove themselves from the set.
-poad tx poa update-params [admin1,admin2,admin3,...] [allow_validator_self_exit]
 
 # (admin) Update the staking module params
 # - unbondingTime is the time that a validator must wait to unbond (ex: 336h)

@@ -2,6 +2,7 @@ package e2e
 
 import (
 	"context"
+	"os"
 	"testing"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -18,7 +19,6 @@ func TestPOABase(t *testing.T) {
 		t.Skip("skipping in short mode")
 	}
 
-	// setup base chain
 	chains := interchaintest.CreateChainWithConfig(t, numVals, numNodes, "poa", "", POACfg)
 	chain := chains[0].(*cosmos.CosmosChain)
 
@@ -34,6 +34,8 @@ func TestPOABase(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	require.NoError(t, os.Setenv("POA_BYPASS_ADMIN_CHECK_FOR_SIMULATION_TESTING_ONLY", "false"))
 
 	users := interchaintest.GetAndFundTestUsers(t, ctx, t.Name(), userFunds, chain)
 	incorrectUser := users[0]
@@ -74,7 +76,6 @@ func testStakingDisabled(t *testing.T, ctx context.Context, chain *cosmos.Cosmos
 	require.NoError(t, err)
 	require.Contains(t, res.RawLog, poa.ErrStakingActionNotAllowed.Error())
 }
-
 func testWithdrawDelegatorRewardsDisabled(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, validators []string, acc0, acc1 ibc.Wallet) {
 	t.Log("\n===== TEST WITHDRAW DELEGATOR REWARDS DISABLED =====")
 
@@ -100,16 +101,16 @@ func testWithdrawDelegatorRewardsDisabled(t *testing.T, ctx context.Context, cha
 	require.Contains(t, res.RawLog, poa.ErrWithdrawDelegatorRewardsNotAllowed.Error())
 }
 
-func testRemovePending(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, acc0 ibc.Wallet) {
+func testRemovePending(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, admin ibc.Wallet) {
 	t.Log("\n===== TEST PENDING =====")
 
-	_, err := helpers.POACreatePendingValidator(t, ctx, chain, acc0, "pl3Q8OQwtC7G2dSqRqsUrO5VZul7l40I+MKUcejqRsg=", "testval", "0.10", "0.25", "0.05")
+	_, err := helpers.POACreatePendingValidator(t, ctx, chain, admin, "pl3Q8OQwtC7G2dSqRqsUrO5VZul7l40I+MKUcejqRsg=", "testval", "0.10", "0.25", "0.05")
 	require.NoError(t, err)
 
 	pv := helpers.GetPOAPending(t, ctx, chain).Pending
 	require.Equal(t, 1, len(pv))
 
-	_, err = helpers.POARemovePending(t, ctx, chain, acc0, pv[0].OperatorAddress)
+	_, err = helpers.POARemovePending(t, ctx, chain, admin, pv[0].OperatorAddress)
 	require.NoError(t, err)
 
 	// validate it was removed
@@ -122,8 +123,9 @@ func testPowerErrors(t *testing.T, ctx context.Context, chain *cosmos.CosmosChai
 	var err error
 
 	t.Run("fail: set-power message from a non authorized user", func(t *testing.T) {
-		// runtime error: index out of range [1] with length 1 [recovered]
-		res, _ = helpers.POASetPower(t, ctx, chain, incorrectUser, validators[0], 1_000_000)
+		res, _ = helpers.POASetPower(t, ctx, chain, incorrectUser, validators[0], 2_000_000, "--unsafe=true")
+		require.NoError(t, err)
+
 		res, err := chain.GetTransaction(res.TxHash)
 		require.NoError(t, err)
 		require.Contains(t, res.RawLog, poa.ErrNotAnAuthority.Error())

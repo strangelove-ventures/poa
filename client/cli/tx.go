@@ -42,7 +42,6 @@ func NewTxCmd(ac address.Codec) *cobra.Command {
 		NewSetPowerCmd(ac),
 		NewRemovePendingCmd(),
 		NewRemoveValidatorCmd(),
-		NewUpdateParamsCmd(),
 		NewUpdateStakingParamsCmd(),
 	)
 
@@ -148,53 +147,6 @@ func NewRemovePendingCmd() *cobra.Command {
 			msg := &poa.MsgRemovePending{
 				Sender:           clientCtx.GetFromAddress().String(),
 				ValidatorAddress: validator,
-			}
-
-			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
-		},
-	}
-
-	flags.AddTxFlagsToCmd(cmd)
-
-	return cmd
-}
-
-func NewUpdateParamsCmd() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "update-params [admin1,admin2,admin3,...] [allow-validator-self-exit-bool]",
-		Short: "update the PoA module params",
-		Args:  cobra.ExactArgs(2),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx, err := client.GetClientTxContext(cmd)
-			if err != nil {
-				return err
-			}
-
-			admins := strings.Split(args[0], ",")
-			for _, admin := range admins {
-				_, err = sdk.AccAddressFromBech32(admin)
-				if err != nil {
-					return fmt.Errorf("AccAddressFromBech32 failed: %w", err)
-				}
-			}
-
-			allowGracefulExit, err := strconv.ParseBool(args[1])
-			if err != nil {
-				return fmt.Errorf("strconv.ParseBool failed: %w", err)
-			}
-
-			p, err := poa.NewParams(admins, allowGracefulExit)
-			if err != nil {
-				return fmt.Errorf("NewParams failed: %w", err)
-			}
-
-			msg := &poa.MsgUpdateParams{
-				Sender: clientCtx.GetFromAddress().String(),
-				Params: p,
-			}
-
-			if err := msg.Params.Validate(); err != nil {
-				return fmt.Errorf("msg.Params.Validate failed: %w", err)
 			}
 
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)

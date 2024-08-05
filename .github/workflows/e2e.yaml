@@ -54,7 +54,6 @@ jobs:
           - "ictest-jail"
           - "ictest-val-add"
           - "ictest-val-remove"
-          - "ictest-gov"
       fail-fast: false
 
     steps:

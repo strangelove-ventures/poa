@@ -28,9 +28,6 @@ service Msg {
    // RemovePending removes a pending validator from the queue.
    rpc RemovePending(MsgRemovePending) returns (MsgRemovePendingResponse);
 
-  // UpdateParams updates the module parameters.
-  rpc UpdateParams(MsgUpdateParams) returns (MsgUpdateParamsResponse);
-
   // UpdateStakingParams updates the module parameters.
   rpc UpdateStakingParams(MsgUpdateStakingParams) returns (MsgUpdateStakingParamsResponse);
 }
@@ -84,23 +81,6 @@ message MsgRemovePending {
 
 // MsgRemovePendingResponse is the response type for the Msg/RemovePending RPC method.
 message MsgRemovePendingResponse {}
-
-// MsgUpdateParams is the Msg/UpdateParams request type.
-message MsgUpdateParams {
-  option (cosmos.msg.v1.signer) = "sender";
-  option (amino.name) = "poa/MsgUpdateParams";
-
-  // sender is the address of the admin account with permission to update.
-  // ex: governance, multisig/DAO, or standard account found in Params.
-  string sender = 1 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
-
-  // module parameters (all must be supplied).
-  Params params = 2 [ (gogoproto.nullable) = false ];
-}
-
-// MsgUpdateParamsResponse defines the response structure for executing a
-// MsgUpdateParams message.
-message MsgUpdateParamsResponse {}
 
 // MsgUpdateStakingParams is the Msg/UpdateStakingParams request type.
 message MsgUpdateStakingParams {

@@ -9,17 +9,18 @@ import "cosmos_proto/cosmos.proto";
 option go_package = "github.com/strangelove-ventures/poa";
 
 // Params defines the parameters for the module.
-message Params {
-  option (amino.name) = "poa/params";
-  option (gogoproto.equal) = true;
-  option (gogoproto.goproto_stringer) = false;
+// message Params {
+//   option (amino.name) = "poa/params";
+//   option (gogoproto.equal) = true;
+//   option (gogoproto.goproto_stringer) = false;
 
-  // Array of addresses that are allowed to control the chains validators power.
-  repeated string admins = 1;
+//   // Array of addresses that are allowed to control the chains validators power.
+//   // deprecated: set with the authority in the keeper instead. This is just here for store compatibility.
+//   repeated string admins = 1;
 
-  // allow_validator_self_exit allows for a valdiator to remove themselves from the validator set.
-  bool allow_validator_self_exit = 2;
-}
+//   // allow_validator_self_exit allows for a valdiator to remove themselves from the validator set.
+//   bool allow_validator_self_exit = 2;
+// }
 
 // StakingParams defines the parameters for the x/staking module.
 message StakingParams {

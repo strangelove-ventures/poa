@@ -13,62 +13,6 @@ import (
 	"github.com/strangelove-ventures/poa"
 )
 
-func TestUpdateParams(t *testing.T) {
-	f := SetupTest(t, 2_000_000)
-	require := require.New(t)
-
-	testCases := []struct {
-		name         string
-		request      *poa.MsgUpdateParams
-		expectErrMsg string
-	}{
-		{
-			name: "set invalid authority (not an address)",
-			request: &poa.MsgUpdateParams{
-				Sender: "foo",
-			},
-			expectErrMsg: "not an authority",
-		},
-		{
-			name: "set invalid authority (not defined authority)",
-			request: &poa.MsgUpdateParams{
-				Sender: f.addrs[1].String(),
-			},
-			expectErrMsg: "not an authority",
-		},
-		{
-			name: "set invalid admins",
-			request: &poa.MsgUpdateParams{
-				Sender: f.govModAddr,
-				Params: poa.Params{},
-			},
-			expectErrMsg: poa.ErrMustProvideAtLeastOneAddress.Error(),
-		},
-		{
-			name: "set valid params",
-			request: &poa.MsgUpdateParams{
-				Sender: f.govModAddr,
-				Params: poa.Params{
-					Admins: []string{f.addrs[0].String()},
-				},
-			},
-		},
-	}
-
-	for _, tc := range testCases {
-		tc := tc
-		t.Run(tc.name, func(t *testing.T) {
-			_, err := f.msgServer.UpdateParams(f.ctx, tc.request)
-			if tc.expectErrMsg != "" {
-				require.Error(err)
-				require.ErrorContains(err, tc.expectErrMsg)
-			} else {
-				require.NoError(err)
-			}
-		})
-	}
-}
-
 func TestUpdateStakingParams(t *testing.T) {
 	f := SetupTest(t, 2_000_000)
 	require := require.New(t)
@@ -96,7 +40,7 @@ func TestUpdateStakingParams(t *testing.T) {
 		{
 			name: "set valid params",
 			request: &poa.MsgUpdateStakingParams{
-				Sender: f.govModAddr,
+				Sender: f.authorityAddr,
 				Params: poa.DefaultStakingParams(),
 			},
 			expectErrMsg: "",
@@ -325,15 +269,6 @@ func TestRemoveValidator(t *testing.T) {
 			expectErrMsg: "is not bonded",
 		},
 		{
-			name: "fail; try to remove validator as itself with self removal disabled",
-			request: &poa.MsgRemoveValidator{
-				Sender:           sdk.AccAddress(MustValAddressFromBech32(vals[1].OperatorAddress)).String(),
-				ValidatorAddress: vals[1].OperatorAddress,
-			},
-			expectErrMsg:         poa.ErrValidatorSelfRemoval.Error(),
-			isSelfRemovalAllowed: false,
-		},
-		{
 			name: "success; remove validator as itself",
 			request: &poa.MsgRemoveValidator{
 				Sender:           sdk.AccAddress(MustValAddressFromBech32(vals[1].OperatorAddress)).String(),
@@ -355,17 +290,10 @@ func TestRemoveValidator(t *testing.T) {
 	for _, tc := range testCases {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
-			// Update the params for self approval
-			currParams, _ := f.k.GetParams(f.ctx)
-			currParams.AllowValidatorSelfExit = tc.isSelfRemovalAllowed
-
-			err = f.k.SetParams(f.ctx, currParams)
-			require.NoError(err)
-
 			_, err = f.msgServer.RemoveValidator(f.ctx, tc.request)
 
 			if tc.expectErrMsg != "" {
-				require.Error(err)
+				require.Error(err, tc.expectErrMsg)
 				require.ErrorContains(err, tc.expectErrMsg)
 			} else {
 				require.NoError(err)

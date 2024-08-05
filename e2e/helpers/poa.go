@@ -82,12 +82,6 @@ func SubmitGovernanceProposalForValidatorChanges(t *testing.T, ctx context.Conte
 	return txProp.ProposalID
 }
 
-func GetPOAParams(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain) poa.Params {
-	var res poa.ParamsResponse
-	ExecuteQuery(ctx, chain, []string{"query", "poa", "params"}, &res)
-	return res.Params
-}
-
 func GetPOAConsensusPower(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, valoperAddr string) int64 {
 	var res POAConsensusPower
 	ExecuteQuery(ctx, chain, []string{"query", "poa", "consensus-power", valoperAddr}, &res)
@@ -103,23 +97,6 @@ func GetPOAPending(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain)
 	var res POAPending
 	ExecuteQuery(ctx, chain, []string{"query", "poa", "pending-validators"}, &res)
 	return res
-}
-
-func POAUpdateParams(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, user ibc.Wallet, admins []string, gracefulExit bool) (sdk.TxResponse, error) {
-	// admin1,admin2,admin3
-	adminList := ""
-	for _, admin := range admins {
-		adminList += admin + ","
-	}
-	adminList = adminList[:len(adminList)-1]
-
-	gracefulParam := "true"
-	if !gracefulExit {
-		gracefulParam = "false"
-	}
-
-	cmd := TxCommandBuilder(ctx, chain, []string{"tx", "poa", "update-params", adminList, gracefulParam}, user.KeyName())
-	return ExecuteTransaction(ctx, chain, cmd)
 }
 
 func POAUpdateStakingParams(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, user ibc.Wallet, sp stakingtypes.Params) (sdk.TxResponse, error) {

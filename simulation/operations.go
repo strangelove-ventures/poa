@@ -3,6 +3,7 @@ package simulation
 import (
 	"math"
 	"math/rand"
+	"os"
 	"sort"
 
 	"github.com/pkg/errors"
@@ -25,7 +26,6 @@ const (
 	OpWeightMsgPOASetPower               = "op_weight_msg_poa_set_power"                // nolint: gosec
 	OpWeightMsgPOARemoveValidator        = "op_weight_msg_poa_remove_validator"         // nolint: gosec
 	OpWeightMsgPOARemovePendingValidator = "op_weight_msg_poa_remove_pending_validator" // nolint: gosec
-	OpWeightMsgPOAUpdateParams           = "op_weight_msg_poa_update_params"            // nolint: gosec
 	OpWeightMsgPOACreateValidator        = "op_weight_msg_poa_create_validator"         // nolint: gosec
 
 )
@@ -35,7 +35,6 @@ var (
 		OpWeightMsgPOASetPower:               100,
 		OpWeightMsgPOARemoveValidator:        20,
 		OpWeightMsgPOARemovePendingValidator: 100,
-		OpWeightMsgPOAUpdateParams:           85,
 		OpWeightMsgPOACreateValidator:        100,
 	}
 )
@@ -46,6 +45,8 @@ func WeightedOperations(appParams simtypes.AppParams,
 	txGen client.TxConfig,
 	k keeper.Keeper) []simtypes.WeightedOperation {
 	operations := make([]simtypes.WeightedOperation, 0)
+
+	os.Setenv("POA_BYPASS_ADMIN_CHECK_FOR_SIMULATION_TESTING_ONLY", "not_for-production")
 
 	// Iterating over a map is non-deterministic in Go. To simulate determinism, we sort the keys in a slice and iterate over them.
 	keys := make([]string, 0, len(weights))
@@ -72,8 +73,6 @@ func getWeightedOperation(op string, weight int, txGen client.TxConfig, k keeper
 		return simulation.NewWeightedOperation(weight, SimulateMsgRemoveValidator(txGen, k))
 	case OpWeightMsgPOARemovePendingValidator:
 		return simulation.NewWeightedOperation(weight, SimulateMsgRemovePendingValidator(txGen, k))
-	case OpWeightMsgPOAUpdateParams:
-		return simulation.NewWeightedOperation(weight, SimulateMsgUpdateParams(txGen, k))
 	case OpWeightMsgPOACreateValidator:
 		return simulation.NewWeightedOperation(weight, SimulateMsgCreateValidator(txGen, k))
 	default:
@@ -112,7 +111,7 @@ func SimulateMsgCreateValidator(txGen client.TxConfig, k keeper.Keeper) simtypes
 
 		// Generate a random self-delegation amount between 1 and balance
 		amount := sdkmath.NewInt(r.Int63n(balance.Amount.Int64()-1) + 1)
-		if err != nil {
+		if amount.IsNegative() {
 			return simtypes.NoOpMsg(poatypes.ModuleName, msgType, "unable to generate positive amount"), nil, err
 		}
 
@@ -125,44 +124,7 @@ func SimulateMsgCreateValidator(txGen client.TxConfig, k keeper.Keeper) simtypes
 			return simtypes.NoOpMsg(poatypes.ModuleName, msgType, errors.WithMessage(err, "unable to create MsgCreateValidator").Error()), nil, err
 		}
 
-		return genAndDeliverTxWithRandFees(r, app, ctx, txGen, simAccount, msg, k)
-	}
-}
-
-func SimulateMsgUpdateParams(txGen client.TxConfig, k keeper.Keeper) simtypes.Operation {
-	return func(r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
-	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
-		msgType := sdk.MsgTypeURL(&poatypes.MsgUpdateParams{})
-
-		params, err := k.GetParams(ctx)
-		if err != nil {
-			return simtypes.NoOpMsg(poatypes.ModuleName, msgType, "unable to get params"), nil, err
-		}
-
-		admins := params.GetAdmins()
-		if len(admins) < 2 {
-			return simtypes.NoOpMsg(poatypes.ModuleName, msgType, "not enough admins found"), nil, nil
-		}
-
-		// Remove a random admin from the list
-		idx := r.Intn(len(admins))
-		admins[idx] = admins[len(admins)-1]
-		admins = admins[:len(admins)-1]
-
-		adminAcc, err := selectRandomPOAAccount(r, admins, accs)
-		if err != nil {
-			return simtypes.NoOpMsg(poatypes.ModuleName, msgType, err.Error()), nil, err
-		}
-
-		msg := poatypes.MsgUpdateParams{
-			Sender: adminAcc.Address.String(),
-			Params: poatypes.Params{
-				Admins:                 admins,
-				AllowValidatorSelfExit: r.Intn(2) == 1,
-			},
-		}
-
-		return genAndDeliverTxWithRandFees(r, app, ctx, txGen, adminAcc, &msg, k)
+		return genAndDeliverTxWithNoFees(r, app, ctx, txGen, simAccount, msg, k)
 	}
 }
 
@@ -182,17 +144,15 @@ func SimulateMsgRemovePendingValidator(txGen client.TxConfig, k keeper.Keeper) s
 		// Pick a random pending validator address
 		valAddr := pending.Validators[r.Intn(len(pending.Validators))].OperatorAddress
 
-		adminAcc, err := selectRandomPOAAccount(r, k.GetAdmins(ctx), accs)
-		if err != nil {
-			return simtypes.NoOpMsg(poatypes.ModuleName, msgType, err.Error()), nil, err
-		}
+		admin := accs[0].Address.String()
+		k.SetTestAuthority(admin)
 
 		msg := poatypes.MsgRemovePending{
-			Sender:           adminAcc.Address.String(),
+			Sender:           admin,
 			ValidatorAddress: valAddr,
 		}
 
-		return genAndDeliverTxWithRandFees(r, app, ctx, txGen, adminAcc, &msg, k)
+		return genAndDeliverTxWithNoFees(r, app, ctx, txGen, accs[0], &msg, k)
 	}
 }
 
@@ -215,28 +175,28 @@ func SimulateMsgRemoveValidator(txGen client.TxConfig, k keeper.Keeper) simtypes
 		// Select a random bonded validator to remove
 		validator := validators[r.Intn(len(validators))]
 
-		adminAcc, err := selectRandomPOAAccount(r, k.GetAdmins(ctx), accs)
-		if err != nil {
-			return simtypes.NoOpMsg(poatypes.ModuleName, msgType, err.Error()), nil, err
-		}
-
 		power := validator.GetConsensusPower(k.GetStakingKeeper().PowerReduction(ctx))
 		if power == 0 {
 			return simtypes.NoOpMsg(poatypes.ModuleName, msgType, "validator has no power"), nil, nil
 		}
 
+		admin := accs[0].Address.String()
+		k.SetTestAuthority(admin)
+
 		msg := poatypes.MsgRemoveValidator{
-			Sender:           adminAcc.Address.String(),
+			Sender:           admin,
 			ValidatorAddress: validator.OperatorAddress,
 		}
 
-		return genAndDeliverTxWithRandFees(r, app, ctx, txGen, adminAcc, &msg, k)
+		return genAndDeliverTxWithNoFees(r, app, ctx, txGen, accs[0], &msg, k)
 	}
 }
 
 func SimulateMsgSetPower(txGen client.TxConfig, k keeper.Keeper) simtypes.Operation {
 	return func(r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
+		k.SetTestAuthority(accs[0].Address.String())
+
 		msgType := sdk.MsgTypeURL(&poatypes.MsgSetPower{})
 
 		validators, err := k.GetStakingKeeper().GetAllValidators(ctx)
@@ -259,20 +219,18 @@ func SimulateMsgSetPower(txGen client.TxConfig, k keeper.Keeper) simtypes.Operat
 			return simtypes.NoOpMsg(poatypes.ModuleName, msgType, errStr), nil, nil
 		}
 
-		adminAcc, err := selectRandomPOAAccount(r, k.GetAdmins(ctx), accs)
-		if err != nil {
-			return simtypes.NoOpMsg(poatypes.ModuleName, msgType, err.Error()), nil, err
-		}
+		admin := accs[0].Address.String()
+		k.SetTestAuthority(admin)
 
 		// Generate random transaction fees
 		msg := poatypes.MsgSetPower{
-			Sender:           adminAcc.Address.String(),
+			Sender:           admin,
 			ValidatorAddress: validator.OperatorAddress,
 			Power:            newPower,
 			Unsafe:           false, // We only cover the case where the power is <= 30% of the total power
 		}
 
-		return genAndDeliverTxWithRandFees(r, app, ctx, txGen, adminAcc, &msg, k)
+		return genAndDeliverTxWithNoFees(r, app, ctx, txGen, accs[0], &msg, k)
 	}
 }
 
@@ -338,31 +296,6 @@ func getNewPower(r *rand.Rand, k keeper.Keeper, ctx sdk.Context, validator staki
 	return newPowerTokens.Uint64(), "", false
 }
 
-func selectRandomPOAAccount(r *rand.Rand, admins []string, accs []simtypes.Account) (simtypes.Account, error) {
-	randomAdminAddr, err := getRandomPOAAdmin(r, admins)
-	if err != nil {
-		return simtypes.Account{}, err
-	}
-
-	acc, found := simtypes.FindAccount(accs, sdk.MustAccAddressFromBech32(randomAdminAddr))
-	if !found {
-		return simtypes.Account{}, errors.New("admin not found in simulator accounts")
-	}
-
-	return acc, nil
-}
-
-func getRandomPOAAdmin(r *rand.Rand, admins []string) (string, error) {
-	if len(admins) == 0 {
-		return "", errors.New("no admins found")
-	}
-
-	idx := r.Intn(len(admins))
-	admin := admins[idx]
-
-	return admin, nil
-}
-
 func generateRandomDescription(r *rand.Rand) poatypes.Description {
 	return poatypes.Description{
 		Moniker:         simtypes.RandStringOfLength(r, 10),
@@ -404,6 +337,6 @@ func newOperationInput(r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, txGe
 	}
 }
 
-func genAndDeliverTxWithRandFees(r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, txGen client.TxConfig, simAccount simtypes.Account, msg sdk.Msg, k keeper.Keeper) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
-	return simulation.GenAndDeliverTxWithRandFees(newOperationInput(r, app, ctx, txGen, simAccount, msg, k))
+func genAndDeliverTxWithNoFees(r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, txGen client.TxConfig, simAccount simtypes.Account, msg sdk.Msg, k keeper.Keeper) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
+	return simulation.GenAndDeliverTx(newOperationInput(r, app, ctx, txGen, simAccount, msg, k), sdk.NewCoins())
 }

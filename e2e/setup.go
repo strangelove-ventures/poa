@@ -2,6 +2,7 @@ package e2e
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	moduletestutil "github.com/cosmos/cosmos-sdk/types/module/testutil"
@@ -24,13 +25,6 @@ var (
 	}
 
 	defaultGenesis = []cosmos.GenesisKV{
-		{
-			Key: "app_state.poa.params.admins",
-			Value: []string{
-				"cosmos10d07y265gmmuvt4z0w9aw880jnsr700j6zn9kn", // gov
-				"cosmos1hj5fveer5cjtn4wd6wstzugjfdxzl0xpxvjjvr", // testing account
-			},
-		},
 		{
 			Key:   "app_state.gov.params.voting_period",
 			Value: VotingPeriod,
@@ -65,6 +59,9 @@ var (
 		CoinType:       "118",
 		GasPrices:      "0" + Denom,
 		TrustingPeriod: "330h",
+		Env: []string{
+			fmt.Sprintf("POA_ADMIN_ADDRESS=%s", "cosmos1hj5fveer5cjtn4wd6wstzugjfdxzl0xpxvjjvr"), // acc0 / admin
+		},
 	}
 )
 

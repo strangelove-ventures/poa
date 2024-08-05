@@ -29,89 +29,6 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// QueryParamsRequest is the request type for the Query/Params RPC method.
-type QueryParamsRequest struct {
-}
-
-func (m *QueryParamsRequest) Reset()         { *m = QueryParamsRequest{} }
-func (m *QueryParamsRequest) String() string { return proto.CompactTextString(m) }
-func (*QueryParamsRequest) ProtoMessage()    {}
-func (*QueryParamsRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_676fcce3868e4c52, []int{0}
-}
-func (m *QueryParamsRequest) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *QueryParamsRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_QueryParamsRequest.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *QueryParamsRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryParamsRequest.Merge(m, src)
-}
-func (m *QueryParamsRequest) XXX_Size() int {
-	return m.Size()
-}
-func (m *QueryParamsRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryParamsRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_QueryParamsRequest proto.InternalMessageInfo
-
-// QueryParamsResponse is the response type for the Query/Params RPC method.
-type ParamsResponse struct {
-	// params is the returned parameter from the module
-	Params Params `protobuf:"bytes,1,opt,name=params,proto3" json:"params"`
-}
-
-func (m *ParamsResponse) Reset()         { *m = ParamsResponse{} }
-func (m *ParamsResponse) String() string { return proto.CompactTextString(m) }
-func (*ParamsResponse) ProtoMessage()    {}
-func (*ParamsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_676fcce3868e4c52, []int{1}
-}
-func (m *ParamsResponse) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *ParamsResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_ParamsResponse.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *ParamsResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ParamsResponse.Merge(m, src)
-}
-func (m *ParamsResponse) XXX_Size() int {
-	return m.Size()
-}
-func (m *ParamsResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_ParamsResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_ParamsResponse proto.InternalMessageInfo
-
-func (m *ParamsResponse) GetParams() Params {
-	if m != nil {
-		return m.Params
-	}
-	return Params{}
-}
-
 // QueryPendingValidatorsRequest is the request type for the Query/PendingValidators RPC method.
 type QueryPendingValidatorsRequest struct {
 }
@@ -120,7 +37,7 @@ func (m *QueryPendingValidatorsRequest) Reset()         { *m = QueryPendingValid
 func (m *QueryPendingValidatorsRequest) String() string { return proto.CompactTextString(m) }
 func (*QueryPendingValidatorsRequest) ProtoMessage()    {}
 func (*QueryPendingValidatorsRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_676fcce3868e4c52, []int{2}
+	return fileDescriptor_676fcce3868e4c52, []int{0}
 }
 func (m *QueryPendingValidatorsRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -159,7 +76,7 @@ func (m *PendingValidatorsResponse) Reset()         { *m = PendingValidatorsResp
 func (m *PendingValidatorsResponse) String() string { return proto.CompactTextString(m) }
 func (*PendingValidatorsResponse) ProtoMessage()    {}
 func (*PendingValidatorsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_676fcce3868e4c52, []int{3}
+	return fileDescriptor_676fcce3868e4c52, []int{1}
 }
 func (m *PendingValidatorsResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -205,7 +122,7 @@ func (m *QueryConsensusPowerRequest) Reset()         { *m = QueryConsensusPowerR
 func (m *QueryConsensusPowerRequest) String() string { return proto.CompactTextString(m) }
 func (*QueryConsensusPowerRequest) ProtoMessage()    {}
 func (*QueryConsensusPowerRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_676fcce3868e4c52, []int{4}
+	return fileDescriptor_676fcce3868e4c52, []int{2}
 }
 func (m *QueryConsensusPowerRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -251,7 +168,7 @@ func (m *QueryConsensusPowerResponse) Reset()         { *m = QueryConsensusPower
 func (m *QueryConsensusPowerResponse) String() string { return proto.CompactTextString(m) }
 func (*QueryConsensusPowerResponse) ProtoMessage()    {}
 func (*QueryConsensusPowerResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_676fcce3868e4c52, []int{5}
+	return fileDescriptor_676fcce3868e4c52, []int{3}
 }
 func (m *QueryConsensusPowerResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -288,8 +205,6 @@ func (m *QueryConsensusPowerResponse) GetConsensusPower() int64 {
 }
 
 func init() {
-	proto.RegisterType((*QueryParamsRequest)(nil), "strangelove_ventures.poa.v1.QueryParamsRequest")
-	proto.RegisterType((*ParamsResponse)(nil), "strangelove_ventures.poa.v1.ParamsResponse")
 	proto.RegisterType((*QueryPendingValidatorsRequest)(nil), "strangelove_ventures.poa.v1.QueryPendingValidatorsRequest")
 	proto.RegisterType((*PendingValidatorsResponse)(nil), "strangelove_ventures.poa.v1.PendingValidatorsResponse")
 	proto.RegisterType((*QueryConsensusPowerRequest)(nil), "strangelove_ventures.poa.v1.QueryConsensusPowerRequest")
@@ -301,37 +216,33 @@ func init() {
 }
 
 var fileDescriptor_676fcce3868e4c52 = []byte{
-	// 475 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x93, 0xc1, 0x6a, 0x14, 0x31,
-	0x18, 0xc7, 0x37, 0xae, 0xae, 0x98, 0xc2, 0xda, 0x86, 0xa2, 0xed, 0xb4, 0xce, 0x96, 0x14, 0xec,
-	0xc2, 0xe2, 0x84, 0xae, 0xa0, 0x22, 0x78, 0x68, 0x85, 0x82, 0xb7, 0xba, 0x82, 0x07, 0x2f, 0x4b,
-	0x3a, 0x13, 0xc6, 0x81, 0x6d, 0x92, 0x26, 0x99, 0x11, 0x2f, 0x1e, 0x7c, 0x02, 0xc1, 0x57, 0xf0,
-	0xe6, 0x8b, 0xf4, 0x58, 0xf0, 0xe2, 0x41, 0x44, 0x76, 0x7d, 0x10, 0x99, 0x64, 0x66, 0xec, 0xda,
-	0xe9, 0xb8, 0xbd, 0x0d, 0xf9, 0xbe, 0xff, 0xff, 0xfb, 0xe5, 0xfb, 0x4f, 0xe0, 0x8e, 0x36, 0x8a,
-	0xf2, 0x98, 0x4d, 0x44, 0xc6, 0xc6, 0x19, 0xe3, 0x26, 0x55, 0x4c, 0x13, 0x29, 0x28, 0xc9, 0x76,
-	0xc9, 0x49, 0xca, 0xd4, 0xfb, 0x40, 0x2a, 0x61, 0x04, 0xda, 0xa8, 0x6b, 0x0c, 0xa4, 0xa0, 0x41,
-	0xb6, 0xeb, 0xad, 0xc6, 0x22, 0x16, 0xb6, 0x8f, 0xe4, 0x5f, 0x4e, 0xe2, 0x6d, 0xc6, 0x42, 0xc4,
-	0x13, 0x46, 0xa8, 0x4c, 0x08, 0xe5, 0x5c, 0x18, 0x6a, 0x12, 0xc1, 0x75, 0x51, 0xed, 0x37, 0x4d,
-	0x96, 0x54, 0xd1, 0xe3, 0xb2, 0x73, 0xd0, 0xd4, 0x99, 0xd1, 0x49, 0x12, 0x51, 0x23, 0x94, 0x6b,
-	0xc6, 0xab, 0x10, 0xbd, 0xcc, 0xb1, 0x0f, 0xad, 0xc3, 0x88, 0x9d, 0xa4, 0x4c, 0x1b, 0xfc, 0x0a,
-	0x76, 0xcb, 0x03, 0x2d, 0x05, 0xd7, 0x0c, 0xed, 0xc1, 0x8e, 0x1b, 0xb2, 0x06, 0xb6, 0x40, 0x7f,
-	0x69, 0xb8, 0x1d, 0x34, 0x5c, 0x30, 0x70, 0xe2, 0xfd, 0xeb, 0xa7, 0x3f, 0x7b, 0xad, 0x51, 0x21,
-	0xc4, 0x3d, 0x78, 0xcf, 0x8d, 0x62, 0x3c, 0x4a, 0x78, 0xfc, 0xba, 0x24, 0xa9, 0xa6, 0x86, 0x70,
-	0xbd, 0xa6, 0x56, 0x00, 0x1c, 0xc0, 0x9b, 0xd2, 0x15, 0xd7, 0xc0, 0x56, 0xbb, 0xbf, 0x34, 0xbc,
-	0xdf, 0x48, 0x50, 0x39, 0x14, 0x10, 0xa5, 0x18, 0xbf, 0x80, 0x9e, 0xa5, 0x78, 0x9e, 0xbb, 0x72,
-	0x9d, 0xea, 0x43, 0xf1, 0x8e, 0xa9, 0x02, 0x01, 0x0d, 0xe0, 0x4a, 0xb5, 0xa1, 0x31, 0x8d, 0x22,
-	0xc5, 0xb4, 0xbb, 0xf1, 0xad, 0xd1, 0x72, 0x55, 0xd8, 0x73, 0xe7, 0xf8, 0x00, 0x6e, 0xd4, 0x5a,
-	0x15, 0xc4, 0x3b, 0xf0, 0x76, 0x58, 0x56, 0xc6, 0x32, 0x2f, 0x59, 0xa7, 0xf6, 0xa8, 0x1b, 0xce,
-	0x09, 0x86, 0x3f, 0xda, 0xf0, 0x86, 0x35, 0x42, 0x1f, 0x60, 0xc7, 0xad, 0x0e, 0x91, 0xc6, 0xdb,
-	0x5d, 0x8c, 0xcc, 0x1b, 0x2c, 0x10, 0x48, 0x89, 0x86, 0xef, 0x7c, 0xfc, 0xf6, 0xfb, 0xf3, 0xb5,
-	0x65, 0xd4, 0x9d, 0xff, 0x81, 0xd0, 0x57, 0x00, 0x57, 0x2e, 0x44, 0x80, 0x9e, 0x2e, 0xc0, 0x72,
-	0x49, 0xa6, 0xde, 0xa3, 0x66, 0xac, 0xcb, 0xe2, 0xc6, 0xd8, 0x12, 0x6e, 0x22, 0xaf, 0x22, 0x74,
-	0xad, 0xe3, 0xec, 0x2f, 0xd7, 0x17, 0x00, 0xbb, 0xf3, 0xbb, 0x47, 0x8f, 0xff, 0x8f, 0x5a, 0x1b,
-	0xbc, 0xf7, 0xe4, 0xea, 0xc2, 0x82, 0xb4, 0x67, 0x49, 0xd7, 0xd1, 0xdd, 0x92, 0xf4, 0x9f, 0xd0,
-	0xf7, 0x9f, 0x9d, 0x4e, 0x7d, 0x70, 0x36, 0xf5, 0xc1, 0xaf, 0xa9, 0x0f, 0x3e, 0xcd, 0xfc, 0xd6,
-	0xd9, 0xcc, 0x6f, 0x7d, 0x9f, 0xf9, 0xad, 0x37, 0xdb, 0x71, 0x62, 0xde, 0xa6, 0x47, 0x41, 0x28,
-	0x8e, 0xc9, 0xb9, 0xf1, 0x0f, 0xce, 0x3f, 0xda, 0xa3, 0x8e, 0x7d, 0xa8, 0x0f, 0xff, 0x04, 0x00,
-	0x00, 0xff, 0xff, 0xf3, 0x3e, 0x02, 0x49, 0x7b, 0x04, 0x00, 0x00,
+	// 411 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x92, 0x4f, 0xeb, 0xd3, 0x30,
+	0x1c, 0xc6, 0x9b, 0xcd, 0x3f, 0x18, 0x61, 0xba, 0x20, 0xb8, 0x75, 0xb3, 0x1b, 0x15, 0xdc, 0x60,
+	0xd8, 0xb2, 0x09, 0x2a, 0x82, 0x07, 0x27, 0x0c, 0xbc, 0xcd, 0x1e, 0x3c, 0x78, 0x29, 0x59, 0x1b,
+	0x6a, 0x61, 0x4b, 0xb2, 0x24, 0xad, 0x78, 0xf5, 0x15, 0x08, 0xbe, 0x05, 0x6f, 0xbe, 0x91, 0x1d,
+	0x07, 0x5e, 0x3c, 0x88, 0xc8, 0xe6, 0x0b, 0x91, 0xfe, 0x75, 0xd3, 0x5a, 0xf9, 0xdd, 0x4a, 0x9f,
+	0xe7, 0xfb, 0xe4, 0xf3, 0x7d, 0x12, 0x38, 0x92, 0x4a, 0x60, 0x1a, 0x90, 0x35, 0x8b, 0x89, 0x1b,
+	0x13, 0xaa, 0x22, 0x41, 0xa4, 0xcd, 0x19, 0xb6, 0xe3, 0xa9, 0xbd, 0x8d, 0x88, 0x78, 0x67, 0x71,
+	0xc1, 0x14, 0x43, 0xbd, 0x2a, 0xa3, 0xc5, 0x19, 0xb6, 0xe2, 0xa9, 0x7e, 0x2b, 0x60, 0x01, 0x4b,
+	0x7d, 0x76, 0xf2, 0x95, 0x8d, 0xe8, 0xfd, 0x80, 0xb1, 0x60, 0x4d, 0x6c, 0xcc, 0x43, 0x1b, 0x53,
+	0xca, 0x14, 0x56, 0x21, 0xa3, 0x32, 0x57, 0xc7, 0x75, 0x27, 0x73, 0x2c, 0xf0, 0xa6, 0x70, 0x4e,
+	0xea, 0x9c, 0x31, 0x5e, 0x87, 0x3e, 0x56, 0x4c, 0x64, 0x66, 0x73, 0x00, 0xef, 0xbc, 0x4c, 0xb0,
+	0x97, 0x84, 0xfa, 0x21, 0x0d, 0x5e, 0x15, 0xb2, 0x74, 0xc8, 0x36, 0x22, 0x52, 0x99, 0x1e, 0xec,
+	0x56, 0x68, 0x92, 0x33, 0x2a, 0x09, 0x5a, 0xc0, 0xab, 0x3c, 0x13, 0x3b, 0x60, 0xd8, 0x1c, 0x5f,
+	0x9f, 0xdd, 0xb3, 0x6a, 0xf6, 0xb6, 0xca, 0x84, 0xf9, 0xa5, 0xdd, 0xf7, 0x81, 0xe6, 0x14, 0xc3,
+	0xe6, 0x0b, 0xa8, 0xa7, 0x14, 0xcf, 0x93, 0x54, 0x2a, 0x23, 0xb9, 0x64, 0x6f, 0x89, 0xc8, 0x11,
+	0xd0, 0x04, 0xb6, 0x4b, 0x6c, 0x17, 0xfb, 0xbe, 0x20, 0x52, 0x76, 0xc0, 0x10, 0x8c, 0xaf, 0x39,
+	0x37, 0x4b, 0xe1, 0x59, 0xf6, 0xdf, 0x5c, 0xc0, 0x5e, 0x65, 0x54, 0x4e, 0x3c, 0x82, 0x37, 0xbc,
+	0x42, 0x71, 0x79, 0x22, 0xa5, 0x49, 0x4d, 0xa7, 0xe5, 0x9d, 0x0d, 0xcc, 0xbe, 0x35, 0xe0, 0xe5,
+	0x34, 0x08, 0x7d, 0x06, 0xb0, 0xfd, 0x57, 0x05, 0xe8, 0x49, 0xed, 0xa6, 0xb5, 0x9d, 0xea, 0x0f,
+	0x6b, 0x67, 0xff, 0x59, 0xb7, 0x69, 0xbe, 0xff, 0xf2, 0xf3, 0x63, 0xa3, 0x8f, 0xf4, 0xf2, 0xde,
+	0x33, 0xab, 0x1b, 0xff, 0xe6, 0xfa, 0x04, 0x60, 0xeb, 0x7c, 0x77, 0xf4, 0xe8, 0xff, 0xa8, 0x95,
+	0xc5, 0xeb, 0x8f, 0x2f, 0x3e, 0x98, 0x93, 0x0e, 0x52, 0xd2, 0x2e, 0xba, 0x5d, 0x90, 0xfe, 0x51,
+	0xfa, 0xfc, 0xe9, 0xee, 0x60, 0x80, 0xfd, 0xc1, 0x00, 0x3f, 0x0e, 0x06, 0xf8, 0x70, 0x34, 0xb4,
+	0xfd, 0xd1, 0xd0, 0xbe, 0x1e, 0x0d, 0xed, 0xf5, 0xdd, 0x20, 0x54, 0x6f, 0xa2, 0x95, 0xe5, 0xb1,
+	0x8d, 0x7d, 0x72, 0xfc, 0xfd, 0xd3, 0x97, 0xbc, 0xba, 0x92, 0xbe, 0xde, 0x07, 0xbf, 0x02, 0x00,
+	0x00, 0xff, 0xff, 0x2c, 0xb8, 0x2b, 0x91, 0x90, 0x03, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -346,8 +257,6 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type QueryClient interface {
-	// Params returns the current params of the module.
-	Params(ctx context.Context, in *QueryParamsRequest, opts ...grpc.CallOption) (*ParamsResponse, error)
 	// PendingValidators returns currently pending validators of the module.
 	PendingValidators(ctx context.Context, in *QueryPendingValidatorsRequest, opts ...grpc.CallOption) (*PendingValidatorsResponse, error)
 	// ConsensusPower returns the current consensus power of a validator.
@@ -360,15 +269,6 @@ type queryClient struct {
 
 func NewQueryClient(cc grpc1.ClientConn) QueryClient {
 	return &queryClient{cc}
-}
-
-func (c *queryClient) Params(ctx context.Context, in *QueryParamsRequest, opts ...grpc.CallOption) (*ParamsResponse, error) {
-	out := new(ParamsResponse)
-	err := c.cc.Invoke(ctx, "/strangelove_ventures.poa.v1.Query/Params", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
 }
 
 func (c *queryClient) PendingValidators(ctx context.Context, in *QueryPendingValidatorsRequest, opts ...grpc.CallOption) (*PendingValidatorsResponse, error) {
@@ -391,8 +291,6 @@ func (c *queryClient) ConsensusPower(ctx context.Context, in *QueryConsensusPowe
 
 // QueryServer is the server API for Query service.
 type QueryServer interface {
-	// Params returns the current params of the module.
-	Params(context.Context, *QueryParamsRequest) (*ParamsResponse, error)
 	// PendingValidators returns currently pending validators of the module.
 	PendingValidators(context.Context, *QueryPendingValidatorsRequest) (*PendingValidatorsResponse, error)
 	// ConsensusPower returns the current consensus power of a validator.
@@ -403,9 +301,6 @@ type QueryServer interface {
 type UnimplementedQueryServer struct {
 }
 
-func (*UnimplementedQueryServer) Params(ctx context.Context, req *QueryParamsRequest) (*ParamsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Params not implemented")
-}
 func (*UnimplementedQueryServer) PendingValidators(ctx context.Context, req *QueryPendingValidatorsRequest) (*PendingValidatorsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PendingValidators not implemented")
 }
@@ -415,24 +310,6 @@ func (*UnimplementedQueryServer) ConsensusPower(ctx context.Context, req *QueryC
 
 func RegisterQueryServer(s grpc1.Server, srv QueryServer) {
 	s.RegisterService(&_Query_serviceDesc, srv)
-}
-
-func _Query_Params_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryParamsRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(QueryServer).Params(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/strangelove_ventures.poa.v1.Query/Params",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).Params(ctx, req.(*QueryParamsRequest))
-	}
-	return interceptor(ctx, in, info, handler)
 }
 
 func _Query_PendingValidators_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -476,10 +353,6 @@ var _Query_serviceDesc = grpc.ServiceDesc{
 	HandlerType: (*QueryServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "Params",
-			Handler:    _Query_Params_Handler,
-		},
-		{
 			MethodName: "PendingValidators",
 			Handler:    _Query_PendingValidators_Handler,
 		},
@@ -490,62 +363,6 @@ var _Query_serviceDesc = grpc.ServiceDesc{
 	},
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "strangelove_ventures/poa/v1/query.proto",
-}
-
-func (m *QueryParamsRequest) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *QueryParamsRequest) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *QueryParamsRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	return len(dAtA) - i, nil
-}
-
-func (m *ParamsResponse) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *ParamsResponse) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *ParamsResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	{
-		size, err := m.Params.MarshalToSizedBuffer(dAtA[:i])
-		if err != nil {
-			return 0, err
-		}
-		i -= size
-		i = encodeVarintQuery(dAtA, i, uint64(size))
-	}
-	i--
-	dAtA[i] = 0xa
-	return len(dAtA) - i, nil
 }
 
 func (m *QueryPendingValidatorsRequest) Marshal() (dAtA []byte, err error) {
@@ -677,26 +494,6 @@ func encodeVarintQuery(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
-func (m *QueryParamsRequest) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	return n
-}
-
-func (m *ParamsResponse) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = m.Params.Size()
-	n += 1 + l + sovQuery(uint64(l))
-	return n
-}
-
 func (m *QueryPendingValidatorsRequest) Size() (n int) {
 	if m == nil {
 		return 0
@@ -751,139 +548,6 @@ func sovQuery(x uint64) (n int) {
 }
 func sozQuery(x uint64) (n int) {
 	return sovQuery(uint64((x << 1) ^ uint64((int64(x) >> 63))))
-}
-func (m *QueryParamsRequest) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowQuery
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: QueryParamsRequest: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryParamsRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		default:
-			iNdEx = preIndex
-			skippy, err := skipQuery(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *ParamsResponse) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowQuery
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: ParamsResponse: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ParamsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Params", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowQuery
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthQuery
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.Params.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipQuery(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
 }
 func (m *QueryPendingValidatorsRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)

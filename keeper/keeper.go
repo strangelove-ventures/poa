@@ -2,6 +2,8 @@ package keeper
 
 import (
 	"context"
+	"fmt"
+	"os"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -31,12 +33,13 @@ type Keeper struct {
 
 	// state management
 	Schema                 collections.Schema
-	Params                 collections.Item[poa.Params]
 	PendingValidators      collections.Item[poa.Validators]
 	UpdatedValidatorsCache collections.KeySet[string]
 
 	CachedBlockPower            collections.Item[poa.PowerCache]
 	AbsoluteChangedInBlockPower collections.Item[poa.PowerCache]
+
+	authority string
 }
 
 // NewKeeper creates a new poa Keeper instance
@@ -47,10 +50,16 @@ func NewKeeper(
 	slk SlashingKeeper,
 	bk BankKeeper,
 	logger log.Logger,
+	adminAuthority string,
 ) Keeper {
 	logger = logger.With(log.ModuleKey, "x/"+poa.ModuleName)
 
 	sb := collections.NewSchemaBuilder(storeService)
+
+	if address := os.Getenv("POA_ADMIN_ADDRESS"); address != "" {
+		adminAuthority = address
+		logger.Info("admin authority override from environment variable `POA_ADMIN_ADDRESS`", "address", adminAuthority)
+	}
 
 	k := Keeper{
 		cdc:           cdc,
@@ -60,12 +69,13 @@ func NewKeeper(
 		logger:        logger,
 
 		// Stores
-		Params:                 collections.NewItem(sb, poa.ParamsKey, "params", codec.CollValue[poa.Params](cdc)),
 		PendingValidators:      collections.NewItem(sb, poa.PendingValidatorsKey, "pending", codec.CollValue[poa.Validators](cdc)),
 		UpdatedValidatorsCache: collections.NewKeySet(sb, poa.UpdatedValidatorsCacheKey, "updated_validators", collections.StringKey),
 
 		CachedBlockPower:            collections.NewItem(sb, poa.CachedPreviousBlockPowerKey, "cached_block", codec.CollValue[poa.PowerCache](cdc)),
 		AbsoluteChangedInBlockPower: collections.NewItem(sb, poa.AbsoluteChangedInBlockPowerKey, "absolute_changed_power", codec.CollValue[poa.PowerCache](cdc)),
+
+		authority: adminAuthority,
 	}
 
 	schema, err := sb.Build()
@@ -104,25 +114,22 @@ func (k *Keeper) SetTestAccountKeeper(ak AccountKeeper) {
 	k.accountKeeper = ak
 }
 
-// GetAdmins returns the module's administrators with delegation of power control.
-func (k Keeper) GetAdmins(ctx context.Context) []string {
-	p, err := k.GetParams(ctx)
-	if err != nil {
-		return []string{}
-	}
+func (k *Keeper) SetTestAuthority(addr string) {
+	k.authority = addr
+}
 
-	return p.Admins
+func (k Keeper) GetAdmin(ctx context.Context) string {
+	return k.authority
 }
 
 // IsAdmin checks if the given address is an admin.
 func (k Keeper) IsAdmin(ctx context.Context, fromAddr string) bool {
-	for _, auth := range k.GetAdmins(ctx) {
-		if auth == fromAddr {
-			return true
-		}
+	if os.Getenv("POA_BYPASS_ADMIN_CHECK_FOR_SIMULATION_TESTING_ONLY") == "not_for-production" {
+		fmt.Println("[!] POA: Bypassing admin check for simulation testing") // nolint:forbidigo
+		return true
 	}
 
-	return false
+	return k.authority == fromAddr
 }
 
 // IsSenderValidator checks if the given sender address is the same address as the validator by bytes.

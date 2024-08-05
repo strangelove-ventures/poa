@@ -323,6 +323,7 @@ func NewSimApp(
 		app.SlashingKeeper,
 		app.BankKeeper,
 		logger,
+		govModAddress,
 	)
 	app.POAKeeper.SetTestAccountKeeper(app.AccountKeeper)
 

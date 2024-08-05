@@ -44,9 +44,12 @@ func ExecuteExec(ctx context.Context, chain *cosmos.CosmosChain, cmd []string, i
 
 	// If the codec can not properly unmarshal, then it may be a standard json Unmarshal request.
 	// This is required since we are ExecuteExec'ing an interface{} instead of some concrete type.
-	err = chain.GetCodec().UnmarshalInterface(stdout, &i)
-	if err != nil && !strings.Contains(err.Error(), "illegal wireType") {
-		fmt.Println("chain.GetCodec.UnmarshalInterface", err)
+	cdc := chain.GetCodec()
+	if cdc != nil {
+		err = cdc.UnmarshalInterface(stdout, &i)
+		if err != nil && !strings.Contains(err.Error(), "illegal wireType") {
+			fmt.Println("chain.GetCodec.UnmarshalInterface", err)
+		}
 	}
 }
 
@@ -65,8 +68,17 @@ func ExecuteTransaction(ctx context.Context, chain *cosmos.CosmosChain, cmd []st
 	}
 
 	var res sdk.TxResponse
-	if err := chain.GetCodec().UnmarshalJSON(stdout, &res); err != nil {
-		return sdk.TxResponse{}, err
+
+	cdc := chain.GetCodec()
+
+	if cdc != nil {
+		if err := cdc.UnmarshalJSON(stdout, &res); err != nil {
+			// return sdk.TxResponse{}, fmt.Errorf("failed to cdc unmarshal tx response: %s", err)
+			fmt.Println("cdc.UnmarshalJSON err", err, "using json Unmarshal instead")
+			json.Unmarshal(stdout, &res)
+		}
+	} else {
+		json.Unmarshal(stdout, &res)
 	}
 
 	return res, err
