@@ -30,10 +30,6 @@ const (
 
 )
 
-func init() {
-	os.Setenv("POA_BYPASS_ADMIN_CHECK_FOR_SIMULATION_TESTING_ONLY", "not_for-production")
-}
-
 var (
 	weights = map[string]int{
 		OpWeightMsgPOASetPower:               100,
@@ -49,6 +45,8 @@ func WeightedOperations(appParams simtypes.AppParams,
 	txGen client.TxConfig,
 	k keeper.Keeper) []simtypes.WeightedOperation {
 	operations := make([]simtypes.WeightedOperation, 0)
+
+	os.Setenv("POA_BYPASS_ADMIN_CHECK_FOR_SIMULATION_TESTING_ONLY", "not_for-production")
 
 	// Iterating over a map is non-deterministic in Go. To simulate determinism, we sort the keys in a slice and iterate over them.
 	keys := make([]string, 0, len(weights))
