@@ -2,6 +2,7 @@ package keeper_test
 
 import (
 	"fmt"
+	"os"
 	"testing"
 	"time"
 
@@ -113,6 +114,8 @@ func SetupTest(t *testing.T, baseValShares int64) *testFixture {
 	f.InitPoAGenesis(t)
 
 	f.createBaseStakingValidators(t, baseValShares)
+
+	os.Setenv("POA_BYPASS_ADMIN_CHECK_FOR_SIMULATION_TESTING_ONLY", "false")
 
 	return f
 }

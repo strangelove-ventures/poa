@@ -293,7 +293,7 @@ func TestRemoveValidator(t *testing.T) {
 			_, err = f.msgServer.RemoveValidator(f.ctx, tc.request)
 
 			if tc.expectErrMsg != "" {
-				require.Error(err)
+				require.Error(err, tc.expectErrMsg)
 				require.ErrorContains(err, tc.expectErrMsg)
 			} else {
 				require.NoError(err)
