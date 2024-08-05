@@ -124,9 +124,8 @@ func (k Keeper) GetAdmin(ctx context.Context) string {
 
 // IsAdmin checks if the given address is an admin.
 func (k Keeper) IsAdmin(ctx context.Context, fromAddr string) bool {
-
 	if os.Getenv("POA_BYPASS_ADMIN_CHECK_FOR_SIMULATION_TESTING_ONLY") == "not_for-production" {
-		fmt.Println("[!] POA: Bypassing admin check for simulation testing")
+		fmt.Println("[!] POA: Bypassing admin check for simulation testing") // nolint:forbidigo
 		return true
 	}
 
