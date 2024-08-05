@@ -6,6 +6,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 
 	"cosmossdk.io/core/address"
 	"cosmossdk.io/core/appmodule"
@@ -13,8 +15,6 @@ import (
 	"cosmossdk.io/depinject"
 	"cosmossdk.io/log"
 
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	"github.com/strangelove-ventures/poa"
 	modulev1 "github.com/strangelove-ventures/poa/api/module/v1"
 	"github.com/strangelove-ventures/poa/keeper"
