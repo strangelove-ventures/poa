@@ -128,10 +128,6 @@ from_scratch () {
   # crisis
   update_test_genesis '.app_state["crisis"]["constant_fee"]={"denom": "stake","amount": "1000"}'
 
-  # x/POA
-  # allows gov & acc1 to perform actions on POA.
-  update_test_genesis '.app_state["poa"]["params"]["admins"]=["cosmos10d07y265gmmuvt4z0w9aw880jnsr700j6zn9kn","cosmos1hj5fveer5cjtn4wd6wstzugjfdxzl0xpxvjjvr"]'
-
   # Allocate genesis accounts
   # stake should ONLY be as much as they gentx with. No more.
   BINARY genesis add-genesis-account $KEY 1000000000000stake,1000utest --keyring-backend $KEYRING

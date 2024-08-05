@@ -2,6 +2,7 @@ package e2e
 
 import (
 	"context"
+	"os"
 	"testing"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -33,6 +34,8 @@ func TestPOABase(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	require.NoError(t, os.Setenv("POA_BYPASS_ADMIN_CHECK_FOR_SIMULATION_TESTING_ONLY", "false"))
 
 	users := interchaintest.GetAndFundTestUsers(t, ctx, t.Name(), userFunds, chain)
 	incorrectUser := users[0]
@@ -120,8 +123,9 @@ func testPowerErrors(t *testing.T, ctx context.Context, chain *cosmos.CosmosChai
 	var err error
 
 	t.Run("fail: set-power message from a non authorized user", func(t *testing.T) {
-		// runtime error: index out of range [1] with length 1 [recovered]
-		res, _ = helpers.POASetPower(t, ctx, chain, incorrectUser, validators[0], 1_000_000)
+		res, _ = helpers.POASetPower(t, ctx, chain, incorrectUser, validators[0], 2_000_000, "--unsafe=true")
+		require.NoError(t, err)
+
 		res, err := chain.GetTransaction(res.TxHash)
 		require.NoError(t, err)
 		require.Contains(t, res.RawLog, poa.ErrNotAnAuthority.Error())
