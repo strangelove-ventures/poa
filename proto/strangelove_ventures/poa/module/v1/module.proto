@@ -11,7 +11,7 @@ message Module {
     go_import : "github.com/strangelove-ventures/poa"
   };
 
-  // admins defines the custom module admins.
+  // authority defines the custom module authority.
   // if not set, defaults to the governance module.
-  repeated string admins = 1;
+  string authority = 1;
 }

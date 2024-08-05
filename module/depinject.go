@@ -59,8 +59,8 @@ type ModuleOutputs struct {
 
 func ProvideModule(in ModuleInputs) ModuleOutputs {
 	authority := authtypes.NewModuleAddress(govtypes.ModuleName)
-	if len(in.Config.Admins) > 0 && in.Config.Admins[0] != "" {
-		authority = authtypes.NewModuleAddressOrBech32Address(in.Config.Admins[0])
+	if in.Config.Authority != "" {
+		authority = authtypes.NewModuleAddress(in.Config.Authority)
 	}
 
 	k := keeper.NewKeeper(in.Cdc, in.StoreService, in.StakingKeeper, in.SlashingKeeper, in.BankKeeper, log.NewLogger(os.Stderr), authority.String())
