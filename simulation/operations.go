@@ -3,6 +3,7 @@ package simulation
 import (
 	"math"
 	"math/rand"
+	"os"
 	"sort"
 
 	"github.com/pkg/errors"
@@ -11,6 +12,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/address"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
@@ -29,7 +31,13 @@ const (
 
 )
 
+func init() {
+	os.Setenv("POA_BYPASS_ADMIN_CHECK_FOR_SIMULATION_TESTING_ONLY", "not_for-production")
+}
+
 var (
+	authority sdk.AccAddress = address.Module("gov")
+
 	weights = map[string]int{
 		OpWeightMsgPOASetPower:               100,
 		OpWeightMsgPOARemoveValidator:        20,
@@ -121,7 +129,7 @@ func SimulateMsgCreateValidator(txGen client.TxConfig, k keeper.Keeper) simtypes
 			return simtypes.NoOpMsg(poatypes.ModuleName, msgType, errors.WithMessage(err, "unable to create MsgCreateValidator").Error()), nil, err
 		}
 
-		return genAndDeliverTxWithRandFees(r, app, ctx, txGen, simAccount, msg, k)
+		return genAndDeliverTxWithNoFees(r, app, ctx, txGen, simAccount, msg, k)
 	}
 }
 
@@ -141,17 +149,15 @@ func SimulateMsgRemovePendingValidator(txGen client.TxConfig, k keeper.Keeper) s
 		// Pick a random pending validator address
 		valAddr := pending.Validators[r.Intn(len(pending.Validators))].OperatorAddress
 
-		adminAcc, err := getPOAAdmin(accs, k.GetAdmin(ctx))
-		if err != nil {
-			return simtypes.NoOpMsg(poatypes.ModuleName, msgType, err.Error()), nil, err
-		}
+		admin := accs[0].Address.String()
+		k.SetTestAuthority(admin)
 
 		msg := poatypes.MsgRemovePending{
-			Sender:           adminAcc.Address.String(),
+			Sender:           admin,
 			ValidatorAddress: valAddr,
 		}
 
-		return genAndDeliverTxWithRandFees(r, app, ctx, txGen, adminAcc, &msg, k)
+		return genAndDeliverTxWithNoFees(r, app, ctx, txGen, accs[0], &msg, k)
 	}
 }
 
@@ -174,22 +180,20 @@ func SimulateMsgRemoveValidator(txGen client.TxConfig, k keeper.Keeper) simtypes
 		// Select a random bonded validator to remove
 		validator := validators[r.Intn(len(validators))]
 
-		adminAcc, err := getPOAAdmin(accs, k.GetAdmin(ctx))
-		if err != nil {
-			return simtypes.NoOpMsg(poatypes.ModuleName, msgType, err.Error()), nil, err
-		}
-
 		power := validator.GetConsensusPower(k.GetStakingKeeper().PowerReduction(ctx))
 		if power == 0 {
 			return simtypes.NoOpMsg(poatypes.ModuleName, msgType, "validator has no power"), nil, nil
 		}
 
+		admin := accs[0].Address.String()
+		k.SetTestAuthority(admin)
+
 		msg := poatypes.MsgRemoveValidator{
-			Sender:           adminAcc.Address.String(),
+			Sender:           admin,
 			ValidatorAddress: validator.OperatorAddress,
 		}
 
-		return genAndDeliverTxWithRandFees(r, app, ctx, txGen, adminAcc, &msg, k)
+		return genAndDeliverTxWithNoFees(r, app, ctx, txGen, accs[0], &msg, k)
 	}
 }
 
@@ -220,20 +224,18 @@ func SimulateMsgSetPower(txGen client.TxConfig, k keeper.Keeper) simtypes.Operat
 			return simtypes.NoOpMsg(poatypes.ModuleName, msgType, errStr), nil, nil
 		}
 
-		adminAcc, err := getPOAAdmin(accs, k.GetAdmin(ctx))
-		if err != nil {
-			return simtypes.NoOpMsg(poatypes.ModuleName, msgType, err.Error()), nil, err
-		}
+		admin := accs[0].Address.String()
+		k.SetTestAuthority(admin)
 
 		// Generate random transaction fees
 		msg := poatypes.MsgSetPower{
-			Sender:           adminAcc.Address.String(),
+			Sender:           admin,
 			ValidatorAddress: validator.OperatorAddress,
 			Power:            newPower,
 			Unsafe:           false, // We only cover the case where the power is <= 30% of the total power
 		}
 
-		return genAndDeliverTxWithRandFees(r, app, ctx, txGen, adminAcc, &msg, k)
+		return genAndDeliverTxWithNoFees(r, app, ctx, txGen, accs[0], &msg, k)
 	}
 }
 
@@ -299,15 +301,6 @@ func getNewPower(r *rand.Rand, k keeper.Keeper, ctx sdk.Context, validator staki
 	return newPowerTokens.Uint64(), "", false
 }
 
-func getPOAAdmin(accs []simtypes.Account, admin string) (simtypes.Account, error) {
-	acc, found := simtypes.FindAccount(accs, sdk.MustAccAddressFromBech32(admin))
-	if !found {
-		return simtypes.Account{}, errors.New("admin not found in simulator accounts")
-	}
-
-	return acc, nil
-}
-
 func generateRandomDescription(r *rand.Rand) poatypes.Description {
 	return poatypes.Description{
 		Moniker:         simtypes.RandStringOfLength(r, 10),
@@ -349,6 +342,6 @@ func newOperationInput(r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, txGe
 	}
 }
 
-func genAndDeliverTxWithRandFees(r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, txGen client.TxConfig, simAccount simtypes.Account, msg sdk.Msg, k keeper.Keeper) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
-	return simulation.GenAndDeliverTxWithRandFees(newOperationInput(r, app, ctx, txGen, simAccount, msg, k))
+func genAndDeliverTxWithNoFees(r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, txGen client.TxConfig, simAccount simtypes.Account, msg sdk.Msg, k keeper.Keeper) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
+	return simulation.GenAndDeliverTx(newOperationInput(r, app, ctx, txGen, simAccount, msg, k), sdk.NewCoins())
 }
