@@ -8,11 +8,18 @@ Our security policy can be found in the [SECURITY.md](./SECURITY.md) file.
 
 ## Integration
 
-Since this module depends on x/staking, carefully read through the [Integration Guide](./INTEGRATION.md) to add it to your network. This design choice was made to allow for the PoA module to have backwards compatibility with:
+Since this module depends on `x/staking`, carefully read through the [Integration Guide](./INTEGRATION.md) to add it to your network. This design choice was made to allow for the PoA module to have backwards compatibility with:
 - Website UIs
 - Uptime bots
 - Validator scripts
 - in-process multi-validator testnets
+
+The default POA administrator is set to the `x/gov` module address. One can change the POA administrator by setting the `POA_ADMIN_ADDRESS` environment variable to a valid address. E.g.,
+
+```bash
+# Override the default PoA admin address
+POA_ADMIN_ADDRESS="cosmos1hj5fveer5cjtn4wd6wstzugjfdxzl0xpxvjjvr" poad start
+````
 
 ## Configuration
 

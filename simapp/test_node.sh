@@ -43,11 +43,7 @@ poad tx poa remove-pending $(poad q poa pending-validators --output=json | jq .p
 
 # Submit via proposal (who is authority of the simapp for governance)
 poad tx gov submit-proposal simapp/proposal.json --home=$HOME_DIR --from=acc1 --yes
-poad tx gov submit-proposal simapp/proposal-params.json --home=$HOME_DIR --from=acc1 --yes
 poad tx gov vote 1 yes --home=$HOME_DIR --from=acc1 --yes
-
-poad q poa params
-poad tx poa update-params cosmos1hj5fveer5cjtn4wd6wstzugjfdxzl0xpxvjjvr --home=$HOME_DIR --from=acc1 --yes
 '
 
 
