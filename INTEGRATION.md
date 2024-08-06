@@ -217,17 +217,7 @@ app_state.slashing.params.downtime_jail_duration
 600s
 ```
 
-## PoA - Genesis params
-
-The PoA module can be configured to pre-define the admin controls. One admin must be set for a valid network. If you do not yet have an admin, set the chain's governance address. (CLI: `appd q auth module-account gov`)
-
-```json
-// base + module accounts, DAOs, and multisigs are supported.
-app_state.poa.params.admins
-["admin1...", "admin2..."]
-```
-
-## Staking - Genesis Params
+### Staking - Genesis Params
 
 You must modify the genesis staking parameters for some other PoA configuration options.
 
