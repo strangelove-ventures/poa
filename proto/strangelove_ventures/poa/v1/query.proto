@@ -20,6 +20,11 @@ service Query {
       returns (QueryConsensusPowerResponse) {
     option (google.api.http).get = "/poa/v1/consensus_power";
   }
+  // POA Authority
+  rpc PoaAuthority(QueryPoaAuthorityRequest)
+      returns (QueryPoaAuthorityResponse) {
+    option (google.api.http).get = "/poa/v1/authority";
+  }
 }
 
 // QueryPendingValidatorsRequest is the request type for the Query/PendingValidators RPC method.
@@ -41,4 +46,13 @@ message QueryConsensusPowerRequest {
 message QueryConsensusPowerResponse {
   // consensus_power is the returned consensus power from the BFT consensus mechanism
   int64 consensus_power = 1;
+}
+
+// QueryPoaAuthorityRequest is the request type for the Query/PoaAuthority RPC method.
+message QueryPoaAuthorityRequest {}
+
+// QueryPoaAuthorityResponse is the response type for the Query/QueryPoaAuthorityRequest RPC method.
+message QueryPoaAuthorityResponse {
+  // authority is the module authority address
+  string authority = 1;
 }

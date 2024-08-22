@@ -48,3 +48,8 @@ func (qs queryServer) PendingValidators(ctx context.Context, _ *poa.QueryPending
 
 	return &poa.PendingValidatorsResponse{Pending: pending.Validators}, nil
 }
+
+// PoaAuthority implements poa.QueryServer.
+func (qs queryServer) PoaAuthority(ctx context.Context, _ *poa.QueryPoaAuthorityRequest) (*poa.QueryPoaAuthorityResponse, error) {
+	return &poa.QueryPoaAuthorityResponse{Authority: qs.k.GetAdmin(ctx)}, nil
+}
