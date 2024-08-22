@@ -21,6 +21,7 @@ const _ = grpc.SupportPackageIsVersion7
 const (
 	Query_PendingValidators_FullMethodName = "/strangelove_ventures.poa.v1.Query/PendingValidators"
 	Query_ConsensusPower_FullMethodName    = "/strangelove_ventures.poa.v1.Query/ConsensusPower"
+	Query_PoaAuthority_FullMethodName      = "/strangelove_ventures.poa.v1.Query/PoaAuthority"
 )
 
 // QueryClient is the client API for Query service.
@@ -31,6 +32,8 @@ type QueryClient interface {
 	PendingValidators(ctx context.Context, in *QueryPendingValidatorsRequest, opts ...grpc.CallOption) (*PendingValidatorsResponse, error)
 	// ConsensusPower returns the current consensus power of a validator.
 	ConsensusPower(ctx context.Context, in *QueryConsensusPowerRequest, opts ...grpc.CallOption) (*QueryConsensusPowerResponse, error)
+	// POA Authority
+	PoaAuthority(ctx context.Context, in *QueryPoaAuthorityRequest, opts ...grpc.CallOption) (*QueryPoaAuthorityResponse, error)
 }
 
 type queryClient struct {
@@ -59,6 +62,15 @@ func (c *queryClient) ConsensusPower(ctx context.Context, in *QueryConsensusPowe
 	return out, nil
 }
 
+func (c *queryClient) PoaAuthority(ctx context.Context, in *QueryPoaAuthorityRequest, opts ...grpc.CallOption) (*QueryPoaAuthorityResponse, error) {
+	out := new(QueryPoaAuthorityResponse)
+	err := c.cc.Invoke(ctx, Query_PoaAuthority_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // QueryServer is the server API for Query service.
 // All implementations must embed UnimplementedQueryServer
 // for forward compatibility
@@ -67,6 +79,8 @@ type QueryServer interface {
 	PendingValidators(context.Context, *QueryPendingValidatorsRequest) (*PendingValidatorsResponse, error)
 	// ConsensusPower returns the current consensus power of a validator.
 	ConsensusPower(context.Context, *QueryConsensusPowerRequest) (*QueryConsensusPowerResponse, error)
+	// POA Authority
+	PoaAuthority(context.Context, *QueryPoaAuthorityRequest) (*QueryPoaAuthorityResponse, error)
 	mustEmbedUnimplementedQueryServer()
 }
 
@@ -79,6 +93,9 @@ func (UnimplementedQueryServer) PendingValidators(context.Context, *QueryPending
 }
 func (UnimplementedQueryServer) ConsensusPower(context.Context, *QueryConsensusPowerRequest) (*QueryConsensusPowerResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ConsensusPower not implemented")
+}
+func (UnimplementedQueryServer) PoaAuthority(context.Context, *QueryPoaAuthorityRequest) (*QueryPoaAuthorityResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PoaAuthority not implemented")
 }
 func (UnimplementedQueryServer) mustEmbedUnimplementedQueryServer() {}
 
@@ -129,6 +146,24 @@ func _Query_ConsensusPower_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Query_PoaAuthority_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryPoaAuthorityRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).PoaAuthority(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Query_PoaAuthority_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).PoaAuthority(ctx, req.(*QueryPoaAuthorityRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Query_ServiceDesc is the grpc.ServiceDesc for Query service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -143,6 +178,10 @@ var Query_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ConsensusPower",
 			Handler:    _Query_ConsensusPower_Handler,
+		},
+		{
+			MethodName: "PoaAuthority",
+			Handler:    _Query_PoaAuthority_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
