@@ -49,3 +49,17 @@ func TestPendingValidatorsQuery(t *testing.T) {
 		require.NotEqual(valAddr, val.OperatorAddress)
 	}
 }
+
+func TestPOAAuthorityQuery(t *testing.T) {
+	f := SetupTest(t, 1_000_000)
+	require := require.New(t)
+
+	currAdmin := f.k.GetAdmin(f.ctx)
+	require.NotEmpty(currAdmin)
+
+	r, err := f.queryServer.PoaAuthority(f.ctx, &poa.QueryPoaAuthorityRequest{})
+	require.NoError(err)
+
+	require.NotEmpty(r.Authority)
+	require.Equal(currAdmin, r.Authority)
+}
