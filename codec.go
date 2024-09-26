@@ -14,6 +14,7 @@ func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	legacy.RegisterAminoMsg(cdc, &MsgSetPower{}, "poa/MsgSetPower")
 	legacy.RegisterAminoMsg(cdc, &MsgCreateValidator{}, "poa/MsgCreateValidator")
 	legacy.RegisterAminoMsg(cdc, &MsgRemoveValidator{}, "poa/MsgRemoveValidator")
+	legacy.RegisterAminoMsg(cdc, &MsgRemovePending{}, "poa/MsgRemovePending")
 	legacy.RegisterAminoMsg(cdc, &MsgUpdateStakingParams{}, "poa/MsgUpdateStakingParams")
 }
 
@@ -23,6 +24,7 @@ func RegisterInterfaces(registry types.InterfaceRegistry) {
 		&MsgSetPower{},
 		&MsgCreateValidator{},
 		&MsgRemoveValidator{},
+		&MsgRemovePending{},
 		&MsgUpdateStakingParams{},
 	)
 
