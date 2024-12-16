@@ -23,6 +23,18 @@ func TestInitGenesis(t *testing.T) {
 		require.NoError(err)
 	})
 
+	t.Run("duplicate validators found in state", func(t *testing.T) {
+		data := &poa.GenesisState{
+			Vals: []poa.Validator{{
+				OperatorAddress: "cosmos1abc",
+			}, {
+				OperatorAddress: "cosmos1abc",
+			}},
+		}
+		err := fixture.k.InitGenesis(fixture.ctx, data)
+		require.Error(err)
+	})
+
 	t.Run("pending validator export", func(t *testing.T) {
 		acc := GenAcc()
 		valAddr := sdk.ValAddress(acc.addr)

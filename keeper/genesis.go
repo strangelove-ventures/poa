@@ -2,12 +2,21 @@ package keeper
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/strangelove-ventures/poa"
 )
 
 // InitGenesis initializes the module's state from a genesis state.
 func (k *Keeper) InitGenesis(ctx context.Context, data *poa.GenesisState) error {
+	found := make(map[string]bool)
+	for _, vals := range data.Vals {
+		if found[vals.OperatorAddress] {
+			return fmt.Errorf("duplicate validator found in genesis state: %s", vals.OperatorAddress)
+		}
+		found[vals.OperatorAddress] = true
+	}
+
 	if err := k.PendingValidators.Set(ctx, poa.Validators{
 		Validators: data.Vals,
 	}); err != nil {
