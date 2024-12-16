@@ -32,6 +32,12 @@ func (k Keeper) AddPendingValidator(ctx context.Context, newVal stakingtypes.Val
 		return err
 	}
 
+	for _, val := range vals.Validators {
+		if val.OperatorAddress == poaVal.OperatorAddress {
+			return poa.ErrValidatorAlreadyPending
+		}
+	}
+
 	vals.Validators = append(vals.Validators, poaVal)
 
 	return k.PendingValidators.Set(ctx, vals)
