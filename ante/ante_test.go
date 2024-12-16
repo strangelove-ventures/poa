@@ -122,6 +122,12 @@ func TestAnteNested(t *testing.T) {
 	ctx := sdk.Context{}
 	ctx = setBlockHeader(ctx, 2)
 
+	t.Run("fail: floor > ceil on create panic", func(t *testing.T) {
+		require.Panics(t, func() {
+			NewCommissionLimitDecorator(true, math.LegacyMustNewDecFromStr("0.50"), math.LegacyMustNewDecFromStr("0.10"))
+		})
+	})
+
 	const invalidRequestErr = "messages contains *types.Any which is not a sdk.MsgRequest"
 	cases := []struct {
 		name      string

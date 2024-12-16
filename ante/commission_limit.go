@@ -24,6 +24,10 @@ type CommissionLimitDecorator struct {
 }
 
 func NewCommissionLimitDecorator(doGenTxRateValidation bool, rateFloor, rateCiel math.LegacyDec) CommissionLimitDecorator {
+	if rateFloor.GT(rateCiel) {
+		panic(fmt.Sprintf("NewCommissionLimitDecorator: rateFloor %v is greater than rateCiel %v", rateFloor, rateCiel))
+	}
+
 	return CommissionLimitDecorator{
 		DoGenTxRateValidation: doGenTxRateValidation,
 		RateFloor:             rateFloor,
