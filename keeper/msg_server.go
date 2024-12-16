@@ -97,34 +97,23 @@ func (ms msgServer) RemoveValidator(ctx context.Context, msg *poa.MsgRemoveValid
 		}
 	}
 
-	vals, err := ms.k.stakingKeeper.GetAllValidators(ctx)
+	valAddr, err := sdk.ValAddressFromBech32(msg.ValidatorAddress)
 	if err != nil {
-		return nil, err
+		return nil, sdkerrors.ErrInvalidAddress.Wrapf("invalid validator address: %s", err)
 	}
 
-	if len(vals) == 1 {
-		return nil, fmt.Errorf("cannot remove the last validator in the set")
-	}
-
-	// Ensure the validator exists and is bonded.
-	found := false
-	for _, val := range vals {
-		if val.OperatorAddress == msg.ValidatorAddress {
-			if !val.IsBonded() {
-				return nil, errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "validator %s is not bonded", msg.ValidatorAddress)
-			}
-
-			found = true
-			break
-		}
-	}
-
-	if !found {
+	val, err := ms.k.stakingKeeper.GetValidator(ctx, valAddr)
+	if err != nil {
+		// validator not found in the set.
 		return nil, errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "validator %s does not exist", msg.ValidatorAddress)
+	}
+	// Validator must exist and be bonded for us to set to remove it from the set
+	if !val.IsBonded() {
+		return nil, errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "validator %s is not bonded", msg.ValidatorAddress)
 	}
 
 	// Remove the validator from the active set with 0 consensus power.
-	val, err := ms.k.SetPOAPower(ctx, msg.ValidatorAddress, 0)
+	val, err = ms.k.SetPOAPower(ctx, msg.ValidatorAddress, 0)
 	if err != nil {
 		return nil, err
 	}
