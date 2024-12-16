@@ -242,5 +242,9 @@ func (ms msgServer) UpdateStakingParams(ctx context.Context, msg *poa.MsgUpdateS
 		MinCommissionRate: msg.Params.MinCommissionRate,
 	}
 
+	if err := stakingParams.Validate(); err != nil {
+		return nil, err
+	}
+
 	return &poa.MsgUpdateStakingParamsResponse{}, ms.k.stakingKeeper.SetParams(ctx, stakingParams)
 }
