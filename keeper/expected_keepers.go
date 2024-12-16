@@ -52,6 +52,7 @@ type StakingKeeper interface {
 	MinCommissionRate(ctx context.Context) (math.LegacyDec, error)
 	GetValidatorByConsAddr(ctx context.Context, consAddr sdk.ConsAddress) (validator stakingtypes.Validator, err error)
 	SetParams(ctx context.Context, params stakingtypes.Params) error
+	GetParams(ctx context.Context) (stakingtypes.Params, error)
 	GetAllDelegations(ctx context.Context) (delegations []stakingtypes.Delegation, err error)
 	BondDenom(ctx context.Context) (string, error)
 	ValidatorAddressCodec() addresscodec.Codec

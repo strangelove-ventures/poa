@@ -233,6 +233,40 @@ func (ms msgServer) UpdateStakingParams(ctx context.Context, msg *poa.MsgUpdateS
 		return nil, poa.ErrNotAnAuthority
 	}
 
+	prevStakingParams, err := ms.k.stakingKeeper.GetParams(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	// https://github.com/liftedinit/cosmos-sdk/blob/a877e3e8048a5acb07a0bff92bd8498cd24d1a01/x/staking/keeper/msg_server.go#L619-L642
+	// when min commission rate is updated, we need to update the commission rate of all validators
+	if !prevStakingParams.MinCommissionRate.Equal(msg.Params.MinCommissionRate) {
+		minRate := msg.Params.MinCommissionRate
+
+		vals, err := ms.k.stakingKeeper.GetAllValidators(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		blockTime := sdk.UnwrapSDKContext(ctx).BlockHeader().Time
+
+		for _, val := range vals {
+			// set the commission rate to min rate
+			if val.Commission.CommissionRates.Rate.LT(minRate) {
+				val.Commission.CommissionRates.Rate = minRate
+				// set the max rate to minRate if it is less than min rate
+				if val.Commission.CommissionRates.MaxRate.LT(minRate) {
+					val.Commission.CommissionRates.MaxRate = minRate
+				}
+
+				val.Commission.UpdateTime = blockTime
+				if err := ms.k.stakingKeeper.SetValidator(ctx, val); err != nil {
+					return nil, fmt.Errorf("failed to set validator after MinCommissionRate param change: %w", err)
+				}
+			}
+		}
+	}
+
 	stakingParams := stakingtypes.Params{
 		UnbondingTime:     msg.Params.UnbondingTime,
 		MaxValidators:     msg.Params.MaxValidators,
