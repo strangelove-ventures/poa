@@ -3,9 +3,11 @@ package keeper_test
 import (
 	"testing"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/strangelove-ventures/poa"
 	"github.com/stretchr/testify/require"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	"github.com/strangelove-ventures/poa"
 )
 
 func TestAddPending(t *testing.T) {
@@ -36,5 +38,5 @@ func TestAddPending(t *testing.T) {
 
 	pending, err := f.k.GetPendingValidators(f.ctx)
 	require.NoError(err)
-	require.Len(pending.Validators, 0)
+	require.Empty(pending.Validators)
 }
