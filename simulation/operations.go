@@ -122,7 +122,7 @@ func SimulateMsgCreateValidator(txGen client.TxConfig, k keeper.Keeper) simtypes
 
 		vals, err := k.PendingValidators.Get(ctx)
 		if err != nil {
-			return simtypes.OperationMsg{}, nil, nil
+			return simtypes.OperationMsg{}, nil, nil // nolint:nilerr
 		}
 		for _, v := range vals.Validators {
 			if v.OperatorAddress == address.String() {
