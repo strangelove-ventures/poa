@@ -1,7 +1,6 @@
 package simulation
 
 import (
-	"fmt"
 	"math"
 	"math/rand"
 	"os"
@@ -126,8 +125,6 @@ func SimulateMsgCreateValidator(txGen client.TxConfig, k keeper.Keeper) simtypes
 		}
 		for _, v := range vals.Validators {
 			if v.OperatorAddress == address.String() {
-				fmt.Println(v.OperatorAddress, address.String())
-				fmt.Println("skipping due to validator already being in PendingValidators")
 				return simtypes.OperationMsg{}, nil, nil
 			}
 		}
