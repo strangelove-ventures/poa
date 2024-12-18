@@ -20,7 +20,7 @@ func TestAddPending(t *testing.T) {
 		"myval",
 		valAddr.String(),
 		val.valKey.PubKey(),
-		int64(1_000_000),
+		1_000_000,
 	))
 
 	// successful add

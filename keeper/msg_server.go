@@ -45,7 +45,7 @@ func (ms msgServer) SetPower(ctx context.Context, msg *poa.MsgSetPower) (*poa.Ms
 	}
 
 	// Sets the new POA power to the validator.
-	if _, err := ms.k.SetPOAPower(ctx, msg.ValidatorAddress, int64(msg.Power)); err != nil {
+	if _, err := ms.k.SetPOAPower(ctx, msg.ValidatorAddress, msg.Power); err != nil {
 		return nil, err
 	}
 

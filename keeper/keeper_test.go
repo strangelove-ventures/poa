@@ -221,7 +221,7 @@ func (f *testFixture) createBaseStakingValidators(t *testing.T, baseValShares in
 			fmt.Sprintf("val-%d", idx),
 			valAddr,
 			pubKey,
-			bondCoin.Amount.Int64(),
+			bondCoin.Amount.Uint64(),
 		))
 
 		if err := f.k.AddPendingValidator(f.ctx, val, pubKey); err != nil {
@@ -277,7 +277,7 @@ func (f *testFixture) createBaseStakingValidators(t *testing.T, baseValShares in
 	}
 }
 
-func CreateNewValidator(moniker string, opAddr string, pubKey cryptotypes.PubKey, amt int64) poa.Validator {
+func CreateNewValidator(moniker string, opAddr string, pubKey cryptotypes.PubKey, amt uint64) poa.Validator {
 	var pkAny *codectypes.Any
 	if pubKey != nil {
 		var err error
@@ -286,13 +286,15 @@ func CreateNewValidator(moniker string, opAddr string, pubKey cryptotypes.PubKey
 		}
 	}
 
+	sdkIntAmt := sdkmath.NewIntFromUint64(amt)
+
 	return poa.Validator{
 		OperatorAddress: opAddr,
 		ConsensusPubkey: pkAny,
 		Jailed:          false,
 		Status:          poa.Bonded,
-		Tokens:          sdkmath.NewInt(amt),
-		DelegatorShares: sdkmath.LegacyNewDecFromInt(sdkmath.NewInt(amt)),
+		Tokens:          sdkIntAmt,
+		DelegatorShares: sdkmath.LegacyNewDecFromInt(sdkIntAmt),
 		Description:     poa.NewDescription(moniker, "", "", "", ""),
 		UnbondingHeight: 0,
 		UnbondingTime:   time.Time{},
@@ -313,7 +315,7 @@ func (f *testFixture) CreatePendingValidator(name string, power uint64) sdk.ValA
 		name,
 		valAddr.String(),
 		val.valKey.PubKey(),
-		int64(power),
+		power,
 	))
 
 	if err := f.k.AddPendingValidator(f.ctx, v, val.valKey.PubKey()); err != nil {

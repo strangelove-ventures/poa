@@ -261,12 +261,12 @@ func TestRemoveValidator(t *testing.T) {
 	require.NoError(err)
 
 	for _, v := range vals {
-		power := 10_000_000
+		var power uint64 = 10_000_000
 
 		_, err = f.msgServer.SetPower(f.ctx, &poa.MsgSetPower{
 			Sender:           f.addrs[0].String(),
 			ValidatorAddress: v.OperatorAddress,
-			Power:            uint64(power),
+			Power:            power,
 			Unsafe:           true,
 		})
 		require.NoError(err)
