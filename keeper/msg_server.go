@@ -45,7 +45,7 @@ func (ms msgServer) SetPower(ctx context.Context, msg *poa.MsgSetPower) (*poa.Ms
 	}
 
 	// Sets the new POA power to the validator.
-	if _, err := ms.k.SetPOAPower(ctx, msg.ValidatorAddress, int64(msg.Power)); err != nil {
+	if _, err := ms.k.SetPOAPower(ctx, msg.ValidatorAddress, msg.Power); err != nil {
 		return nil, err
 	}
 
@@ -97,34 +97,23 @@ func (ms msgServer) RemoveValidator(ctx context.Context, msg *poa.MsgRemoveValid
 		}
 	}
 
-	vals, err := ms.k.stakingKeeper.GetAllValidators(ctx)
+	valAddr, err := sdk.ValAddressFromBech32(msg.ValidatorAddress)
 	if err != nil {
-		return nil, err
+		return nil, sdkerrors.ErrInvalidAddress.Wrapf("invalid validator address: %s", err)
 	}
 
-	if len(vals) == 1 {
-		return nil, fmt.Errorf("cannot remove the last validator in the set")
-	}
-
-	// Ensure the validator exists and is bonded.
-	found := false
-	for _, val := range vals {
-		if val.OperatorAddress == msg.ValidatorAddress {
-			if !val.IsBonded() {
-				return nil, errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "validator %s is not bonded", msg.ValidatorAddress)
-			}
-
-			found = true
-			break
-		}
-	}
-
-	if !found {
+	val, err := ms.k.stakingKeeper.GetValidator(ctx, valAddr)
+	if err != nil {
+		// validator not found in the set.
 		return nil, errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "validator %s does not exist", msg.ValidatorAddress)
+	}
+	// Validator must exist and be bonded for us to set to remove it from the set
+	if !val.IsBonded() {
+		return nil, errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "validator %s is not bonded", msg.ValidatorAddress)
 	}
 
 	// Remove the validator from the active set with 0 consensus power.
-	val, err := ms.k.SetPOAPower(ctx, msg.ValidatorAddress, 0)
+	val, err = ms.k.SetPOAPower(ctx, msg.ValidatorAddress, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -244,6 +233,40 @@ func (ms msgServer) UpdateStakingParams(ctx context.Context, msg *poa.MsgUpdateS
 		return nil, poa.ErrNotAnAuthority
 	}
 
+	prevStakingParams, err := ms.k.stakingKeeper.GetParams(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	// https://github.com/liftedinit/cosmos-sdk/blob/a877e3e8048a5acb07a0bff92bd8498cd24d1a01/x/staking/keeper/msg_server.go#L619-L642
+	// when min commission rate is updated, we need to update the commission rate of all validators
+	if !prevStakingParams.MinCommissionRate.Equal(msg.Params.MinCommissionRate) {
+		minRate := msg.Params.MinCommissionRate
+
+		vals, err := ms.k.stakingKeeper.GetAllValidators(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		blockTime := sdk.UnwrapSDKContext(ctx).BlockHeader().Time
+
+		for _, val := range vals {
+			// set the commission rate to min rate
+			if val.Commission.CommissionRates.Rate.LT(minRate) {
+				val.Commission.CommissionRates.Rate = minRate
+				// set the max rate to minRate if it is less than min rate
+				if val.Commission.CommissionRates.MaxRate.LT(minRate) {
+					val.Commission.CommissionRates.MaxRate = minRate
+				}
+
+				val.Commission.UpdateTime = blockTime
+				if err := ms.k.stakingKeeper.SetValidator(ctx, val); err != nil {
+					return nil, fmt.Errorf("failed to set validator after MinCommissionRate param change: %w", err)
+				}
+			}
+		}
+	}
+
 	stakingParams := stakingtypes.Params{
 		UnbondingTime:     msg.Params.UnbondingTime,
 		MaxValidators:     msg.Params.MaxValidators,
@@ -251,6 +274,10 @@ func (ms msgServer) UpdateStakingParams(ctx context.Context, msg *poa.MsgUpdateS
 		HistoricalEntries: msg.Params.HistoricalEntries,
 		BondDenom:         msg.Params.BondDenom,
 		MinCommissionRate: msg.Params.MinCommissionRate,
+	}
+
+	if err := stakingParams.Validate(); err != nil {
+		return nil, err
 	}
 
 	return &poa.MsgUpdateStakingParamsResponse{}, ms.k.stakingKeeper.SetParams(ctx, stakingParams)

@@ -122,6 +122,12 @@ func TestAnteNested(t *testing.T) {
 	ctx := sdk.Context{}
 	ctx = setBlockHeader(ctx, 2)
 
+	t.Run("fail: floor > ceil on create panic", func(t *testing.T) {
+		require.Panics(t, func() {
+			NewCommissionLimitDecorator(true, math.LegacyMustNewDecFromStr("0.50"), math.LegacyMustNewDecFromStr("0.10"))
+		})
+	})
+
 	const invalidRequestErr = "messages contains *types.Any which is not a sdk.MsgRequest"
 	cases := []struct {
 		name      string
@@ -247,7 +253,7 @@ func TestAnteStakingFilter(t *testing.T) {
 		})
 
 		t.Run(fmt.Sprintf("fail: staking action not allowed after gentx (%s)", k), func(t *testing.T) {
-			for h := uint64(2); h < 10; h++ {
+			for h := int64(2); h < 10; h++ {
 				ctx = setBlockHeader(ctx, h)
 				_, err := sf.AnteHandle(ctx, tx, false, EmptyAnte)
 				require.Error(t, err)
@@ -278,7 +284,7 @@ func TestAnteDisableWithdrawRewards(t *testing.T) {
 		})
 
 		t.Run(fmt.Sprintf("fail: withdraw rewards not allowed after gentx (%s)", k), func(t *testing.T) {
-			for h := uint64(2); h < 10; h++ {
+			for h := int64(2); h < 10; h++ {
 				ctx = setBlockHeader(ctx, h)
 				_, err := dwr.AnteHandle(ctx, tx, false, EmptyAnte)
 				require.Error(t, err)
@@ -287,9 +293,9 @@ func TestAnteDisableWithdrawRewards(t *testing.T) {
 	}
 }
 
-func setBlockHeader(ctx sdk.Context, height uint64) sdk.Context {
+func setBlockHeader(ctx sdk.Context, height int64) sdk.Context {
 	h := ctx.BlockHeader()
-	h.Height = int64(height)
+	h.Height = height
 
 	return ctx.WithBlockHeader(h)
 }

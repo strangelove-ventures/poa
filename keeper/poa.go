@@ -16,9 +16,9 @@ import (
 )
 
 // UpdateValidatorSet updates a validator to their new share and consensus power, then updates the total power of the set.
-func (k Keeper) UpdateValidatorSet(ctx context.Context, newShares, newConsensusPower int64, val stakingtypes.Validator, valAddr sdk.ValAddress) error {
-	newShare := sdkmath.LegacyNewDec(newShares)
-	newShareInt := sdkmath.NewIntFromUint64(uint64(newShares))
+func (k Keeper) UpdateValidatorSet(ctx context.Context, newShares uint64, newConsensusPower int64, val stakingtypes.Validator, valAddr sdk.ValAddress) error {
+	newShareInt := sdkmath.NewIntFromUint64(newShares)
+	newShare := sdkmath.LegacyNewDecFromInt(newShareInt)
 
 	delAddr := sdk.AccAddress(valAddr.Bytes())
 	delegation := stakingtypes.Delegation{
@@ -52,9 +52,10 @@ func (k Keeper) UpdateValidatorSet(ctx context.Context, newShares, newConsensusP
 // - sets a single delegation for POA power
 // - updates the validator with the new shares, single delegation
 // - sets the last validator power to the new value.
-func (k Keeper) SetPOAPower(ctx context.Context, valOpBech32 string, newShares int64) (stakingtypes.Validator, error) {
+func (k Keeper) SetPOAPower(ctx context.Context, valOpBech32 string, newShares uint64) (stakingtypes.Validator, error) {
 	// 1 Consenus Power = 1_000_000 shares by default
-	newBFTConsensusPower := k.stakingKeeper.TokensToConsensusPower(ctx, sdkmath.NewInt(newShares))
+	amt := sdkmath.NewIntFromUint64(newShares)
+	newBFTConsensusPower := k.stakingKeeper.TokensToConsensusPower(ctx, amt)
 
 	valAddr, err := sdk.ValAddressFromBech32(valOpBech32)
 	if err != nil {
@@ -79,7 +80,7 @@ func (k Keeper) SetPOAPower(ctx context.Context, valOpBech32 string, newShares i
 
 	// When we SetValidatorByPowerIndex, the Tokens are used to get the shares of power for CometBFT consensus (voting_power).
 	// We don't `k.stakingKeeper.SetValidator` since we only use this for CometBFT consensus power.
-	val.Tokens = sdkmath.NewIntFromUint64(uint64(newShares))
+	val.Tokens = amt
 
 	// slash all the validator's tokens (100%)
 	if newShares == 0 && currentPower > 0 {

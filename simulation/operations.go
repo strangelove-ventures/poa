@@ -119,6 +119,16 @@ func SimulateMsgCreateValidator(txGen client.TxConfig, k keeper.Keeper) simtypes
 		description := generateRandomDescription(r)
 		commission := generateRandomCommission(r)
 
+		vals, err := k.PendingValidators.Get(ctx)
+		if err != nil {
+			return simtypes.OperationMsg{}, nil, nil // nolint:nilerr
+		}
+		for _, v := range vals.Validators {
+			if v.OperatorAddress == address.String() {
+				return simtypes.OperationMsg{}, nil, nil
+			}
+		}
+
 		msg, err := poatypes.NewMsgCreateValidator(address.String(), simAccount.ConsKey.PubKey(), description, commission, selfDelegation.Amount)
 		if err != nil {
 			return simtypes.NoOpMsg(poatypes.ModuleName, msgType, errors.WithMessage(err, "unable to create MsgCreateValidator").Error()), nil, err

@@ -61,6 +61,52 @@ func TestUpdateStakingParams(t *testing.T) {
 	}
 }
 
+// Verifies that if the minimum commission rate is brought up, all validators with too low of a commission are updated.
+// i.e.:
+// - MinCommission is 0, change is now 1%, all validators below 1% are updated to 1%.
+// - MinCommission is 1%, but now changed back down to 0%. No changes.
+func TestUpdateStakingParamChangeValidatorMinCommission(t *testing.T) {
+	f := SetupTest(t, 2_000_000)
+	require := require.New(t)
+
+	// current staking params
+	sp, err := f.k.GetStakingKeeper().GetParams(f.ctx)
+	require.NoError(err)
+	require.True(sp.MinCommissionRate.Equal(sdkmath.LegacyZeroDec()))
+
+	// verify the validator is at the current minimum commission rate (0%)
+	vals, err := f.stakingKeeper.GetValidators(f.ctx, 1)
+	require.NoError(err)
+	require.True(vals[0].Commission.Rate.Equal(sp.MinCommissionRate))
+
+	// increase the min commission rate to 1%
+	p := poa.DefaultStakingParams()
+	p.MinCommissionRate = sdkmath.LegacyMustNewDecFromStr("0.01")
+	_, err = f.msgServer.UpdateStakingParams(f.ctx, &poa.MsgUpdateStakingParams{
+		Sender: f.authorityAddr,
+		Params: p,
+	})
+	require.NoError(err)
+
+	// valiadte the validator is now at 1% (the new updated mincommission)
+	vals, err = f.stakingKeeper.GetValidators(f.ctx, 1)
+	require.NoError(err)
+	require.True(vals[0].Commission.Rate.Equal(p.MinCommissionRate))
+
+	// set commission rate back to 0
+	p.MinCommissionRate = sdkmath.LegacyZeroDec()
+	_, err = f.msgServer.UpdateStakingParams(f.ctx, &poa.MsgUpdateStakingParams{
+		Sender: f.authorityAddr,
+		Params: p,
+	})
+	require.NoError(err)
+
+	// no updates made to the validator. It is still at 1%.
+	postChangeVals, err := f.stakingKeeper.GetValidators(f.ctx, 1)
+	require.NoError(err)
+	require.NotEqual(postChangeVals[0].Commission.Rate, p.MinCommissionRate)
+}
+
 func TestSetPowerAndCreateValidator(t *testing.T) {
 	f := SetupTest(t, 2_000_000)
 	require := require.New(t)
@@ -215,12 +261,12 @@ func TestRemoveValidator(t *testing.T) {
 	require.NoError(err)
 
 	for _, v := range vals {
-		power := 10_000_000
+		var power uint64 = 10_000_000
 
 		_, err = f.msgServer.SetPower(f.ctx, &poa.MsgSetPower{
 			Sender:           f.addrs[0].String(),
 			ValidatorAddress: v.OperatorAddress,
-			Power:            uint64(power),
+			Power:            power,
 			Unsafe:           true,
 		})
 		require.NoError(err)
