@@ -1,6 +1,7 @@
 package simulation
 
 import (
+	"fmt"
 	"math"
 	"math/rand"
 	"os"
@@ -118,6 +119,18 @@ func SimulateMsgCreateValidator(txGen client.TxConfig, k keeper.Keeper) simtypes
 		selfDelegation := sdk.NewCoin(denom, amount)
 		description := generateRandomDescription(r)
 		commission := generateRandomCommission(r)
+
+		vals, err := k.PendingValidators.Get(ctx)
+		if err != nil {
+			return simtypes.OperationMsg{}, nil, nil
+		}
+		for _, v := range vals.Validators {
+			if v.OperatorAddress == address.String() {
+				fmt.Println(v.OperatorAddress, address.String())
+				fmt.Println("skipping due to validator already being in PendingValidators")
+				return simtypes.OperationMsg{}, nil, nil
+			}
+		}
 
 		msg, err := poatypes.NewMsgCreateValidator(address.String(), simAccount.ConsKey.PubKey(), description, commission, selfDelegation.Amount)
 		if err != nil {
