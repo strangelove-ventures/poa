@@ -9,3 +9,6 @@ ictest-val-add:
 
 ictest-val-remove:
 	go clean -testcache && go test -race -v -run TestPOARemoval .
+
+ictest-poa-to-pos:
+	go clean -testcache && go test -race -v -run TestPoAToPoSUpgrade .

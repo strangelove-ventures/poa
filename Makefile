@@ -35,7 +35,10 @@ ictest-val-add:
 ictest-val-remove:
 	$(MAKE) -C e2e/ ictest-val-remove
 
-.PHONY: test ictest-poa ictest-jail ictest-val-add ictest-val-remove
+ictest-poa-to-pos:
+	$(MAKE) -C e2e/ ictest-poa-to-pos
+
+.PHONY: test ictest-poa ictest-jail ictest-val-add ictest-val-remove ictest-poa-to-pos
 
 COV_ROOT="/tmp/poa-coverage"
 COV_UNIT_E2E="${COV_ROOT}/unit-e2e"
