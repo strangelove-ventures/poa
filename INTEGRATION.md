@@ -267,10 +267,18 @@ Networks using IBC (07-tendermint light client) may break if too many new valida
 PoA safe guards this risk within the module itself by not allowing >33% of the validator set to be changed within a block *(technically you could still bypass this with the unsafe message flag on SetPower)*. This is a security limitation of IBC and how the 07-tendermint light client works, NOT a limit of proof of authority in any way. This could technically happen on any PoS network in the Cosmos ecosystem, but is more likely to happen on a PoA network with a small validator set and low stake.
 
 We recommend you coordinate with either foundation delegations or a phased approach
+
+#### Approach 1 - self delegations
 - validators get tokens
 - PoA is removed but a staking ante block is set so only validators can delegate
 - validators self delegate
 - then the ante staking whitelist is removed and open for all
+
+#### Approach 2 - blocked new validators
+- poa is removed
+- a staking decorator is added to the ante blocking MsgNewValidator creation messages
+- delegations must delegate to the current set.
+- In a future upgrade this block can be removed once the set is in a stable place
 
 This is up to your team to implement and is more operations than technical. It may not be an issue for teams but we do want to call out so you are aware.
 
