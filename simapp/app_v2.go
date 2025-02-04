@@ -46,7 +46,7 @@ import (
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	slashingkeeper "github.com/cosmos/cosmos-sdk/x/slashing/keeper"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
-	poakeeper "github.com/strangelove-ventures/poa/keeper"
+	// poakeeper "github.com/strangelove-ventures/poa/keeper"
 )
 
 var DefaultNodeHome string
@@ -81,7 +81,7 @@ type SimApp struct {
 	NFTKeeper             nftkeeper.Keeper
 	ConsensusParamsKeeper consensusparamkeeper.Keeper
 	CircuitKeeper         circuitkeeper.Keeper
-	POAKeeper             poakeeper.Keeper
+	// POAKeeper             poakeeper.Keeper
 
 	// simulation manager
 	sm *module.SimulationManager
@@ -140,7 +140,7 @@ func NewSimApp(
 		&app.NFTKeeper,
 		&app.ConsensusParamsKeeper,
 		&app.CircuitKeeper,
-		&app.POAKeeper,
+		// &app.POAKeeper,
 	); err != nil {
 		panic(err)
 	}

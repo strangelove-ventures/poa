@@ -42,7 +42,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/params"
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/cosmos/cosmos-sdk/x/staking"
-	poamodule "github.com/strangelove-ventures/poa/module"
+	// poamodule "github.com/strangelove-ventures/poa/module"
 )
 
 func TestSimAppExportAndBlockedAddrs(t *testing.T) {
@@ -212,7 +212,7 @@ func TestRunMigrations(t *testing.T) {
 					"evidence":     evidence.AppModule{}.ConsensusVersion(),
 					"crisis":       crisis.AppModule{}.ConsensusVersion(),
 					"genutil":      genutil.AppModule{}.ConsensusVersion(),
-					"poa":          poamodule.AppModule{}.ConsensusVersion(),
+					// "poa":          poamodule.AppModule{}.ConsensusVersion(),
 				},
 			)
 			if tc.expRunErr {

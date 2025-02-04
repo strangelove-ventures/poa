@@ -50,8 +50,9 @@ import (
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	"github.com/strangelove-ventures/poa"
-	poamodulev1 "github.com/strangelove-ventures/poa/api/module/v1"
+
+	// "github.com/strangelove-ventures/poa"
+	// poamodulev1 "github.com/strangelove-ventures/poa/api/module/v1"
 
 	_ "cosmossdk.io/x/circuit"                      // import for side-effects
 	_ "cosmossdk.io/x/evidence"                     // import for side-effects
@@ -71,7 +72,7 @@ import (
 	_ "github.com/cosmos/cosmos-sdk/x/params"       // import for side-effects
 	_ "github.com/cosmos/cosmos-sdk/x/slashing"     // import for side-effects
 	_ "github.com/cosmos/cosmos-sdk/x/staking"      // import for side-effects
-	_ "github.com/strangelove-ventures/poa/module"  // import for side-effects
+	// _ "github.com/strangelove-ventures/poa/module"  // import for side-effects
 )
 
 var (
@@ -117,7 +118,7 @@ var (
 						distrtypes.ModuleName,
 						slashingtypes.ModuleName,
 						evidencetypes.ModuleName,
-						poa.ModuleName,
+						// poa.ModuleName,
 						stakingtypes.ModuleName,
 						genutiltypes.ModuleName,
 						authz.ModuleName,
@@ -125,7 +126,7 @@ var (
 					EndBlockers: []string{
 						crisistypes.ModuleName,
 						govtypes.ModuleName,
-						poa.ModuleName,
+						// poa.ModuleName,
 						stakingtypes.ModuleName,
 						genutiltypes.ModuleName,
 						feegrant.ModuleName,
@@ -160,7 +161,7 @@ var (
 						vestingtypes.ModuleName,
 						consensustypes.ModuleName,
 						circuittypes.ModuleName,
-						poa.ModuleName,
+						// poa.ModuleName,
 					},
 					// When ExportGenesis is not specified, the export genesis module order
 					// is equal to the init genesis order
@@ -262,10 +263,10 @@ var (
 				Name:   circuittypes.ModuleName,
 				Config: appconfig.WrapAny(&circuitmodulev1.Module{}),
 			},
-			{
-				Name:   poa.ModuleName,
-				Config: appconfig.WrapAny(&poamodulev1.Module{}),
-			},
+			// {
+			// 	Name:   poa.ModuleName,
+			// 	Config: appconfig.WrapAny(&poamodulev1.Module{}),
+			// },
 		},
 	}),
 		depinject.Supply(

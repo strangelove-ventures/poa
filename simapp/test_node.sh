@@ -2,6 +2,8 @@
 #
 # Example:
 : '
+make install
+make local-image && docker image tag poa:local poa-removed:local && docker image save poa-removed:local > poa-removed.tar
 cd simapp
 BINARY="poad" CHAIN_ID="poa-1" HOME_DIR="$HOME/.poad" TIMEOUT_COMMIT="1200ms" CLEAN=true sh test_node.sh
 

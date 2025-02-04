@@ -3,13 +3,10 @@ package simapp
 import (
 	"errors"
 
-	"cosmossdk.io/math"
 	circuitante "cosmossdk.io/x/circuit/ante"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
-
-	poaante "github.com/strangelove-ventures/poa/ante"
 )
 
 // HandlerOptions are the options required for constructing a default SDK AnteHandler.
@@ -34,11 +31,11 @@ func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 		return nil, errors.New("sign mode handler is required for ante builder")
 	}
 
-	doGenTxRateValidation := false
+	// doGenTxRateValidation := false
 
-	// example floor and ceiling for commission rate (poa.NewMsgCommissionLimiterDecorator)
-	rateFloor := math.LegacyMustNewDecFromStr("0.10")
-	rateCeil := math.LegacyMustNewDecFromStr("0.50")
+	// // example floor and ceiling for commission rate (poa.NewMsgCommissionLimiterDecorator)
+	// rateFloor := math.LegacyMustNewDecFromStr("0.10")
+	// rateCeil := math.LegacyMustNewDecFromStr("0.50")
 
 	anteDecorators := []sdk.AnteDecorator{
 		ante.NewSetUpContextDecorator(), // outermost AnteDecorator. SetUpContext must be called first
@@ -54,9 +51,9 @@ func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 		ante.NewSigGasConsumeDecorator(options.AccountKeeper, options.SigGasConsumer),
 		ante.NewSigVerificationDecorator(options.AccountKeeper, options.SignModeHandler),
 		ante.NewIncrementSequenceDecorator(options.AccountKeeper),
-		poaante.NewPOADisableStakingDecorator(),
-		poaante.NewPOADisableWithdrawDelegatorRewards(),
-		poaante.NewCommissionLimitDecorator(doGenTxRateValidation, rateFloor, rateCeil),
+		// poaante.NewPOADisableStakingDecorator(),
+		// poaante.NewPOADisableWithdrawDelegatorRewards(),
+		// poaante.NewCommissionLimitDecorator(doGenTxRateValidation, rateFloor, rateCeil),
 	}
 
 	return sdk.ChainAnteDecorators(anteDecorators...), nil

@@ -14,7 +14,7 @@ replace (
 
 	// breaks SDK app.toml parsing in ictest.
 	github.com/spf13/viper => github.com/spf13/viper v1.17.0
-	github.com/strangelove-ventures/poa => ../.
+	// github.com/strangelove-ventures/poa => ../.
 
 	// replace broken goleveldb
 	github.com/syndtr/goleveldb => github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7
@@ -45,7 +45,7 @@ require (
 	github.com/spf13/cobra v1.8.0
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/spf13/viper v1.18.2
-	github.com/strangelove-ventures/poa v0.0.0-00010101000000-000000000000
+	// github.com/strangelove-ventures/poa v0.0.0-00010101000000-000000000000
 	github.com/stretchr/testify v1.9.0
 	google.golang.org/protobuf v1.34.1 // indirect
 )

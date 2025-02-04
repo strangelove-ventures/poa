@@ -105,11 +105,10 @@ import (
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/cosmos/gogoproto/proto"
 	"github.com/spf13/cast"
-
-	"github.com/strangelove-ventures/poa"
-	poatypes "github.com/strangelove-ventures/poa"
-	poakeeper "github.com/strangelove-ventures/poa/keeper"
-	poamodule "github.com/strangelove-ventures/poa/module"
+	// "github.com/strangelove-ventures/poa"
+	// poatypes "github.com/strangelove-ventures/poa"
+	// poakeeper "github.com/strangelove-ventures/poa/keeper"
+	// poamodule "github.com/strangelove-ventures/poa/module"
 )
 
 const appName = "SimApp"
@@ -169,7 +168,7 @@ type SimApp struct {
 	NFTKeeper             nftkeeper.Keeper
 	ConsensusParamsKeeper consensusparamkeeper.Keeper
 	CircuitKeeper         circuitkeeper.Keeper
-	POAKeeper             poakeeper.Keeper
+	// POAKeeper             poakeeper.Keeper
 
 	// the module manager
 	ModuleManager      *module.Manager
@@ -262,7 +261,7 @@ func NewSimApp(
 		minttypes.StoreKey, distrtypes.StoreKey, slashingtypes.StoreKey,
 		govtypes.StoreKey, paramstypes.StoreKey, consensusparamtypes.StoreKey, upgradetypes.StoreKey, feegrant.StoreKey,
 		evidencetypes.StoreKey, circuittypes.StoreKey,
-		authzkeeper.StoreKey, nftkeeper.StoreKey, group.StoreKey, poa.StoreKey,
+		authzkeeper.StoreKey, nftkeeper.StoreKey, group.StoreKey,
 	)
 
 	// register streaming services
@@ -316,16 +315,16 @@ func NewSimApp(
 	app.FeeGrantKeeper = feegrantkeeper.NewKeeper(appCodec, runtime.NewKVStoreService(keys[feegrant.StoreKey]), app.AccountKeeper)
 
 	// POA Module
-	app.POAKeeper = poakeeper.NewKeeper(
-		appCodec,
-		runtime.NewKVStoreService(keys[poatypes.StoreKey]),
-		app.StakingKeeper,
-		app.SlashingKeeper,
-		app.BankKeeper,
-		logger,
-		govModAddress,
-	)
-	app.POAKeeper.SetTestAccountKeeper(app.AccountKeeper)
+	// app.POAKeeper = poakeeper.NewKeeper(
+	// 	appCodec,
+	// 	runtime.NewKVStoreService(keys[poatypes.StoreKey]),
+	// 	app.StakingKeeper,
+	// 	app.SlashingKeeper,
+	// 	app.BankKeeper,
+	// 	logger,
+	// 	govModAddress,
+	// )
+	// app.POAKeeper.SetTestAccountKeeper(app.AccountKeeper)
 
 	// register the staking hooks
 	// NOTE: stakingKeeper above is passed by reference, so that it will contain these hooks
@@ -423,7 +422,7 @@ func NewSimApp(
 		nftmodule.NewAppModule(appCodec, app.NFTKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
 		consensus.NewAppModule(appCodec, app.ConsensusParamsKeeper),
 		circuit.NewAppModule(appCodec, app.CircuitKeeper),
-		poamodule.NewAppModule(appCodec, app.POAKeeper),
+		// poamodule.NewAppModule(appCodec, app.POAKeeper),
 	)
 
 	// BasicModuleManager defines the module BasicManager is in charge of setting up basic,
@@ -457,7 +456,7 @@ func NewSimApp(
 		distrtypes.ModuleName,
 		slashingtypes.ModuleName,
 		evidencetypes.ModuleName,
-		poa.ModuleName, // before staking
+		// poa.ModuleName, // before staking
 		stakingtypes.ModuleName,
 		genutiltypes.ModuleName,
 		authz.ModuleName,
@@ -465,7 +464,7 @@ func NewSimApp(
 	app.ModuleManager.SetOrderEndBlockers(
 		crisistypes.ModuleName,
 		govtypes.ModuleName,
-		poa.ModuleName, // before staking
+		// poa.ModuleName, // before staking
 		stakingtypes.ModuleName,
 		genutiltypes.ModuleName,
 		feegrant.ModuleName,
@@ -480,7 +479,7 @@ func NewSimApp(
 		distrtypes.ModuleName, stakingtypes.ModuleName, slashingtypes.ModuleName, govtypes.ModuleName,
 		minttypes.ModuleName, crisistypes.ModuleName, genutiltypes.ModuleName, evidencetypes.ModuleName, authz.ModuleName,
 		feegrant.ModuleName, nft.ModuleName, group.ModuleName, paramstypes.ModuleName, upgradetypes.ModuleName,
-		vestingtypes.ModuleName, consensusparamtypes.ModuleName, circuittypes.ModuleName, poa.ModuleName,
+		vestingtypes.ModuleName, consensusparamtypes.ModuleName, circuittypes.ModuleName, // poa.ModuleName,
 	}
 	app.ModuleManager.SetOrderInitGenesis(genesisModuleOrder...)
 	app.ModuleManager.SetOrderExportGenesis(genesisModuleOrder...)
@@ -799,7 +798,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(slashingtypes.ModuleName)
 	paramsKeeper.Subspace(govtypes.ModuleName)
 	paramsKeeper.Subspace(crisistypes.ModuleName)
-	paramsKeeper.Subspace(poa.ModuleName)
+	// paramsKeeper.Subspace(poa.ModuleName)
 
 	return paramsKeeper
 }
