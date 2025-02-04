@@ -1,0 +1,20 @@
+{
+ "messages": [
+  {
+   "@type": "/cosmos.upgrade.v1beta1.MsgSoftwareUpgrade",
+   "authority": "cosmos10d07y265gmmuvt4z0w9aw880jnsr700j6zn9kn",
+   "plan": {
+    "name": "v2-remove-poa",
+    "time": "0001-01-01T00:00:00Z",
+    "height": "7",
+    "info": "",
+    "upgraded_client_state": null
+   }
+  }
+ ],
+ "metadata": "ipfs://CID",
+ "deposit": "10000001stake",
+ "title": "upgrade",
+ "summary": "summary",
+ "expedited": false
+}
