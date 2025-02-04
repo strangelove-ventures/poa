@@ -9,7 +9,7 @@
 
 
 
-The Proof of Authority (PoA) module allows for permissioned networks to be controlled by a predefined set of validators to verify transactions. This implementation extends the Cosmos-SDK's x/staking module to a set of administrators over the chain. These administrators gate keep the chain by whitelisting validators, updating consensus power, and removing validators from the network.
+The Proof of Authority (PoA) module allows for permissioned networks to be controlled by a predefined set of validators to verify transactions. This implementation extends the Cosmos-SDK's x/staking module to a set of administrators over the chain. These administrators gate keep the chain by whitelisting validators, updating consensus power, and removing validators from the network. Networks can then easily transition to a standard Proof of Stake (PoS) module [with a simple upgrade](./INTEGRATION.md#migrating-to-pos-from-poa).
 
 ## Security
 
@@ -28,13 +28,17 @@ The default POA administrator is set to the `x/gov` module address. One can chan
 ```bash
 # Override the default PoA admin address
 POA_ADMIN_ADDRESS="cosmos1hj5fveer5cjtn4wd6wstzugjfdxzl0xpxvjjvr" poad start
-````
+```
+
+## Migration
+
+You can migrate from the PoA module to the standard x/staking module by following the [migration guide](./INTEGRATION.md#migrating-to-pos-from-poa). **READ** the risk that are involved with this migration if your network has live IBC (07-tendermint) connections.
 
 ## Configuration
 
 After integrating the PoA module into your chain, read the [network considerations](./INTEGRATION.md#network-considerations) before launching the network.
 
-This includes: parameters, full module control, migrating from PoA->PoS, and other useful information.
+This includes: parameters, full module control, and other useful information.
 
 ## Concepts
 
@@ -68,9 +72,9 @@ For better UX, this is accomplished by wrapping the x/staking module's `create-v
 
 **Flow**:
 - Validator previous block set power is 9 (3 validators @ 3 power)
-- The admin increases validator[0] to 4 power (+11%)
-- The admin increases validator[1] to 4 power (+22%)
-- The admin increases validator[2] to 4 power (+33%, error)
+- The admin increases `validator[0]` to 4 power (+11%)
+- The admin increases `validator[1]` to 4 power (+22%)
+- The admin increases `validator[2]` to 4 power (+33%, error)
 
 The `AbsoluteChangedPower` of +1 to each validator is 3, which is 33% of the previous block power (3/9). It can be bypassed with the use of the `--unsafe` flag in the CLI command.
 

@@ -2,6 +2,7 @@
 #
 # Example:
 : '
+make install
 cd simapp
 BINARY="poad" CHAIN_ID="poa-1" HOME_DIR="$HOME/.poad" TIMEOUT_COMMIT="1200ms" CLEAN=true sh test_node.sh
 

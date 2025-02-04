@@ -5,6 +5,7 @@
 * [Example integration of the PoA Module](#example-integration-of-the-poa-module)
     * [Ante Handler Setup](#ante-handler-integration)
 * [Network Considerations](#network-considerations)
+* [PoA to PoS Migration](#migrating-to-pos-from-poa)
 
 # Introduction
 
@@ -133,7 +134,7 @@ func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 
 ### [Disable Withdraw Delegation Rewards](./ante/disable_withdraw_delegator_rewards.go)
 
-This decorator blocks the `MsgWithdrawDelegatorReward` message from the CosmosSDK `x/distribution` module. The decorator acts as a preventive measure against a crash caused by an interaction between the POA module and the CosmosSDK `x/distribution` module. 
+This decorator blocks the `MsgWithdrawDelegatorReward` message from the CosmosSDK `x/distribution` module. The decorator acts as a preventive measure against a crash caused by an interaction between the POA module and the CosmosSDK `x/distribution` module.
 
 While the crash has a low probability of occurring in the wild, it is a critical issue that can cause the chain to halt.
 
@@ -253,8 +254,37 @@ If you want a module's control not to be based on governance (e.g. x/upgrade for
 
 ## Migrating to PoS from PoA
 
-A future optional upgrade will grant PoA networks the ability to migrate to PoS (Proof-of-Stake).
+You can perform an upgrade to transition from this PoA module on your network, to the Cosmos SDK's native staking module with delegators. [poa_to_pos_test e2e](./e2e/poa_to_pos_test.go).
 
-Reasons this may be desired:
+### Desired Reasons
 - The chain product has been successful and the network is ready to be decentralized.
 - There is a new token use case that requires a PoS network for user delegations (ex: sharing platform rewards with stakers).
+
+### Risk
+
+Networks using IBC (07-tendermint light client) may break if too many new validators enter the set within the trusting period. This would require IBC clients be updated on counterparty chains with the 'new' validator set.
+
+PoA safe guards this risk within the module itself by not allowing >33% of the validator set to be changed within a block *(technically you could still bypass this with the unsafe message flag on SetPower)*. This is a security limitation of IBC and how the 07-tendermint light client works, NOT a limit of proof of authority in any way. This could technically happen on any PoS network in the Cosmos ecosystem, but is more likely to happen on a PoA network with a small validator set and low stake.
+
+We recommend you coordinate with either foundation delegations or a phased approach
+
+#### Approach 1 - self delegations
+- validators get tokens
+- PoA is removed but a staking ante block is set so only validators can delegate
+- validators self delegate
+- then the ante staking whitelist is removed and open for all
+
+#### Approach 2 - blocked new validators
+- poa is removed
+- a staking decorator is added to the ante blocking MsgNewValidator creation messages
+- delegations must delegate to the current set.
+- In a future upgrade this block can be removed once the set is in a stable place
+
+This is up to your team to implement and is more operations than technical. It may not be an issue for teams but we do want to call out so you are aware.
+
+### How to Upgrade
+- Remove all references to the poa module in your application
+- Any modules using the poa.ModuleName as the authority should be changed to something like govtypes.ModuleName (app.go)
+- Create a NoOp upgrade handler that does a Store removal of the "poa" key namespace. ([example, PR #240](https://github.com/strangelove-ventures/poa/pull/240))
+
+
