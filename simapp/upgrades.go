@@ -10,7 +10,7 @@ import (
 )
 
 // UpgradeName defines the on-chain upgrade name for the sample SimApp upgrade.
-const UpgradeName = "v2-zremove-poa"
+const UpgradeName = "v2-remove-poa"
 
 func (app SimApp) RegisterUpgradeHandlers() {
 	app.UpgradeKeeper.SetUpgradeHandler(
