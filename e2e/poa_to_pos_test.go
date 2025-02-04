@@ -26,23 +26,22 @@ const (
 	chainName   = "poa"
 	upgradeName = "v2-remove-poa"
 
+	// off of a simapp that does not have PoA code in it:
+	// make local-image && docker image tag poa:local ghcr.io/reecepbcups/poa:bare-pos-feb-4-2025 && docker push
+	upgradeRepo, upgradeVersion = "ghcr.io/reecepbcups/poa", "bare-pos-feb-4-2025"
+
 	haltHeightDelta    = int64(9) // will propose upgrade this many blocks in the future
 	blocksAfterUpgrade = int64(3)
 )
 
 func TestPoAToPoSUpgrade(t *testing.T) {
-	// repo, version := GetDockerImageInfo()
-	CosmosChainUpgradeTest(t, chainName, POAImage.Version, POAImage.Repository)
-}
-
-func CosmosChainUpgradeTest(t *testing.T, chainName, upgradeBranchVersion, upgradeRepo string) {
 	if testing.Short() {
 		t.Skip("skipping in short mode")
 	}
 
 	t.Parallel()
 
-	t.Log(chainName, upgradeBranchVersion, upgradeRepo, upgradeName)
+	t.Log(chainName, POAImage.Repository, POAImage.Version, upgradeName)
 
 	numVals, numNodes := 4, 0
 	cfg := POACfg
@@ -87,15 +86,14 @@ func CosmosChainUpgradeTest(t *testing.T, chainName, upgradeBranchVersion, upgra
 	// this should timeout due to chain halt at upgrade height.
 	_ = testutil.WaitForBlocks(timeoutCtx, int(haltHeight-height)+1, chain)
 
-	// // bring down nodes to prepare for upgrade
+	// bring down nodes to prepare for upgrade
 	err = chain.StopAllNodes(ctx)
 	require.NoError(t, err, "error stopping node(s)")
 
 	// upgrade version on all nodes
-	chain.UpgradeVersion(ctx, client, "poa-removed", "local") // TODO: push to GHCR?
+	chain.UpgradeVersion(ctx, client, upgradeRepo, upgradeVersion)
 
-	// start all nodes back up.
-	// validators reach consensus on first block after upgrade height
+	// start all nodes back up. validators reach consensus on first block after upgrade height
 	// and chain block production resumes.
 	err = chain.StartAllNodes(ctx)
 	require.NoError(t, err, "error starting upgraded node(s)")
@@ -106,6 +104,10 @@ func CosmosChainUpgradeTest(t *testing.T, chainName, upgradeBranchVersion, upgra
 	err = testutil.WaitForBlocks(timeoutCtx, int(blocksAfterUpgrade), chain)
 	require.NoError(t, err, "chain did not produce blocks after upgrade")
 
+	verifyStakingFunctions(t, ctx, chain)
+}
+
+func verifyStakingFunctions(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain) {
 	vals, err := chain.StakingQueryValidators(ctx, stakingttypes.BondStatusBonded)
 	require.NoError(t, err, "error querying validators")
 
@@ -113,20 +115,17 @@ func CosmosChainUpgradeTest(t *testing.T, chainName, upgradeBranchVersion, upgra
 
 	val, err := chain.StakingQueryValidator(ctx, validator.OperatorAddress)
 	require.NoError(t, err, "error querying validator")
-	t.Logf("validator: %s", val)
-
 	before := val.Tokens
+	t.Logf("before validator: %s", val)
 
-	// TODO: confirm staking works here by staking to a validator
 	err = chain.GetNode().StakingDelegate(ctx, "validator", validator.OperatorAddress, "7000000"+chain.Config().Denom)
 	require.NoError(t, err, "error delegating to validator")
 
 	val, err = chain.StakingQueryValidator(ctx, validator.OperatorAddress)
 	require.NoError(t, err, "error querying validator")
-	t.Logf("validator: %s", val)
+	t.Logf("after validator: %s", val)
 
 	after := val.Tokens
-
 	require.True(t, after.GT(before), "after tokens is not greater than before")
 }
 

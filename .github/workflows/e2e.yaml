@@ -55,7 +55,7 @@ jobs:
           - "ictest-jail"
           - "ictest-val-add"
           - "ictest-val-remove"
-          - "ictest-poa-to-pos" # TODO: load poa-removed.tar as well
+          - "ictest-poa-to-pos"
       fail-fast: false
 
     steps:
