@@ -32,7 +32,7 @@ POA_ADMIN_ADDRESS="cosmos1hj5fveer5cjtn4wd6wstzugjfdxzl0xpxvjjvr" poad start
 
 ## Migration
 
-You can migrate from the PoA module to the standard x/staking module by following the [migration guide](./INTEGRATION.md#migrating-to-pos-from-poa). **READ** the risk that are involved with this migration if your network has live IBC (07-tendermint) connections.
+You can migrate from the PoA module to the standard x/staking module by following the [migration guide](./INTEGRATION.md#migrating-to-pos-from-poa). **READ** the risks that are involved with this migration if your network has live IBC (07-tendermint) connections.
 
 ## Configuration
 
@@ -160,7 +160,7 @@ The `AbsoluteChangedPower` of +1 to each validator is 3, which is 33% of the pre
 
 As the PoA logic is dependent on the x/staking module, the PoA module must be run before the x/staking modules `BeginBlock` logic. This is described in the [integration guide](./INTEGRATION.md).
 
-When removing validators, the validator can not be instantly removed from the set and it required a few intermediate blocks.
+When removing validators, the validator can not be instantly removed from the set and it requires a few intermediate blocks.
 
 **Flow**
 
