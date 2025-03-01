@@ -164,7 +164,7 @@ Depending on the chain use case, it may be desired to limit the commission rate 
 - `rateFloor`: The minimum commission rate allowed. *(note: this must be higher than the StakingParams MinCommissionRate)*
 - `rateCeil`: The maximum commission rate allowed.
 
-if both rateFloor and rateCiel are set to the same value, then the commission rate is forced to that value.
+if both rateFloor and rateCeil are set to the same value, then the commission rate is forced to that value.
 
 ```go
 import (
