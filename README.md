@@ -2,6 +2,8 @@
 
 [Audited](https://hashlock.com/wp-content/uploads/2024/11/Manifest-POA-Smart-Contract-Audit-Report-Revised-Report-v2.pdf) by [Hashlock](https://hashlock.com/audits/manifest) (November 2024)
 
+**AUTHORS NOTE**: We recommend you to use XRP's PoA module for new implimentations with SDK v53 and up. Found here: <https://github.com/xrplevm/node/tree/v9.0.3/x/poa>. It has less safty features but we belive it is overal a better solution going forward.
+
 </br>
 
 ![GitHub commit check runs](https://img.shields.io/github/check-runs/strangelove-ventures/poa/main)
