@@ -19,7 +19,7 @@ replace (
 )
 
 require (
-	cosmossdk.io/math v1.3.0
+	cosmossdk.io/math v1.4.0
 	github.com/cosmos/cosmos-sdk v0.50.8
 	github.com/rs/zerolog v1.32.0
 	github.com/strangelove-ventures/interchaintest/v8 v8.2.1-0.20240405204947-1c05790eb2d8
