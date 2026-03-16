@@ -12,3 +12,6 @@ ictest-poa-to-pos:
 
 ictest-val-remove:
 	go clean -testcache && go test -race -v -run TestPOARemoval .
+
+ictest-val-remove-add:
+	go clean -testcache && go test -race -v -run TestPOARemoveAdd .

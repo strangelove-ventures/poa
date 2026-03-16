@@ -55,6 +55,7 @@ jobs:
           - "ictest-jail"
           - "ictest-val-add"
           - "ictest-val-remove"
+          - "ictest-val-remove-add"
           - "ictest-poa-to-pos"
       fail-fast: false
 

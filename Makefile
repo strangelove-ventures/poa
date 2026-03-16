@@ -35,6 +35,9 @@ ictest-val-add:
 ictest-val-remove:
 	$(MAKE) -C e2e/ ictest-val-remove
 
+ictest-val-remove-add:
+	$(MAKE) -C e2e/ ictest-val-remove-add
+
 ictest-poa-to-pos:
 	$(MAKE) -C e2e/ ictest-poa-to-pos
 
